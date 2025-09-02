@@ -1,0 +1,187 @@
+/* ServicesOverview.css */
+
+.services-overview {
+  min-height: fit-content;
+  cursor: default;
+  display: flex;
+  justify-content: center;
+  margin: 60px 0;
+}
+
+.services-container {
+  width: 100%;
+}
+
+.services-grid {
+  gap: 20px;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.service-card {
+  flex: 1;
+  background: white;
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 2px solid #dde3f8;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.service-card:hover {
+  transition: 300ms;
+  background-color: #e8efff66;
+}
+
+.service-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #fef3c7, #f59e0b);
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.service-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+.service-description {
+  color: #797979;
+  line-height: 1.7;
+  font-size: 1rem;
+  margin: 0;
+  flex-grow: 1;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 1440px) {
+  .services-grid {
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .service-icon {
+    font-size: 3rem;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 2rem;
+  }
+
+  .service-title {
+    font-size: 18px;
+    margin-bottom: 1.5rem;
+  }
+
+  .service-description {
+    font-size: 16px;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) and (max-width: 1279px) {
+  .service-icon {
+    width: 90px;
+    height: 90px;
+    font-size: 2.75rem;
+  }
+
+  .service-title {
+    font-size: 16px;
+  }
+
+  .service-description {
+    font-size: 14px;
+  }
+}
+
+/* Mobile fine-tuning */
+@media (max-width: 480px) {
+  .service-icon {
+    width: 70px;
+    height: 70px;
+    font-size: 2.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .service-title {
+    font-size: 1.375rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .service-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+
+/* Focus states for accessibility */
+.service-card:focus-within {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .service-card {
+    border: 2px solid #000;
+    box-shadow: none;
+  }
+
+  .service-card:hover {
+    box-shadow: none;
+    border-color: #0066cc;
+  }
+
+  .service-title {
+    color: #000;
+  }
+
+  .service-description {
+    color: #333;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .service-card {
+    transition: none;
+  }
+
+  .service-card:hover {
+    transform: none;
+  }
+}
