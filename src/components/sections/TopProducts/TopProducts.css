@@ -1,0 +1,30 @@
+.top-products-section {
+  display: flex;
+  justify-content: center;
+  margin: 60px 0;
+}
+
+.section-title {
+  cursor: default;
+  font-size: 32px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 40px;
+  color: #152147;
+}
+
+.top-prods-heding-wrapper {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #dde3f8;
+}
+
+.top-prods-heding-wrapper a {
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
+  color: #43579c;
+  font-weight: 600;
+}
