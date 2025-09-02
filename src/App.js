@@ -6,6 +6,7 @@ import TopProducts from "./components/sections/TopProducts/TopProducts";
 import AboutUs from "./components/sections/AboutUs/AboutUs";
 import Variety from "./components/sections/Variety/Variety";
 import ServicesOverview from "./components/sections/ServicesOverview/ServicesOverview";
+import Footer from "./components/Footer/Footer";
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
         <Variety />
         <ServicesOverview />
       </main>
+      <Footer />
+      <footer></footer>
     </div>
   );
 }
