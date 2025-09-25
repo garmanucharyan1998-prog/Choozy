@@ -81,7 +81,7 @@
   .grid-container {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 колонки */
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
     grid-template-rows: unset;
     grid-auto-rows: auto;
     gap: 20px;
@@ -168,14 +168,7 @@
 @media (max-width: 768px) {
   .grid-catalog,
   .grid-container {
-    overflow-x: scroll;
-    /* overflow: auto; */
-    /* width: 100%; */
-    /* display: grid; */
-    grid-template-columns: 1fr;
-    /* grid-template-rows: unset; */
-    /* grid-auto-rows: auto; */
-    /* gap: 12px; */
+    grid-auto-rows: auto;
   }
 
   .catalog-card {

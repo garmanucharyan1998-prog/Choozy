@@ -8,7 +8,7 @@ export const searchProducts = async (query, options = {}) => {
     return {
       success: true,
       data: [],
-      message: 'Введите поисковый запрос'
+      message: 'Enter search query'
     };
   }
 
@@ -71,8 +71,8 @@ export const searchProducts = async (query, options = {}) => {
     total: filteredResults.length,
     query: searchQuery,
     message: filteredResults.length > 0 
-      ? `Найдено ${filteredResults.length} результатов` 
-      : 'Ничего не найдено'
+      ? `Found ${filteredResults.length} results` 
+      : 'Nothing found'
   };
 };
 
@@ -155,7 +155,7 @@ export const getProductById = async (id) => {
   if (!product) {
     return {
       success: false,
-      message: 'Продукт не найден'
+      message: 'Product not found'
     };
   }
 
