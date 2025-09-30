@@ -130,7 +130,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #F2F4F9;
+  background: #f2f4f9;
   border: 1px solid #dce3ff;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -255,6 +255,10 @@
 }
 
 @media (max-width: 1440px) {
+  .header {
+    padding: 20px 50px;
+  }
+
   .header-btn-text {
     display: none;
   }
@@ -333,8 +337,6 @@
     justify-content: center;
   }
 
-
-
   .search-input {
     padding: 12px;
   }
@@ -355,7 +357,7 @@
   .clear-btn {
     margin-right: 20px;
   }
-  
+
   .header {
     padding: 20px 20px;
   }
@@ -380,7 +382,7 @@
     height: auto;
   }
 
-  .header-container{
+  .header-container {
     flex-wrap: wrap;
   }
 
@@ -391,4 +393,3 @@
     margin-left: unset;
   }
 }
-

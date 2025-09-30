@@ -1,30 +1,45 @@
 .top-products-section {
   display: flex;
   justify-content: center;
-  margin: 60px 0;
-}
-
-.section-title {
-  cursor: default;
-  font-size: 32px;
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 40px;
-  color: #152147;
+  margin: 80px 0;
+  padding: 40px 0;
+  background-color: #ffffff;
 }
 
 .top-prods-heding-wrapper {
   display: flex;
   align-items: center;
-  text-align: center;
   justify-content: space-between;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
   border-bottom: 2px solid #dde3f8;
 }
 
 .top-prods-heding-wrapper a {
   cursor: pointer;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 16px;
   color: #43579c;
   font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.top-prods-heding-wrapper a:hover {
+  background-color: #f0f4ff;
+  color: #152147;
+}
+
+@media (max-width: 1024px) {
+  .top-products-section {
+    margin: 40px 0;
+    padding: 20px 0;
+  }
+  
+  .top-prods-heding-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
 }

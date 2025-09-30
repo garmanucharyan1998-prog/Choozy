@@ -1,19 +1,36 @@
 .App {
   text-align: center;
   min-width: 360px;
+  background-color: #ffffff;
 }
 
 .App main {
   padding: 0 100px;
+  background-color: #ffffff;
 }
 
 .cont-width-default {
   width: 100%;
   max-width: 1800px;
+  margin: 0 auto;
 }
 
 .flex {
   display: flex;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #152147;
+  margin: 0;
+  text-align: left;
+}
+
+@media (max-width: 1440px) {
+  .App main {
+    padding: 0 50px;
+  }
 }
 
 @media (max-width: 1024px) {
@@ -24,6 +41,6 @@
 
 @media (max-width: 768px) {
   .App main {
-    padding: 0 25px;
+    padding: 0 15px;
   }
 }
