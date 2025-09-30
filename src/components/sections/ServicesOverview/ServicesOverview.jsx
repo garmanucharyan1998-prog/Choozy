@@ -1,24 +1,27 @@
 import "./ServicesOverview.css";
+import cartIcon from "../../../assets/icons/cart.svg";
+import settingsIcon from "../../../assets/icons/settings.svg";
+import shareIcon from "../../../assets/icons/shareBlank.svg";
 
 const ServicesOverview = () => {
   const services = [
     {
       id: "ai-powered-search",
-      iconPath: "assets/images/ServicesOverview/cart.svg",
+      icon: cartIcon,
       title: "Ամեն ինչ մեկ վայրում",
       description:
         "Choosy-ն նախատեսված է ինտերնետ-խանութներում ապրանքների որոնման և գների համեմատության համար։ Այն ընդգրկում է ամենատարբեր ապրանքների կատեգորիաներ՝ էլեկտրոնիկա, համակարգիչներ, կենցաղային տեխնիկա, ավտոմասեր, վերանորոգման և շինարարական սարքավորումներ, զբոսաշրջային հանդերձանք, մանկական ապրանքներ և շատ ավելին։ Մեր նպատակն է օգնել գնորդներին արագ և հարմարավետ գտնել ամենաարդյունավետ առաջարկը։",
     },
     {
       id: "smart-recommendations",
-      iconPath: "assets/images/ServicesOverview/settings.svg",
+      icon: settingsIcon,
       title: "Ճկուն Կարգավորումներ",
       description:
         "Նրանց համար, ովքեր դեռ չեն կողմնորոշվել ընտրության հարցում, յուրաքանչյուր բաժնում հասանելի է պարամետրերով ընտրություն և հնարավորություն ապրանքները միմյանց հետ համեմատելու։ Կա նաև հարմար տեքստային որոնում, որը թույլ է տալիս գտնել ինչպես անհրաժեշտ բաժինները, այնպես էլ կոնկրետ ապրանքները ըստ անվանման։ Իսկ յուրաքանչյուր մոդելի էջում ներկայացված է մանրամասն տեղեկատվություն, որը կօգնի որոշում կայացնել՝ նկարագրություն, տեխնիկական բնութագրեր, լուսանկարներ և վիդեոներ, օգտակար հղումներ և կարծիքներ։",
     },
     {
       id: "personalized-service",
-      iconPath: "assets/images/ServicesOverview/shareBlank.svg",
+      icon: shareIcon,
       title: "Choosy-n ամեն վայրում",
       description:
         "Choosy-ի համակարգին միացված է ավելի քան 3000 խանութ՝ 1,5 միլիոն ապրանքներով, որոնց վերաբերյալ տվյալները մշտապես թարմացվում են։ Դրա շնորհիվ դուք կարող եք ոչ միայն ընտրել համապատասխան ապրանքը, այլև ձեռք բերել այն ամենաօպտիմալ պայմաններով։ Այսօր մենք գործում ենք տարբեր երկրների շուկաներում՝ Ուկրաինայում, Լեհաստանում, ԱՄՆ-ում, Մեծ Բրիտանիայում, Ղազախստանում, և ձգտում ենք ընդլայնել մեր աշխարհագրությունը։",
@@ -52,11 +55,10 @@ const ServicesOverview = () => {
               <img
                 className="service-icon"
                 role="img"
-                src={`${service.iconPath}`}
+                src={service.icon}
+                alt={`${service.title} icon`}
                 aria-label={`${service.title} image`}
-              >
-                {service.icon}
-              </img>
+              />
 
               <h3 id={`service-title-${service.id}`} className="service-title">
                 {service.title}

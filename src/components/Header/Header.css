@@ -254,7 +254,11 @@
   position: relative;
 }
 
-@media (max-width: 1340px) {
+@media (max-width: 1440px) {
+  .header-btn-text {
+    display: none;
+  }
+
   .search-bar {
     max-width: unset;
     margin-left: 20px;
@@ -303,7 +307,6 @@
     visibility: visible;
   }
 
-  .header-btn-text,
   .profile-btn-text {
     display: none;
   }
@@ -329,23 +332,11 @@
     margin: 0 5px;
     justify-content: center;
   }
-}
 
-@media (max-width: 1080px) {
-  .header {
-    padding: 20px 20px;
-  }
+
 
   .search-input {
     padding: 12px;
-  }
-
-  .nav-right {
-    gap: 0;
-  }
-
-  .header-nav-link {
-    padding: 8px;
   }
 
   .search-btn {
@@ -363,6 +354,10 @@
 @media (max-width: 1024px) {
   .clear-btn {
     margin-right: 20px;
+  }
+  
+  .header {
+    padding: 20px 20px;
   }
 }
 
