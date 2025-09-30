@@ -27,9 +27,13 @@
   cursor: pointer;
   text-decoration: none;
   text-align: start;
-  padding: 8px 14px;
+  padding: 18px 14px;
   width: fit-content;
   max-width: 160px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .catalog-btn {
@@ -38,10 +42,11 @@
   justify-content: space-around;
   background-color: #152147;
   color: white;
-  border-radius: 35px;
+  border-radius: 4px;
   padding: 18px 20px;
-  margin-right: 10px;
+  margin-right: 26px;
   width: 160px;
+  height: 54px;
 }
 
 .nav-link:hover,
@@ -93,6 +98,8 @@
     padding: 20px 10px;
     border-radius: 0 0 15px 15px;
     transition: 500ms;
+    height: auto;
+    min-height: 54px;
   }
 
   .catalog-btn {
@@ -100,6 +107,8 @@
     justify-content: center;
     border-radius: unset;
     gap: 10px 0;
+    height: auto;
+    min-height: 54px;
   }
 
   .selected {
@@ -124,8 +133,10 @@
     padding: 10px 5px;
     line-height: 1.3;
     letter-spacing: -0.7px;
+    min-height: 54px;
   }
   .catalog-btn {
     font-size: 16px;
+    min-height: 54px;
   }
 }

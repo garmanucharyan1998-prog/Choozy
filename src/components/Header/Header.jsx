@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import "./Header.css";
-import { FaSearch, FaBalanceScale, FaUser, FaListUl, FaTimes } from "react-icons/fa";
+import { FaSearch, FaBalanceScale, FaUser, FaTimes } from "react-icons/fa";
 import choozyMainLogo from "../../assets/Logos/choozyMainLogo.svg";
 import { getSearchSuggestions, searchProducts } from "../../features/api/services/apiService";
 
@@ -226,7 +226,13 @@ const Header = () => {
         title="Favorite products"
         aria-label="Go to favorite products"
       >
-        <FaListUl size={20} aria-hidden="true" />
+        <img 
+          src="/assets/icons/heart.svg" 
+          alt="Favorites icon" 
+          width="24" 
+          height="24"
+          aria-hidden="true"
+        />
         <span className="header-btn-text">Նախընտրելի</span>
       </a>
 

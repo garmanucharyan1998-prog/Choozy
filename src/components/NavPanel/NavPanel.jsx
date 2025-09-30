@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./NavPanel.css";
-import { FaBars } from "react-icons/fa";
 
 const NAV_ITEMS = [
   { label: "Տեխնիկա և էլեկտրոնիկա", aria: "Tech and Electronics" },
@@ -22,7 +21,12 @@ function NavPanel() {
       <div className="nav-list flex cont-width-default">
         <div>
           <button className="nav-button catalog-btn" aria-label="Open catalog">
-            <FaBars color="#fff" />
+            <img 
+              src="/assets/icons/catalog.svg" 
+              alt="Catalog icon" 
+              width="24" 
+              height="24"
+            />
             Կատալոգ
           </button>
         </div>

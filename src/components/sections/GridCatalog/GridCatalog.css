@@ -38,8 +38,8 @@
   text-align: center;
   border-radius: 20px;
   font-size: 16px;
-  margin: 12px;
   backdrop-filter: blur(6px);
+  margin: 0 0 20px 0;
 }
 
 .grid-container {
@@ -178,6 +178,9 @@
 
   .catalog-item-caption {
     font-size: 12px;
+    padding: 8px;
+    margin: 0;
+    background-color: #f6f6f680;
   }
 
   .grid-item img {
