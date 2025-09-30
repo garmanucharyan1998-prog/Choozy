@@ -171,6 +171,10 @@
     grid-auto-rows: auto;
   }
 
+  .grid-catalog {
+    gap: 8px;
+  }
+
   .catalog-card {
     height: auto;
     aspect-ratio: 16 / 10;
@@ -178,7 +182,7 @@
 
   .catalog-item-caption {
     font-size: 12px;
-    padding: 8px;
+    padding: 6px;
     margin: 0;
     background-color: #f6f6f680;
   }
