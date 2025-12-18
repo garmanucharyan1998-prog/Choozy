@@ -108,6 +108,12 @@
 
 /* Media Queries for Responsive Design */
 
+@media (min-width: 1024px) {
+  .footer-nav{
+    padding: 0 80px;
+  }
+}
+
 /* 1024px to 1440px */
 @media (max-width: 1440px) and (min-width: 1024px) {
   .footer-container {
