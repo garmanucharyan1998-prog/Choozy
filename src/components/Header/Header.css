@@ -26,7 +26,7 @@
   height: auto;
 }
 
-.nav-left,
+.about-us-link,
 .nav-right {
   display: flex;
   align-items: center;
@@ -50,6 +50,7 @@
 }
 
 .search-bar {
+  position: relative;
   display: flex;
   background: #f1f3f6;
   border-radius: 35px;
@@ -101,10 +102,6 @@
 .search-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-}
-
-.search-bar {
-  position: relative;
 }
 
 .clear-btn {
@@ -311,12 +308,8 @@
     visibility: visible;
   }
 
-  .profile-btn-text {
-    display: none;
-  }
-
-  .nav-left {
-    display: none;
+  .about-us-link {
+    padding: 0 70px;
   }
 
   .header-nav-link {
@@ -361,6 +354,25 @@
   .header {
     padding: 20px 20px;
   }
+
+  .header-nav-link {
+    transform: scale(1.1);
+  }
+
+  .header-nav-link:hover {
+    transform: scale(1.15);
+  }
+
+  .search-btn {
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-left: -100px;
+  }
+
+  .about-us-link {
+    font-size: 12px;
+    padding: 0 10px;
+  }
 }
 
 /* Screen reader only content */
@@ -380,6 +392,10 @@
   .main-choozy-logo {
     width: 55px;
     height: auto;
+  }
+
+  .profile-wrapper {
+    display: none;
   }
 
   .header-container {

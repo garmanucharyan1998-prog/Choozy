@@ -115,7 +115,7 @@ const Header = () => {
   ), []);
 
   const NavigationSection = useMemo(() => (
-    <nav aria-label="Main navigation" className="nav-left">
+    <nav aria-label="Main navigation" className="about-us-link">
       <a 
         href="/about" 
         className="header-nav-link"
