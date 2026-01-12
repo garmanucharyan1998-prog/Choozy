@@ -1,20 +1,57 @@
 .nav-panel {
   position: relative;
   display: flex;
-  justify-content: center;
   background-color: #ffffff;
   color: #171717;
   padding: 20px 0;
   margin: 12px 0;
-  overflow-x: hidden;
 }
 
-.nav-list,
+.nav-panel > .nav-list {
+  margin: 0 auto;
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 0;
+  width: 100%;
+}
+
+.nav-list > div:first-child {
+  flex-shrink: 0;
+}
+
 .nav-items-container {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
   list-style: none;
+  gap: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-items-container > div {
+  flex-shrink: 0;
+}
+
+.nav-items-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.nav-items-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav-items-container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.nav-items-container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .nav-link,
@@ -61,82 +98,29 @@
 }
 
 @media (max-width: 1024px) {
-  /* .nav-panel {
-    margin: 0;
-    padding: 0;
-    min-height: 40px;
-    width: 100vw;
-    left: -50px;
-    top: 10px;
-  }
-
-  .nav-items-container {
-    background: linear-gradient(
-      to bottom,
-      #152147 0%,
-      #e8efff 30%,
-      #e8efff63 100%
-    );
-    margin-bottom: 20px;
-  }
-
-  .nav-list {
-    position: sticky;
-    flex-direction: column;
-    z-index: 1;
-  }
-
-  .nav-link,
-  .nav-button {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    width: 100%;
-    border-radius: unset;
-    max-width: unset;
-    transition: 200ms;
-    padding: 20px 10px;
-    border-radius: 0 0 15px 15px;
-    transition: 500ms;
-    height: auto;
-    min-height: 54px;
-  }
-
   .catalog-btn {
-    font-size: 18px;
-    justify-content: center;
-    border-radius: unset;
-    gap: 10px 0;
-    height: auto;
-    min-height: 54px;
+    height: 48px;
   }
 
-  .selected {
-    background: linear-gradient(to bottom, #152147 0%, #15214785 100%);
-    color: white;
-    transition: 700ms;
-  }
-
-  .selected:hover {
-    color: white;
-  } */
 }
 
 @media (max-width: 768px) {
-  .nav-panel {
-    left: -25px;
-  }
-
   .nav-link,
   .nav-button {
-    font-size: 10px;
-    padding: 10px 5px;
+    font-size: 12px;
+    padding: 4px 8px;
     line-height: 1.3;
     letter-spacing: -0.7px;
-    min-height: 54px;
+    height: auto;
+    min-height: 36px;
+    max-width: 100px;
+    align-items: center;
   }
   .catalog-btn {
     font-size: 16px;
-    min-height: 54px;
+    width: 130px;
+    height: 36px;
+    min-height: unset;
+    padding: 6px 10px;
   }
 }
