@@ -96,6 +96,10 @@ figure {
   clip: rect(0 0 0 0);
 }
 @media (max-width: 1024px) {
+  .about-us-section {
+    margin: 0 0 40px 0;
+  }
+
   .about-us {
     display: flex;
     flex-direction: column;
@@ -103,14 +107,49 @@ figure {
   }
 
   .about-us div {
+    padding: 32px;
+  }
+
+  .about-us h2 {
+    font-size: 20px;
+    margin: 8px 0;
+  }
+
+  .about-us div {
     text-align: center;
   }
 
   .about-us p {
-    font-size: 16px;
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .about-us div {
+    max-height: 280px;
+  }
+
+  .about-us img {
+    max-height: 280px;
   }
 
   .btn-learn-more {
-    margin: 1rem auto 0;
+    margin-top: 10px;
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-us div {
+    padding: 14px;
+  }
+
+  .about-us h2 {
+    font-size: 18px;
+  }
+
+  .about-us p {
+    font-size: 12px;
   }
 }

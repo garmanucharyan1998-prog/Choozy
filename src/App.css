@@ -37,10 +37,18 @@
   .App main {
     padding: 0 30px;
   }
+
+  .section-title {
+    font-size: 20px;
+  }
 }
 
 @media (max-width: 768px) {
   .App main {
     padding: 0 15px;
+  }
+
+  .section-title {
+    font-size: 16px;
   }
 }
