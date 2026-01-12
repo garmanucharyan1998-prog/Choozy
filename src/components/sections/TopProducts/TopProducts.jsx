@@ -45,9 +45,9 @@ const TopProducts = () => {
   return (
     <section className="top-products-section">
       <div className="cont-width-default">
-        <div className="top-prods-heding-wrapper">
+        <div className="top-prods-heading-wrapper">
           <h2 className="section-title">Թոփ ապրանքներ</h2>
-          <a href="#">Տեսնել Ավելին</a>
+          <a href="/products">Տեսնել Ավելին</a>
         </div>
         <Carousel items={products} />
       </div>

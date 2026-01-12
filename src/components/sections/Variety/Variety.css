@@ -6,7 +6,7 @@
   background-color: #ffffff;
 }
 
-.variety-heding-wrapper {
+.variety-heading-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -15,7 +15,7 @@
   border-bottom: 2px solid #dde3f8;
 }
 
-.variety-heding-wrapper a {
+.variety-heading-wrapper a {
   cursor: pointer;
   text-decoration: none;
   font-size: 16px;
@@ -26,7 +26,7 @@
   transition: all 0.3s ease;
 }
 
-.variety-heding-wrapper a:hover {
+.variety-heading-wrapper a:hover {
   background-color: #f0f4ff;
   color: #152147;
 }
@@ -36,10 +36,14 @@
     margin: 40px 0;
     padding: 20px 0;
   }
-  
-  .variety-heding-wrapper {
-    flex-direction: column;
+
+  .variety-heading-wrapper {
     align-items: flex-start;
     gap: 16px;
+  }
+
+  .variety-heading-wrapper a {
+    font-size: 14px;
+    padding: 0;
   }
 }

@@ -304,8 +304,7 @@
 
   .tooltip-container:hover::after,
   .tooltip-container:hover::before {
-    opacity: 1;
-    visibility: visible;
+    display: none;
   }
 
   .about-us-link {

@@ -46,9 +46,9 @@ const Variety = () => {
   return (
     <section className="variety-section">
       <div className="cont-width-default">
-        <div className="variety-heding-wrapper">
+        <div className="variety-heading-wrapper">
           <h2 className="section-title">Տեսականի</h2>
-          <a href="#">Տեսնել Ավելին</a>
+          <a href="/variety">Տեսնել Ավելին</a>
         </div>
         <Carousel items={products} />
       </div>
