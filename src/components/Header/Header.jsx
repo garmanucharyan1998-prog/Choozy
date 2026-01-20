@@ -294,7 +294,7 @@ const Header = () => {
                 className="flag-option"
                 loading="lazy"
               />
-              {lang.name}
+              <span className="lang-btn-text">{lang.name}</span>
             </div>
           ))}
         </div>

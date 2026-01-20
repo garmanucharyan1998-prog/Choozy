@@ -346,6 +346,25 @@
 }
 
 @media (max-width: 1024px) {
+
+  .lang-dropdown-item {
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  .lang-dropdown-item img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .flag-option {
+    margin-right: 4px;
+  }
+
+  .lang-btn-text {
+    font-size: 12px;
+  }
+
   .clear-btn {
     margin-right: 20px;
   }
@@ -388,10 +407,7 @@
 }
 
 @media (max-width: 768px) {
-  .main-choozy-logo {
-    width: 55px;
-    height: auto;
-  }
+
 
   .profile-wrapper {
     display: none;
@@ -406,5 +422,12 @@
     width: 100%;
     margin-top: 12px;
     margin-left: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-choozy-logo {
+    width: 55px;
+    height: auto;
   }
 }
