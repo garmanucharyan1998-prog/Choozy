@@ -221,7 +221,7 @@
   opacity: 1;
 }
 
-.dropdown-item {
+.lang-dropdown-item {
   display: flex;
   align-items: center;
   padding: 8px;
@@ -229,13 +229,13 @@
   transition: 300ms;
 }
 
-.dropdown-item img {
+.lang-dropdown-item img {
   width: 24px;
   height: 24px;
   border-radius: 50%;
 }
 
-.dropdown-item:hover {
+.lang-dropdown-item:hover {
   background-color: #f1f1f1;
 }
 

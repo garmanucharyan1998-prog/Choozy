@@ -96,3 +96,32 @@
   font-weight: 600;
   margin: 0;
 }
+
+@media (max-width: 1440px) {
+  .product-card {
+    width: 208px;
+    height: 376px;
+  }
+
+  .product-img {
+    height: 240px;
+  }
+
+  .product-info {
+    height: 140px;
+  }
+
+  .product-title {
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .product-description {
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .product-price {
+    font-size: 16px;
+  }
+}

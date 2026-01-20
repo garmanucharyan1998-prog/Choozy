@@ -274,7 +274,7 @@ const Header = () => {
           {Object.entries(LANGUAGES).map(([code, lang]) => (
             <div
               key={code}
-              className="dropdown-item"
+              className="lang-dropdown-item"
               role="option"
               aria-selected={code === language}
               onClick={() => handleLanguageChange(code)}
