@@ -1,10 +1,15 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import "./Header.css";
 import { FaSearch, FaBalanceScale, FaUser, FaTimes, FaBars, FaChevronDown } from "react-icons/fa";
 import choozyMainLogo from "../../assets/Logos/choozyMainLogo.svg";
 import { useHeaderPresenter } from "../../core/mvp/presenter";
 
-const Header = ({ isCompact = false }) => {
+const Header = ({
+  isCompact = false,
+  isMobileMenuOpen = false,
+  onToggleMobileMenu,
+  onCloseMobileMenu,
+}) => {
   const headerRef = useRef(null);
 
   const {
@@ -13,11 +18,8 @@ const Header = ({ isCompact = false }) => {
     language,
     currentLanguage,
     isLanguageDropdownOpen,
-    isMobileMenuOpen,
     handleLanguageChange,
     toggleLanguageDropdown,
-    toggleMobileMenu,
-    closeMobileMenu,
     searchQuery,
     searchSuggestions,
     showSuggestions,
@@ -28,6 +30,21 @@ const Header = ({ isCompact = false }) => {
     handleClearSearch,
     handleSearchFocus,
   } = useHeaderPresenter();
+
+  const handleMobileMenuToggle = useCallback(() => {
+    if (isLanguageDropdownOpen) {
+      toggleLanguageDropdown();
+    }
+    if (typeof onToggleMobileMenu === "function") {
+      onToggleMobileMenu();
+    }
+  }, [isLanguageDropdownOpen, toggleLanguageDropdown, onToggleMobileMenu]);
+
+  const handleMobileMenuClose = useCallback(() => {
+    if (typeof onCloseMobileMenu === "function") {
+      onCloseMobileMenu();
+    }
+  }, [onCloseMobileMenu]);
 
   useEffect(() => {
     const updateHeaderHeight = () => {
@@ -240,7 +257,7 @@ const Header = ({ isCompact = false }) => {
         }`}
         aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         aria-expanded={isMobileMenuOpen}
-        onClick={toggleMobileMenu}
+        onClick={handleMobileMenuToggle}
       >
         {isMobileMenuOpen ? <FaTimes size={14} aria-hidden="true" /> : <FaBars size={14} aria-hidden="true" />}
       </button>
@@ -306,7 +323,7 @@ const Header = ({ isCompact = false }) => {
         )}
       </div>
     </nav>
-  ), [currentLanguage, isLanguageDropdownOpen, isMobileMenuOpen, language, toggleLanguageDropdown, handleLanguageChange, languages, toggleMobileMenu, isCompact]);
+  ), [currentLanguage, isLanguageDropdownOpen, isMobileMenuOpen, language, toggleLanguageDropdown, handleLanguageChange, languages, isCompact, handleMobileMenuToggle]);
 
   return (
     <header
@@ -323,30 +340,22 @@ const Header = ({ isCompact = false }) => {
         {UserNavigationSection}
       </div>
 
-      <div
-        className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-30 bg-black/10 transition-opacity duration-[400ms] ease-in-out md:hidden ${
-          isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={closeMobileMenu}
-        aria-hidden="true"
-      />
-
       <aside
-        className={`fixed top-[var(--header-height,72px)] left-0 z-40 w-[80vw] max-w-[300px] h-[calc(100vh-var(--header-height,72px))] bg-white border-r border-[#e6e9f2] px-4 py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-[var(--header-height,72px)] right-0 z-40 w-[80vw] max-w-[300px] h-[calc(100vh-var(--header-height,72px))] bg-white border-l border-[#e6e9f2] px-4 py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
+          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-label="Mobile navigation menu"
       >
         <h3 className="m-0 mb-6 text-base font-semibold text-[#171717]">
           {"Մենյու"}
         </h3>
-        <nav className="flex flex-col gap-6" aria-label="Mobile links">
+        <nav className="flex flex-col gap-6 items-start" aria-label="Mobile links">
           {mobileMenuItems.map((item) => (
             <a
               key={item.label}
               href={item.href}
-              className="text-[#171717] no-underline text-sm font-medium"
-              onClick={closeMobileMenu}
+              className="block w-full text-left text-[#171717] no-underline text-sm font-medium"
+              onClick={handleMobileMenuClose}
             >
               {item.label}
             </a>
