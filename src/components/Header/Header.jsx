@@ -1,17 +1,23 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import "./Header.css";
-import { FaSearch, FaBalanceScale, FaUser, FaTimes } from "react-icons/fa";
+import { FaSearch, FaBalanceScale, FaUser, FaTimes, FaBars, FaChevronDown } from "react-icons/fa";
 import choozyMainLogo from "../../assets/Logos/choozyMainLogo.svg";
 import { useHeaderPresenter } from "../../core/mvp/presenter";
 
-const Header = () => {
+const Header = ({ isCompact = false }) => {
+  const headerRef = useRef(null);
+
   const {
     languages,
+    mobileMenuItems,
     language,
     currentLanguage,
     isLanguageDropdownOpen,
+    isMobileMenuOpen,
     handleLanguageChange,
     toggleLanguageDropdown,
+    toggleMobileMenu,
+    closeMobileMenu,
     searchQuery,
     searchSuggestions,
     showSuggestions,
@@ -23,6 +29,33 @@ const Header = () => {
     handleSearchFocus,
   } = useHeaderPresenter();
 
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      const headerHeight = headerRef.current?.offsetHeight ?? 0;
+      document.documentElement.style.setProperty("--header-height", `${headerHeight}px`);
+    };
+
+    updateHeaderHeight();
+
+    let resizeObserver = null;
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(updateHeaderHeight);
+      if (headerRef.current) {
+        resizeObserver.observe(headerRef.current);
+      }
+    }
+
+    window.addEventListener("resize", updateHeaderHeight);
+
+    return () => {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      window.removeEventListener("resize", updateHeaderHeight);
+      document.documentElement.style.removeProperty("--header-height");
+    };
+  }, []);
+
   const LogoSection = useMemo(() => (
     <a
       href="/"
@@ -33,39 +66,48 @@ const Header = () => {
       <img
         src={choozyMainLogo}
         alt="Choozy - Electronics online store logo"
-        className="w-[55px] h-auto sm:w-[100px]"
+        className={`${isCompact ? "w-[44px] sm:w-[78px]" : "w-[55px] sm:w-[100px]"} h-auto transition-all duration-300`}
         loading="eager"
       />
     </a>
-  ), []);
+  ), [isCompact]);
 
   const NavigationSection = useMemo(() => (
-    <nav aria-label="Main navigation" className="flex items-center gap-4 text-xs px-[10px] lg:px-[70px] 2xl:px-0">
+    <nav aria-label="Main navigation" className="hidden md:flex items-center gap-4 text-xs px-[10px] lg:px-[70px] 2xl:px-0">
       <a
         href="/about"
-        className="no-underline text-[#333] flex items-center p-3.5 rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:px-5 2xl:py-3.5 2xl:mx-0"
+        className={`no-underline text-[#333] flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
+          isCompact ? "px-3 py-2 text-[11px] 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
+        }`}
         title="Learn more about Choozy company"
       >
         {"Մեր մասին"}
       </a>
     </nav>
-  ), []);
+  ), [isCompact]);
 
   const SearchSection = useMemo(() => (
     <form
-      className="relative flex bg-input-bg rounded-pill grow border-[1.5px] border-accent-blue order-3 w-full mt-3 md:order-none md:w-auto md:mt-0 md:ml-5 2xl:max-w-[400px] 2xl:ml-0"
+      className={`search-bar relative flex bg-input-bg rounded-pill grow border-[1.5px] border-accent-blue order-3 w-full md:order-none md:w-auto md:mt-0 md:ml-5 2xl:max-w-[400px] 2xl:ml-0 transition-all duration-300 ${
+        isCompact ? "mt-2" : "mt-3"
+      }`}
       role="search"
       onSubmit={handleSearchSubmit}
       aria-label="Product search"
     >
-      <FaSearch className="text-[#888] mr-2 ml-[18px] self-center" aria-hidden="true" />
+      <FaSearch
+        className={`text-[#888] self-center transition-all duration-300 ${isCompact ? "mr-1.5 ml-3" : "mr-2 ml-[18px]"}`}
+        aria-hidden="true"
+      />
       <input
         type="search"
         name="q"
         placeholder={"Որոնել"}
         aria-label="Search for products and services"
         aria-describedby="search-help"
-        className="search-input border-none bg-transparent p-3 grow text-sm outline-none 2xl:p-4"
+        className={`search-input border-none bg-transparent grow text-sm outline-none transition-all duration-300 ${
+          isCompact ? "p-2 2xl:p-2.5" : "p-3 2xl:p-4"
+        }`}
         value={searchQuery}
         onChange={handleSearchInputChange}
         onFocus={handleSearchFocus}
@@ -80,7 +122,9 @@ const Header = () => {
       {searchQuery && (
         <button
           type="button"
-          className="bg-transparent border-none text-[#888] cursor-pointer p-2 flex items-center justify-center rounded-full transition-all duration-200 hover:bg-input-bg hover:text-[#666] mr-5 lg:mr-0"
+          className={`bg-transparent border-none text-[#888] cursor-pointer flex items-center justify-center rounded-full transition-all duration-200 hover:bg-input-bg hover:text-[#666] lg:mr-0 ${
+            isCompact ? "p-1.5 mr-2" : "p-2 mr-5"
+          }`}
           onClick={handleClearSearch}
           aria-label="Clear search"
           title="Clear search field"
@@ -91,7 +135,11 @@ const Header = () => {
 
       <button
         type="submit"
-        className="bg-accent-blue border-none px-4 py-3 rounded-pill text-active-blue font-semibold cursor-pointer transition-all duration-200 text-[13px] -ml-[100px] hover:enabled:bg-[#c8d4ff] hover:enabled:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm 2xl:ml-0"
+        className={`bg-accent-blue border-none rounded-pill text-active-blue font-semibold cursor-pointer transition-all duration-200 hover:enabled:bg-[#c8d4ff] hover:enabled:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed 2xl:ml-0 ${
+          isCompact
+            ? "px-3 py-2 text-xs -ml-[86px] lg:-ml-4 2xl:px-4 2xl:py-2.5 2xl:text-[13px]"
+            : "px-4 py-3 text-[13px] -ml-[100px] lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm"
+        }`}
         aria-label="Execute search"
         disabled={!searchQuery.trim()}
       >
@@ -131,13 +179,15 @@ const Header = () => {
         </div>
       )}
     </form>
-  ), [searchQuery, searchSuggestions, showSuggestions, showNoResults, handleSearchInputChange, handleSearchSubmit, handleClearSearch, handleSuggestionClick, handleSearchFocus]);
+  ), [searchQuery, searchSuggestions, showSuggestions, showNoResults, handleSearchInputChange, handleSearchSubmit, handleClearSearch, handleSuggestionClick, handleSearchFocus, isCompact]);
 
   const UserNavigationSection = useMemo(() => (
-    <nav className="flex items-center gap-[5px] 2xl:gap-4" aria-label="User navigation">
+    <nav className={`flex items-center transition-all duration-300 ${isCompact ? "gap-1.5 md:gap-1.5 2xl:gap-3" : "gap-2 md:gap-[5px] 2xl:gap-4"}`} aria-label="User navigation">
       <a
         href="/compare"
-        className="tooltip-container relative no-underline text-[#333] flex items-center p-3.5 rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:px-5 2xl:py-3.5 2xl:mx-0"
+        className={`tooltip-container relative no-underline text-[#333] hidden md:flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
+          isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
+        }`}
         title="Compare products"
         aria-label="Compare selected products"
       >
@@ -149,7 +199,9 @@ const Header = () => {
 
       <a
         href="/favorites"
-        className="tooltip-container relative no-underline text-[#333] flex items-center p-3.5 rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:px-5 2xl:py-3.5 2xl:mx-0"
+        className={`tooltip-container relative no-underline text-[#333] hidden md:flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
+          isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
+        }`}
         title="Favorite products"
         aria-label="Go to favorite products"
       >
@@ -168,7 +220,9 @@ const Header = () => {
       <div className="hidden md:block">
         <a
           href="/login"
-          className="tooltip-container relative flex items-center gap-1.5 bg-white border-[1.5px] border-navy p-3.5 rounded-[40px] text-active-blue no-underline min-w-0 mx-[5px] justify-center 2xl:px-5 2xl:py-3.5 2xl:mx-0"
+          className={`tooltip-container relative flex items-center gap-1.5 bg-white border-[1.5px] border-navy rounded-[40px] text-active-blue no-underline min-w-0 mx-[5px] justify-center 2xl:mx-0 transition-all duration-300 ${
+            isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
+          }`}
           title="Login to account"
           aria-label="Login to personal cabinet"
         >
@@ -179,10 +233,22 @@ const Header = () => {
         </a>
       </div>
 
+      <button
+        type="button"
+        className={`md:hidden flex items-center justify-center rounded-full bg-[#eceff3] text-navy border-none cursor-pointer transition-all duration-300 ease-in-out hover:bg-accent-blue hover:scale-105 ${
+          isCompact ? "w-7 h-7" : "w-8 h-8"
+        }`}
+        aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+        aria-expanded={isMobileMenuOpen}
+        onClick={toggleMobileMenu}
+      >
+        {isMobileMenuOpen ? <FaTimes size={14} aria-hidden="true" /> : <FaBars size={14} aria-hidden="true" />}
+      </button>
+
       <div className="relative" aria-label="Language selection">
         <button
           onClick={toggleLanguageDropdown}
-          className="bg-transparent border-none cursor-pointer p-0 flex items-center"
+          className="bg-transparent border-none cursor-pointer p-0 flex items-center gap-1"
           aria-label={`Current language: ${currentLanguage.alt}`}
           aria-expanded={isLanguageDropdownOpen}
           aria-haspopup="listbox"
@@ -192,8 +258,13 @@ const Header = () => {
             alt={currentLanguage.alt}
             width="24"
             height="16"
-            className="w-6 h-6 rounded-full border border-[#ccc]"
+            className={`${isCompact ? "w-5 h-5" : "w-6 h-6"} rounded-full border border-[#ccc] transition-all duration-300`}
             loading="lazy"
+          />
+          <span className={`font-semibold text-[#171717] md:hidden ${isCompact ? "text-[11px]" : "text-xs"}`}>{currentLanguage.name}</span>
+          <FaChevronDown
+            className={`text-[#171717] md:hidden transition-transform duration-200 ${isCompact ? "text-[9px]" : "text-[10px]"} ${isLanguageDropdownOpen ? "rotate-180" : ""}`}
+            aria-hidden="true"
           />
         </button>
 
@@ -206,7 +277,9 @@ const Header = () => {
             {Object.entries(languages).map(([code, lang]) => (
               <div
                 key={code}
-                className="flex items-center justify-center whitespace-nowrap px-3 py-2 cursor-pointer transition-colors duration-200 hover:bg-[#f1f1f1] md:justify-start"
+                className={`flex items-center justify-center whitespace-nowrap cursor-pointer transition-colors duration-200 hover:bg-[#f1f1f1] md:justify-start ${
+                  isCompact ? "px-2.5 py-1.5" : "px-3 py-2"
+                }`}
                 role="option"
                 aria-selected={code === language}
                 onClick={() => handleLanguageChange(code)}
@@ -223,26 +296,63 @@ const Header = () => {
                   alt={lang.alt}
                   width="24"
                   height="16"
-                  className="w-6 h-6 rounded-full border border-[#ccc] flex-shrink-0"
+                  className={`${isCompact ? "w-5 h-5" : "w-6 h-6"} rounded-full border border-[#ccc] flex-shrink-0 transition-all duration-300`}
                   loading="lazy"
                 />
-                <span className="hidden md:inline ml-2 text-sm">{lang.name}</span>
+                <span className={`hidden md:inline ml-2 ${isCompact ? "text-xs" : "text-sm"}`}>{lang.name}</span>
               </div>
             ))}
           </div>
         )}
       </div>
     </nav>
-  ), [currentLanguage, isLanguageDropdownOpen, language, toggleLanguageDropdown, handleLanguageChange, languages]);
+  ), [currentLanguage, isLanguageDropdownOpen, isMobileMenuOpen, language, toggleLanguageDropdown, handleLanguageChange, languages, toggleMobileMenu, isCompact]);
 
   return (
-    <header className="flex justify-center bg-[#c0caec26] px-5 py-5 lg:px-[50px] 2xl:px-[100px]" role="banner">
-      <div className="flex flex-wrap items-center text-[#171717] font-bold justify-between cont-width-default md:flex-nowrap">
+    <header
+      ref={headerRef}
+      className={`relative flex justify-center bg-transparent px-5 lg:px-[50px] 2xl:px-[100px] transition-all duration-300 ${
+        isCompact ? "py-2.5" : "py-5"
+      }`}
+      role="banner"
+    >
+      <div className="flex flex-wrap items-center text-[#171717] font-bold justify-between cont-width-default md:flex-nowrap transition-all duration-300">
         {LogoSection}
         {NavigationSection}
         {SearchSection}
         {UserNavigationSection}
       </div>
+
+      <div
+        className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-30 bg-black/10 transition-opacity duration-[400ms] ease-in-out md:hidden ${
+          isMobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={closeMobileMenu}
+        aria-hidden="true"
+      />
+
+      <aside
+        className={`fixed top-[var(--header-height,72px)] left-0 z-40 w-[80vw] max-w-[300px] h-[calc(100vh-var(--header-height,72px))] bg-white border-r border-[#e6e9f2] px-4 py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+        aria-label="Mobile navigation menu"
+      >
+        <h3 className="m-0 mb-6 text-base font-semibold text-[#171717]">
+          {"Մենյու"}
+        </h3>
+        <nav className="flex flex-col gap-6" aria-label="Mobile links">
+          {mobileMenuItems.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              className="text-[#171717] no-underline text-sm font-medium"
+              onClick={closeMobileMenu}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </aside>
     </header>
   );
 };

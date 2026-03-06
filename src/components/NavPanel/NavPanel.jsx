@@ -2,15 +2,24 @@ import React from "react";
 import { useNavPanelPresenter } from "../../core/mvp/presenter";
 import "./NavPanel.css";
 
-function NavPanel() {
+function NavPanel({ isCompact = false }) {
   const { navItems, activeIndex, handleSelect } = useNavPanelPresenter();
 
   return (
-    <nav className="relative flex bg-white text-[#171717] py-5 my-3" aria-label="Main navigation menu">
+    <nav
+      className={`relative flex bg-transparent text-[#171717] px-5 lg:px-[50px] 2xl:px-[100px] transition-all duration-300 ${
+        isCompact ? "pt-2.5 pb-5 mb-2 border-b-[3px] border-navy" : "py-5 mb-3 border-b-0"
+      }`}
+      aria-label="Main navigation menu"
+    >
       <div className="flex items-center w-full cont-width-default">
         <div className="shrink-0">
           <button
-            className="flex items-center justify-around bg-navy text-white rounded px-2.5 py-1.5 mr-[26px] w-[130px] h-9 min-w-fit text-base font-medium border-none cursor-pointer lg:w-[160px] lg:h-[54px] lg:px-5 lg:py-[18px] lg:text-xs"
+            className={`flex items-center justify-around bg-navy hover:bg-navy text-white rounded min-w-fit border-none cursor-pointer transition-all duration-300 ${
+              isCompact
+                ? "px-2 py-1 mr-4 w-[110px] h-8 text-sm lg:w-[145px] lg:h-[42px] lg:px-4 lg:py-2.5 lg:text-[11px]"
+                : "px-2.5 py-1.5 mr-[26px] w-[130px] h-9 text-base lg:w-[160px] lg:h-[54px] lg:px-5 lg:py-[18px] lg:text-xs"
+            }`}
             aria-label="Open catalog"
           >
             <img
@@ -26,8 +35,12 @@ function NavPanel() {
           {navItems.map((item, index) => (
             <div key={index} className="shrink-0">
               <button
-                className={`nav-link flex items-center justify-center text-xs font-medium text-text-dark bg-transparent border-none cursor-pointer no-underline text-start px-2 py-1 w-fit max-w-[100px] h-auto min-h-9 leading-[1.3] tracking-[-0.7px] hover:text-blue-600 lg:px-3.5 lg:py-[18px] lg:max-w-[160px] lg:h-[54px] lg:min-h-0 lg:leading-normal lg:tracking-normal ${
-                  index === activeIndex ? "!bg-subtle-bg !rounded-xl !text-navy" : ""
+                className={`nav-link flex items-center justify-center font-medium text-text-dark bg-transparent border-none cursor-pointer no-underline text-start w-fit h-auto hover:text-blue-600 transition-all duration-300 ${
+                  isCompact
+                    ? "text-[11px] px-2 py-1 max-w-[96px] min-h-7 leading-[1.25] tracking-[-0.5px] lg:px-3 lg:py-2.5 lg:max-w-[150px] lg:h-[42px] lg:min-h-0 lg:text-xs"
+                    : "text-xs px-2 py-1 max-w-[100px] min-h-9 leading-[1.3] tracking-[-0.7px] lg:px-3.5 lg:py-[18px] lg:max-w-[160px] lg:h-[54px] lg:min-h-0 lg:leading-normal lg:tracking-normal"
+                } ${
+                  index === activeIndex ? "!bg-subtle-bg/65 !rounded-xl !text-navy" : ""
                 }`}
                 aria-label={item.aria}
                 onClick={() => handleSelect(index)}

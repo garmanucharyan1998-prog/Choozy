@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { searchModel } from '../model/searchModel';
 import { headerModel } from '../model/headerModel';
 
-const { LANGUAGES, DEFAULT_LANGUAGE } = headerModel;
+const { LANGUAGES, DEFAULT_LANGUAGE, MOBILE_MENU_ITEMS } = headerModel;
 const { MIN_QUERY_LENGTH } = searchModel;
 
 export const useHeaderPresenter = () => {
@@ -17,8 +17,10 @@ export const useHeaderPresenter = () => {
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showNoResults, setShowNoResults] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const currentLanguage = useMemo(() => LANGUAGES[language], [language]);
+  const mobileMenuItems = useMemo(() => MOBILE_MENU_ITEMS, []);
 
   const handleLanguageChange = useCallback((langCode) => {
     setLanguage(langCode);
@@ -27,6 +29,15 @@ export const useHeaderPresenter = () => {
 
   const toggleLanguageDropdown = useCallback(() => {
     setIsLanguageDropdownOpen((prev) => !prev);
+  }, []);
+
+  const toggleMobileMenu = useCallback(() => {
+    setIsLanguageDropdownOpen(false);
+    setIsMobileMenuOpen((prev) => !prev);
+  }, []);
+
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
   }, []);
 
   const handleSearchInputChange = useCallback(async (e) => {
@@ -92,13 +103,28 @@ export const useHeaderPresenter = () => {
     return () => document.removeEventListener('click', handler);
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return {
     languages: LANGUAGES,
+    mobileMenuItems,
     language,
     currentLanguage,
     isLanguageDropdownOpen,
+    isMobileMenuOpen,
     handleLanguageChange,
     toggleLanguageDropdown,
+    toggleMobileMenu,
+    closeMobileMenu,
 
     searchQuery,
     searchSuggestions,

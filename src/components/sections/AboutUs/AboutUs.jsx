@@ -1,6 +1,6 @@
 const AboutUs = () => {
   return (
-    <section className="flex justify-center gap-5 mb-10 lg:my-[120px]" aria-label={"Մեր Մասին"}>
+    <section id="about-us" className="flex justify-center gap-5 mb-10 lg:my-[120px]" aria-label={"Մեր Մասին"}>
       <article className="flex flex-col text-center items-center gap-8 cont-width-default lg:grid lg:grid-cols-2 lg:text-left lg:items-center">
         <div className="flex flex-col justify-center box-border bg-section-bg p-3.5 h-full rounded-[32px] max-h-[280px] md:p-8 lg:p-9 lg:max-h-none">
           <h2 className="mx-auto text-lg my-2 font-semibold md:text-xl lg:text-[2rem] lg:mb-4 lg:mt-0 lg:mx-0">

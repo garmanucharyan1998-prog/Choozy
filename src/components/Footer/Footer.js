@@ -2,7 +2,7 @@ import choozyMainLogoWhite from "../../assets/Logos/choozyMainLogoWhite.svg";
 
 const Footer = () => {
   return (
-    <footer className="bg-navy text-white text-sm">
+    <footer id="contact" className="bg-navy text-white text-sm">
       <div className="cont-width-default mx-auto box-border px-4 py-4 md:px-10 md:py-[31px] lg:px-[60px] lg:py-12 2xl:px-[100px] 2xl:py-[70px]">
         <div className="flex flex-col gap-[30px] mb-5 sm:items-center md:flex-row md:justify-between md:items-start md:gap-0 md:mb-0">
           <div className="flex flex-col gap-5">
@@ -56,7 +56,7 @@ const Footer = () => {
               </a>
             </div>
             <div className="flex flex-col gap-[10px] items-center text-center min-w-0 sm:gap-3 md:gap-4 md:items-stretch md:text-left md:min-w-[150px] lg:min-w-[200px]">
-              <a href="#" className="flex items-center text-white no-underline text-xs mr-auto transition-opacity duration-300 hover:opacity-80 md:text-sm md:mr-0">
+              <a id="privacy" href="#" className="flex items-center text-white no-underline text-xs mr-auto transition-opacity duration-300 hover:opacity-80 md:text-sm md:mr-0">
                 {"Գաղտնիություն"}
               </a>
               <a href="#" className="flex items-center text-white no-underline text-xs mr-auto transition-opacity duration-300 hover:opacity-80 md:text-sm md:mr-0">

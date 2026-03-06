@@ -6,7 +6,7 @@ const TopProducts = () => {
   const { items, loading, error, onRetry } = useTopProductsPresenter();
 
   return (
-    <section className="flex justify-center my-5 py-5 bg-white lg:my-20 lg:py-10">
+    <section id="top-products" className="flex justify-center my-5 py-5 bg-white lg:my-20 lg:py-10">
       <div className="cont-width-default">
         <div className="flex items-start gap-4 justify-between mb-10 pb-5 border-b-2 border-border-blue lg:items-center lg:gap-0">
           <h2 className="text-base md:text-xl lg:text-[32px] font-bold text-navy m-0 text-left">

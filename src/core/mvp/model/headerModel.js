@@ -10,10 +10,18 @@ export const LANGUAGES = {
 };
 
 export const DEFAULT_LANGUAGE = "am";
+export const MOBILE_MENU_ITEMS = [
+  { label: "Թոփ Ապրանքներ", href: "#top-products" },
+  { label: "Տեսականի", href: "#variety-products" },
+  { label: "Կապ Մեզ Հետ", href: "#contact" },
+  { label: "Մեր Մասին", href: "#about-us" },
+  { label: "Գաղտնիության Քաղաքականություն", href: "#privacy" },
+];
 
 export const headerModel = {
   LANGUAGES,
   DEFAULT_LANGUAGE,
+  MOBILE_MENU_ITEMS,
 };
 
 export default headerModel;
