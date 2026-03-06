@@ -7,8 +7,9 @@ import "swiper/css/navigation";
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23ddd' width='300' height='300'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='14'%3ENo image%3C/text%3E%3C/svg%3E";
 
-const Carousel = ({ items = [] }) => {
-  const slideCount = items.length;
+const Carousel = ({ items }) => {
+  const safeItems = Array.isArray(items) ? items : [];
+  const slideCount = safeItems.length;
   const maxSlidesPerView = 5;
   const loopEnabled = slideCount >= Math.max(8, maxSlidesPerView + 3);
 
@@ -31,7 +32,7 @@ const Carousel = ({ items = [] }) => {
             1280: { slidesPerView: 5 },
           }}
         >
-          {items.map((product, index) => (
+          {safeItems.map((product, index) => (
             <SwiperSlide key={product.id || index} className="!flex justify-center m-0">
               <figure
                 className="group cursor-pointer overflow-hidden flex flex-col w-[230px] h-[440px] m-0 transition-all duration-[400ms] 2xl:w-[230px] 2xl:h-[440px]"

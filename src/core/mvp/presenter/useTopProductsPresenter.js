@@ -15,7 +15,7 @@ export const useTopProductsPresenter = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await productModel.getTopProducts(6);
+      const response = await productModel.getTopProducts();
       if (response.success && response.data?.length) {
         setItems(response.data);
       }

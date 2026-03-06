@@ -3,7 +3,7 @@ import Carousel from "../../Carousel/Carousel";
 import { useVarietyPresenter } from "../../../core/mvp/presenter";
 
 const Variety = () => {
-  const { items, loading, error, onRetry } = useVarietyPresenter({ type: 'smartphone', limit: 6 });
+  const { items, loading, error, onRetry } = useVarietyPresenter();
 
   return (
     <section className="flex justify-center my-10 py-5 bg-white lg:my-20 lg:py-10">

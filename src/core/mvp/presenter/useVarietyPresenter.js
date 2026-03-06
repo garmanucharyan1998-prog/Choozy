@@ -6,9 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { productModel } from '../model/productModel';
 
-export const useVarietyPresenter = (options = {}) => {
-  const { type = 'smartphone', limit = 6 } = options;
-
+export const useVarietyPresenter = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,7 +15,7 @@ export const useVarietyPresenter = (options = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await productModel.getVarietyProducts(type, limit);
+      const response = await productModel.getVarietyProducts();
       if (response.success && response.data?.length) {
         setItems(response.data);
       }
@@ -26,7 +24,7 @@ export const useVarietyPresenter = (options = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [type, limit]);
+  }, []);
 
   useEffect(() => {
     loadProducts();

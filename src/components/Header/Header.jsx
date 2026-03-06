@@ -197,40 +197,40 @@ const Header = () => {
           />
         </button>
 
-        <div
-          className={`absolute top-[160%] left-1/2 -translate-x-1/2 bg-white border border-[#ccc] shadow-[0_2px_8px_rgba(0,0,0,0.1)] z-10 rounded-xl min-w-[50px] overflow-hidden transition-opacity duration-[350ms] ${
-            isLanguageDropdownOpen ? "h-auto opacity-100" : "h-0 opacity-0"
-          }`}
-          role="listbox"
-          aria-label="Select language"
-        >
-          {Object.entries(languages).map(([code, lang]) => (
-            <div
-              key={code}
-              className="flex items-center p-1 text-xs cursor-pointer transition-all duration-300 hover:bg-[#f1f1f1] lg:p-2 lg:text-sm"
-              role="option"
-              aria-selected={code === language}
-              onClick={() => handleLanguageChange(code)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleLanguageChange(code);
-                }
-              }}
-              tabIndex={0}
-            >
-              <img
-                src={`https://flagcdn.com/w40/${lang.flag}.png`}
-                alt={lang.alt}
-                width="24"
-                height="16"
-                className="w-4 h-4 rounded-full mr-1 lg:w-6 lg:h-6 lg:mr-2"
-                loading="lazy"
-              />
-              <span className="text-xs lg:text-sm">{lang.name}</span>
-            </div>
-          ))}
-        </div>
+        {isLanguageDropdownOpen && (
+          <div
+            className="absolute top-[calc(100%+8px)] right-1/2 translate-x-1/2 bg-white border border-[#ccc] shadow-[0_2px_8px_rgba(0,0,0,0.1)] z-50 rounded-xl py-1 md:right-0 md:translate-x-0"
+            role="listbox"
+            aria-label="Select language"
+          >
+            {Object.entries(languages).map(([code, lang]) => (
+              <div
+                key={code}
+                className="flex items-center justify-center whitespace-nowrap px-3 py-2 cursor-pointer transition-colors duration-200 hover:bg-[#f1f1f1] md:justify-start"
+                role="option"
+                aria-selected={code === language}
+                onClick={() => handleLanguageChange(code)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleLanguageChange(code);
+                  }
+                }}
+                tabIndex={0}
+              >
+                <img
+                  src={`https://flagcdn.com/w40/${lang.flag}.png`}
+                  alt={lang.alt}
+                  width="24"
+                  height="16"
+                  className="w-6 h-6 rounded-full border border-[#ccc] flex-shrink-0"
+                  loading="lazy"
+                />
+                <span className="hidden md:inline ml-2 text-sm">{lang.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </nav>
   ), [currentLanguage, isLanguageDropdownOpen, language, toggleLanguageDropdown, handleLanguageChange, languages]);

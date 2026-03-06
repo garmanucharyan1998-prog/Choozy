@@ -603,6 +603,96 @@ export const mockBrands = [
   { id: "oneplus", name: "OnePlus", logo: "➕", productCount: 1 }
 ];
 
+export const mockTopProducts = [
+  {
+    id: 'top-1',
+    title: 'Apple iPhone 16 Pro Max 1TB Black Titanium',
+    price: '489,600 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/smartphone.png',
+  },
+  {
+    id: 'top-2',
+    title: 'SONY: Ականջակալներ',
+    price: '120,600 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/earphones.png',
+  },
+  {
+    id: 'top-3',
+    title: 'SLING: Դրամապանակ',
+    price: '120,600 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/bag.png',
+  },
+  {
+    id: 'top-4',
+    title: 'Sigma 30mm f/1.4 Contemporary DC DN',
+    price: '120,600 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/objective.png',
+  },
+  {
+    id: 'top-5',
+    title: 'Apple MacBook Pro 14',
+    price: '1,200,000 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/smartphone.png',
+  },
+  {
+    id: 'top-6',
+    title: 'Sony 4K TV',
+    price: '450,000 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/bag.png',
+  },
+];
+
+export const mockVarietyProducts = [
+  {
+    id: 'var-1',
+    title: 'Apple iPhone 16 Pro Max 1TB Black Titanium',
+    price: '489,600 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/smartphone.png',
+  },
+  {
+    id: 'var-2',
+    title: 'SONY: Ականջակալներ',
+    price: '120,600 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/earphones.png',
+  },
+  {
+    id: 'var-3',
+    title: 'SLING: Դրամապանակ',
+    price: '120,600 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/bag.png',
+  },
+  {
+    id: 'var-4',
+    title: 'Sigma 30mm f/1.4 Contemporary DC DN',
+    price: '120,600 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/objective.png',
+  },
+  {
+    id: 'var-5',
+    title: 'Apple MacBook Pro 14',
+    price: '1,200,000 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/smartphone.png',
+  },
+  {
+    id: 'var-6',
+    title: 'Sony 4K TV',
+    price: '450,000 AMD',
+    description: 'Choosy-ը նոր առցանգ շուկա է՝ նախատեսված խելամիտ Choozy',
+    image: '/assets/images/gridCatalog/bag.png',
+  },
+];
+
 export const getProductsByCategory = (category) => {
   return mockProducts.filter(product => product.category === category);
 };
@@ -625,6 +715,8 @@ export const getInStockProducts = () => {
 
 export default {
   products: mockProducts,
+  topProducts: mockTopProducts,
+  varietyProducts: mockVarietyProducts,
   categories: mockCategories,
   brands: mockBrands,
   popularSearches: mockPopularSearches,

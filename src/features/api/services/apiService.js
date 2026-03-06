@@ -1,5 +1,5 @@
 
-import { mockProducts, mockArmenianSuggestions, mockPopularSearches } from '../mocks/mockData.js';
+import { mockProducts, mockArmenianSuggestions, mockPopularSearches, mockTopProducts, mockVarietyProducts } from '../mocks/mockData.js';
 
 export const searchProducts = async (query, options = {}) => {
   await new Promise(resolve => setTimeout(resolve, 300));
@@ -197,6 +197,16 @@ export const getProductsByBrand = async (brand, options = {}) => {
   };
 };
 
+export const getTopProducts = async () => {
+  await new Promise(resolve => setTimeout(resolve, 200));
+  return { success: true, data: mockTopProducts };
+};
+
+export const getVarietyProducts = async () => {
+  await new Promise(resolve => setTimeout(resolve, 200));
+  return { success: true, data: mockVarietyProducts };
+};
+
 export const apiService = {
   searchProducts,
   getPopularSearches,
@@ -204,7 +214,9 @@ export const apiService = {
   getProductById,
   getProductsByCategory,
   getProductsByType,
-  getProductsByBrand
+  getProductsByBrand,
+  getTopProducts,
+  getVarietyProducts
 };
 
 export default apiService;
