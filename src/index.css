@@ -1,6 +1,6 @@
-:root {
-  --scrollbar-width: calc(100vw - 100%);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @font-face {
   font-family: "Montserrat";
@@ -74,14 +74,22 @@
   font-display: swap;
 }
 
-body {
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-family: "MontserratArm", sans-serif;
+@layer base {
+  body {
+    @apply m-0 antialiased font-sans;
+  }
+
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+
+  figure {
+    @apply m-0;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+@layer components {
+  .cont-width-default {
+    @apply w-full max-w-site mx-auto;
+  }
 }

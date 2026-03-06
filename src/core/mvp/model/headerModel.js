@@ -4,9 +4,9 @@
  */
 
 export const LANGUAGES = {
-  am: { code: "am", name: "\u0540\u0561\u0575", flag: "am", alt: "\u0540\u0561\u0575\u0565\u0580\u0565\u0576" },
+  am: { code: "am", name: "Հայ", flag: "am", alt: "Հայերեն" },
   en: { code: "en", name: "Eng", flag: "gb", alt: "English" },
-  ru: { code: "ru", name: "\u0420\u0443\u0441", flag: "ru", alt: "\u0420\u0443\u0441\u0441\u043a\u0438\u0439" },
+  ru: { code: "ru", name: "Рус", flag: "ru", alt: "Русский" },
 };
 
 export const DEFAULT_LANGUAGE = "am";

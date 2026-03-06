@@ -1,5 +1,4 @@
 import Header from "./components/Header/Header";
-import "./App.css";
 import NavPanel from "./components/NavPanel/NavPanel";
 import GridCatalog from "./components/sections/GridCatalog/GridCatalog";
 import TopProducts from "./components/sections/TopProducts/TopProducts";
@@ -10,9 +9,9 @@ import Footer from "./components/Footer/Footer";
 
 function App() {
   return (
-    <div className="App">
+    <div className="min-w-[360px] bg-white text-center">
       <Header />
-      <main>
+      <main className="bg-white px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
         <NavPanel />
         <GridCatalog />
         <TopProducts />

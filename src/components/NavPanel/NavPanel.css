@@ -1,42 +1,6 @@
-.nav-panel {
-  position: relative;
-  display: flex;
-  background-color: #ffffff;
-  color: #171717;
-  padding: 20px 0;
-  margin: 12px 0;
-}
-
-.nav-panel > .nav-list {
-  margin: 0 auto;
-}
-
-.nav-list {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  gap: 0;
-  width: 100%;
-}
-
-.nav-list > div:first-child {
-  flex-shrink: 0;
-}
-
+/* Custom scrollbar — no Tailwind equivalent */
 .nav-items-container {
-  display: flex;
-  list-style: none;
-  gap: 0;
-  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  flex: 1;
-  min-width: 0;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-items-container > div {
-  flex-shrink: 0;
 }
 
 .nav-items-container::-webkit-scrollbar {
@@ -54,84 +18,11 @@
 }
 
 .nav-items-container:hover::-webkit-scrollbar-thumb,
-.nav-items-container .nav-link:hover ~ * ~ * ~ * ~ * ::-webkit-scrollbar-thumb,
 .nav-items-container:has(.nav-link:hover)::-webkit-scrollbar-thumb {
-
   background: #d1d5db;
 }
 
 .nav-items-container:hover::-webkit-scrollbar-thumb:hover,
 .nav-items-container:has(.nav-link:hover)::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
-}
-
-.nav-link,
-.nav-button {
-  font-size: 12px;
-  font-weight: 500;
-  color: #1f2937;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  text-align: start;
-  padding: 18px 14px;
-  width: fit-content;
-  max-width: 160px;
-  height: 54px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.catalog-btn {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background-color: #152147;
-  color: white;
-  border-radius: 4px;
-  padding: 18px 20px;
-  margin-right: 26px;
-  width: 160px;
-  height: 54px;
-}
-
-.nav-link:hover,
-.nav-button:hover {
-  color: #2563eb;
-}
-
-.selected {
-  background-color: #f2f4f9;
-  border-radius: 12px;
-  color: #152147;
-}
-
-@media (max-width: 1024px) {
-  .catalog-btn {
-    font-size: 16px;
-    width: 130px;
-    height: 36px;
-    min-height: unset;
-    padding: 6px 10px;
-    min-width: fit-content;
-  }
-
-  .nav-link,
-  .nav-button {
-    font-size: 12px;
-    padding: 4px 8px;
-    line-height: 1.3;
-    letter-spacing: -0.7px;
-    height: auto;
-    min-height: 36px;
-    max-width: 100px;
-    align-items: center;
-  }
-}
-
-@media (max-width: 768px) {
-
-
 }
