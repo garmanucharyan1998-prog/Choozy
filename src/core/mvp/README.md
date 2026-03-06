@@ -52,13 +52,13 @@ User Action -> View (callback) -> Presenter -> Model (API)
 
 ## Coverage
 
-| Component        | Model              | Presenter                  | View                  |
-|-----------------|--------------------|-----------------------------|----------------------|
-| Header          | headerModel, searchModel | useHeaderPresenter    | Header.jsx           |
-| NavPanel        | navModel           | useNavPanelPresenter        | NavPanel.jsx         |
-| GridCatalog     | catalogModel       | useGridCatalogPresenter     | GridCatalog.jsx      |
-| TopProducts     | productModel       | useTopProductsPresenter     | TopProducts.jsx      |
-| Variety         | productModel       | useVarietyPresenter         | Variety.jsx          |
-| ServicesOverview| servicesModel      | useServicesPresenter        | ServicesOverview.jsx  |
-| AboutUs         | (static)           | (none)                      | AboutUs.jsx          |
-| Footer          | (static)           | (none)                      | Footer.js            |
+| Component             | Model                    | Presenter                   | View                       |
+|-----------------------|--------------------------|-----------------------------|----------------------------|
+| Header                | headerModel, searchModel | useHeaderPresenter          | Header.jsx                 |
+| NavPanel              | navModel                 | useNavPanelPresenter        | NavPanel.jsx               |
+| GridCatalog           | catalogModel             | useGridCatalogPresenter     | GridCatalog.jsx            |
+| TopProducts           | productModel             | useTopProductsPresenter     | TopProducts.jsx            |
+| Variety               | productModel             | useVarietyPresenter         | Variety.jsx                |
+| ServicesOverview      | servicesModel            | use ServicesPresenter       | ServicesOverview.jsx       |
+| AboutUs               | (static)                 | (none)                      | AboutUs.jsx                |
+| Footer                | (static)                 | (none)                      | Footer.js                  |
