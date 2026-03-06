@@ -1,103 +1,32 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+/**
+ * Header - MVP View.
+ * Receives data and callbacks from useHeaderPresenter, render only.
+ */
+import { useMemo } from "react";
 import "./Header.css";
 import { FaSearch, FaBalanceScale, FaUser, FaTimes } from "react-icons/fa";
 import choozyMainLogo from "../../assets/Logos/choozyMainLogo.svg";
-import { getSearchSuggestions, searchProducts } from "../../features/api/services/apiService";
-
-// Constants for better maintainability
-const MIN_SEARCH_LENGTH = 2;
-const LANGUAGES = {
-  am: { code: "am", name: "Հայ", flag: "am", alt: "Հայերեն" },
-  en: { code: "en", name: "Eng", flag: "gb", alt: "English" },
-  ru: { code: "ru", name: "Рус", flag: "ru", alt: "Русский" }
-};
+import { useHeaderPresenter } from "../../core/mvp/presenter";
 
 const Header = () => {
-  // State management
-  const [language, setLanguage] = useState("am");
-  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchSuggestions, setSearchSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showNoResultsInDropdown, setShowNoResultsInDropdown] = useState(false);
+  const {
+    languages,
+    language,
+    currentLanguage,
+    isLanguageDropdownOpen,
+    handleLanguageChange,
+    toggleLanguageDropdown,
+    searchQuery,
+    searchSuggestions,
+    showSuggestions,
+    showNoResults,
+    handleSearchInputChange,
+    handleSearchSubmit,
+    handleSuggestionClick,
+    handleClearSearch,
+    handleSearchFocus,
+  } = useHeaderPresenter();
 
-  // Memoized current language data
-  const currentLanguage = useMemo(() => LANGUAGES[language], [language]);
-
-  // Language handling
-  const handleLanguageChange = useCallback((langCode) => {
-    setLanguage(langCode);
-    setIsLanguageDropdownOpen(false);
-  }, []);
-
-  const toggleLanguageDropdown = useCallback(() => {
-    setIsLanguageDropdownOpen(prev => !prev);
-  }, []);
-
-  // Search functionality
-  const handleSearchInputChange = useCallback(async (e) => {
-    const query = e.target.value.trim();
-    setSearchQuery(query);
-    
-    if (query.length >= MIN_SEARCH_LENGTH) {
-      try {
-        const suggestionsResponse = await getSearchSuggestions(query);
-        if (suggestionsResponse.success) {
-          const hasResults = suggestionsResponse.data.length > 0;
-          setSearchSuggestions(suggestionsResponse.data);
-          setShowNoResultsInDropdown(!hasResults);
-          setShowSuggestions(true);
-        }
-      } catch (error) {
-        console.error('Error getting search suggestions:', error);
-        setSearchSuggestions([]);
-        setShowNoResultsInDropdown(true);
-        setShowSuggestions(true);
-      }
-    } else {
-      setSearchSuggestions([]);
-      setShowSuggestions(false);
-      setShowNoResultsInDropdown(false);
-    }
-  }, []);
-
-  const handleSearchSubmit = useCallback((e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      setShowSuggestions(false);
-      // TODO: Implement actual search functionality
-      console.log('Search submitted:', searchQuery);
-    }
-  }, [searchQuery]);
-
-  const handleSuggestionClick = useCallback((suggestion) => {
-    setSearchQuery(suggestion);
-    setShowSuggestions(false);
-    console.log('Suggestion selected:', suggestion);
-  }, []);
-
-  const handleClearSearch = useCallback(() => {
-    setSearchQuery("");
-    setSearchSuggestions([]);
-    setShowSuggestions(false);
-    setShowNoResultsInDropdown(false);
-  }, []);
-
-  const handleClickOutside = useCallback((e) => {
-    if (!e.target.closest('.search-bar')) {
-      setShowSuggestions(false);
-    }
-  }, []);
-
-  // Event listeners
-  useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [handleClickOutside]);
-
-  // Memoized components for better performance
   const LogoSection = useMemo(() => (
     <a 
       href="/" 
@@ -143,7 +72,7 @@ const Header = () => {
         className="search-input"
         value={searchQuery}
         onChange={handleSearchInputChange}
-        onFocus={() => searchQuery.length >= MIN_SEARCH_LENGTH && setShowSuggestions(true)}
+        onFocus={handleSearchFocus}
         autoComplete="off"
         style={{ WebkitAppearance: 'none' }}
         maxLength="100"
@@ -198,7 +127,7 @@ const Header = () => {
                 {suggestion}
               </div>
             ))
-          ) : showNoResultsInDropdown ? (
+          ) : showNoResults ? (
             <div className="no-results-item" role="status" aria-live="polite">
               Արդյունքներ չեն գտնվել
             </div>
@@ -206,7 +135,7 @@ const Header = () => {
         </div>
       )}
     </form>
-  ), [searchQuery, searchSuggestions, showSuggestions, showNoResultsInDropdown, handleSearchInputChange, handleSearchSubmit, handleClearSearch, handleSuggestionClick]);
+  ), [searchQuery, searchSuggestions, showSuggestions, showNoResults, handleSearchInputChange, handleSearchSubmit, handleClearSearch, handleSuggestionClick]);
 
   const UserNavigationSection = useMemo(() => (
     <nav className="nav-right" aria-label="User navigation">
@@ -271,7 +200,7 @@ const Header = () => {
           role="listbox"
           aria-label="Select language"
         >
-          {Object.entries(LANGUAGES).map(([code, lang]) => (
+          {Object.entries(languages).map(([code, lang]) => (
             <div
               key={code}
               className="lang-dropdown-item"

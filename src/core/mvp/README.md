@@ -6,17 +6,30 @@ Choozy uses **Model-View-Presenter (MVP)** for separation of concerns.
 
 ```
 core/mvp/
-├── model/          # Data access, business entities
-├── presenter/      # Presentation logic (hooks)
-└── view/           # Reference: components/ — thin UI components
+├── model/
+│   ├── productModel.js      # Product data (top products, variety)
+│   ├── searchModel.js       # Search suggestions, search submit
+│   ├── headerModel.js       # Languages config
+│   ├── catalogModel.js      # Grid catalog items
+│   ├── navModel.js          # Navigation items
+│   └── servicesModel.js     # Services overview data
+├── presenter/
+│   ├── index.js             # Re-exports all presenters
+│   ├── useTopProductsPresenter.js
+│   ├── useVarietyPresenter.js
+│   ├── useHeaderPresenter.js
+│   ├── useNavPanelPresenter.js
+│   ├── useGridCatalogPresenter.js
+│   └── useServicesPresenter.js
+└── view/                    # = components/ (thin UI components)
 ```
 
 ## Layers
 
 ### Model
-- **Location:** `core/mvp/model/productModel.js` (domain model) + `features/api/` (data source)
-- **Responsibility:** Load raw data via API/mocks, transform to view-ready format, resolve images
-- **Rule:** No UI logic, data only
+- **Location:** `core/mvp/model/` (domain) + `features/api/` (data source)
+- **Responsibility:** Data access, transformation, business rules
+- **Rule:** No UI logic, no JSX, data only
 
 ### Presenter
 - **Location:** `core/mvp/presenter/`
@@ -26,23 +39,26 @@ core/mvp/
 
 ### View
 - **Location:** `components/`
-- **Responsibility:** Render data and invoke callbacks
-- **Rule:** Presentational components, receive props from Presenter
+- **Responsibility:** Render data and invoke callbacks from Presenter
+- **Rule:** Presentational components, no direct API calls, no business logic
 
 ## Data Flow
 
 ```
-User Action → View (callback) → Presenter → Model (API)
-                ↑                              │
-                └────── state/props ←──────────┘
+User Action -> View (callback) -> Presenter -> Model (API)
+                 ^                                |
+                 +-------- state/props <----------+
 ```
 
-## Usage Example
+## Coverage
 
-```jsx
-// View
-const VarietyView = () => {
-  const { items, loading, error } = useVarietyPresenter();
-  return <VarietySection items={items} loading={loading} error={error} />;
-};
-```
+| Component        | Model              | Presenter                  | View                  |
+|-----------------|--------------------|-----------------------------|----------------------|
+| Header          | headerModel, searchModel | useHeaderPresenter    | Header.jsx           |
+| NavPanel        | navModel           | useNavPanelPresenter        | NavPanel.jsx         |
+| GridCatalog     | catalogModel       | useGridCatalogPresenter     | GridCatalog.jsx      |
+| TopProducts     | productModel       | useTopProductsPresenter     | TopProducts.jsx      |
+| Variety         | productModel       | useVarietyPresenter         | Variety.jsx          |
+| ServicesOverview| servicesModel      | useServicesPresenter        | ServicesOverview.jsx  |
+| AboutUs         | (static)           | (none)                      | AboutUs.jsx          |
+| Footer          | (static)           | (none)                      | Footer.js            |

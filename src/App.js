@@ -21,7 +21,6 @@ function App() {
         <ServicesOverview />
       </main>
       <Footer />
-      <footer></footer>
     </div>
   );
 }

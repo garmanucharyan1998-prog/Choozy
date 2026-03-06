@@ -1,5 +1,5 @@
 
-import { mockProducts, mockArmenianSuggestions } from '../mocks/mockData.js';
+import { mockProducts, mockArmenianSuggestions, mockPopularSearches } from '../mocks/mockData.js';
 
 export const searchProducts = async (query, options = {}) => {
   await new Promise(resolve => setTimeout(resolve, 300));
@@ -78,20 +78,7 @@ export const searchProducts = async (query, options = {}) => {
 
 export const getPopularSearches = async () => {
   await new Promise(resolve => setTimeout(resolve, 100));
-  
-  return {
-    success: true,
-    data: [
-      "iPhone 15",
-      "MacBook Air",
-      "Samsung Galaxy",
-      "AirPods Pro",
-      "PlayStation 5",
-      "iPad Pro",
-      "Nintendo Switch",
-      "Apple Watch"
-    ]
-  };
+  return { success: true, data: mockPopularSearches };
 };
 
 export const getSearchSuggestions = async (query) => {

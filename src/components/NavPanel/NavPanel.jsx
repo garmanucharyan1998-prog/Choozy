@@ -1,20 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavPanelPresenter } from "../../core/mvp/presenter";
 import "./NavPanel.css";
 
-const NAV_ITEMS = [
-  { label: "Տեխնիկա և էլեկտրոնիկա", aria: "Tech and Electronics" },
-  { label: "Շարժական բարձրախոսներ", aria: "Portable Speakers" },
-  { label: "Կենցաղային Տեխնիկա", aria: "Home Appliances" },
-  { label: "Խոհանոցային Տեխնիկա", aria: "Kitchen Appliances" },
-  { label: "Գեղեցկություն և խնամք", aria: "Beauty and Care" },
-];
-
 function NavPanel() {
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const handleSelect = (index) => {
-    setActiveIndex(index);
-  };
+  const { navItems, activeIndex, handleSelect } = useNavPanelPresenter();
 
   return (
     <nav className="nav-panel" aria-label="Main navigation menu">
@@ -31,7 +20,7 @@ function NavPanel() {
           </button>
         </div>
         <div className="nav-items-container">
-          {NAV_ITEMS.map((item, index) => (
+          {navItems.map((item, index) => (
             <div key={index}>
               <button
                 className={`nav-link ${
