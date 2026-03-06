@@ -1,47 +1,11 @@
-// TopProducts.jsx
+import React from "react";
 import "./TopProducts.css";
 import Carousel from "../../Carousel/Carousel";
-
-const products = [
-  {
-    title: "Apple iPhone 16 Pro Max 1TB Black Titanium",
-    price: "489,600 AMD",
-    description: "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ Choozy",
-    image: "/assets/images/gridCatalog/smartphone.png",
-  },
-  {
-    title: "SONY: Ականջակալներ",
-    price: "120,600 AMD",
-    description: "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ Choozy",
-    image: "/assets/images/gridCatalog/earphones.png",
-  },
-  {
-    title: "SLING: Դրամապանակ",
-    price: "120,600 AMD",
-    description: "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ Choozy",
-    image: "/assets/images/gridCatalog//bag.png",
-  },
-  {
-    title: "Sigma 30mm f/1.4 Contemporary DC DN",
-    price: "120,600 AMD",
-    description: "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ Choozy",
-    image: "/assets/images/gridCatalog/objective.png",
-  },
-  {
-    title: "Apple MacBook Pro 14",
-    price: "1,200,000 AMD",
-    description: "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ Choozy",
-    image: "/assets/images/gridCatalog/smartphone.png",
-  },
-  {
-    title: "Sony 4K TV",
-    price: "450,000 AMD",
-    description: "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ Choozy",
-    image: "/assets/images/gridCatalog/bag.png",
-  },
-];
+import { useTopProductsPresenter } from "../../../core/mvp/presenter";
 
 const TopProducts = () => {
+  const { items, loading, error, onRetry } = useTopProductsPresenter();
+
   return (
     <section className="top-products-section">
       <div className="cont-width-default">
@@ -49,7 +13,17 @@ const TopProducts = () => {
           <h2 className="section-title">Թոփ ապրանքներ</h2>
           <a href="/products">Տեսնել Ավելին</a>
         </div>
-        <Carousel items={products} />
+        {error && (
+          <div className="top-products-error">
+            {error}
+            <button type="button" onClick={onRetry}>Retry</button>
+          </div>
+        )}
+        {loading && !items.length ? (
+          <div className="top-products-loading">Loading...</div>
+        ) : (
+          <Carousel items={items} />
+        )}
       </div>
     </section>
   );
