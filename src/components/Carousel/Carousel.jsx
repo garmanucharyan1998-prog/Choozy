@@ -18,50 +18,54 @@ const Carousel = ({ items }) => {
       className="my-10 flex justify-center items-center"
       aria-label="Top products carousel"
     >
-      <div className="flex items-center relative overflow-hidden">
+      <div className="w-full relative px-1 sm:px-2 md:px-0 [&_.swiper-button-prev]:!hidden [&_.swiper-button-next]:!hidden md:[&_.swiper-button-prev]:!flex md:[&_.swiper-button-next]:!flex">
         <Swiper
           modules={[Navigation]}
           navigation
-          spaceBetween={20}
+          spaceBetween={10}
           slidesPerView={Math.min(5, slideCount || 1)}
           loop={loopEnabled}
           breakpoints={{
-            0: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 },
-            1280: { slidesPerView: 5 },
+            0: { slidesPerView: 1.05, spaceBetween: 8 },
+            320: { slidesPerView: 1.12, spaceBetween: 10 },
+            375: { slidesPerView: 1.2, spaceBetween: 10 },
+            480: { slidesPerView: 1.4, spaceBetween: 12 },
+            640: { slidesPerView: 2, spaceBetween: 14 },
+            768: { slidesPerView: 3, spaceBetween: 16 },
+            1024: { slidesPerView: 4, spaceBetween: 18 },
+            1280: { slidesPerView: 5, spaceBetween: 20 },
           }}
         >
           {safeItems.map((product, index) => (
             <SwiperSlide key={product.id || index} className="!flex justify-center m-0">
               <figure
-                className="group cursor-pointer overflow-hidden flex flex-col w-[230px] h-[440px] m-0 transition-all duration-[400ms] 2xl:w-[230px] 2xl:h-[440px]"
+                className="group cursor-pointer flex flex-col w-full max-w-[280px] min-h-[360px] m-0 transition-all duration-[400ms] sm:min-h-[390px] md:w-[230px] md:max-w-[230px] md:min-h-[440px] 2xl:min-h-[440px]"
                 style={{ width: undefined }}
                 aria-labelledby={`product-title-${index}`}
               >
                 <img
                   src={product.image || PLACEHOLDER_IMG}
                   alt={product.title}
-                  className="h-[240px] bg-[#f1f1f1] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-contain bg-no-repeat bg-center transition-all duration-[400ms] group-hover:bg-hover-blue object-contain 2xl:h-[285px]"
+                  className="h-[190px] bg-[#f1f1f1] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-contain bg-no-repeat bg-center transition-all duration-[400ms] group-hover:bg-hover-blue object-contain sm:h-[220px] md:h-[240px] 2xl:h-[285px]"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = PLACEHOLDER_IMG;
                   }}
                 />
-                <figcaption className="mt-2.5 h-[140px] flex flex-col justify-center text-start grow 2xl:h-[155px]">
+                <figcaption className="mt-2.5 flex flex-col text-start grow">
                   <h4
                     id={`product-title-${index}`}
-                    className="text-navy h-8 text-base font-semibold mt-3.5 mb-0 2xl:h-12"
+                    className="text-navy text-sm font-semibold mt-2.5 mb-0 leading-tight line-clamp-2 sm:text-base md:mt-3.5"
                   >
                     {product.title}
                   </h4>
                   <p
-                    className="my-2.5 h-8 text-sm text-text-muted overflow-hidden line-clamp-2 leading-[1.2em] max-h-[2.4em] 2xl:h-12"
+                    className="my-2 text-xs text-text-muted overflow-hidden line-clamp-2 leading-[1.25em] sm:text-sm sm:my-2.5 md:leading-[1.2em]"
                     title={product.description}
                   >
                     {product.description}
                   </p>
-                  <p className="text-navy text-sm font-semibold m-0 2xl:text-base">
+                  <p className="text-navy text-sm font-semibold m-0 mt-auto 2xl:text-base">
                     {product.price}
                   </p>
                 </figcaption>
