@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   FaSearch,
+  FaHome,
   FaBalanceScale,
   FaUser,
   FaTimes,
@@ -229,6 +230,64 @@ const Header = ({
     ],
   );
 
+  const mobileBottomNavItems = useMemo(
+    () => [
+      {
+        href: "/",
+        label: "Գլխավոր",
+        ariaLabel: "Go to home page",
+        iconType: "home",
+      },
+      {
+        href: "/compare",
+        label: "Համեմատել",
+        ariaLabel: "Go to compare products",
+        iconType: "compare",
+      },
+      {
+        href: "/favorites",
+        label: "Նախընտրելի",
+        ariaLabel: "Go to favorite products",
+        iconType: "favorites",
+      },
+      {
+        href: "/login",
+        label: "Մուտք",
+        ariaLabel: "Open personal account",
+        iconType: "profile",
+      },
+    ],
+    [],
+  );
+
+  /** Renders mobile bottom panel icon according to item type and active state. */
+  const renderMobileBottomIcon = useCallback((iconType, isActive) => {
+    const commonIconClassName = isActive ? "text-[#fbfbfb]" : "text-[#6B738C]";
+    const commonIconSize = 18;
+
+    switch (iconType) {
+      case "home":
+        return <FaHome size={commonIconSize} className={commonIconClassName} aria-hidden="true" />;
+      case "compare":
+        return <FaBalanceScale size={commonIconSize} className={commonIconClassName} aria-hidden="true" />;
+      case "favorites":
+        return (
+          <img
+            src="/assets/icons/heart.svg"
+            alt=""
+            width="18"
+            height="18"
+            className={`${isActive ? "brightness-0 invert" : "opacity-60"} transition-all duration-200`}
+            aria-hidden="true"
+          />
+        );
+      case "profile":
+        return <FaUser size={commonIconSize} className={commonIconClassName} aria-hidden="true" />;
+      default:
+        return null;
+    }
+  }, []);
+
   const UserNavigationSection = useMemo(
     () => (
       <nav
@@ -372,6 +431,8 @@ const Header = ({
     ],
   );
 
+  const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+
   return (
     <header
       ref={headerRef}
@@ -409,6 +470,44 @@ const Header = ({
           ))}
         </nav>
       </aside>
+
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#e6e9f2] bg-[#fbfbfb] shadow-[0_-4px_18px_rgba(157,157,157,0.12)] md:hidden"
+        aria-label="Bottom mobile navigation"
+      >
+        <ul
+          className="m-0 flex list-none items-end justify-around px-4 pt-2"
+          style={{ paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom))" }}
+        >
+          {mobileBottomNavItems.map((item) => {
+            const isActive =
+              item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href);
+
+            return (
+              <li key={item.href} className="flex-1">
+                <a
+                  href={item.href}
+                  className="flex w-full flex-col items-center justify-center gap-1 py-1.5 no-underline transition-colors duration-200"
+                  aria-label={item.ariaLabel}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={handleMobileMenuClose}
+                >
+                  <span
+                    className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                      isActive ? "bg-[#152147]" : "bg-transparent"
+                    }`}
+                  >
+                    {renderMobileBottomIcon(item.iconType, isActive)}
+                  </span>
+                  <span className={`text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
+                    {item.label}
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </header>
   );
 };
