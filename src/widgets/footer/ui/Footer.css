@@ -1,0 +1,10 @@
+.footer-bottom-bar {
+  padding-bottom: var(--mobile-bottom-nav-height, 0px);
+}
+
+@media (min-width: 768px) {
+  .footer-bottom-bar {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+}

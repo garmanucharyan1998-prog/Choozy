@@ -22,7 +22,7 @@ const HomePage = () => {
   } = useHomePagePresenter();
 
   return (
-    <div className="min-w-[360px] bg-white text-center">
+    <div className="min-w-[320px] bg-white text-center">
       <div
         className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[65] bg-black/45 transition-opacity duration-[400ms] ease-in-out md:hidden ${
           isAnyMobilePanelOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
@@ -56,7 +56,7 @@ const HomePage = () => {
         />
       </div>
 
-      <main className="bg-white px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
+      <main className="bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
         <GridCatalogWidget />
         <TopProductsWidget />
         <AboutUsWidget />

@@ -1,4 +1,5 @@
 import choozyMainLogoWhite from "shared/assets/logos/choozyMainLogoWhite.svg";
+import "./Footer.css";
 
 const socialLinks = [
   {
@@ -38,9 +39,9 @@ const footerColumns = [
 ];
 
 const columnClassName =
-  "flex flex-col gap-[10px] items-center text-center min-w-0 sm:gap-3 md:gap-4 md:items-stretch md:text-left md:min-w-[150px] lg:min-w-[200px]";
+  "flex flex-col gap-2 items-center text-center min-w-0 sm:gap-[10px] md:gap-4 md:items-stretch md:text-left md:min-w-[150px] lg:min-w-[200px]";
 const textLinkClassName =
-  "flex items-center text-white no-underline text-xs mr-auto transition-opacity duration-300 hover:opacity-80 md:text-sm md:mr-0";
+  "flex items-center text-white no-underline text-[11px] mr-auto transition-opacity duration-300 hover:opacity-80 sm:text-xs md:text-sm md:mr-0";
 
 const SocialLink = ({ href, label, iconPath }) => (
   <a
@@ -74,14 +75,14 @@ const FooterLink = ({ href, label, id, withEmailIcon = false }) => (
 const Footer = () => {
   return (
     <footer id="contact" className="bg-navy text-white text-sm">
-      <div className="cont-width-default mx-auto box-border px-4 py-4 md:px-10 md:py-[31px] lg:px-[60px] lg:py-12 2xl:px-[100px] 2xl:py-[70px]">
-        <div className="flex flex-col gap-[30px] mb-5 sm:items-center md:flex-row md:justify-between md:items-start md:gap-0 md:mb-0">
+      <div className="cont-width-default mx-auto box-border px-3 py-3 sm:px-4 sm:py-4 md:px-10 md:py-[31px] lg:px-[60px] lg:py-12 2xl:px-[100px] 2xl:py-[70px]">
+        <div className="flex flex-col gap-5 sm:gap-[30px] mb-4 sm:mb-5 sm:items-center md:flex-row md:justify-between md:items-start md:gap-0 md:mb-0">
           <div className="flex flex-col gap-5">
             <div>
               <img
                 src={choozyMainLogoWhite}
                 alt="Choosy"
-                className="block h-[47px] w-auto rounded mr-auto mb-auto"
+                className="block h-[38px] sm:h-[47px] w-auto rounded mr-auto mb-auto"
               />
             </div>
             <div className="flex gap-4">
@@ -96,7 +97,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <nav className="flex flex-col gap-4 w-full sm:gap-5 md:flex-row md:gap-10 md:w-auto md:flex-1 md:justify-end lg:gap-20 lg:px-20">
+          <nav className="flex flex-col gap-3 w-full sm:gap-5 md:flex-row md:gap-10 md:w-auto md:flex-1 md:justify-end lg:gap-20 lg:px-20">
             {footerColumns.map((column, columnIndex) => (
               <div key={columnIndex} className={columnClassName}>
                 {column.map((link) => (
@@ -114,8 +115,8 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="bg-black py-5 text-center">
-        <p className="m-0 text-sm text-white">{"©"} 2025, Choosy. All Rights Reserved</p>
+      <div className="footer-bottom-bar bg-black pt-3 text-center sm:pt-5">
+        <p className="m-0 text-xs sm:text-sm text-white">{"©"} 2025, Choosy. All Rights Reserved</p>
       </div>
     </footer>
   );

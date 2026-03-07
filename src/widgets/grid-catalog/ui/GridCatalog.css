@@ -56,12 +56,12 @@
   }
 }
 
-@media (max-width: 374px) {
+@media (max-width: 375px) {
   .grid-catalog {
     grid-template-columns: 1fr;
     grid-template-rows: none;
     grid-auto-rows: auto;
-    gap: 10px;
+    gap: 8px;
   }
 
   .grid-catalog .grid-item {

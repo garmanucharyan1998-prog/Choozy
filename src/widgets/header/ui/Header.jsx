@@ -19,6 +19,7 @@ const Header = ({
   onCloseMobileMenu,
 }) => {
   const headerRef = useRef(null);
+  const mobileBottomNavRef = useRef(null);
 
   const {
     languages,
@@ -55,29 +56,89 @@ const Header = ({
   }, [onCloseMobileMenu]);
 
   useEffect(() => {
+    const isTouchLikeDevice = () =>
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches ||
+      window.matchMedia("(any-hover: none) and (any-pointer: coarse)").matches;
+
     const updateHeaderHeight = () => {
       const headerHeight = headerRef.current?.offsetHeight ?? 0;
       document.documentElement.style.setProperty("--header-height", `${headerHeight}px`);
     };
 
-    updateHeaderHeight();
+    const updateMobileBottomNavHeight = () => {
+      const mobileBottomNavHeight = mobileBottomNavRef.current?.offsetHeight ?? 0;
+      document.documentElement.style.setProperty("--mobile-bottom-nav-height", `${mobileBottomNavHeight}px`);
+    };
+
+    /**
+     * Keeps fixed bottom elements stable on mobile browsers while
+     * browser chrome appears/disappears during scroll.
+     */
+    const updateMobileViewportBottomOffset = () => {
+      const shouldApplyMobileViewportOffset =
+        window.innerWidth < 768 &&
+        typeof window.visualViewport !== "undefined" &&
+        isTouchLikeDevice();
+
+      if (!shouldApplyMobileViewportOffset) {
+        document.documentElement.style.setProperty("--mobile-viewport-offset-bottom", "0px");
+        return;
+      }
+
+      const layoutViewportHeight = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+      const viewportBottom = window.visualViewport.offsetTop + window.visualViewport.height;
+      const viewportBottomOffset = Math.max(0, layoutViewportHeight - viewportBottom);
+
+      document.documentElement.style.setProperty(
+        "--mobile-viewport-offset-bottom",
+        `${viewportBottomOffset}px`,
+      );
+    };
+
+    const updateLayoutMetrics = () => {
+      updateHeaderHeight();
+      updateMobileBottomNavHeight();
+      updateMobileViewportBottomOffset();
+    };
+
+    updateLayoutMetrics();
 
     let resizeObserver = null;
     if (typeof ResizeObserver !== "undefined") {
-      resizeObserver = new ResizeObserver(updateHeaderHeight);
+      resizeObserver = new ResizeObserver(updateLayoutMetrics);
       if (headerRef.current) {
         resizeObserver.observe(headerRef.current);
       }
+      if (mobileBottomNavRef.current) {
+        resizeObserver.observe(mobileBottomNavRef.current);
+      }
     }
 
-    window.addEventListener("resize", updateHeaderHeight);
+    const visualViewport = window.visualViewport;
+
+    window.addEventListener("resize", updateLayoutMetrics);
+    window.addEventListener("orientationchange", updateLayoutMetrics);
+    window.addEventListener("scroll", updateMobileViewportBottomOffset, { passive: true });
+
+    if (visualViewport) {
+      visualViewport.addEventListener("resize", updateMobileViewportBottomOffset);
+      visualViewport.addEventListener("scroll", updateMobileViewportBottomOffset);
+    }
 
     return () => {
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
-      window.removeEventListener("resize", updateHeaderHeight);
+      window.removeEventListener("resize", updateLayoutMetrics);
+      window.removeEventListener("orientationchange", updateLayoutMetrics);
+      window.removeEventListener("scroll", updateMobileViewportBottomOffset);
+      if (visualViewport) {
+        visualViewport.removeEventListener("resize", updateMobileViewportBottomOffset);
+        visualViewport.removeEventListener("scroll", updateMobileViewportBottomOffset);
+      }
       document.documentElement.style.removeProperty("--header-height");
+      document.documentElement.style.removeProperty("--mobile-bottom-nav-height");
+      document.documentElement.style.removeProperty("--mobile-viewport-offset-bottom");
     };
   }, []);
 
@@ -92,7 +153,7 @@ const Header = ({
         <img
           src={choozyMainLogo}
           alt="Choozy - Electronics online store logo"
-          className={`${isCompact ? "w-[44px] sm:w-[78px]" : "w-[55px] sm:w-[100px]"} h-auto transition-all duration-300`}
+          className={`${isCompact ? "w-[38px] sm:w-[78px]" : "w-[44px] sm:w-[100px]"} h-auto transition-all duration-300`}
           loading="eager"
         />
       </a>
@@ -124,14 +185,14 @@ const Header = ({
     () => (
       <form
         className={`search-bar relative flex bg-input-bg rounded-pill grow border-[1.5px] border-accent-blue order-3 w-full md:order-none md:w-auto md:mt-0 md:ml-5 2xl:max-w-[400px] 2xl:ml-0 transition-all duration-300 ${
-          isCompact ? "mt-2" : "mt-3"
+          isCompact ? "mt-1.5 sm:mt-2" : "mt-2 sm:mt-3"
         }`}
         role="search"
         onSubmit={handleSearchSubmit}
         aria-label="Product search"
       >
         <FaSearch
-          className={`text-[#888] self-center transition-all duration-300 ${isCompact ? "mr-1.5 ml-3" : "mr-2 ml-[18px]"}`}
+          className={`text-[#888] self-center text-xs sm:text-sm transition-all duration-300 ${isCompact ? "mr-1 ml-2 sm:mr-1.5 sm:ml-3" : "mr-1.5 ml-2.5 sm:mr-2 sm:ml-[18px]"}`}
           aria-hidden="true"
         />
         <input
@@ -140,8 +201,8 @@ const Header = ({
           placeholder={"Որոնել"}
           aria-label="Search for products and services"
           aria-describedby="search-help"
-          className={`search-input border-none bg-transparent grow text-sm outline-none transition-all duration-300 ${
-            isCompact ? "p-2 2xl:p-2.5" : "p-3 2xl:p-4"
+          className={`search-input border-none bg-transparent grow text-xs sm:text-sm outline-none transition-all duration-300 ${
+            isCompact ? "p-1.5 sm:p-2 2xl:p-2.5" : "p-2 sm:p-3 2xl:p-4"
           }`}
           value={searchQuery}
           onChange={handleSearchInputChange}
@@ -172,8 +233,8 @@ const Header = ({
           type="submit"
           className={`bg-accent-blue border-none rounded-pill text-active-blue font-semibold cursor-pointer transition-all duration-200 hover:enabled:bg-[#c8d4ff] hover:enabled:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed 2xl:ml-0 ${
             isCompact
-              ? "px-3 py-2 text-xs -ml-[86px] lg:-ml-4 2xl:px-4 2xl:py-2.5 2xl:text-[13px]"
-              : "px-4 py-3 text-[13px] -ml-[100px] lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm"
+              ? "px-2.5 py-1.5 text-[11px] -ml-[76px] sm:px-3 sm:py-2 sm:text-xs sm:-ml-[86px] lg:-ml-4 2xl:px-4 2xl:py-2.5 2xl:text-[13px]"
+              : "px-3 py-2 text-xs -ml-[86px] sm:px-4 sm:py-3 sm:text-[13px] sm:-ml-[100px] lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm"
           }`}
           aria-label="Execute search"
           disabled={!searchQuery.trim()}
@@ -291,7 +352,7 @@ const Header = ({
   const UserNavigationSection = useMemo(
     () => (
       <nav
-        className={`flex items-center transition-all duration-300 ${isCompact ? "gap-1.5 md:gap-1.5 2xl:gap-3" : "gap-2 md:gap-[5px] 2xl:gap-4"}`}
+        className={`flex items-center transition-all duration-300 ${isCompact ? "gap-1 sm:gap-1.5 md:gap-1.5 2xl:gap-3" : "gap-1.5 sm:gap-2 md:gap-[5px] 2xl:gap-4"}`}
         aria-label="User navigation"
       >
         <a
@@ -347,7 +408,7 @@ const Header = ({
         <button
           type="button"
           className={`md:hidden flex items-center justify-center rounded-full bg-[#eceff3] text-navy border-none cursor-pointer transition-all duration-300 ease-in-out hover:bg-accent-blue hover:scale-105 ${
-            isCompact ? "w-7 h-7" : "w-8 h-8"
+            isCompact ? "w-6 h-6 sm:w-7 sm:h-7" : "w-7 h-7 sm:w-8 sm:h-8"
           }`}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={isMobileMenuOpen}
@@ -369,12 +430,12 @@ const Header = ({
               alt={currentLanguage.alt}
               width="24"
               height="16"
-              className={`${isCompact ? "w-5 h-5" : "w-6 h-6"} rounded-full border border-[#ccc] transition-all duration-300`}
+              className={`${isCompact ? "w-4 h-4 sm:w-5 sm:h-5" : "w-5 h-5 sm:w-6 sm:h-6"} rounded-full border border-[#ccc] transition-all duration-300`}
               loading="lazy"
             />
-            <span className={`font-semibold text-[#171717] md:hidden ${isCompact ? "text-[11px]" : "text-xs"}`}>{currentLanguage.name}</span>
+            <span className={`font-semibold text-[#171717] md:hidden ${isCompact ? "text-[10px] sm:text-[11px]" : "text-[11px] sm:text-xs"}`}>{currentLanguage.name}</span>
             <FaChevronDown
-              className={`text-[#171717] md:hidden transition-transform duration-200 ${isCompact ? "text-[9px]" : "text-[10px]"} ${isLanguageDropdownOpen ? "rotate-180" : ""}`}
+              className={`text-[#171717] md:hidden transition-transform duration-200 ${isCompact ? "text-[8px] sm:text-[9px]" : "text-[9px] sm:text-[10px]"} ${isLanguageDropdownOpen ? "rotate-180" : ""}`}
               aria-hidden="true"
             />
           </button>
@@ -436,8 +497,8 @@ const Header = ({
   return (
     <header
       ref={headerRef}
-      className={`relative flex justify-center bg-transparent px-5 lg:px-[50px] 2xl:px-[100px] transition-all duration-300 ${
-        isCompact ? "py-2.5" : "py-5"
+      className={`relative flex justify-center bg-transparent px-3 sm:px-5 lg:px-[50px] 2xl:px-[100px] transition-all duration-300 ${
+        isCompact ? "py-2" : "py-3 sm:py-5"
       }`}
       role="banner"
     >
@@ -449,7 +510,7 @@ const Header = ({
       </div>
 
       <aside
-        className={`fixed top-[var(--header-height,72px)] right-0 z-40 w-[80vw] max-w-[300px] h-[calc(100vh-var(--header-height,72px))] bg-white border-l border-[#e6e9f2] px-4 py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
+        className={`fixed top-[var(--header-height,72px)] right-0 z-40 w-[75vw] max-w-[300px] h-[calc(100vh-var(--header-height,72px))] bg-white border-l border-[#e6e9f2] px-3 py-5 sm:px-4 sm:py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-label="Mobile navigation menu"
@@ -472,13 +533,12 @@ const Header = ({
       </aside>
 
       <nav
+        ref={mobileBottomNavRef}
         className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#e6e9f2] bg-[#fbfbfb] shadow-[0_-4px_18px_rgba(157,157,157,0.12)] md:hidden"
         aria-label="Bottom mobile navigation"
+        style={{ bottom: "var(--mobile-viewport-offset-bottom, 0px)" }}
       >
-        <ul
-          className="m-0 flex list-none items-end justify-around px-4 pt-2"
-          style={{ paddingBottom: "calc(0.5rem + env(safe-area-inset-bottom))" }}
-        >
+        <ul className="m-0 flex list-none items-end justify-around px-2 sm:px-4 pt-2 pb-2 sm:pb-2.5">
           {mobileBottomNavItems.map((item) => {
             const isActive =
               item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href);
@@ -493,13 +553,13 @@ const Header = ({
                   onClick={handleMobileMenuClose}
                 >
                   <span
-                    className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                    className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full transition-all duration-200 ${
                       isActive ? "bg-[#152147]" : "bg-transparent"
                     }`}
                   >
                     {renderMobileBottomIcon(item.iconType, isActive)}
                   </span>
-                  <span className={`text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
+                  <span className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
                     {item.label}
                   </span>
                 </a>

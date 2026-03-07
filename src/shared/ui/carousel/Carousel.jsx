@@ -14,7 +14,7 @@ const Carousel = ({ items }) => {
 
   return (
     <section
-      className="my-10 flex justify-center items-center"
+      className="my-5 sm:my-10 flex justify-center items-center"
       aria-label="Top products carousel"
     >
       <div className="w-full relative px-1 sm:px-2 md:px-0 [&_.swiper-button-prev]:!hidden [&_.swiper-button-next]:!hidden md:[&_.swiper-button-prev]:!flex md:[&_.swiper-button-next]:!flex">
@@ -38,14 +38,14 @@ const Carousel = ({ items }) => {
           {safeItems.map((product, index) => (
             <SwiperSlide key={product.id || index} className="!flex justify-center m-0">
               <figure
-                className="group cursor-pointer flex flex-col w-full max-w-[280px] min-h-[360px] m-0 transition-all duration-[400ms] sm:min-h-[390px] md:w-[230px] md:max-w-[230px] md:min-h-[440px] 2xl:min-h-[440px]"
+                className="group cursor-pointer flex flex-col w-full max-w-[260px] min-h-[320px] m-0 transition-all duration-[400ms] sm:max-w-[280px] sm:min-h-[360px] md:w-[230px] md:max-w-[230px] md:min-h-[440px] 2xl:min-h-[440px]"
                 style={{ width: undefined }}
                 aria-labelledby={`product-title-${index}`}
               >
                 <img
                   src={product.image || PLACEHOLDER_IMG}
                   alt={product.title}
-                  className="h-[190px] bg-[#f1f1f1] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-contain bg-no-repeat bg-center transition-all duration-[400ms] group-hover:bg-hover-blue object-contain sm:h-[220px] md:h-[240px] 2xl:h-[285px]"
+                  className="h-[170px] bg-[#f1f1f1] rounded-xl sm:rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-contain bg-no-repeat bg-center transition-all duration-[400ms] group-hover:bg-hover-blue object-contain sm:h-[220px] md:h-[240px] 2xl:h-[285px]"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = PLACEHOLDER_IMG;
@@ -54,12 +54,12 @@ const Carousel = ({ items }) => {
                 <figcaption className="mt-2.5 flex flex-col text-start grow">
                   <h4
                     id={`product-title-${index}`}
-                    className="text-navy text-sm font-semibold mt-2.5 mb-0 leading-tight line-clamp-2 sm:text-base md:mt-3.5"
+                    className="text-navy text-xs font-semibold mt-2 mb-0 leading-tight line-clamp-2 sm:text-sm sm:mt-2.5 md:text-base md:mt-3.5"
                   >
                     {product.title}
                   </h4>
                   <p
-                    className="my-2 text-xs text-text-muted overflow-hidden line-clamp-2 leading-[1.25em] sm:text-sm sm:my-2.5 md:leading-[1.2em]"
+                    className="my-1.5 text-[11px] text-text-muted overflow-hidden line-clamp-2 leading-[1.25em] sm:text-xs sm:my-2 md:text-sm md:my-2.5 md:leading-[1.2em]"
                     title={product.description}
                   >
                     {product.description}

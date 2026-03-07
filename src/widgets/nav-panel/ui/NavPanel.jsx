@@ -27,8 +27,8 @@ function NavPanel({
 
   return (
     <nav
-      className={`relative flex bg-transparent text-[#171717] px-5 lg:px-[50px] 2xl:px-[100px] transition-all duration-300 ${
-        isCompact ? "pt-2.5 pb-5 mb-2 border-b-[3px] border-navy" : "py-5 mb-3 border-b-0"
+      className={`relative flex bg-transparent text-[#171717] px-3 sm:px-5 lg:px-[50px] 2xl:px-[100px] transition-all duration-300 ${
+        isCompact ? "pt-2 pb-3 sm:pt-2.5 sm:pb-5 mb-2 border-b-[3px] border-navy" : "py-3 sm:py-5 mb-3 border-b-0"
       }`}
       aria-label="Main navigation menu"
     >
@@ -38,8 +38,8 @@ function NavPanel({
             type="button"
             className={`flex items-center justify-around bg-navy hover:bg-navy text-white rounded min-w-fit border-none cursor-pointer transition-all duration-300 ${
               isCompact
-                ? "px-2 py-1 mr-4 w-[110px] h-8 text-sm lg:w-[145px] lg:h-[42px] lg:px-4 lg:py-2.5 lg:text-[11px]"
-                : "px-2.5 py-1.5 mr-[26px] w-[130px] h-9 text-base lg:w-[160px] lg:h-[54px] lg:px-5 lg:py-[18px] lg:text-xs"
+                ? "px-1.5 py-1 mr-2 w-[90px] h-7 text-xs sm:px-2 sm:mr-4 sm:w-[110px] sm:h-8 sm:text-sm lg:w-[145px] lg:h-[42px] lg:px-4 lg:py-2.5 lg:text-[11px]"
+                : "px-2 py-1 mr-3 w-[105px] h-8 text-sm sm:px-2.5 sm:py-1.5 sm:mr-[26px] sm:w-[130px] sm:h-9 sm:text-base lg:w-[160px] lg:h-[54px] lg:px-5 lg:py-[18px] lg:text-xs"
             }`}
             aria-label="Open catalog"
             aria-expanded={isMobileCatalogOpen}
@@ -60,8 +60,8 @@ function NavPanel({
               <button
                 className={`nav-link flex items-center justify-center font-medium text-text-dark bg-transparent border-none cursor-pointer no-underline text-start w-fit h-auto hover:text-blue-600 transition-all duration-300 ${
                   isCompact
-                    ? "text-[11px] px-2 py-1 max-w-[96px] min-h-7 leading-[1.25] tracking-[-0.5px] lg:px-3 lg:py-2.5 lg:max-w-[150px] lg:h-[42px] lg:min-h-0 lg:text-xs"
-                    : "text-xs px-2 py-1 max-w-[100px] min-h-9 leading-[1.3] tracking-[-0.7px] lg:px-3.5 lg:py-[18px] lg:max-w-[160px] lg:h-[54px] lg:min-h-0 lg:leading-normal lg:tracking-normal"
+                    ? "text-[10px] px-1 py-0.5 max-w-[80px] min-h-6 leading-[1.2] tracking-[-0.5px] sm:text-[11px] sm:px-2 sm:py-1 sm:max-w-[96px] sm:min-h-7 sm:leading-[1.25] lg:px-3 lg:py-2.5 lg:max-w-[150px] lg:h-[42px] lg:min-h-0 lg:text-xs"
+                    : "text-[11px] px-1 py-0.5 max-w-[85px] min-h-7 leading-[1.2] tracking-[-0.7px] sm:text-xs sm:px-2 sm:py-1 sm:max-w-[100px] sm:min-h-9 sm:leading-[1.3] lg:px-3.5 lg:py-[18px] lg:max-w-[160px] lg:h-[54px] lg:min-h-0 lg:leading-normal lg:tracking-normal"
                 } ${
                   index === activeIndex ? "!bg-subtle-bg/65 !rounded-xl !text-navy" : ""
                 }`}
@@ -76,19 +76,19 @@ function NavPanel({
       </div>
 
       <aside
-        className={`fixed top-[var(--header-height,72px)] left-0 z-40 w-[88vw] max-w-[360px] h-[calc(100vh-var(--header-height,72px))] bg-white border-r border-[#e6e9f2] px-6 py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
+        className={`fixed top-[var(--header-height,72px)] left-0 z-40 w-[85vw] max-w-[360px] h-[calc(100vh-var(--header-height,72px))] bg-white border-r border-[#e6e9f2] px-4 py-5 sm:px-6 sm:py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
           isMobileCatalogOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-label="Mobile catalog panel"
       >
         <div className="flex items-center justify-between mb-7">
-          <h3 className="m-0 text-[34px] leading-none font-semibold text-navy">
+          <h3 className="m-0 text-[26px] sm:text-[34px] leading-none font-semibold text-navy">
             {"Կատալոգ"}
           </h3>
           <button
             type="button"
             onClick={handleCatalogClose}
-            className="w-12 h-12 rounded-full border-none bg-[#eceff3] text-navy flex items-center justify-center cursor-pointer"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-none bg-[#eceff3] text-navy flex items-center justify-center cursor-pointer"
             aria-label="Close catalog"
           >
             <FaTimes size={22} aria-hidden="true" />
