@@ -1,8 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import App from './App';
+import App from 'app/App';
 
-test('renders learn react link', () => {
+jest.mock('shared/ui/carousel', () => ({
+  Carousel: () => <div data-testid="carousel-mock" />,
+}));
+
+test('renders main search input', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const searchInput = screen.getByRole('searchbox', {
+    name: /search for products and services/i,
+  });
+  expect(searchInput).toBeInTheDocument();
 });
