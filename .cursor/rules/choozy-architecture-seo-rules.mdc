@@ -1,0 +1,66 @@
+---
+description: Verified Choozy architecture, SEO, and semantic coding rules
+alwaysApply: true
+---
+
+# Choozy Project Rules (Verified Baseline)
+
+## 1) Architecture
+- Application type: CSR React SPA.
+- Entry flow: `src/index.js` -> `src/app/App.jsx` -> `src/pages/home/ui/HomePage.jsx`.
+- Rendering mode: client-only mount via `ReactDOM.createRoot(document.getElementById("root"))` in `src/index.js`.
+- Prerender and server-side rendering are not present in the codebase (no `renderToString`, no SSR framework).
+- Initial HTML (`public/index.html`) ships with an empty `#root`; visible page content appears only after the JS bundle runs.
+- Data flow uses `entities/*/model` and `shared/api/services/apiService.js` with `shared/api/mocks/mockData.js`.
+
+## 2) Folder Structure Responsibilities
+- `public`: static template and public assets (`index.html`, `manifest.json`, `robots.txt`). The shell must match the **default** UI locale: `<html lang="hy">` and Armenian title/description (same copy as `homePage.seoTitle` / `homePage.seoDescription` in `shared/i18n/translations.js`) so the no-JS response stays aligned with `LanguageContext` and `PageSeo` after hydration.
+- `src/app`: root app composition.
+- `src/pages`: page-level composition.
+- `src/widgets`: large UI blocks.
+- `src/features`: presenter hooks and interaction orchestration.
+- `src/entities`: model/data access wrappers.
+- `src/shared`: reusable UI, API, assets, i18n.
+- `src/contexts`: app-level context providers.
+- `src/hooks`: reusable hooks.
+- `src/fonts`: local font files.
+
+## 3) Key Patterns To Keep
+- MVP-style separation: view (`widgets/pages`) vs presenter (`features`) vs model (`entities`).
+- Functional React components with hooks (`useState`, `useEffect`, `useMemo`, `useCallback`, `useRef`).
+- Shared async presenter logic via reusable hooks (avoid duplicating the same async state machine).
+- Centralized translations through `contexts/LanguageContext` and `shared/i18n`.
+- Barrel exports (`index.js`) for module boundaries.
+
+## 4) Stack Constraints
+- Runtime: React + ReactDOM + react-scripts + Swiper + react-icons + web-vitals.
+- Styling: Tailwind + local CSS modules/files.
+- Tests: Testing Library stack.
+- Imports use `src` baseUrl aliasing (`jsconfig.json`).
+
+## 5) SEO and Semantic Requirements
+### CSR vs SEO (verified)
+- Crawlers that execute JavaScript can still index the app after hydration; the first response is still a thin shell (template + static meta only).
+- Relying on CSR alone does not populate HTML body before JS; improving `index.html` defaults and in-app document metadata reduces weak snippets when crawlers or previews see the shell first.
+- If deep URLs or richer snippets become a priority, plan prerender/SSR or a static export — out of scope until added to the stack.
+
+- Keep a single `<main>` landmark on page composition level.
+- Use semantic containers (`<section>`, `<article>`, `<figure>`, `<figcaption>`) for content structure.
+- Preserve and extend ARIA where interactive behavior exists.
+- Do not mark interactive UI as `aria-hidden="true"`.
+- Do not use `role="button"` on actual links.
+- Ensure each page has a heading hierarchy with one `<h1>`.
+- Keep metadata intentional: page title and description must not remain generic defaults.
+- Keep crawlability files updated (`robots.txt`, sitemap references when introduced).
+
+## 6) Routing and Indexing Rules
+- SPA routes are defined in `src/app/App.jsx` (`react-router-dom`: `HomePage` at `/`, other paths under `AppLayout` with `Outlet`, `*` → `NotFoundPage`).
+- Internal navigation uses `<Link to="...">` (or `navigate`) for registered paths; do not add user-facing path links without a matching `<Route>`.
+- For in-page jumps on the home page, stable section anchors (`#id`) remain valid alongside router links.
+
+## 7) Best Practices (Enforced)
+- Repeated logic in 3+ places must be extracted into shared hooks/components.
+- UI strings should be added through translation keys, not hardcoded in view components.
+- Use stable keys in lists (`id`/stable value), never index-based keys when stable keys exist.
+- Keep dependency declarations aligned with imports (`package.json` must include used packages).
+- Maintain clear separation of concerns across `widgets`, `features`, `entities`, and `shared`.
