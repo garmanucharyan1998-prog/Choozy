@@ -10,6 +10,7 @@ const Variety = () => {
     <ProductShowcaseSection
       sectionId="variety-products"
       title={t("variety.title")}
+      carouselAriaLabel={t("variety.carouselAriaLabel")}
       moreHref="/variety"
       items={items}
       loading={loading}

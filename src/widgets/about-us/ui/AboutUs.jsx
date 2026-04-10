@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useLanguage } from "contexts";
 
 const AboutUs = () => {
@@ -11,18 +12,17 @@ const AboutUs = () => {
             {t("aboutUs.title")}
           </h2>
           <p className="text-[11px] text-[#333] m-0 leading-normal sm:text-xs md:text-sm lg:text-base lg:leading-6 lg:font-normal lg:my-8 lg:text-left">
-            <strong>Choosy</strong>
+            <strong>Choozy</strong>
             {t("aboutUs.descriptionStart")}{" "}
-            <strong>Choosy</strong>
+            <strong>Choozy</strong>
             {t("aboutUs.descriptionEnd")}
           </p>
-          <a
-            href="/about"
-            role="button"
+          <Link
+            to="/about"
             className="flex w-fit mx-auto mt-2 px-2.5 py-2 bg-navy text-white text-xs no-underline rounded-pill font-medium leading-none tracking-normal transition-colors duration-300 hover:bg-navy-light hover:shadow-[#15214760_0_0_10px] sm:mt-2.5 sm:px-3 sm:py-2.5 sm:text-sm lg:text-base lg:px-4 lg:py-3.5 lg:mt-0 lg:mx-0"
           >
             {t("aboutUs.learnMoreLabel")}
-          </a>
+          </Link>
         </div>
 
         <figure className="w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden group">

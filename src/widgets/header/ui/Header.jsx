@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   FaSearch,
   FaHome,
@@ -146,8 +147,8 @@ const Header = ({
 
   const LogoSection = useMemo(
     () => (
-      <a
-        href="/"
+      <Link
+        to="/"
         className="no-underline flex justify-start"
         aria-label={t("header.brandAriaLabel")}
         title={t("header.brandTitle")}
@@ -158,7 +159,7 @@ const Header = ({
           className={`${isCompact ? "w-[38px] sm:w-[78px]" : "w-[44px] sm:w-[100px]"} h-auto transition-all duration-300`}
           loading="eager"
         />
-      </a>
+      </Link>
     ),
     [isCompact, t],
   );
@@ -169,15 +170,15 @@ const Header = ({
         aria-label={t("header.mainNavigationAriaLabel")}
         className="hidden md:flex items-center gap-4 text-xs px-[10px] lg:px-[70px] 2xl:px-0"
       >
-        <a
-          href="/about"
+        <Link
+          to="/about"
           className={`no-underline text-[#333] flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
             isCompact ? "px-3 py-2 text-[11px] 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
           }`}
           title={t("header.aboutLinkTitle")}
         >
           {t("header.aboutLinkLabel")}
-        </a>
+        </Link>
       </nav>
     ),
     [isCompact, t],
@@ -358,8 +359,8 @@ const Header = ({
         className={`flex items-center transition-all duration-300 ${isCompact ? "gap-1 sm:gap-1.5 md:gap-1.5 2xl:gap-3" : "gap-1.5 sm:gap-2 md:gap-[5px] 2xl:gap-4"}`}
         aria-label={t("header.userNavigationAriaLabel")}
       >
-        <a
-          href="/compare"
+        <Link
+          to="/compare"
           className={`tooltip-container relative no-underline text-[#333] hidden md:flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
             isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
           }`}
@@ -370,10 +371,10 @@ const Header = ({
           <span className="hidden 2xl:inline 2xl:ml-[5px]">
             {t("header.compareLabel")}
           </span>
-        </a>
+        </Link>
 
-        <a
-          href="/favorites"
+        <Link
+          to="/favorites"
           className={`tooltip-container relative no-underline text-[#333] hidden md:flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
             isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
           }`}
@@ -390,11 +391,11 @@ const Header = ({
           <span className="hidden 2xl:inline 2xl:ml-[5px]">
             {t("header.favoritesLabel")}
           </span>
-        </a>
+        </Link>
 
         <div className="hidden md:block">
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className={`tooltip-container relative flex items-center gap-1.5 bg-white border-[1.5px] border-navy rounded-[40px] text-active-blue no-underline min-w-0 mx-[5px] justify-center 2xl:mx-0 transition-all duration-300 ${
               isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
             }`}
@@ -405,7 +406,7 @@ const Header = ({
             <span className="hidden 2xl:inline 2xl:ml-[5px]">
               {t("header.loginLabel")}
             </span>
-          </a>
+          </Link>
         </div>
 
         <button
@@ -496,7 +497,7 @@ const Header = ({
     ],
   );
 
-  const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+  const { pathname: currentPath } = useLocation();
 
   return (
     <header
@@ -549,8 +550,8 @@ const Header = ({
 
             return (
               <li key={item.href} className="flex-1">
-                <a
-                  href={item.href}
+                <Link
+                  to={item.href}
                   className="flex w-full flex-col items-center justify-center gap-1 py-1.5 no-underline transition-colors duration-200"
                   aria-label={item.ariaLabel}
                   aria-current={isActive ? "page" : undefined}
@@ -566,7 +567,7 @@ const Header = ({
                   <span className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
                     {item.label}
                   </span>
-                </a>
+                </Link>
               </li>
             );
           })}

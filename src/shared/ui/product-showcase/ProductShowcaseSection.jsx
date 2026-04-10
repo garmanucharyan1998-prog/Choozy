@@ -14,6 +14,7 @@ const ProductShowcaseSection = ({
   error,
   onRetry,
   sectionClassName,
+  carouselAriaLabel,
 }) => {
   const { t } = useLanguage();
 
@@ -44,7 +45,7 @@ const ProductShowcaseSection = ({
         {loading && !items.length ? (
           <div className="text-center py-8 text-gray-500">{t("productShowcase.loadingLabel")}</div>
         ) : (
-          <Carousel items={items} />
+          <Carousel items={items} ariaLabel={carouselAriaLabel} />
         )}
       </div>
     </section>

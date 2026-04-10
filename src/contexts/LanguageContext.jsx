@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { translations } from "shared/i18n";
+import { getHtmlLangForAppLanguage } from "shared/lib/locale";
 
 const FALLBACK_LANGUAGE = "am";
 const LanguageContext = createContext(null);
@@ -17,6 +18,10 @@ const resolveTextByPath = (dictionary, path) =>
  */
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState(FALLBACK_LANGUAGE);
+
+  useEffect(() => {
+    document.documentElement.lang = getHtmlLangForAppLanguage(language);
+  }, [language]);
 
   const t = useCallback(
     (path, fallback = "") => {

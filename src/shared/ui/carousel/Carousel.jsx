@@ -6,7 +6,7 @@ import "swiper/css/navigation";
 const PLACEHOLDER_IMG =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23ddd' width='300' height='300'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='14'%3ENo image%3C/text%3E%3C/svg%3E";
 
-const Carousel = ({ items }) => {
+const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
   const safeItems = Array.isArray(items) ? items : [];
   const slideCount = safeItems.length;
   const maxSlidesPerView = 5;
@@ -15,7 +15,7 @@ const Carousel = ({ items }) => {
   return (
     <section
       className="my-5 sm:my-10 flex justify-center items-center"
-      aria-label="Top products carousel"
+      aria-label={ariaLabel}
     >
       <div className="w-full relative px-1 sm:px-2 md:px-0 [&_.swiper-button-prev]:!hidden [&_.swiper-button-next]:!hidden md:[&_.swiper-button-prev]:!flex md:[&_.swiper-button-next]:!flex">
         <Swiper

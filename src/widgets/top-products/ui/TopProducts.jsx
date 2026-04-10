@@ -10,6 +10,7 @@ const TopProducts = () => {
     <ProductShowcaseSection
       sectionId="top-products"
       title={t("topProducts.title")}
+      carouselAriaLabel={t("topProducts.carouselAriaLabel")}
       moreHref="/products"
       items={items}
       loading={loading}

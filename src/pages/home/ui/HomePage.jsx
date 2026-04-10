@@ -1,3 +1,5 @@
+import { useLanguage } from "contexts";
+import { PageSeo } from "shared/lib/seo";
 import { AboutUsWidget } from "widgets/about-us";
 import { FooterWidget } from "widgets/footer";
 import { GridCatalogWidget } from "widgets/grid-catalog";
@@ -9,6 +11,7 @@ import { VarietyWidget } from "widgets/variety";
 import { useHomePagePresenter } from "pages/home/presenter/useHomePagePresenter";
 
 const HomePage = () => {
+  const { t } = useLanguage();
   const {
     isCompactHeader,
     isMobileMenuOpen,
@@ -23,12 +26,16 @@ const HomePage = () => {
 
   return (
     <div className="min-w-[320px] bg-white text-center">
-      <div
-        className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[65] bg-black/45 transition-opacity duration-[400ms] ease-in-out md:hidden ${
-          isAnyMobilePanelOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      <PageSeo title={t("homePage.seoTitle")} description={t("homePage.seoDescription")} path="/" />
+      <button
+        type="button"
+        className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[65] m-0 cursor-pointer border-0 bg-black/45 p-0 transition-opacity duration-[400ms] ease-in-out appearance-none md:hidden ${
+          isAnyMobilePanelOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={closeAllMobilePanels}
-        aria-hidden="true"
+        aria-label={t("homePage.closeMobileBackdropAriaLabel")}
+        aria-hidden={!isAnyMobilePanelOpen}
+        tabIndex={isAnyMobilePanelOpen ? 0 : -1}
       />
 
       <div
@@ -57,6 +64,7 @@ const HomePage = () => {
       </div>
 
       <main className="bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
+        <h1 className="sr-only">{t("homePage.mainHeading")}</h1>
         <GridCatalogWidget />
         <TopProductsWidget />
         <AboutUsWidget />
