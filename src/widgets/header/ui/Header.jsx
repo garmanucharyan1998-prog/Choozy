@@ -243,7 +243,6 @@ const Header = ({
         </button>
 
         {showSuggestions && (
-          /////////////
           <div
             className="absolute top-full left-0 right-0 bg-subtle-bg border border-accent-blue rounded-[10px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-[1000] max-h-[280px] overflow-y-auto mt-2 py-2"
             role="listbox"
