@@ -1,4 +1,5 @@
 import { Carousel } from "shared/ui/carousel";
+import { useLanguage } from "contexts";
 
 /**
  * Reusable section layout for product showcase blocks.
@@ -14,6 +15,8 @@ const ProductShowcaseSection = ({
   onRetry,
   sectionClassName,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <section id={sectionId} className={sectionClassName}>
       <div className="cont-width-default">
@@ -25,7 +28,7 @@ const ProductShowcaseSection = ({
             href={moreHref}
             className="cursor-pointer no-underline text-xs sm:text-sm font-semibold text-link-blue p-0 rounded-lg transition-all duration-300 hover:bg-[#f0f4ff] hover:text-navy lg:text-base lg:px-4 lg:py-2"
           >
-            {"Տեսնել Ավելին"}
+            {t("productShowcase.viewMoreLabel")}
           </a>
         </div>
 
@@ -33,13 +36,13 @@ const ProductShowcaseSection = ({
           <div className="text-red-500 text-center py-4">
             {error}
             <button type="button" onClick={onRetry} className="ml-2 underline">
-              Retry
+              {t("productShowcase.retryLabel")}
             </button>
           </div>
         )}
 
         {loading && !items.length ? (
-          <div className="text-center py-8 text-gray-500">Loading...</div>
+          <div className="text-center py-8 text-gray-500">{t("productShowcase.loadingLabel")}</div>
         ) : (
           <Carousel items={items} />
         )}

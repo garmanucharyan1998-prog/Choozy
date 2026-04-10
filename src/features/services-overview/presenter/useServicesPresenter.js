@@ -5,9 +5,19 @@
 
 import { useMemo } from "react";
 import { servicesModel } from "entities/service";
+import { useLanguage } from "contexts";
 
 export const useServicesPresenter = () => {
-  const services = useMemo(() => servicesModel.getServices(), []);
+  const { t } = useLanguage();
+  const services = useMemo(
+    () =>
+      servicesModel.getServices().map((service) => ({
+        ...service,
+        title: t(service.titleKey, service.id),
+        description: t(service.descriptionKey, service.id),
+      })),
+    [t],
+  );
 
   return { services };
 };

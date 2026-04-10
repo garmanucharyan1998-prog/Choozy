@@ -6,12 +6,13 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { searchModel } from "entities/search";
 import { headerModel } from "entities/header";
+import { useLanguage } from "contexts";
 
 const { LANGUAGES, DEFAULT_LANGUAGE, MOBILE_MENU_ITEMS } = headerModel;
 const { MIN_QUERY_LENGTH } = searchModel;
 
 export const useHeaderPresenter = () => {
-  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
+  const { language, setLanguage, t } = useLanguage();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState([]);
@@ -19,13 +20,26 @@ export const useHeaderPresenter = () => {
   const [showNoResults, setShowNoResults] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const currentLanguage = useMemo(() => LANGUAGES[language], [language]);
-  const mobileMenuItems = useMemo(() => MOBILE_MENU_ITEMS, []);
+  const currentLanguage = useMemo(
+    () => LANGUAGES[language] || LANGUAGES[DEFAULT_LANGUAGE],
+    [language],
+  );
+  const mobileMenuItems = useMemo(
+    () =>
+      MOBILE_MENU_ITEMS.map((item) => ({
+        ...item,
+        label: t(item.labelKey, item.id),
+      })),
+    [t],
+  );
 
   const handleLanguageChange = useCallback((langCode) => {
+    if (!LANGUAGES[langCode]) {
+      return;
+    }
     setLanguage(langCode);
     setIsLanguageDropdownOpen(false);
-  }, []);
+  }, [setLanguage]);
 
   const toggleLanguageDropdown = useCallback(() => {
     setIsLanguageDropdownOpen((prev) => !prev);

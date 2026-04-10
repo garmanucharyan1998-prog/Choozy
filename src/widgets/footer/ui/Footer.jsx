@@ -1,4 +1,5 @@
 import choozyMainLogoWhite from "shared/assets/logos/choozyMainLogoWhite.svg";
+import { useLanguage } from "contexts";
 import "./Footer.css";
 
 const socialLinks = [
@@ -22,19 +23,19 @@ const socialLinks = [
   },
 ];
 
-const footerColumns = [
+const footerColumnsConfig = [
   [
-    { href: "/", label: "Գլխավոր" },
-    { href: "/about", label: "Մեր Մասին" },
-    { href: "/catalog", label: "Կատալոգ" },
+    { id: "home", href: "/", labelKey: "footer.columns.primary.home" },
+    { id: "about", href: "/about", labelKey: "footer.columns.primary.about" },
+    { id: "catalog", href: "/catalog", labelKey: "footer.columns.primary.catalog" },
   ],
   [
-    { href: "#contact", label: "Կապ Մեզ Հետ" },
-    { href: "mailto:info@choosy.com", label: "info@choosy.com", withEmailIcon: true },
+    { id: "contact", href: "#contact", labelKey: "footer.columns.contact.contact" },
+    { id: "email", href: "mailto:info@choosy.com", labelKey: "footer.columns.contact.email", withEmailIcon: true },
   ],
   [
-    { id: "privacy", href: "/privacy-policy", label: "Գաղտնիություն" },
-    { href: "/terms-of-service", label: "Ծառայության Պայմաններ" },
+    { id: "privacy", href: "/privacy-policy", labelKey: "footer.columns.legal.privacy" },
+    { id: "terms", href: "/terms-of-service", labelKey: "footer.columns.legal.terms" },
   ],
 ];
 
@@ -73,6 +74,14 @@ const FooterLink = ({ href, label, id, withEmailIcon = false }) => (
 );
 
 const Footer = () => {
+  const { t } = useLanguage();
+  const footerColumns = footerColumnsConfig.map((column) =>
+    column.map((link) => ({
+      ...link,
+      label: t(link.labelKey, link.id),
+    })),
+  );
+
   return (
     <footer id="contact" className="bg-navy text-white text-sm">
       <div className="cont-width-default mx-auto box-border px-3 py-3 sm:px-4 sm:py-4 md:px-10 md:py-[31px] lg:px-[60px] lg:py-12 2xl:px-[100px] 2xl:py-[70px]">
@@ -98,11 +107,11 @@ const Footer = () => {
           </div>
 
           <nav className="flex flex-col gap-3 w-full sm:gap-5 md:flex-row md:gap-10 md:w-auto md:flex-1 md:justify-end lg:gap-20 lg:px-20">
-            {footerColumns.map((column, columnIndex) => (
-              <div key={columnIndex} className={columnClassName}>
+            {footerColumns.map((column) => (
+              <div key={column[0].id} className={columnClassName}>
                 {column.map((link) => (
                   <FooterLink
-                    key={`${link.label}-${link.href}`}
+                    key={`${link.id}-${link.href}`}
                     id={link.id}
                     href={link.href}
                     label={link.label}
@@ -116,7 +125,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom-bar bg-black pt-3 text-center sm:pt-5">
-        <p className="m-0 text-xs sm:text-sm text-white">{"©"} 2025, Choosy. All Rights Reserved</p>
+        <p className="m-0 text-xs sm:text-sm text-white">{t("footer.copyright")}</p>
       </div>
     </footer>
   );

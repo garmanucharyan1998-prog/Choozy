@@ -1,7 +1,9 @@
 import { useServicesPresenter } from "features/services-overview";
+import { useLanguage } from "contexts";
 import "./ServicesOverview.css";
 
 const ServicesOverview = () => {
+  const { t } = useLanguage();
   const { services } = useServicesPresenter();
 
   return (
@@ -11,13 +13,13 @@ const ServicesOverview = () => {
     >
       <div className="w-full cont-width-default">
         <h2 id="services-overview-heading" className="sr-only">
-          {"Մեր ծառայությունները"}
+          {t("servicesOverview.heading")}
         </h2>
 
         <div
           className="flex flex-col gap-3 sm:gap-5 w-full justify-between items-stretch 2xl:flex-row"
           role="list"
-          aria-label={"Ծառայությունների ցանկ"}
+          aria-label={t("servicesOverview.listAriaLabel")}
         >
           {services.map((service) => (
             <article

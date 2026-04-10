@@ -1,13 +1,15 @@
 import { useTopProductsPresenter } from "features/top-products";
+import { useLanguage } from "contexts";
 import { ProductShowcaseSection } from "shared/ui/product-showcase";
 
 const TopProducts = () => {
+  const { t } = useLanguage();
   const { items, loading, error, onRetry } = useTopProductsPresenter();
 
   return (
     <ProductShowcaseSection
       sectionId="top-products"
-      title="Թոփ ապրանքներ"
+      title={t("topProducts.title")}
       moreHref="/products"
       items={items}
       loading={loading}

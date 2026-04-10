@@ -4,11 +4,31 @@
  */
 
 export const getNavItems = () => [
-  { label: "Տեխնիկա և էլեկտրոնիկա", aria: "Tech and Electronics" },
-  { label: "Շարժական բարձրախոսներ", aria: "Portable Speakers" },
-  { label: "Կենցաղային Տեխնիկա", aria: "Home Appliances" },
-  { label: "Խոհանոցային Տեխնիկա", aria: "Kitchen Appliances" },
-  { label: "Գեղեցկություն և խնամք", aria: "Beauty and Care" },
+  {
+    id: "tech-electronics",
+    labelKey: "navPanel.items.techElectronics",
+    aria: "Tech and Electronics",
+  },
+  {
+    id: "portable-speakers",
+    labelKey: "navPanel.items.portableSpeakers",
+    aria: "Portable Speakers",
+  },
+  {
+    id: "home-appliances",
+    labelKey: "navPanel.items.homeAppliances",
+    aria: "Home Appliances",
+  },
+  {
+    id: "kitchen-appliances",
+    labelKey: "navPanel.items.kitchenAppliances",
+    aria: "Kitchen Appliances",
+  },
+  {
+    id: "beauty-care",
+    labelKey: "navPanel.items.beautyCare",
+    aria: "Beauty and Care",
+  },
 ];
 
 export const navModel = { getNavItems };

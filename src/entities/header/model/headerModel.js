@@ -11,11 +11,11 @@ export const LANGUAGES = {
 
 export const DEFAULT_LANGUAGE = "am";
 export const MOBILE_MENU_ITEMS = [
-  { label: "Թոփ Ապրանքներ", href: "#top-products" },
-  { label: "Տեսականի", href: "#variety-products" },
-  { label: "Կապ Մեզ Հետ", href: "#contact" },
-  { label: "Մեր Մասին", href: "#about-us" },
-  { label: "Գաղտնիության Քաղաքականություն", href: "#privacy" },
+  { id: "topProducts", labelKey: "header.mobileMenuItems.topProducts", href: "#top-products" },
+  { id: "varietyProducts", labelKey: "header.mobileMenuItems.varietyProducts", href: "#variety-products" },
+  { id: "contact", labelKey: "header.mobileMenuItems.contact", href: "#contact" },
+  { id: "aboutUs", labelKey: "header.mobileMenuItems.aboutUs", href: "#about-us" },
+  { id: "privacy", labelKey: "header.mobileMenuItems.privacy", href: "#privacy" },
 ];
 
 export const headerModel = {

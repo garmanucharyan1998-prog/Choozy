@@ -5,9 +5,18 @@
 
 import { useMemo } from "react";
 import { catalogModel } from "entities/catalog";
+import { useLanguage } from "contexts";
 
 export const useGridCatalogPresenter = () => {
-  const items = useMemo(() => catalogModel.getCatalogItems(), []);
+  const { t } = useLanguage();
+  const items = useMemo(
+    () =>
+      catalogModel.getCatalogItems().map((item) => ({
+        ...item,
+        label: t(item.labelKey, item.id),
+      })),
+    [t],
+  );
 
   return { items };
 };

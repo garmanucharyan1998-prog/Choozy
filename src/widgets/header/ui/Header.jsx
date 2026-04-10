@@ -9,6 +9,7 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import { useHeaderPresenter } from "features/header";
+import { useLanguage } from "contexts";
 import choozyMainLogo from "shared/assets/logos/choozyMainLogo.svg";
 import "./Header.css";
 
@@ -18,6 +19,7 @@ const Header = ({
   onToggleMobileMenu,
   onCloseMobileMenu,
 }) => {
+  const { t } = useLanguage();
   const headerRef = useRef(null);
   const mobileBottomNavRef = useRef(null);
 
@@ -147,24 +149,24 @@ const Header = ({
       <a
         href="/"
         className="no-underline flex justify-start"
-        aria-label="Choozy - Main page"
-        title="Choozy - Electronics online store"
+        aria-label={t("header.brandAriaLabel")}
+        title={t("header.brandTitle")}
       >
         <img
           src={choozyMainLogo}
-          alt="Choozy - Electronics online store logo"
+          alt={t("header.brandAlt")}
           className={`${isCompact ? "w-[38px] sm:w-[78px]" : "w-[44px] sm:w-[100px]"} h-auto transition-all duration-300`}
           loading="eager"
         />
       </a>
     ),
-    [isCompact],
+    [isCompact, t],
   );
 
   const NavigationSection = useMemo(
     () => (
       <nav
-        aria-label="Main navigation"
+        aria-label={t("header.mainNavigationAriaLabel")}
         className="hidden md:flex items-center gap-4 text-xs px-[10px] lg:px-[70px] 2xl:px-0"
       >
         <a
@@ -172,13 +174,13 @@ const Header = ({
           className={`no-underline text-[#333] flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
             isCompact ? "px-3 py-2 text-[11px] 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
           }`}
-          title="Learn more about Choozy company"
+          title={t("header.aboutLinkTitle")}
         >
-          {"Մեր մասին"}
+          {t("header.aboutLinkLabel")}
         </a>
       </nav>
     ),
-    [isCompact],
+    [isCompact, t],
   );
 
   const SearchSection = useMemo(
@@ -189,7 +191,7 @@ const Header = ({
         }`}
         role="search"
         onSubmit={handleSearchSubmit}
-        aria-label="Product search"
+        aria-label={t("header.search.formAriaLabel")}
       >
         <FaSearch
           className={`text-[#888] self-center text-xs sm:text-sm transition-all duration-300 ${isCompact ? "mr-1 ml-2 sm:mr-1.5 sm:ml-3" : "mr-1.5 ml-2.5 sm:mr-2 sm:ml-[18px]"}`}
@@ -198,8 +200,8 @@ const Header = ({
         <input
           type="search"
           name="q"
-          placeholder={"Որոնել"}
-          aria-label="Search for products and services"
+          placeholder={t("header.search.placeholder")}
+          aria-label={t("header.search.inputAriaLabel")}
           aria-describedby="search-help"
           className={`search-input border-none bg-subtle-bg grow text-xs sm:text-sm outline-none transition-all duration-300 ${
             isCompact ? "p-1.5 sm:p-2 2xl:p-2.5" : "p-2 sm:p-3 2xl:p-4"
@@ -212,7 +214,7 @@ const Header = ({
           maxLength="100"
         />
         <div id="search-help" className="sr-only">
-          Enter at least 2 characters to search
+          {t("header.search.helpText")}
         </div>
 
         {searchQuery && (
@@ -222,8 +224,8 @@ const Header = ({
               isCompact ? "p-1.5 mr-2" : "p-2 mr-5"
             }`}
             onClick={handleClearSearch}
-            aria-label="Clear search"
-            title="Clear search field"
+            aria-label={t("header.search.clearAriaLabel")}
+            title={t("header.search.clearTitle")}
           >
             <FaTimes aria-hidden="true" />
           </button>
@@ -236,22 +238,22 @@ const Header = ({
               ? "px-2.5 py-1.5 text-[11px] -ml-[76px] sm:px-3 sm:py-2 sm:text-xs sm:-ml-[86px] lg:-ml-4 2xl:px-4 2xl:py-2.5 2xl:text-[13px]"
               : "px-3 py-2 text-xs -ml-[86px] sm:px-4 sm:py-3 sm:text-[13px] sm:-ml-[100px] lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm"
           }`}
-          aria-label="Execute search"
+          aria-label={t("header.search.submitAriaLabel")}
           disabled={!searchQuery.trim()}
         >
-          {"Որոնել"}
+          {t("header.search.submitLabel")}
         </button>
 
         {showSuggestions && (
           <div
             className="absolute top-full left-0 right-0 bg-subtle-bg border border-accent-blue rounded-[10px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-[1000] max-h-[280px] overflow-y-auto mt-2 py-2"
             role="listbox"
-            aria-label="Search results"
+            aria-label={t("header.search.resultsAriaLabel")}
           >
             {searchSuggestions.length > 0 ? (
-              searchSuggestions.map((suggestion, index) => (
+              searchSuggestions.map((suggestion) => (
                 <div
-                  key={`suggestion-${index}`}
+                  key={suggestion}
                   className="px-5 py-3 cursor-pointer text-sm text-[#333] transition-colors duration-200 hover:bg-[#f8f9ff] hover:text-active-blue"
                   role="option"
                   aria-selected={false}
@@ -263,14 +265,14 @@ const Header = ({
                       handleSuggestionClick(suggestion);
                     }
                   }}
-                  aria-label={`Select: ${suggestion}`}
+                  aria-label={`${t("header.search.selectSuggestionPrefix")} ${suggestion}`}
                 >
                   {suggestion}
                 </div>
               ))
             ) : showNoResults ? (
               <div className="px-5 py-4 text-sm text-[#666] text-center" role="status" aria-live="polite">
-                {"Արդյունքներ չեն գտնվել"}
+                {t("header.search.noResults")}
               </div>
             ) : null}
           </div>
@@ -288,6 +290,7 @@ const Header = ({
       handleSuggestionClick,
       handleSearchFocus,
       isCompact,
+      t,
     ],
   );
 
@@ -295,30 +298,30 @@ const Header = ({
     () => [
       {
         href: "/",
-        label: "Գլխավոր",
-        ariaLabel: "Go to home page",
+        label: t("header.mobileBottomNav.home.label"),
+        ariaLabel: t("header.mobileBottomNav.home.ariaLabel"),
         iconType: "home",
       },
       {
         href: "/compare",
-        label: "Համեմատել",
-        ariaLabel: "Go to compare products",
+        label: t("header.mobileBottomNav.compare.label"),
+        ariaLabel: t("header.mobileBottomNav.compare.ariaLabel"),
         iconType: "compare",
       },
       {
         href: "/favorites",
-        label: "Նախընտրելի",
-        ariaLabel: "Go to favorite products",
+        label: t("header.mobileBottomNav.favorites.label"),
+        ariaLabel: t("header.mobileBottomNav.favorites.ariaLabel"),
         iconType: "favorites",
       },
       {
         href: "/login",
-        label: "Մուտք",
-        ariaLabel: "Open personal account",
+        label: t("header.mobileBottomNav.profile.label"),
+        ariaLabel: t("header.mobileBottomNav.profile.ariaLabel"),
         iconType: "profile",
       },
     ],
-    [],
+    [t],
   );
 
   /** Renders mobile bottom panel icon according to item type and active state. */
@@ -334,7 +337,7 @@ const Header = ({
       case "favorites":
         return (
           <img
-            src="/assets/icons/heart.svg"
+            src="/assets/Icons/heart.svg"
             alt=""
             width="18"
             height="18"
@@ -353,19 +356,19 @@ const Header = ({
     () => (
       <nav
         className={`flex items-center transition-all duration-300 ${isCompact ? "gap-1 sm:gap-1.5 md:gap-1.5 2xl:gap-3" : "gap-1.5 sm:gap-2 md:gap-[5px] 2xl:gap-4"}`}
-        aria-label="User navigation"
+        aria-label={t("header.userNavigationAriaLabel")}
       >
         <a
           href="/compare"
           className={`tooltip-container relative no-underline text-[#333] hidden md:flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
             isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
           }`}
-          title="Compare products"
-          aria-label="Compare selected products"
+          title={t("header.compareTitle")}
+          aria-label={t("header.compareAriaLabel")}
         >
           <FaBalanceScale size={20} aria-hidden="true" />
           <span className="hidden 2xl:inline 2xl:ml-[5px]">
-            {"Համեմատել"}
+            {t("header.compareLabel")}
           </span>
         </a>
 
@@ -374,18 +377,18 @@ const Header = ({
           className={`tooltip-container relative no-underline text-[#333] hidden md:flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
             isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
           }`}
-          title="Favorite products"
-          aria-label="Go to favorite products"
+          title={t("header.favoritesTitle")}
+          aria-label={t("header.favoritesAriaLabel")}
         >
           <img
-            src="/assets/icons/heart.svg"
+            src="/assets/Icons/heart.svg"
             alt="Favorites icon"
             width="24"
             height="24"
             aria-hidden="true"
           />
           <span className="hidden 2xl:inline 2xl:ml-[5px]">
-            {"Նախընտրելի"}
+            {t("header.favoritesLabel")}
           </span>
         </a>
 
@@ -395,12 +398,12 @@ const Header = ({
             className={`tooltip-container relative flex items-center gap-1.5 bg-white border-[1.5px] border-navy rounded-[40px] text-active-blue no-underline min-w-0 mx-[5px] justify-center 2xl:mx-0 transition-all duration-300 ${
               isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
             }`}
-            title="Login to account"
-            aria-label="Login to personal cabinet"
+            title={t("header.loginTitle")}
+            aria-label={t("header.loginAriaLabel")}
           >
             <FaUser color="#152147" aria-hidden="true" />
             <span className="hidden 2xl:inline 2xl:ml-[5px]">
-              {"Մուտք"}
+              {t("header.loginLabel")}
             </span>
           </a>
         </div>
@@ -410,18 +413,18 @@ const Header = ({
           className={`md:hidden flex items-center justify-center rounded-full bg-[#eceff3] text-navy border-none cursor-pointer transition-all duration-300 ease-in-out hover:bg-accent-blue hover:scale-105 ${
             isCompact ? "w-6 h-6 sm:w-7 sm:h-7" : "w-7 h-7 sm:w-8 sm:h-8"
           }`}
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-label={isMobileMenuOpen ? t("header.closeMenuAriaLabel") : t("header.openMenuAriaLabel")}
           aria-expanded={isMobileMenuOpen}
           onClick={handleMobileMenuToggle}
         >
           {isMobileMenuOpen ? <FaTimes size={14} aria-hidden="true" /> : <FaBars size={14} aria-hidden="true" />}
         </button>
 
-        <div className="relative" aria-label="Language selection">
+        <div className="relative" aria-label={t("header.languageSelectionAriaLabel")}>
           <button
             onClick={toggleLanguageDropdown}
             className="bg-transparent border-none cursor-pointer p-0 flex items-center gap-1"
-            aria-label={`Current language: ${currentLanguage.alt}`}
+            aria-label={`${t("header.currentLanguagePrefix")}: ${currentLanguage.alt}`}
             aria-expanded={isLanguageDropdownOpen}
             aria-haspopup="listbox"
           >
@@ -444,7 +447,7 @@ const Header = ({
             <div
               className="absolute top-[calc(100%+8px)] right-1/2 translate-x-1/2 bg-white border border-[#ccc] shadow-[0_2px_8px_rgba(0,0,0,0.1)] z-50 rounded-xl py-1 md:right-0 md:translate-x-0"
               role="listbox"
-              aria-label="Select language"
+              aria-label={t("header.selectLanguageAriaLabel")}
             >
               {Object.entries(languages).map(([code, lang]) => (
                 <div
@@ -489,6 +492,7 @@ const Header = ({
       languages,
       isCompact,
       handleMobileMenuToggle,
+      t,
     ],
   );
 
@@ -513,15 +517,15 @@ const Header = ({
         className={`fixed top-[var(--header-height,72px)] right-0 z-40 w-[75vw] max-w-[300px] h-[calc(100vh-var(--header-height,72px))] bg-white border-l border-[#e6e9f2] px-3 py-5 sm:px-4 sm:py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
-        aria-label="Mobile navigation menu"
+        aria-label={t("header.mobileNavigationAriaLabel")}
       >
         <h3 className="m-0 mb-6 text-base font-semibold text-[#171717]">
-          {"Մենյու"}
+          {t("header.mobileMenuTitle")}
         </h3>
-        <nav className="flex flex-col gap-6 items-start" aria-label="Mobile links">
+        <nav className="flex flex-col gap-6 items-start" aria-label={t("header.mobileLinksAriaLabel")}>
           {mobileMenuItems.map((item) => (
             <a
-              key={item.label}
+              key={item.id}
               href={item.href}
               className="block w-full text-left text-[#171717] no-underline text-sm font-medium"
               onClick={handleMobileMenuClose}
@@ -535,7 +539,7 @@ const Header = ({
       <nav
         ref={mobileBottomNavRef}
         className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#e6e9f2] bg-[#fbfbfb] shadow-[0_-4px_18px_rgba(157,157,157,0.12)] md:hidden"
-        aria-label="Bottom mobile navigation"
+        aria-label={t("header.bottomNavigationAriaLabel")}
         style={{ bottom: "var(--mobile-viewport-offset-bottom, 0px)" }}
       >
         <ul className="m-0 flex list-none items-end justify-around px-2 sm:px-4 pt-2 pb-2 sm:pb-2.5">

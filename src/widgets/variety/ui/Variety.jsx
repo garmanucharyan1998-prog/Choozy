@@ -1,13 +1,15 @@
 import { useVarietyPresenter } from "features/variety";
+import { useLanguage } from "contexts";
 import { ProductShowcaseSection } from "shared/ui/product-showcase";
 
 const Variety = () => {
+  const { t } = useLanguage();
   const { items, loading, error, onRetry } = useVarietyPresenter();
 
   return (
     <ProductShowcaseSection
       sectionId="variety-products"
-      title="Տեսականի"
+      title={t("variety.title")}
       moreHref="/variety"
       items={items}
       loading={loading}
