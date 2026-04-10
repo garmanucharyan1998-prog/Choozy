@@ -201,7 +201,7 @@ const Header = ({
           placeholder={"Որոնել"}
           aria-label="Search for products and services"
           aria-describedby="search-help"
-          className={`search-input border-none bg-transparent grow text-xs sm:text-sm outline-none transition-all duration-300 ${
+          className={`search-input border-none bg-subtle-bg grow text-xs sm:text-sm outline-none transition-all duration-300 ${
             isCompact ? "p-1.5 sm:p-2 2xl:p-2.5" : "p-2 sm:p-3 2xl:p-4"
           }`}
           value={searchQuery}
@@ -231,7 +231,7 @@ const Header = ({
 
         <button
           type="submit"
-          className={`bg-accent-blue border-none rounded-pill text-active-blue font-semibold cursor-pointer transition-all duration-200 hover:enabled:bg-[#c8d4ff] hover:enabled:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed 2xl:ml-0 ${
+          className={`bg-accent-blue border-none rounded-pill text-link-blue font-semibold cursor-pointer transition-all duration-200 hover:enabled:bg-[#c8d4ff] hover:enabled:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed 2xl:ml-0 ${
             isCompact
               ? "px-2.5 py-1.5 text-[11px] -ml-[76px] sm:px-3 sm:py-2 sm:text-xs sm:-ml-[86px] lg:-ml-4 2xl:px-4 2xl:py-2.5 2xl:text-[13px]"
               : "px-3 py-2 text-xs -ml-[86px] sm:px-4 sm:py-3 sm:text-[13px] sm:-ml-[100px] lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm"
@@ -243,6 +243,7 @@ const Header = ({
         </button>
 
         {showSuggestions && (
+          /////////////
           <div
             className="absolute top-full left-0 right-0 bg-subtle-bg border border-accent-blue rounded-[10px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-[1000] max-h-[280px] overflow-y-auto mt-2 py-2"
             role="listbox"
