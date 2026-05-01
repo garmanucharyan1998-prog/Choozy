@@ -1,35 +1,37 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { LanguageProvider } from "contexts";
-import AppLayout from "./AppLayout";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { AccountPage } from "pages/account";
 import { HomePage } from "pages/home";
-import { AboutPage } from "pages/about";
-import { CatalogPage } from "pages/catalog";
-import { ComparePage } from "pages/compare";
-import { FavoritesPage } from "pages/favorites";
-import { LoginPage } from "pages/login";
-import { PrivacyPolicyPage } from "pages/privacy-policy";
-import { TermsOfServicePage } from "pages/terms-of-service";
-import { ProductsPage } from "pages/products";
-import { VarietyPage } from "pages/variety";
-import { NotFoundPage } from "pages/not-found";
+import { FilterProduct } from "pages/filterproduct";
+import { LanguageProvider } from "contexts";
+import { SingleProduct } from "pages/singleproduct";
 
+const UnknownRoute = () => (
+  <div className="min-h-[40vh] flex flex-col items-center justify-center gap-4 px-4 font-sans text-center text-text-dark">
+    <p className="text-lg">No page at this address.</p>
+    <p className="text-text-muted">
+      <Link className="text-link-blue underline" to="/">
+        Home
+      </Link>
+      <span aria-hidden="true"> · </span>
+      <Link className="text-link-blue underline" to="/singleproduct">
+        Single product
+      </Link>
+      <span aria-hidden="true"> · </span>
+      <Link className="text-link-blue underline" to="/filter">
+        Filter catalog
+      </Link>
+    </p>
+  </div>
+);
 const App = () => (
   <LanguageProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route element={<AppLayout />}>
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/catalog" element={<CatalogPage />} />
-          <Route path="/compare" element={<ComparePage />} />
-          <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/terms-of-service" element={<TermsOfServicePage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/variety" element={<VarietyPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Route>
+        <Route path="/singleproduct" element={<SingleProduct />} />
+        <Route path="/filter" element={<FilterProduct />} />
+        <Route path="/login" element={<AccountPage />} />
+        <Route path="*" element={<UnknownRoute />} />
       </Routes>
     </BrowserRouter>
   </LanguageProvider>
