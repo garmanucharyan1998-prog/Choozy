@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   FaSearch,
   FaHome,
@@ -19,6 +20,7 @@ const Header = ({
   onToggleMobileMenu,
   onCloseMobileMenu,
 }) => {
+  const location = useLocation();
   const { t } = useLanguage();
   const headerRef = useRef(null);
   const mobileBottomNavRef = useRef(null);
@@ -393,8 +395,8 @@ const Header = ({
         </a>
 
         <div className="hidden md:block">
-          <a
-            href="/login"
+          <Link
+            to="/login"
             className={`tooltip-container relative flex items-center gap-1.5 bg-white border-[1.5px] border-navy rounded-[40px] text-active-blue no-underline min-w-0 mx-[5px] justify-center 2xl:mx-0 transition-all duration-300 ${
               isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
             }`}
@@ -405,7 +407,7 @@ const Header = ({
             <span className="hidden 2xl:inline 2xl:ml-[5px]">
               {t("header.loginLabel")}
             </span>
-          </a>
+          </Link>
         </div>
 
         <button
@@ -496,7 +498,7 @@ const Header = ({
     ],
   );
 
-  const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+  const currentPath = location.pathname;
 
   return (
     <header
@@ -549,8 +551,8 @@ const Header = ({
 
             return (
               <li key={item.href} className="flex-1">
-                <a
-                  href={item.href}
+                <Link
+                  to={item.href}
                   className="flex w-full flex-col items-center justify-center gap-1 py-1.5 no-underline transition-colors duration-200"
                   aria-label={item.ariaLabel}
                   aria-current={isActive ? "page" : undefined}
@@ -566,7 +568,7 @@ const Header = ({
                   <span className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
                     {item.label}
                   </span>
-                </a>
+                </Link>
               </li>
             );
           })}
