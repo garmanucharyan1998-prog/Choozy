@@ -1,0 +1,45 @@
+/* Product card photos — background cover fills frame (no grey letterboxing on portrait images) */
+.product-card-image {
+  position: relative;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.product-card-image--grid {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  border-radius: 20px;
+}
+
+.product-card-image--carousel {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  border-radius: 0.75rem;
+}
+
+@media (min-width: 480px) {
+  .product-card-image--carousel {
+    border-radius: 1rem;
+  }
+}
+
+.product-card-image--list {
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  border-radius: 20px;
+}
+
+@media (min-width: 480px) {
+  .product-card-image--list {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+.product-card-image__link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+}

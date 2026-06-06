@@ -3,11 +3,13 @@
  * Loads catalog items from Model, passes to View.
  */
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { catalogModel } from "entities/catalog";
 import { useLanguage } from "contexts";
 
 export const useGridCatalogPresenter = () => {
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const items = useMemo(
     () =>
@@ -18,7 +20,15 @@ export const useGridCatalogPresenter = () => {
     [t],
   );
 
-  return { items };
+  const navigateToCategory = useCallback(
+    (filterCategoryId) => {
+      if (!filterCategoryId) return;
+      navigate(`/filter?category=${encodeURIComponent(filterCategoryId)}`);
+    },
+    [navigate],
+  );
+
+  return { items, navigateToCategory };
 };
 
 export default useGridCatalogPresenter;

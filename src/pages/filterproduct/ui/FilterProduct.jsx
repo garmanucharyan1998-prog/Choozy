@@ -18,7 +18,7 @@ const FilterProduct = () => {
   } = useHomePagePresenter();
 
   return (
-    <div className="min-w-[320px] bg-white text-center">
+    <div className="flex min-h-screen min-w-[320px] flex-col bg-white text-center">
       <div
         className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[65] bg-black/45 transition-opacity duration-[400ms] ease-in-out md:hidden ${
           isAnyMobilePanelOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
@@ -52,11 +52,13 @@ const FilterProduct = () => {
         />
       </div>
 
-      <main className="bg-white px-2.5 pb-[calc(var(--mobile-bottom-nav-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] lg:px-[50px] lg:pb-8 2xl:px-[100px]">
+      <main className="flex flex-1 flex-col bg-white px-2.5 pb-[calc(var(--mobile-bottom-nav-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] lg:px-[50px] lg:pb-8 2xl:px-[100px]">
         <FilterCatalogWidget />
       </main>
 
-      <FooterWidget />
+      <div className="mt-auto shrink-0">
+        <FooterWidget />
+      </div>
     </div>
   );
 };

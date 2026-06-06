@@ -40,8 +40,8 @@ function NavPanel({
             type="button"
             className={`flex items-center justify-around bg-navy hover:bg-navy text-white rounded min-w-fit border-none cursor-pointer transition-all duration-300 ${
               isCompact
-                ? "px-1.5 py-1 mr-2 w-[90px] h-7 text-xs sm:px-2 sm:mr-4 sm:w-[110px] sm:h-8 sm:text-sm lg:w-[145px] lg:h-[42px] lg:px-4 lg:py-2.5 lg:text-[11px]"
-                : "px-2 py-1 mr-3 w-[105px] h-8 text-sm sm:px-2.5 sm:py-1.5 sm:mr-[26px] sm:w-[130px] sm:h-9 sm:text-base lg:w-[160px] lg:h-[54px] lg:px-5 lg:py-[18px] lg:text-xs"
+                ? "mr-2 min-[425px]:mr-3 h-7 w-[90px] px-1.5 py-1 text-xs min-[425px]:w-[96px] sm:mr-4 sm:h-8 sm:w-[110px] sm:px-2 sm:text-sm lg:h-[42px] lg:w-[145px] lg:px-4 lg:py-2.5 lg:text-[11px]"
+                : "mr-3 min-[425px]:mr-4 w-[105px] h-8 px-2 py-1 text-sm min-[425px]:w-[112px] sm:mr-[26px] sm:w-[130px] sm:h-9 sm:px-2.5 sm:py-1.5 sm:text-base lg:h-[54px] lg:w-[160px] lg:px-5 lg:py-[18px] lg:text-xs"
             }`}
             aria-label={t("navPanel.openCatalogAriaLabel")}
             aria-expanded={isMobileCatalogOpen}
@@ -56,14 +56,14 @@ function NavPanel({
             {t("navPanel.catalogLabel")}
           </button>
         </div>
-        <div className="nav-items-container flex overflow-x-auto flex-1 min-w-0 justify-between items-center">
+        <div className="nav-items-container flex min-w-0 flex-1 items-center justify-start gap-2 overflow-x-auto min-[425px]:gap-3 sm:gap-4 lg:justify-between lg:gap-0">
           {navItems.map((item, index) => (
             <div key={item.id} className="shrink-0">
               <button
                 className={`nav-link flex items-center justify-center font-medium text-text-dark bg-transparent border-none cursor-pointer no-underline text-start w-fit h-auto hover:text-blue-600 transition-all duration-300 ${
                   isCompact
-                    ? "text-[10px] px-1 py-0.5 max-w-[80px] min-h-6 leading-[1.2] tracking-[-0.5px] sm:text-[11px] sm:px-2 sm:py-1 sm:max-w-[96px] sm:min-h-7 sm:leading-[1.25] lg:px-3 lg:py-2.5 lg:max-w-[150px] lg:h-[42px] lg:min-h-0 lg:text-xs"
-                    : "text-[11px] px-1 py-0.5 max-w-[85px] min-h-7 leading-[1.2] tracking-[-0.7px] sm:text-xs sm:px-2 sm:py-1 sm:max-w-[100px] sm:min-h-9 sm:leading-[1.3] lg:px-3.5 lg:py-[18px] lg:max-w-[160px] lg:h-[54px] lg:min-h-0 lg:leading-normal lg:tracking-normal"
+                    ? "min-h-6 max-w-[80px] px-1.5 py-0.5 text-[10px] leading-[1.2] tracking-[-0.5px] min-[425px]:max-w-[88px] min-[425px]:px-2.5 min-[425px]:tracking-normal sm:min-h-7 sm:max-w-[96px] sm:px-2 sm:py-1 sm:text-[11px] sm:leading-[1.25] lg:h-[42px] lg:min-h-0 lg:max-w-[150px] lg:px-3 lg:py-2.5 lg:text-xs"
+                    : "min-h-7 max-w-[85px] px-1.5 py-0.5 text-[11px] leading-[1.2] tracking-[-0.7px] min-[425px]:max-w-[92px] min-[425px]:px-2.5 min-[425px]:tracking-normal sm:min-h-9 sm:max-w-[100px] sm:px-2 sm:py-1 sm:text-xs sm:leading-[1.3] lg:h-[54px] lg:min-h-0 lg:max-w-[160px] lg:px-3.5 lg:py-[18px] lg:leading-normal lg:tracking-normal"
                 } ${
                   index === activeIndex ? "!bg-subtle-bg/65 !rounded-xl !text-navy" : ""
                 }`}

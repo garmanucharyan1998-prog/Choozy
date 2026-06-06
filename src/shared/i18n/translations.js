@@ -1,9 +1,12 @@
+import { buildLocale } from "./mergeLocale.js";
+import { carouselProductsAm } from "./locales/carouselProducts.am.js";
+import { enOverrides } from "./locales/en.overrides.js";
+import { ruOverrides } from "./locales/ru.overrides.js";
+
 /**
- * Centralized UI text dictionary.
- * Currently populated with project source strings and can be extended per language.
+ * Centralized UI text dictionary (am base + en/ru mock locales).
  */
-export const translations = {
-  am: {
+const am = {
     header: {
       brandAriaLabel: "Choozy - Main page",
       brandTitle: "Choozy - Electronics online store",
@@ -31,6 +34,7 @@ export const translations = {
       favoritesLabel: "Նախընտրելի",
       favoritesTitle: "Favorite products",
       favoritesAriaLabel: "Go to favorite products",
+      favoritesCountForAria: "Նախընտրելիներում",
       loginLabel: "Մուտք",
       loginTitle: "Login to account",
       loginAriaLabel: "Login to personal cabinet",
@@ -115,6 +119,16 @@ export const translations = {
       activeChips: {
         priceLabel: "{{min}}–{{max}} AMD",
       },
+      categories: {
+        smartphones: "Սմարթֆոն",
+        laptops: "Նոթբուքեր",
+        speakers: "Շարժական բարձրախոսներ",
+        headphones: "Ականջակալներ",
+        tablets: "Պլանշետ",
+        tv: "Հեռուստացույց",
+        wearables: "Ժամացույց",
+        cameras: "Տեսախցիկ",
+      },
       filters: {
         price: "Արժեք",
         priceMin: "Նվազագույն",
@@ -131,10 +145,12 @@ export const translations = {
           inch13: "13 դյույմ",
           inch14: "14 դյույմ",
           inch15: "15 դյույմ",
+          inch16: "16 inch",
         },
         brandNames: {
           apple: "Apple",
           samsung: "Samsung",
+          sony: "Sony",
           hp: "HP",
           lenovo: "Lenovo",
           dell: "Dell",
@@ -151,6 +167,8 @@ export const translations = {
           grey: "Մոխրագույն",
           white: "Սպիտակ",
           navy: "Կապույտ",
+          blue: "Blue",
+          orange: "Orange",
         },
       },
       pagination: {
@@ -181,6 +199,7 @@ export const translations = {
     variety: {
       title: "Տեսականի",
     },
+    carouselProducts: carouselProductsAm,
     servicesOverview: {
       heading: "Մեր ծառայությունները",
       listAriaLabel: "Ծառայությունների ցանկ",
@@ -224,9 +243,7 @@ export const translations = {
       priceTo: "Մինչև",
       currencySuffix: "դր.",
       chartAriaLabel: "Գնի պատմության գծապատկեր",
-      tabShort: "Հակիրճ նկարագրություն",
       tabFull: "Նկարագրություն",
-      tabsAriaLabel: "Ապրանքի նկարագրություն",
       specsSectionAriaLabel: "Տեխնիկական բնութագրեր",
       variants: {
         v256a: "256GB / 12 GB",
@@ -246,6 +263,13 @@ export const translations = {
           mar: "Մար",
           apr: "Ապր",
           may: "Մայ",
+          jun: "Հուն",
+          jul: "Հուլ",
+          aug: "Օգս",
+          sep: "Սեպ",
+          oct: "Հոկ",
+          nov: "Նոյ",
+          dec: "Դեկ",
         },
       },
       specsBrief: {
@@ -290,8 +314,7 @@ export const translations = {
         vega: "Vega Digital",
         mobileCentre: "Mobile Centre",
       },
-      offerDescription:
-        "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ Choosy-ը նոր...",
+      offerDescription: "Choosy-ը նոր առցանց շուկա է՝\nնախատեսված խելամիտ",
       badges: {
         discount: "Զեղչ",
         new: "Նորույթ",
@@ -307,6 +330,7 @@ export const translations = {
         sortMenuAriaLabel: "Դասավորման եղանակներ",
         openSortAriaLabel: "Բացել դասավորման ընտրությունը",
         seeMore: "Տեսնել Ավելին",
+        seeLess: "Պակաս ցուցադրել",
         variantsAriaLabel: "Կոնֆիգուրացիայի ընտրություն",
         colorsAriaLabel: "Գույնի ընտրություն",
         sortOptions: {
@@ -380,20 +404,56 @@ export const translations = {
       },
       notificationsPage: {
         title: "Ծանուցումներ",
-        description: "Կարգավորեք, թե ինչ տեսակի ծանուցումներ եք ցանկանում ստանալ։",
+        tabsAria: "Ծանուցումների բաժնի ներդիրներ",
+        tabs: {
+          feed: "Ծանուցումներ",
+          settings: "Կարգավորումներ",
+        },
+        settingsIntro: "Կարգավորեք, թե ինչ տեսակի ծանուցումներ եք ցանկանում ստանալ։",
+        feed: {
+          sampleBody:
+            "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
+          items: {
+            recent: {
+              title: "Լորեմ Իպսում",
+              timeLabel: "3 ր",
+            },
+            hour: {
+              title: "Լորեմ Իպսում",
+              timeLabel: "1 ժ",
+            },
+            dated: {
+              title: "Լորեմ Իպսում",
+              timeLabel: "16.09.2025",
+            },
+          },
+        },
       },
       wishlist: {
         title: "Նախընտրելիներ",
         empty: "Ցուցակը դատարկ է։",
         remove: "Հեռացնել",
+        confirmTitle: "Հեռացնե՞լ ապրանքը",
+        confirmMessage: "Վստա՞հ եք, որ ցանկանում եք հեռացնել այս ապրանքը նախընտրելիներից։",
+        confirmButton: "Հաստատել",
+        cancelButton: "Չեղարկել",
       },
       recent: {
         title: "Վերջին դիտած պրոդուկտները",
         empty: "Դեռ ոչինչ չեք դիտել։",
         clear: "Մաքրել պատմությունը",
+        seeMore: "Տեսնել Ավելին",
+        seeLess: "Պակաս ցուցադրել",
       },
       subscription: {
         title: "Բաժանորդագրություն",
+        planCardTitle: "Բաժանորդագրության պլան",
+        planNameLabel: "Անվանում:",
+        planValueLabel: "Արժեք:",
+        planMonthlyLabel: "Ամսեկան:",
+        planName: "Lorem Ipsum",
+        planTotal: "160,000 AMD",
+        planMonthly: "30,000 AMD",
         description: "Ընտրեք, արդյոք ցանկանում եք ստանալ էլ. փոստով նորություններ։",
         toggleLabel: "Էլ. փոստով նորություններ",
       },
@@ -404,9 +464,241 @@ export const translations = {
         notificationsSaved: "Ծանուցումների կարգավորումը պահպանվեց։",
         subscriptionSaved: "Բաժանորդագրությունը թարմացվեց։",
         wishlistUpdated: "Նախընտրելին թարմացվեց։",
+        dismissStatus: "Փակել ծանուցումը",
         recentCleared: "Պատմությունը մաքրվեց։",
         avatarSaved: "Պրոֆիլի նկարը պահպանվեց։",
         avatarRemoved: "Պրոֆիլի նկարը հեռացվեց։",
+        avatarTooLarge: "Նկարը չափազանց մեծ է (առավելագույնը 200 ԿԲ)։",
+      },
+    },
+    shopAccount: {
+      pageTitle: "Խանութի էջ",
+      sidebarNavAria: "Խանութի էջի բաժիններ",
+      shopTabsAria: "Խանութի տվյալների ներդիրներ",
+      sidebar: {
+        details: "Խանութի տվյալներ",
+        products: "Ապրանքի Կառավարում",
+        statistics: "Ստատիստիկա",
+        finance: "Ֆինանսներ",
+      },
+      innerTabs: {
+        data: "Տվյալներ",
+        notifications: "Ծանուցումներ",
+      },
+      actions: {
+        edit: "Խմբագրել",
+        back: "Վերադառնալ",
+        cancel: "Չեղարկել",
+        save: "Պահպանել",
+      },
+      fields: {
+        emailShort: "Էլ. հասցե",
+        phoneShort: "Հեռախոսահամար",
+        websiteShort: "Կայք",
+        shopNameRequired: "Խանութի անուն*",
+        description: "Նկարագրություն",
+        emailRequired: "Էլ. հասցե*",
+        phoneRequired: "Հեռախոսահամար (+374)*",
+        phoneLocalAria: "Հեռախոսահամար առանց երկրի կոդի",
+        website: "Կայքի հասցե",
+      },
+      avatar: {
+        uploadAria: "Վերբեռնել խանութի լոգոն",
+        remove: "Հեռացնել նկարը",
+      },
+      notifications: {
+        items: {
+          priceDrops: {
+            title: "Գների իջեցումներ",
+            description: "Տեղեկացումներ ձեր ապրանքների և մրցակիցների գների մասին։",
+          },
+          wishlistUpdates: {
+            title: "Պահված ապրանքներ",
+            description: "Երբ գնորդները պահում են ձեր առաջարկները։",
+          },
+          accountNews: {
+            title: "Պլատֆորմի թարմացումներ",
+            description: "Վաճառողի պահնորդի նորություններ և հնարավորություններ։",
+          },
+        },
+      },
+      notificationsPage: {
+        title: "Ծանուցումներ",
+        tabsAria: "Ծանուցումների բաժնի ներդիրներ",
+        tabs: {
+          feed: "Ծանուցումներ",
+          settings: "Կարգավորումներ",
+        },
+        settingsIntro: "Կարգավորեք, թե ինչ տեսակի ծանուցումներ եք ցանկանում ստանալ։",
+        feed: {
+          sampleBody:
+            "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
+          items: {
+            recent: {
+              title: "Լորեմ Իպսում",
+              timeLabel: "3 ր",
+            },
+            hour: {
+              title: "Լորեմ Իպսում",
+              timeLabel: "1 ժ",
+            },
+            dated: {
+              title: "Լորեմ Իպսում",
+              timeLabel: "16.09.2025",
+            },
+          },
+        },
+      },
+      products: {
+        sectionTitle: "Ապրանքի Կառավարում",
+        listTitle: "Ապրանքներ",
+        addProduct: "Ավելացնել ապրանք",
+        addShort: "Ավելացնել",
+        tableAria: "Ապրանքների աղյուսակ",
+        tableHeaders: {
+          product: "Ապրանք",
+          available: "Հասանելի",
+          color: "Գույն",
+          price: "Արժեք",
+          actions: "Գործողություններ",
+        },
+        edit: "Խմբագրել",
+        refresh: "Թարմացնել",
+        editAria: "Խմբագրել ապրանքը",
+        refreshAria: "Թարմացնել ապրանքը",
+        editPriceAria: "Փոխել գինը",
+        priceHoverUsd: "≈ {{amount}} USD",
+        priceHoverRub: "≈ {{amount}} RUB",
+        editFormTitle: "Խմբագրել ապրանք",
+        staleHint: "Ապրանքները ավտոմատ հեռացվում են, եթե 5 օրվա ընթացքում «Թարմացնել» չեք սեղմել։",
+        amd: "AMD",
+        formTitle: "Նոր ապրանք",
+        formHint: "Ընտրեք կատեգորիան, ապրանքը, հիշողությունը, գույները և հասանելիությունը։ Միայն գինը մուտքագրեք ձեռքով։",
+        placeholders: {
+          category: "Ընտրել կատեգորիա",
+          product: "Ընտրել ապրանք",
+          productAfterCategory: "Նախ ընտրեք կատեգորիա",
+        },
+        noProductsInCategory: "Այս կատեգորիայում ապրանքներ չկան։",
+        catalogImageNote: "Նկարը վերցվում է կատալոգից։",
+        fields: {
+          title: "Անվանում*",
+          price: "Գին*",
+          category: "Կատեգորիա*",
+          description: "Նկարագրություն",
+          image: "Նկար",
+          availability: "Հասանելիություն",
+          memories: "Հիշողություն / կոնֆիգուրացիա*",
+          memoryPlaceholder: "256GB / 12 GB",
+          colors: "Գույներ*",
+        },
+        availabilityOptions: {
+          inStock: "Առկա",
+          outOfStock: "Առկա չէ",
+        },
+        addMemoryRow: "Ավելացնել տող",
+        removeMemoryRowAria: "Հեռացնել հիշողության տողը",
+        addColorRow: "Ավելացնել գույն",
+        removeColorRowAria: "Հեռացնել գույնը",
+        uploadImage: "Վերբեռնել նկար",
+        removeImage: "Հեռացնել նկարը",
+        cancel: "Չեղարկել",
+        save: "Պահպանել",
+        empty: "Դեռ ապրանքներ չկան։ Սեղմեք «Ավելացնել ապրանք»՝ ստեղծելու համար։",
+        viewInStore: "Դիտել կայքում",
+        deleteAria: "Հեռացնել ապրանքը",
+        messages: {
+          required: "Լրացրեք անվանումը և գինը։",
+          categoryRequired: "Ընտրեք կատեգորիան։",
+          productRequired: "Ընտրեք ապրանքը։",
+          priceRequired: "Մուտքագրեք գինը։",
+          memoryRequired: "Ընտրեք առնվազն մեկ հիշողության տարբերակ։",
+          colorsRequired: "Ընտրեք առնվազն մեկ գույն։",
+          productAdded: "Ապրանքը ավելացվեց։",
+          productUpdated: "Ապրանքը թարմացվեց։",
+          productRefreshed: "Ապրանքի թարմացման ամսաթիվը թարմացվեց։",
+          priceUpdated: "Գինը թարմացվեց։",
+          autoRemoved: "5 օր չթարմացված ապրանքները հեռացվեցին։",
+          productRemoved: "Ապրանքը հեռացվեց։",
+          imageTooLarge: "Նկարը չափազանց մեծ է (առավելագույնը 200 ԿԲ)։",
+        },
+        stock: {
+          in: "Առկա",
+          out: "Առկա չէ",
+        },
+      },
+      statistics: {
+        sectionTitle: "Ստատիստիկա",
+        intro: "Վերջին շրջանի ցուցանիշների ամփոփում (օրինակելի տվյալներ, մինչև API-ի միացումը)։",
+        chartAria: "Ժամանակային շարքի գծապատկեր",
+        metricTabsAria: "Ցուցանիշների ընտրություն",
+        metrics: {
+          views: {
+            label: "Այցելություններ",
+            summary: "200 հզր",
+          },
+          orders: {
+            label: "Պատվերներ",
+            summary: "10,8 հզր",
+          },
+          session: {
+            label: "Միջին սեանս",
+            summary: "1 ր 11 վ",
+          },
+          revenue: {
+            label: "Եկամուտ",
+            summary: "֏2 812,36",
+          },
+        },
+      },
+      finance: {
+        tabsAria: "Ֆինանսների բաժնի ներդիրներ",
+        tabs: {
+          plan: "Բաժանորդագրության պլան",
+          payments: "Վճարումների պատմություն",
+        },
+        addLabel: "Ավելացնել",
+        addAria: "Ավելացնել բաժանորդագրության պլան",
+        planCardTitle: "Բաժանորդագրության պլան",
+        planNameLabel: "Անվանում:",
+        planValueLabel: "Արժեք:",
+        planMonthlyLabel: "Ամսեկան:",
+        planName: "Lorem Ipsum",
+        planTotal: "160,000 AMD",
+        planMonthly: "30,000 AMD",
+        paymentsEmpty: "Վճարումների պատմությունը շուտով կցուցադրվի այստեղ։",
+        payments: {
+          tableAria: "Վճարումների պատմության աղյուսակ",
+          colDate: "Ամսաթիվ",
+          colMethod: "Վճարման տարբերակ",
+          colStatus: "Կարգավիճակ",
+          colAmount: "Գումար",
+          statusApproved: "Հաստատված",
+          statusRejected: "Մերժված",
+          sampleDate: "02.10.2025",
+          sampleAmount: "550,000 AMD",
+          rows: {
+            card4321: "Credit Card ****4321",
+            idram: "IDram",
+            visa0102: "Visa ***0102",
+          },
+        },
+      },
+      placeholders: {
+        productsTitle: "Ապրանքի Կառավարում",
+        productsBody: "Այս բաժինը շուտով հասանելի կլինի՝ ապրանքների ավելացման և խմբագրման համար։",
+        statisticsTitle: "Ստատիստիկա",
+        statisticsBody: "Վաճառքների և այցելությունների վիճակագրությունը շուտով կցուցադրվի այստեղ։",
+        financeTitle: "Ֆինանսներ",
+        financeBody: "Ֆինանսական ամփոփագրերը և վճարումները շուտով կլինեն հասանելի։",
+      },
+      messages: {
+        profileSaved: "Խանութի տվյալները պահպանվեցին։",
+        profileRequired: "Լրացրեք խանութի անունը և էլ. հասցեն։",
+        notificationsSaved: "Ծանուցումների կարգավորումը պահպանվեց։",
+        dismissStatus: "Փակել ծանուցումը",
+        avatarSaved: "Լոգոն պահպանվեց։",
+        avatarRemoved: "Լոգոն հեռացվեց։",
         avatarTooLarge: "Նկարը չափազանց մեծ է (առավելագույնը 200 ԿԲ)։",
       },
     },
@@ -428,7 +720,12 @@ export const translations = {
       },
       copyright: "© 2025, Choosy. All Rights Reserved",
     },
-  },
+};
+
+export const translations = {
+  am,
+  en: buildLocale(am, enOverrides),
+  ru: buildLocale(am, ruOverrides),
 };
 
 export default translations;

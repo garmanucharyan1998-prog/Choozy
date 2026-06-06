@@ -1,5 +1,5 @@
-import { useTopProductsPresenter } from "features/top-products";
 import { useLanguage } from "contexts";
+import { useTopProductsPresenter } from "features/top-products";
 import { ProductShowcaseSection } from "shared/ui/product-showcase";
 
 const TopProducts = () => {

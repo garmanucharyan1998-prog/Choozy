@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaChevronDown, FaList, FaSlidersH, FaTh, FaTimes } from "react-icons/fa";
 import { BRAND_OPTIONS } from "entities/filter-catalog";
+import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProducts";
+import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useFilterCatalogPresenter } from "features/filter-catalog";
 import FilterProductCard from "shared/ui/filter-product-card/FilterProductCard";
 
@@ -14,6 +16,11 @@ const SectionHead = ({ open, title, onToggle }) => (
     <FaChevronDown className={`h-4 w-4 shrink-0 text-link-blue transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
   </button>
 );
+
+const wishlistMapFromStorage = () => {
+  const ids = new Set(readAccountState().wishlistItems.map((x) => x.id));
+  return Object.fromEntries([...ids].map((id) => [id, true]));
+};
 
 const FilterCatalogWidget = () => {
   const {
@@ -63,10 +70,16 @@ const FilterCatalogWidget = () => {
     activeFilterChips,
   } = useFilterCatalogPresenter();
 
-  const [wishlist, setWishlist] = useState(() => ({}));
+  const [wishlist, setWishlist] = useState(wishlistMapFromStorage);
   const [compare, setCompare] = useState(() => ({}));
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [overlayOptionQuery, setOverlayOptionQuery] = useState("");
+
+  useEffect(() => {
+    const sync = () => setWishlist(wishlistMapFromStorage());
+    window.addEventListener(ACCOUNT_STORAGE_EVENT, sync);
+    return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
+  }, []);
 
   useEffect(() => {
     if (!mobileFilterOpen) return undefined;
@@ -82,8 +95,29 @@ const FilterCatalogWidget = () => {
     setOverlayOptionQuery("");
   }, []);
 
-  const toggleWishlist = useCallback((id) => {
-    setWishlist((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleWishlist = useCallback((product) => {
+    const full =
+      mockFilterProducts.find((p) => p.id === product.id) ||
+      (product.id && product.title
+        ? {
+            id: product.id,
+            title: product.title,
+            description: product.description,
+            price: product.price,
+            image: product.image,
+            href: product.href,
+          }
+        : null);
+    if (!full) return;
+    toggleWishlistProduct({
+      id: full.id,
+      title: full.title,
+      description: full.description,
+      price: full.price,
+      image: full.image,
+      href: full.href,
+    });
+    setWishlist(wishlistMapFromStorage());
   }, []);
 
   const toggleCompare = useCallback((id) => {
@@ -467,10 +501,10 @@ const FilterCatalogWidget = () => {
               </div>
 
               <nav
-                className="mt-8 flex flex-col items-stretch justify-between gap-4 border-t border-border-blue/60 pt-6 sm:flex-row sm:items-center"
+                className="mt-8 flex flex-col flex-wrap items-center justify-center gap-4 border-t border-border-blue/60 pt-6 sm:flex-row sm:gap-6"
                 aria-label={t("filterPage.pagination.navAria")}
               >
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                <div className="flex flex-wrap items-center justify-center gap-2">
                   <button
                     type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -492,8 +526,8 @@ const FilterCatalogWidget = () => {
                         onClick={() => setPage(item)}
                         className={`min-w-[2.25rem] rounded-lg px-3 py-2 text-sm font-semibold ${
                           page === item
-                            ? "bg-amber-500 text-white shadow-sm"
-                            : "border border-border-blue text-navy hover:bg-gray-50"
+                            ? "border border-navy bg-navy text-white shadow-sm"
+                            : "border border-border-blue text-navy hover:bg-hover-blue"
                         }`}
                         aria-label={t("filterPage.pagination.goToPage").replace("{{n}}", String(item))}
                         aria-current={page === item ? "page" : undefined}
@@ -512,7 +546,7 @@ const FilterCatalogWidget = () => {
                     ›
                   </button>
                 </div>
-                <label className="flex items-center justify-center gap-2 text-sm text-navy sm:justify-end">
+                <label className="flex items-center gap-2 text-sm text-navy">
                   <span>{t("filterPage.pagination.showLabel")}:</span>
                   <select
                     value={pageSize}
@@ -540,7 +574,7 @@ const FilterCatalogWidget = () => {
             aria-label={t("filterPage.closeOverlay")}
             onClick={closeMobileFilter}
           />
-          <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl">
+          <div className="absolute left-0 top-0 flex h-full w-full max-w-md flex-col bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-border-blue/60 px-4 py-3">
               <h2 id="mobile-filter-title" className="m-0 text-lg font-bold text-navy">
                 {t("filterPage.mobileOverlayTitle")}

@@ -1,3 +1,37 @@
+/* Favorites row — product count badge (avoids TSX parse issues with arbitrary Tailwind brackets) */
+.header-favorites-count-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  height: 1rem;
+  width: 1rem;
+  padding: 0;
+  transform: translate(42%, -48%);
+  border-radius: 0.25rem;
+  background-color: #000000;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.header-favorites-count-badge--wide {
+  width: 1.125rem;
+  min-width: 1.125rem;
+}
+
+.header-favorites-count-badge--compact-wide {
+  width: auto;
+  min-width: 1.375rem;
+  padding-inline: 0.125rem;
+  font-size: 9px;
+}
+
 /* Webkit search input overrides — no Tailwind equivalent */
 .search-input::-webkit-search-cancel-button,
 .search-input::-webkit-search-decoration {

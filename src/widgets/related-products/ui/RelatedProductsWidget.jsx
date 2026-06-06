@@ -1,14 +1,12 @@
-import { useCallback, useState } from "react";
-import { FaBalanceScale, FaHeart, FaRegHeart } from "react-icons/fa";
-import { Navigation } from "swiper/modules";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useLanguage } from "contexts";
+import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useRelatedProductsPresenter } from "features/related-products";
+import { ProductCardImage } from "shared/ui/product-card-image";
 import "swiper/css";
-import "swiper/css/navigation";
-
-const PLACEHOLDER_IMG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23ddd' width='300' height='300'/%3E%3C/svg%3E";
 
 const FONT_STACK = '"Montserrat arm", Montserrat, sans-serif';
 
@@ -42,29 +40,42 @@ const PRICE_TEXT_STYLE = {
 const ACTION_BTN =
   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/[0.06] bg-white text-[rgba(21,33,71,1)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-colors hover:bg-[#f8f9fc] active:scale-[0.98]";
 
-// Arrows sit over the gray image strip (py-6 + img h), not the full card.
-const SWIPER_NAV_WRAP =
-  "relative py-2 " +
-  "[&_.swiper-button-prev]:left-3 [&_.swiper-button-next]:right-3 sm:[&_.swiper-button-prev]:left-4 sm:[&_.swiper-button-next]:right-4 " +
-  "[&_.swiper-button-prev]:z-[12] [&_.swiper-button-next]:z-[12] " +
-  "[&_.swiper-button-prev]:mt-0 [&_.swiper-button-next]:mt-0 " +
-  "[&_.swiper-button-prev]:top-[114px] sm:[&_.swiper-button-prev]:top-[124px] md:[&_.swiper-button-prev]:top-[134px] " +
-  "[&_.swiper-button-next]:top-[114px] sm:[&_.swiper-button-next]:top-[124px] md:[&_.swiper-button-next]:top-[134px] " +
-  "[&_.swiper-button-prev]:-translate-y-1/2 [&_.swiper-button-next]:-translate-y-1/2 " +
-  "[&_.swiper-button-prev]:text-gray-300 [&_.swiper-button-next]:text-gray-300 " +
-  "[&_.swiper-button-prev]:hover:text-navy [&_.swiper-button-next]:hover:text-navy " +
-  "[&_.swiper-button-prev::after]:text-base [&_.swiper-button-next::after]:text-base " +
-  "[&_.swiper-button-prev]:h-10 [&_.swiper-button-next]:h-10 " +
-  "[&_.swiper-button-prev]:w-10 [&_.swiper-button-next]:w-10";
+/** Side gutters for arrows; center track for cards (no overlap). */
+const CAROUSEL_SHELL =
+  "grid w-full min-w-0 grid-cols-1 items-center md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-2 lg:gap-x-3";
+
+const CAROUSEL_TRACK = "min-w-0 overflow-hidden py-2";
+
+const NAV_BTN = `${ACTION_BTN} z-10 hidden shrink-0 self-center text-navy md:flex`;
+
+const wishlistMapFromStorage = () => {
+  const ids = new Set(readAccountState().wishlistItems.map((x) => x.id));
+  return Object.fromEntries([...ids].map((id) => [id, true]));
+};
 
 const RelatedProductsWidget = () => {
   const { t } = useLanguage();
   const { items } = useRelatedProductsPresenter();
-  const [wishlist, setWishlist] = useState(() => ({}));
+  const swiperRef = useRef(null);
+  const [wishlist, setWishlist] = useState(wishlistMapFromStorage);
   const [compare, setCompare] = useState(() => ({}));
 
-  const toggleWishlist = useCallback((id) => {
-    setWishlist((prev) => ({ ...prev, [id]: !prev[id] }));
+  useEffect(() => {
+    const sync = () => setWishlist(wishlistMapFromStorage());
+    window.addEventListener(ACCOUNT_STORAGE_EVENT, sync);
+    return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
+  }, []);
+
+  const toggleWishlist = useCallback((product) => {
+    toggleWishlistProduct({
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      image: product.image,
+      href: product.href,
+    });
+    setWishlist(wishlistMapFromStorage());
   }, []);
 
   const toggleCompare = useCallback((id) => {
@@ -90,30 +101,44 @@ const RelatedProductsWidget = () => {
 
       <hr className="my-4 border-0 border-t border-border-blue md:my-6" />
 
-      <div className={SWIPER_NAV_WRAP} aria-label={t("relatedProducts.carouselAriaLabel")}>
-        <Swiper
-          modules={[Navigation]}
-          navigation
-          loop
-          watchOverflow={false}
-          slidesPerView={1.15}
-          spaceBetween={14}
-          breakpoints={{
-            480: { slidesPerView: 1.35, spaceBetween: 14 },
-            640: { slidesPerView: 2, spaceBetween: 16 },
-            1024: { slidesPerView: 4, spaceBetween: 18 },
-          }}
+      <div className={CAROUSEL_SHELL} aria-label={t("relatedProducts.carouselAriaLabel")}>
+        <button
+          type="button"
+          className={NAV_BTN}
+          onClick={() => swiperRef.current?.slidePrev()}
+          aria-label="Previous related product"
         >
-          {items.map((product) => {
-            const inWishlist = Boolean(wishlist[product.id]);
-            const inCompare = Boolean(compare[product.id]);
+          <FaChevronLeft className="h-4 w-4" aria-hidden />
+        </button>
 
-            return (
-              <SwiperSlide key={product.id} className="!h-auto">
-                <article className="flex h-full flex-col text-start">
-                  <div
-                    className="relative min-h-[228px] overflow-hidden rounded-[20px] sm:min-h-[248px] md:min-h-[268px]"
-                    style={{ backgroundColor: "rgba(245, 245, 245, 1)" }}
+        <div className={CAROUSEL_TRACK}>
+          <Swiper
+            onSwiper={(instance) => {
+              swiperRef.current = instance;
+            }}
+            loop
+            watchOverflow={false}
+            slidesPerView={1.15}
+            spaceBetween={14}
+            breakpoints={{
+              480: { slidesPerView: 1.35, spaceBetween: 14 },
+              640: { slidesPerView: 2, spaceBetween: 16 },
+              1024: { slidesPerView: 4, spaceBetween: 18 },
+            }}
+          >
+            {items.map((product) => {
+              const inWishlist = Boolean(wishlist[product.id]);
+              const inCompare = Boolean(compare[product.id]);
+
+              return (
+                <SwiperSlide key={product.id} className="!h-auto">
+                  <article className="flex h-full flex-col text-start">
+                  <ProductCardImage
+                    src={product.image}
+                    alt={product.title}
+                    href={product.href}
+                    linkTarget="_blank"
+                    linkRel="noopener noreferrer"
                   >
                     <div className="pointer-events-auto absolute right-3 top-3 z-10 flex flex-col gap-2">
                       <button
@@ -134,7 +159,7 @@ const RelatedProductsWidget = () => {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          toggleWishlist(product.id);
+                          toggleWishlist(product);
                         }}
                         aria-pressed={inWishlist}
                         aria-label={t("relatedProducts.wishlistAriaLabel")}
@@ -147,21 +172,12 @@ const RelatedProductsWidget = () => {
                         )}
                       </button>
                     </div>
-                    <a href={product.href} className="block outline-none">
-                      <img
-                        src={product.image || PLACEHOLDER_IMG}
-                        alt={product.title}
-                        className="mx-auto block h-[180px] w-full max-w-[220px] object-contain px-4 py-6 sm:h-[200px] sm:max-w-none md:h-[220px]"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = PLACEHOLDER_IMG;
-                        }}
-                      />
-                    </a>
-                  </div>
+                  </ProductCardImage>
 
-                  <a
-                    href={product.href}
+                  <Link
+                    to={product.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="mt-3 flex flex-col gap-1 no-underline outline-none"
                   >
                     <h3 className="m-0 line-clamp-2" style={TITLE_TEXT_STYLE}>
@@ -177,12 +193,22 @@ const RelatedProductsWidget = () => {
                     <p className="m-0 mt-0.5" style={PRICE_TEXT_STYLE}>
                       {product.price}
                     </p>
-                  </a>
+                  </Link>
                 </article>
               </SwiperSlide>
             );
-          })}
-        </Swiper>
+            })}
+          </Swiper>
+        </div>
+
+        <button
+          type="button"
+          className={NAV_BTN}
+          onClick={() => swiperRef.current?.slideNext()}
+          aria-label="Next related product"
+        >
+          <FaChevronRight className="h-4 w-4" aria-hidden />
+        </button>
       </div>
     </section>
   );

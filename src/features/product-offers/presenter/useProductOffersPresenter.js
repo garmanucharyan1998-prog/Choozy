@@ -1,30 +1,11 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { defaultMapCenter, mockProductOffers } from "entities/product-offers";
 import { mockProductDetail } from "entities/product-detail";
 
-const formatAmd = (amount) =>
-  typeof amount === "number" ? amount.toLocaleString("en-US") : "";
-
 /**
- * Presenter for the product offers + map section.
- * Holds tab state and prepares view-ready offers / specs data.
+ * Presenter for the product offers + map section (specs panel + store map).
  */
 export const useProductOffersPresenter = () => {
-  const [activeTab, setActiveTab] = useState("sites");
-
-  const selectTab = useCallback((tabId) => {
-    setActiveTab(tabId);
-  }, []);
-
-  const formattedOffers = useMemo(
-    () =>
-      mockProductOffers.map((offer) => ({
-        ...offer,
-        priceFormatted: formatAmd(offer.priceAmd),
-      })),
-    [],
-  );
-
   const mapMarkers = useMemo(
     () =>
       mockProductOffers.map((offer) => ({
@@ -39,9 +20,6 @@ export const useProductOffersPresenter = () => {
   const specsRows = mockProductDetail.specsBriefRows;
 
   return {
-    activeTab,
-    selectTab,
-    offers: formattedOffers,
     specsRows,
     mapCenter: defaultMapCenter,
     mapMarkers,

@@ -1,8 +1,14 @@
-import { useCallback, useMemo, useState } from "react";
-import { mockProductOffers } from "entities/product-offers";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useProductOffersVariantFilter } from "contexts";
+import {
+  mockProductOffers,
+  offerMatchesVariantFilter,
+  resolveOfferVariantIndex,
+} from "entities/product-offers";
 
-const INITIAL_VISIBLE_COUNT = 4;
+const INITIAL_VISIBLE_COUNT = 3;
 const LOAD_MORE_STEP = 2;
+const SHOPS_SEE_MORE_MIN = 3;
 
 export const SORT_OPTIONS = [
   { id: "popular", labelKey: "productOffers.bestOffers.sortOptions.popular" },
@@ -25,11 +31,38 @@ const buildInitialSelections = (offers) =>
     return acc;
   }, {});
 
+const applyVariantKeyToSelections = (variantKey, current) =>
+  mockProductOffers.reduce((acc, offer) => {
+    const prev = current[offer.id] ?? {
+      variantIndex: offer.defaultVariantIndex ?? 0,
+      colorIndex: offer.defaultColorIndex ?? 0,
+    };
+    acc[offer.id] = {
+      variantIndex: resolveOfferVariantIndex(offer, variantKey, prev.variantIndex),
+      colorIndex: prev.colorIndex,
+    };
+    return acc;
+  }, {});
+
+const enrichOffer = (offer, selections) => {
+  const selection = selections[offer.id] ?? {
+    variantIndex: offer.defaultVariantIndex ?? 0,
+    colorIndex: offer.defaultColorIndex ?? 0,
+  };
+
+  return {
+    ...offer,
+    priceFormatted: formatAmd(offer.priceAmd),
+    activeVariantIndex: selection.variantIndex,
+  };
+};
+
 /**
  * Presenter for the "Best offers" table.
- * Manages per-row variant/color selection, sorting, and paginated "See more".
+ * Manages global variant filter, per-row color selection, sorting, and paginated see more/less.
  */
 export const useBestOffersPresenter = () => {
+  const { globalVariantKey } = useProductOffersVariantFilter();
   const [sortId, setSortId] = useState(SORT_OPTIONS[0].id);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
@@ -37,27 +70,43 @@ export const useBestOffersPresenter = () => {
     buildInitialSelections(mockProductOffers),
   );
 
-  const sortedOffers = useMemo(() => {
-    const base = mockProductOffers.map((offer) => ({
-      ...offer,
-      priceFormatted: formatAmd(offer.priceAmd),
-    }));
-    if (sortId === "priceAsc") return [...base].sort(comparePrice(true));
-    if (sortId === "priceDesc") return [...base].sort(comparePrice(false));
-    return base;
-  }, [sortId]);
+  useEffect(() => {
+    if (globalVariantKey == null) return;
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
+    setSelections((current) => applyVariantKeyToSelections(globalVariantKey, current));
+  }, [globalVariantKey]);
 
-  const visibleOffers = useMemo(
-    () => sortedOffers.slice(0, visibleCount),
-    [sortedOffers, visibleCount],
+  const filteredOffers = useMemo(
+    () => mockProductOffers.filter((offer) => offerMatchesVariantFilter(offer, globalVariantKey)),
+    [globalVariantKey],
   );
 
-  const canLoadMore = visibleCount < sortedOffers.length;
+  const sortedOffers = useMemo(() => {
+    if (sortId === "priceAsc") return [...filteredOffers].sort(comparePrice(true));
+    if (sortId === "priceDesc") return [...filteredOffers].sort(comparePrice(false));
+    return filteredOffers;
+  }, [filteredOffers, sortId]);
+
+  const visibleOffers = useMemo(
+    () =>
+      sortedOffers
+        .slice(0, visibleCount)
+        .map((offer) => enrichOffer(offer, selections)),
+    [sortedOffers, visibleCount, selections],
+  );
+
+  const canLoadMore =
+    sortedOffers.length > SHOPS_SEE_MORE_MIN && visibleCount < sortedOffers.length;
+  const canShowLess = visibleCount > INITIAL_VISIBLE_COUNT;
 
   const loadMore = useCallback(() => {
     setVisibleCount((current) =>
-      Math.min(current + LOAD_MORE_STEP, mockProductOffers.length),
+      Math.min(current + LOAD_MORE_STEP, sortedOffers.length),
     );
+  }, [sortedOffers.length]);
+
+  const showLess = useCallback(() => {
+    setVisibleCount(INITIAL_VISIBLE_COUNT);
   }, []);
 
   const selectSort = useCallback((nextSortId) => {
@@ -74,13 +123,20 @@ export const useBestOffersPresenter = () => {
   }, []);
 
   const selectVariantForOffer = useCallback((offerId, variantIndex) => {
-    setSelections((current) => ({
-      ...current,
-      [offerId]: {
-        ...current[offerId],
-        variantIndex,
-      },
-    }));
+    setSelections((current) => {
+      const offer = mockProductOffers.find((item) => item.id === offerId);
+      const prev = current[offerId] ?? {
+        variantIndex: offer?.defaultVariantIndex ?? 0,
+        colorIndex: offer?.defaultColorIndex ?? 0,
+      };
+      return {
+        ...current,
+        [offerId]: {
+          ...prev,
+          variantIndex,
+        },
+      };
+    });
   }, []);
 
   const selectColorForOffer = useCallback((offerId, colorIndex) => {
@@ -104,13 +160,16 @@ export const useBestOffersPresenter = () => {
     sortOptions: SORT_OPTIONS,
     activeSortOption,
     isSortOpen,
+    globalVariantKey,
     canLoadMore,
+    canShowLess,
     toggleSortOpen,
     closeSort,
     selectSort,
     selectVariantForOffer,
     selectColorForOffer,
     loadMore,
+    showLess,
   };
 };
 
