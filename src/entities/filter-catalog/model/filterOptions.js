@@ -9,11 +9,13 @@ export const SCREEN_SIZE_OPTIONS = [
   { id: "13", labelKey: "filterPage.filters.screenSizes.inch13", inch: 13 },
   { id: "14", labelKey: "filterPage.filters.screenSizes.inch14", inch: 14 },
   { id: "15", labelKey: "filterPage.filters.screenSizes.inch15", inch: 15 },
+  { id: "16", labelKey: "filterPage.filters.screenSizes.inch16", inch: 16 },
 ];
 
 export const BRAND_OPTIONS = [
   { id: "apple", labelKey: "filterPage.filters.brandNames.apple" },
   { id: "samsung", labelKey: "filterPage.filters.brandNames.samsung" },
+  { id: "sony", labelKey: "filterPage.filters.brandNames.sony" },
   { id: "hp", labelKey: "filterPage.filters.brandNames.hp" },
   { id: "lenovo", labelKey: "filterPage.filters.brandNames.lenovo" },
   { id: "dell", labelKey: "filterPage.filters.brandNames.dell" },
@@ -32,4 +34,6 @@ export const COLOR_OPTIONS = [
   { id: "grey", hex: "#9ca3af" },
   { id: "white", hex: "#f3f4f6" },
   { id: "navy", hex: "#152147" },
+  { id: "blue", hex: "#2563eb" },
+  { id: "orange", hex: "#f97316" },
 ];

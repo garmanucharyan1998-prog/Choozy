@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { searchModel } from "entities/search";
 import { headerModel } from "entities/header";
 import { useLanguage } from "contexts";
@@ -12,6 +13,7 @@ const { LANGUAGES, DEFAULT_LANGUAGE, MOBILE_MENU_ITEMS } = headerModel;
 const { MIN_QUERY_LENGTH } = searchModel;
 
 export const useHeaderPresenter = () => {
+  const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -79,20 +81,31 @@ export const useHeaderPresenter = () => {
     }
   }, []);
 
+  const navigateToFilterSearch = useCallback(
+    (query) => {
+      const trimmed = query.trim();
+      if (!trimmed) return;
+      setShowSuggestions(false);
+      navigate(`/filter?q=${encodeURIComponent(trimmed)}`);
+    },
+    [navigate],
+  );
+
   const handleSearchSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      if (searchQuery.trim()) {
-        setShowSuggestions(false);
-      }
+      navigateToFilterSearch(searchQuery);
     },
-    [searchQuery],
+    [searchQuery, navigateToFilterSearch],
   );
 
-  const handleSuggestionClick = useCallback((suggestion) => {
-    setSearchQuery(suggestion);
-    setShowSuggestions(false);
-  }, []);
+  const handleSuggestionClick = useCallback(
+    (suggestion) => {
+      setSearchQuery(suggestion);
+      navigateToFilterSearch(suggestion);
+    },
+    [navigateToFilterSearch],
+  );
 
   const handleClearSearch = useCallback(() => {
     setSearchQuery("");
@@ -116,6 +129,19 @@ export const useHeaderPresenter = () => {
     document.addEventListener("click", handler);
     return () => document.removeEventListener("click", handler);
   }, []);
+
+  useEffect(() => {
+    if (!isLanguageDropdownOpen) {
+      return undefined;
+    }
+    const handlePointerDown = (event) => {
+      if (!event.target.closest("[data-language-switcher]")) {
+        setIsLanguageDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [isLanguageDropdownOpen]);
 
   useEffect(() => {
     const handleResize = () => {

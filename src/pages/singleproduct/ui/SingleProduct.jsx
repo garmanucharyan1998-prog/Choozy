@@ -1,3 +1,4 @@
+import { ProductOffersVariantFilterProvider } from "contexts";
 import { BestOffersWidget } from "widgets/best-offers";
 import { FooterWidget } from "widgets/footer";
 import { RelatedProductsWidget } from "widgets/related-products";
@@ -21,7 +22,7 @@ const SingleProduct = () => {
   } = useHomePagePresenter();
 
   return (
-    <div className="min-w-[320px] bg-white text-center">
+    <div className="flex min-h-screen min-w-[320px] flex-col bg-white">
       <div
         className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[65] bg-black/45 transition-opacity duration-[400ms] ease-in-out md:hidden ${
           isAnyMobilePanelOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
@@ -55,16 +56,20 @@ const SingleProduct = () => {
         />
       </div>
 
-      <main className="bg-white px-2.5 py-6 text-start sm:px-[15px] md:px-[30px] md:py-10 lg:px-[50px] 2xl:px-[100px]">
-        <div className="cont-width-default mx-auto">
-          <ProductDetailWidget />
-          <ProductOffersMapWidget />
-          <BestOffersWidget />
-          <RelatedProductsWidget />
-        </div>
+      <main className="flex flex-1 flex-col bg-white px-2.5 py-6 text-start sm:px-[15px] md:px-[30px] md:py-10 lg:px-[50px] 2xl:px-[100px]">
+        <ProductOffersVariantFilterProvider>
+          <div className="cont-width-default mx-auto w-full">
+            <ProductDetailWidget />
+            <ProductOffersMapWidget />
+            <BestOffersWidget />
+            <RelatedProductsWidget />
+          </div>
+        </ProductOffersVariantFilterProvider>
       </main>
 
-      <FooterWidget />
+      <div className="mt-auto shrink-0">
+        <FooterWidget />
+      </div>
     </div>
   );
 };

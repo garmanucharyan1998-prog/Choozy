@@ -15,6 +15,13 @@ const SHARED_VARIANT_KEYS = [
   "productDetail.variants.v1tb",
 ];
 
+const VARIANT_KEYS_256 = [
+  "productDetail.variants.v256a",
+  "productDetail.variants.v256b",
+];
+
+const VARIANT_KEYS_1TB = ["productDetail.variants.v1tb"];
+
 const COLOR_YELLOW = { id: "yellow", hex: "#f2c94c" };
 const COLOR_BLACK = { id: "black", hex: "#1c1c1e" };
 const COLOR_WHITE = { id: "white", hex: "#f5f5f7" };
@@ -30,6 +37,7 @@ export const mockProductOffers = [
     descriptionKey: "productOffers.offerDescription",
     variantKey: "productDetail.variants.v256b",
     variantKeys: SHARED_VARIANT_KEYS,
+    supportedVariantKeys: VARIANT_KEYS_256,
     defaultVariantIndex: 1,
     colors: [COLOR_YELLOW, COLOR_BLACK, COLOR_WHITE, COLOR_BLUE],
     defaultColorIndex: 0,
@@ -46,6 +54,7 @@ export const mockProductOffers = [
     descriptionKey: "productOffers.offerDescription",
     variantKey: "productDetail.variants.v256b",
     variantKeys: SHARED_VARIANT_KEYS,
+    supportedVariantKeys: VARIANT_KEYS_256,
     defaultVariantIndex: 1,
     colors: [COLOR_BLACK, COLOR_YELLOW, COLOR_BLUE],
     defaultColorIndex: 0,
@@ -62,7 +71,8 @@ export const mockProductOffers = [
     descriptionKey: "productOffers.offerDescription",
     variantKey: "productDetail.variants.v1tb",
     variantKeys: SHARED_VARIANT_KEYS,
-    defaultVariantIndex: 1,
+    supportedVariantKeys: VARIANT_KEYS_1TB,
+    defaultVariantIndex: 2,
     colors: [COLOR_BLUE, COLOR_BLACK, COLOR_WHITE],
     defaultColorIndex: 0,
     priceAmd: 1079000,
@@ -78,6 +88,7 @@ export const mockProductOffers = [
     descriptionKey: "productOffers.offerDescription",
     variantKey: "productDetail.variants.v256b",
     variantKeys: SHARED_VARIANT_KEYS,
+    supportedVariantKeys: VARIANT_KEYS_256,
     defaultVariantIndex: 1,
     colors: [COLOR_WHITE, COLOR_BLACK, COLOR_YELLOW, COLOR_BLUE],
     defaultColorIndex: 0,
@@ -94,6 +105,7 @@ export const mockProductOffers = [
     descriptionKey: "productOffers.offerDescription",
     variantKey: "productDetail.variants.v256b",
     variantKeys: SHARED_VARIANT_KEYS,
+    supportedVariantKeys: VARIANT_KEYS_256,
     defaultVariantIndex: 1,
     colors: [COLOR_BLACK, COLOR_YELLOW, COLOR_BLUE],
     defaultColorIndex: 1,
@@ -110,7 +122,8 @@ export const mockProductOffers = [
     descriptionKey: "productOffers.offerDescription",
     variantKey: "productDetail.variants.v1tb",
     variantKeys: SHARED_VARIANT_KEYS,
-    defaultVariantIndex: 1,
+    supportedVariantKeys: VARIANT_KEYS_1TB,
+    defaultVariantIndex: 2,
     colors: [COLOR_BLACK, COLOR_WHITE, COLOR_BLUE],
     defaultColorIndex: 0,
     priceAmd: 1099000,

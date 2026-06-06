@@ -1,7 +1,10 @@
-import { useRef } from "react";
-import { FaArrowLeft, FaPen, FaUpload } from "react-icons/fa";
-import { SIDEBAR_IDS } from "entities/user";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { FaArrowLeft, FaBalanceScale, FaHeart, FaPen, FaRegHeart, FaTimes, FaUpload } from "react-icons/fa";
+import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
+import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
+import { ProductCardImage } from "shared/ui/product-card-image";
 
 const sidebarItems = [
   { id: SIDEBAR_IDS.PERSONAL, labelKey: "account.sidebar.personal" },
@@ -13,16 +16,100 @@ const sidebarItems = [
 
 const notificationKeys = ["priceDrops", "wishlistUpdates", "accountNews"];
 
+const NOTIFICATIONS_PAGE_TABS = {
+  FEED: "feed",
+  SETTINGS: "settings",
+};
+
+const NOTIFICATIONS_FEED_ITEM_KEYS = ["recent", "hour", "dated"];
+
+const RECENT_INITIAL_VISIBLE_COUNT = 4;
+const RECENT_LOAD_MORE_STEP = 4;
+
+const WISHLIST_ACTION_BTN =
+  "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-black/[0.06] bg-white text-[rgba(21,33,71,1)] shadow-[0_2px_6px_rgba(0,0,0,0.07)] transition-colors hover:bg-[#f8f9fc] active:scale-[0.98] xl:h-10 xl:w-10 xl:shadow-[0_2px_8px_rgba(0,0,0,0.08)]";
+
+const WISHLIST_ACTION_ICON = "h-3.5 w-3.5 xl:h-4 xl:w-4";
+
+/**
+ * @param {{
+ *   item: { id: string, title: string, description: string, price: string, image: string, href: string };
+ *   detailTo: string;
+ *   inCompare: boolean;
+ *   onToggleCompare: () => void;
+ *   onHeartClick: () => void;
+ *   heartFilled: boolean;
+ *   compareAria: string;
+ *   heartAria: string;
+ * }} props
+ */
+const AccountGridProductCard = ({
+  item,
+  detailTo,
+  inCompare,
+  onToggleCompare,
+  onHeartClick,
+  heartFilled,
+  compareAria,
+  heartAria,
+}) => (
+  <article className="flex flex-col text-start">
+    <ProductCardImage src={item.image} alt={item.title} href={detailTo}>
+      <div className="pointer-events-auto absolute right-2 top-2 z-10 flex flex-col gap-1.5 xl:right-3 xl:top-3 xl:gap-2">
+        <button
+          type="button"
+          onClick={onToggleCompare}
+          aria-pressed={inCompare}
+          aria-label={compareAria}
+          className={WISHLIST_ACTION_BTN}
+        >
+          <FaBalanceScale className={WISHLIST_ACTION_ICON} aria-hidden />
+        </button>
+        <button
+          type="button"
+          onClick={onHeartClick}
+          aria-pressed={heartFilled}
+          aria-label={heartAria}
+          className={WISHLIST_ACTION_BTN}
+        >
+          {heartFilled ? (
+            <FaHeart className={`${WISHLIST_ACTION_ICON} text-active-blue`} aria-hidden />
+          ) : (
+            <FaRegHeart className={WISHLIST_ACTION_ICON} aria-hidden />
+          )}
+        </button>
+      </div>
+    </ProductCardImage>
+    <Link to={detailTo} className="mt-3 flex min-w-0 flex-col gap-1 no-underline outline-none">
+      <h3 className="m-0 line-clamp-2 text-base font-bold text-[rgba(21,33,71,1)]">{item.title}</h3>
+      <p className="m-0 line-clamp-2 text-sm text-[rgba(105,105,105,1)]" title={item.description}>
+        {item.description}
+      </p>
+      <p className="m-0 mt-0.5 text-base font-semibold text-link-blue">{item.price}</p>
+    </Link>
+  </article>
+);
+
 const MainCard = ({ children, className = "" }) => (
   <div className={`rounded-[12px] border border-[#e1e6ef] bg-white shadow-sm ${className}`}>
     {children}
   </div>
 );
 
+const NotificationFeedCard = ({ title, timeLabel, body }) => (
+  <article className="rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
+    <div className="flex items-start justify-between gap-3 border-b border-[#d9dfea] pb-3">
+      <h3 className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">{title}</h3>
+      <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">{timeLabel}</span>
+    </div>
+    <p className="m-0 mt-3 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
+  </article>
+);
+
 const ToggleRow = ({ title, description, enabled, onToggle }) => (
   <button
     type="button"
-    className="flex w-full items-center justify-between gap-4 rounded-[12px] border border-[#e1e6ef] bg-[#fbfcff] p-4 text-start transition hover:bg-[#f4f6fb]"
+    className="flex min-h-[52px] w-full touch-manipulation items-center justify-between gap-3 rounded-[12px] border border-[#e1e6ef] bg-[#fbfcff] p-3.5 text-start transition hover:bg-[#f4f6fb] sm:min-h-0 sm:gap-4 sm:p-4"
     onClick={onToggle}
     aria-pressed={enabled}
   >
@@ -44,6 +131,16 @@ const ToggleRow = ({ title, description, enabled, onToggle }) => (
 
 const AccountDashboardWidget = () => {
   const fileInputRef = useRef(null);
+  const [wishlistCompare, setWishlistCompare] = useState(() => ({}));
+  const [recentCompare, setRecentCompare] = useState(() => ({}));
+  const [recentVisibleCount, setRecentVisibleCount] = useState(RECENT_INITIAL_VISIBLE_COUNT);
+  const [notificationsPageTab, setNotificationsPageTab] = useState(NOTIFICATIONS_PAGE_TABS.FEED);
+  const toggleWishlistCompare = useCallback((id) => {
+    setWishlistCompare((prev) => ({ ...prev, [id]: !prev[id] }));
+  }, []);
+  const toggleRecentCompare = useCallback((id) => {
+    setRecentCompare((prev) => ({ ...prev, [id]: !prev[id] }));
+  }, []);
   const {
     t,
     accountState,
@@ -71,19 +168,121 @@ const AccountDashboardWidget = () => {
     savePassword,
     cancelPasswordEdit,
     toggleNotification,
-    toggleSubscription,
-    removeWishlistItem,
+    pendingWishlistRemoveId,
+    dismissStatus,
+    requestRemoveWishlistItem,
+    confirmRemoveWishlistItem,
+    cancelRemoveWishlistItem,
     clearRecentlyViewed,
     setAvatarFromFile,
     clearAvatar,
   } = useAccountPresenter();
 
-  const renderStatus = () =>
+  useEffect(() => {
+    if (activeSidebarId === sidebarIds.NOTIFICATIONS) {
+      setNotificationsPageTab(NOTIFICATIONS_PAGE_TABS.FEED);
+    }
+  }, [activeSidebarId, sidebarIds.NOTIFICATIONS]);
+
+  useEffect(() => {
+    setRecentVisibleCount(RECENT_INITIAL_VISIBLE_COUNT);
+  }, [activeSidebarId, accountState.recentlyViewed.length]);
+
+  useEffect(() => {
+    if (!pendingWishlistRemoveId) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") cancelRemoveWishlistItem();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [pendingWishlistRemoveId, cancelRemoveWishlistItem]);
+
+  const wishlistIds = useMemo(() => new Set(accountState.wishlistItems.map((w) => w.id)), [accountState.wishlistItems]);
+
+  const visibleRecentlyViewed = useMemo(
+    () => accountState.recentlyViewed.slice(0, recentVisibleCount),
+    [accountState.recentlyViewed, recentVisibleCount],
+  );
+
+  const canLoadMoreRecent = recentVisibleCount < accountState.recentlyViewed.length;
+  const canShowLessRecent = recentVisibleCount > RECENT_INITIAL_VISIBLE_COUNT;
+
+  const loadMoreRecent = useCallback(() => {
+    setRecentVisibleCount((current) =>
+      Math.min(current + RECENT_LOAD_MORE_STEP, accountState.recentlyViewed.length),
+    );
+  }, [accountState.recentlyViewed.length]);
+
+  const showLessRecent = useCallback(() => {
+    setRecentVisibleCount(RECENT_INITIAL_VISIBLE_COUNT);
+  }, []);
+
+  const pendingWishlistItem = useMemo(
+    () => accountState.wishlistItems.find((item) => item.id === pendingWishlistRemoveId) ?? null,
+    [accountState.wishlistItems, pendingWishlistRemoveId],
+  );
+
+  const renderStatusToastOverlay = () =>
     statusKey ? (
-      <p className="mb-4 rounded-[10px] border border-[#cfe8d5] bg-[#f1fbf3] px-4 py-2.5 text-sm font-medium text-[#236736]">
-        {t(statusKey)}
-      </p>
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-11 -translate-y-[calc(100%+0.75rem)]">
+        <div
+          role="status"
+          aria-live="polite"
+          className="pointer-events-auto flex h-full w-full items-center justify-between gap-3 rounded-[10px] border border-[#cfe8d5] bg-[#f1fbf3] px-5 py-2 text-sm font-medium leading-tight text-[#236736] shadow-sm md:px-8"
+        >
+          <span className="min-w-0 flex-1 truncate text-start">{t(statusKey)}</span>
+          <button
+            type="button"
+            onClick={dismissStatus}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#236736] transition hover:bg-[#dcefe0]"
+            aria-label={t("account.messages.dismissStatus")}
+          >
+            <FaTimes className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
+      </div>
     ) : null;
+
+  const renderWishlistRemoveDialog = () => {
+    if (!pendingWishlistRemoveId) return null;
+    return (
+      <div className="fixed inset-0 z-[90] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="wishlist-remove-title">
+        <button
+          type="button"
+          className="absolute inset-0 bg-black/45"
+          aria-label={t("account.wishlist.cancelButton")}
+          onClick={cancelRemoveWishlistItem}
+        />
+        <div className="relative z-[1] w-full max-w-md rounded-[12px] border border-[#e1e6ef] bg-white p-5 shadow-lg sm:p-6">
+          <h2 id="wishlist-remove-title" className="m-0 text-lg font-bold text-navy">
+            {t("account.wishlist.confirmTitle")}
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-text-muted">
+            {t("account.wishlist.confirmMessage")}
+          </p>
+          {pendingWishlistItem?.title ? (
+            <p className="mt-2 text-sm font-semibold text-navy">{pendingWishlistItem.title}</p>
+          ) : null}
+          <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={cancelRemoveWishlistItem}
+              className="min-h-[44px] rounded-xl border border-[#e1e6ef] bg-white px-5 text-sm font-bold text-navy transition hover:bg-[#f4f6fb]"
+            >
+              {t("account.wishlist.cancelButton")}
+            </button>
+            <button
+              type="button"
+              onClick={confirmRemoveWishlistItem}
+              className="min-h-[44px] rounded-xl bg-navy px-5 text-sm font-bold text-white transition hover:opacity-95"
+            >
+              {t("account.wishlist.confirmButton")}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderAvatar = (editable = false) => (
     <div className="relative h-[72px] w-[72px] shrink-0">
@@ -122,7 +321,7 @@ const AccountDashboardWidget = () => {
     </div>
   );
 
-  const renderNotifications = () => (
+  const renderNotificationSettings = () => (
     <div className="space-y-3">
       {notificationKeys.map((key) => (
         <ToggleRow
@@ -135,6 +334,22 @@ const AccountDashboardWidget = () => {
       ))}
     </div>
   );
+
+  const renderNotificationsFeed = () => {
+    const body = t("account.notificationsPage.feed.sampleBody");
+    return (
+      <div className="space-y-3 sm:space-y-4" role="feed" aria-label={t("account.notificationsPage.title")}>
+        {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
+          <NotificationFeedCard
+            key={itemKey}
+            title={t(`account.notificationsPage.feed.items.${itemKey}.title`)}
+            timeLabel={t(`account.notificationsPage.feed.items.${itemKey}.timeLabel`)}
+            body={body}
+          />
+        ))}
+      </div>
+    );
+  };
 
   const renderReadMode = () => (
     <div className="p-5 md:p-8">
@@ -297,7 +512,7 @@ const AccountDashboardWidget = () => {
         ) : null}
       </div>
       {personalInnerTab === innerTabs.NOTIFICATIONS ? (
-        <div className="p-5 md:p-8">{renderNotifications()}</div>
+        <div className="p-5 md:p-8">{renderNotificationSettings()}</div>
       ) : isPersonalEditMode ? (
         renderEditMode()
       ) : (
@@ -308,36 +523,37 @@ const AccountDashboardWidget = () => {
 
   const renderWishlist = () => (
     <MainCard className="p-5 md:p-8">
-      <h2 className="mb-4 text-lg font-bold text-navy">{t("account.wishlist.title")}</h2>
+      <h2 className="mb-6 text-lg font-bold text-navy md:text-xl">{t("account.wishlist.title")}</h2>
       {accountState.wishlistItems.length === 0 ? (
         <p className="text-sm text-text-muted">{t("account.wishlist.empty")}</p>
       ) : (
-        <ul className="space-y-3">
-          {accountState.wishlistItems.map((item) => (
-            <li key={item.id} className="flex flex-col gap-3 rounded-[12px] border border-[#e1e6ef] bg-[#fbfcff] p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="text-start">
-                <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{item.category}</p>
-                <p className="mt-1 font-bold text-navy">{item.title}</p>
-                <p className="mt-1 text-sm font-semibold text-active-blue">{item.priceLabel}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => removeWishlistItem(item.id)}
-                className="rounded-pill border border-[#e1e6ef] bg-white px-4 py-2 text-sm font-bold text-navy hover:bg-accent-blue"
-              >
-                {t("account.wishlist.remove")}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          {accountState.wishlistItems.map((item) => {
+            const detailTo =
+              item.href && item.href.startsWith("/") ? item.href : getProductDetailHref(item.id, item.title);
+            return (
+              <AccountGridProductCard
+                key={item.id}
+                item={item}
+                detailTo={detailTo}
+                inCompare={Boolean(wishlistCompare[item.id])}
+                onToggleCompare={() => toggleWishlistCompare(item.id)}
+                onHeartClick={() => requestRemoveWishlistItem(item.id)}
+                heartFilled
+                compareAria={t("relatedProducts.compareAriaLabel")}
+                heartAria={t("account.wishlist.remove")}
+              />
+            );
+          })}
+        </div>
       )}
     </MainCard>
   );
 
   const renderRecent = () => (
     <MainCard className="p-5 md:p-8">
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-lg font-bold text-navy">{t("account.recent.title")}</h2>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("account.recent.title")}</h2>
         {accountState.recentlyViewed.length > 0 ? (
           <button type="button" onClick={clearRecentlyViewed} className="text-sm font-bold text-link-blue underline">
             {t("account.recent.clear")}
@@ -347,26 +563,83 @@ const AccountDashboardWidget = () => {
       {accountState.recentlyViewed.length === 0 ? (
         <p className="text-sm text-text-muted">{t("account.recent.empty")}</p>
       ) : (
-        <ul className="m-0 list-none divide-y divide-[#e1e6ef] rounded-[12px] border border-[#e1e6ef] bg-[#fbfcff] p-0">
-          {accountState.recentlyViewed.map((item) => (
-            <li key={item.id} className="px-4 py-3 text-start text-sm font-semibold text-navy">
-              {item.title}
-            </li>
-          ))}
-        </ul>
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+            {visibleRecentlyViewed.map((item) => {
+              const detailTo =
+                item.href && item.href.startsWith("/") ? item.href : getProductDetailHref(item.id, item.title);
+              const inWishlist = wishlistIds.has(item.id);
+              return (
+                <AccountGridProductCard
+                  key={item.id}
+                  item={item}
+                  detailTo={detailTo}
+                  inCompare={Boolean(recentCompare[item.id])}
+                  onToggleCompare={() => toggleRecentCompare(item.id)}
+                  onHeartClick={() => {
+                    toggleWishlistProduct({
+                      id: item.id,
+                      title: item.title,
+                      description: item.description,
+                      price: item.price,
+                      image: item.image,
+                      href: detailTo,
+                    });
+                  }}
+                  heartFilled={inWishlist}
+                  compareAria={t("relatedProducts.compareAriaLabel")}
+                  heartAria={t("relatedProducts.wishlistAriaLabel")}
+                />
+              );
+            })}
+          </div>
+          {canLoadMoreRecent || canShowLessRecent ? (
+            <div className="mt-4 flex justify-end gap-3">
+              {canShowLessRecent ? (
+                <button
+                  type="button"
+                  onClick={showLessRecent}
+                  className="inline-flex items-center gap-2 rounded-full border border-border-blue px-5 py-2 text-sm font-semibold text-text-dark transition-colors hover:bg-hover-blue md:text-base"
+                >
+                  {t("account.recent.seeLess")}
+                </button>
+              ) : null}
+              {canLoadMoreRecent ? (
+                <button
+                  type="button"
+                  onClick={loadMoreRecent}
+                  className="inline-flex items-center gap-2 rounded-full border border-link-blue px-5 py-2 text-sm font-semibold text-link-blue transition-colors hover:bg-hover-blue md:text-base"
+                >
+                  {t("account.recent.seeMore")}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+        </>
       )}
     </MainCard>
   );
 
   const renderSubscription = () => (
-    <MainCard className="p-5 md:p-8">
-      <h2 className="mb-2 text-lg font-bold text-navy">{t("account.subscription.title")}</h2>
-      <p className="mb-6 text-sm leading-relaxed text-text-muted">{t("account.subscription.description")}</p>
-      <ToggleRow
-        title={t("account.subscription.toggleLabel")}
-        enabled={accountState.subscriptionOptIn}
-        onToggle={toggleSubscription}
-      />
+    <MainCard className="overflow-hidden p-0">
+      <div className="px-5 py-4 md:px-8 md:py-5">
+        <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("account.subscription.planCardTitle")}</h2>
+      </div>
+      <div className="border-t border-[#e1e6ef]" role="presentation" />
+      <dl className="m-0 space-y-4 px-5 py-5 md:space-y-5 md:px-8 md:py-6">
+        <div className="flex flex-col gap-0.5 text-start sm:flex-row sm:items-baseline sm:gap-6">
+          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">{t("account.subscription.planNameLabel")}</dt>
+          <dd className="m-0 text-base font-bold text-[#171717]">{t("account.subscription.planName")}</dd>
+        </div>
+        <div className="flex flex-col gap-0.5 text-start sm:flex-row sm:items-baseline sm:gap-6">
+          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">{t("account.subscription.planValueLabel")}</dt>
+          <dd className="m-0 text-base font-bold text-[#171717]">{t("account.subscription.planTotal")}</dd>
+        </div>
+        <div className="flex flex-col gap-0.5 text-start sm:flex-row sm:items-baseline sm:gap-6">
+          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">{t("account.subscription.planMonthlyLabel")}</dt>
+          <dd className="m-0 text-base font-bold text-[#171717]">{t("account.subscription.planMonthly")}</dd>
+        </div>
+      </dl>
     </MainCard>
   );
 
@@ -380,10 +653,51 @@ const AccountDashboardWidget = () => {
         return renderSubscription();
       case sidebarIds.NOTIFICATIONS:
         return (
-          <MainCard className="p-5 md:p-8">
-            <h2 className="mb-2 text-lg font-bold text-navy">{t("account.notificationsPage.title")}</h2>
-            <p className="mb-6 text-sm text-text-muted">{t("account.notificationsPage.description")}</p>
-            {renderNotifications()}
+          <MainCard className="overflow-hidden p-0">
+            <div className="border-b border-[#e1e6ef] px-3 pt-4 sm:px-5 sm:pt-5 md:px-8 md:pt-6">
+              <div
+                className="grid w-full grid-cols-2 sm:flex sm:w-auto sm:gap-8"
+                role="tablist"
+                aria-label={t("account.notificationsPage.tabsAria")}
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={notificationsPageTab === NOTIFICATIONS_PAGE_TABS.FEED}
+                  className={`touch-manipulation border-b-2 px-1 py-3.5 text-center text-sm font-bold transition sm:px-0 sm:py-0 sm:pb-3 sm:text-start ${
+                    notificationsPageTab === NOTIFICATIONS_PAGE_TABS.FEED
+                      ? "border-navy text-navy"
+                      : "border-transparent text-text-muted"
+                  }`}
+                  onClick={() => setNotificationsPageTab(NOTIFICATIONS_PAGE_TABS.FEED)}
+                >
+                  {t("account.notificationsPage.tabs.feed")}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={notificationsPageTab === NOTIFICATIONS_PAGE_TABS.SETTINGS}
+                  className={`touch-manipulation border-b-2 px-1 py-3.5 text-center text-sm font-bold transition sm:px-0 sm:py-0 sm:pb-3 sm:text-start ${
+                    notificationsPageTab === NOTIFICATIONS_PAGE_TABS.SETTINGS
+                      ? "border-navy text-navy"
+                      : "border-transparent text-text-muted"
+                  }`}
+                  onClick={() => setNotificationsPageTab(NOTIFICATIONS_PAGE_TABS.SETTINGS)}
+                >
+                  {t("account.notificationsPage.tabs.settings")}
+                </button>
+              </div>
+            </div>
+            <div className="px-3 py-4 sm:p-5 md:p-8">
+              {notificationsPageTab === NOTIFICATIONS_PAGE_TABS.FEED ? (
+                renderNotificationsFeed()
+              ) : (
+                <>
+                  <p className="mb-4 text-sm leading-relaxed text-text-muted sm:mb-6">{t("account.notificationsPage.settingsIntro")}</p>
+                  {renderNotificationSettings()}
+                </>
+              )}
+            </div>
           </MainCard>
         );
       case sidebarIds.PERSONAL:
@@ -426,12 +740,13 @@ const AccountDashboardWidget = () => {
             </nav>
           </aside>
 
-          <div className="min-w-0 flex-1">
-            {renderStatus()}
+          <div className="relative min-w-0 flex-1">
+            {renderStatusToastOverlay()}
             {renderMain()}
           </div>
         </div>
       </div>
+      {renderWishlistRemoveDialog()}
     </section>
   );
 };

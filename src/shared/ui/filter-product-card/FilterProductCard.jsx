@@ -1,8 +1,6 @@
 import { FaBalanceScale, FaHeart, FaRegHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
-const PLACEHOLDER_IMG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23ddd' width='300' height='300'/%3E%3C/svg%3E";
+import { ProductCardImage } from "shared/ui/product-card-image";
 
 const FONT_STACK = '"Montserrat arm", Montserrat, sans-serif';
 
@@ -34,11 +32,13 @@ const ACTION_BTN =
   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/[0.06] bg-white text-[rgba(21,33,71,1)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-colors hover:bg-[#f8f9fc] active:scale-[0.98]";
 
 const ImgWrap = ({ listMode, product }) => (
-  <div
-    className={`relative shrink-0 overflow-hidden rounded-[20px] ${
-      listMode ? "h-[140px] w-[160px] sm:h-[160px] sm:w-[180px]" : "min-h-[228px] sm:min-h-[248px] md:min-h-[268px]"
-    }`}
-    style={{ backgroundColor: "rgba(245, 245, 245, 1)" }}
+  <ProductCardImage
+    variant={listMode ? "list" : "grid"}
+    className={listMode ? "shrink-0" : "w-full shrink-0"}
+    src={product.image}
+    alt={product.title}
+    href={product.href}
+    external={Boolean(product.href && !product.href.startsWith("/"))}
   >
     <div className="pointer-events-auto absolute right-3 top-3 z-10 flex flex-col gap-2">
       <button
@@ -59,7 +59,7 @@ const ImgWrap = ({ listMode, product }) => (
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          product.onToggleWishlist(product.id);
+          product.onToggleWishlist(product);
         }}
         aria-pressed={product.inWishlist}
         aria-label={product.wishlistAria}
@@ -72,40 +72,8 @@ const ImgWrap = ({ listMode, product }) => (
         )}
       </button>
     </div>
-    <ProductImageLink product={product} listMode={listMode} />
-  </div>
+  </ProductCardImage>
 );
-
-const ProductImageLink = ({ product, listMode }) => {
-  const imgClass = `mx-auto block object-contain px-4 py-6 ${
-    listMode
-      ? "h-full max-h-[140px] w-full max-w-[140px] sm:max-h-[160px] sm:max-w-[160px]"
-      : "h-[180px] w-full max-w-[220px] sm:h-[200px] sm:max-w-none md:h-[220px]"
-  }`;
-  const inner = (
-    <img
-      src={product.image || PLACEHOLDER_IMG}
-      alt={product.title}
-      className={imgClass}
-      onError={(e) => {
-        e.target.onerror = null;
-        e.target.src = PLACEHOLDER_IMG;
-      }}
-    />
-  );
-  if (product.href && product.href.startsWith("/")) {
-    return (
-      <Link to={product.href} className="block outline-none">
-        {inner}
-      </Link>
-    );
-  }
-  return (
-    <a href={product.href} className="block outline-none">
-      {inner}
-    </a>
-  );
-};
 
 const ProductTextLink = ({ product, omitTopMargin }) => {
   const inner = (
@@ -136,7 +104,7 @@ const ProductTextLink = ({ product, omitTopMargin }) => {
 };
 
 /**
- * @param {{ id: string, title: string, description: string, price: string, image: string, href: string }} product
+ * @param {(product: { id: string, title: string, description: string, price: string, image: string, href: string }) => void} onToggleWishlist
  */
 const FilterProductCard = ({
   product,

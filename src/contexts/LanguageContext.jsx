@@ -1,8 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { translations } from "shared/i18n";
+import {
+  DEFAULT_LANGUAGE_CODE,
+  readStoredLanguage,
+  writeStoredLanguage,
+} from "shared/i18n/languageConfig";
 import { getHtmlLangForAppLanguage } from "shared/lib/locale";
 
-const FALLBACK_LANGUAGE = "am";
+const FALLBACK_LANGUAGE = DEFAULT_LANGUAGE_CODE;
 const LanguageContext = createContext(null);
 
 const resolveTextByPath = (dictionary, path) =>
@@ -17,10 +22,17 @@ const resolveTextByPath = (dictionary, path) =>
  * Provides language state and translation helper for UI layers.
  */
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState(FALLBACK_LANGUAGE);
+  const [language, setLanguageState] = useState(() => readStoredLanguage());
+
+  const setLanguage = useCallback((nextLanguage) => {
+    setLanguageState(nextLanguage);
+    writeStoredLanguage(nextLanguage);
+  }, []);
 
   useEffect(() => {
-    document.documentElement.lang = getHtmlLangForAppLanguage(language);
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = getHtmlLangForAppLanguage(language);
+    }
   }, [language]);
 
   const t = useCallback(
@@ -49,7 +61,7 @@ export const LanguageProvider = ({ children }) => {
       setLanguage,
       t,
     }),
-    [language, t],
+    [language, setLanguage, t],
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

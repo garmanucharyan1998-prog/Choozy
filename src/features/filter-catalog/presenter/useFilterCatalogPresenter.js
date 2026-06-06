@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useLanguage } from "contexts";
 import {
   mockFilterProducts,
@@ -6,6 +7,8 @@ import {
   BRAND_OPTIONS,
   RAM_OPTIONS,
   COLOR_OPTIONS,
+  isValidFilterCategoryId,
+  productMatchesSearch,
 } from "entities/filter-catalog";
 
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
@@ -17,6 +20,7 @@ const boundsFromProducts = () => {
 
 export const useFilterCatalogPresenter = () => {
   const { t } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { globalMin, globalMax } = useMemo(boundsFromProducts, []);
 
   const [priceMin, setPriceMin] = useState(globalMin);
@@ -25,6 +29,7 @@ export const useFilterCatalogPresenter = () => {
   const [selectedBrands, setSelectedBrands] = useState(() => new Set());
   const [selectedRam, setSelectedRam] = useState(() => new Set());
   const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("popular");
   const [viewMode, setViewMode] = useState("grid");
@@ -38,6 +43,37 @@ export const useFilterCatalogPresenter = () => {
     color: true,
   }));
   const [brandExpanded, setBrandExpanded] = useState(false);
+
+  const syncUrlParams = useCallback(
+    ({ q, category }) => {
+      const next = new URLSearchParams(searchParams);
+      if (q !== undefined) {
+        const trimmed = q.trim();
+        if (trimmed) next.set("q", trimmed);
+        else next.delete("q");
+      }
+      if (category !== undefined) {
+        if (category && isValidFilterCategoryId(category)) next.set("category", category);
+        else next.delete("category");
+      }
+      setSearchParams(next, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
+  useEffect(() => {
+    const q = searchParams.get("q") ?? "";
+    const categoryParam = searchParams.get("category");
+    setSearch(q);
+    setSelectedCategory(isValidFilterCategoryId(categoryParam) ? categoryParam : null);
+    setPage(1);
+  }, [searchParams]);
+
+  const clearCategory = useCallback(() => {
+    setSelectedCategory(null);
+    setPage(1);
+    syncUrlParams({ category: null, q: search });
+  }, [search, syncUrlParams]);
 
   const toggleSection = useCallback((key) => {
     setSectionsOpen((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -143,17 +179,15 @@ export const useFilterCatalogPresenter = () => {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const q = search.trim();
     let list = mockFilterProducts.filter((p) => {
       if (p.priceValue < priceMin || p.priceValue > priceMax) return false;
       if (selectedScreens.size > 0 && !selectedScreens.has(String(p.screenInch))) return false;
       if (selectedBrands.size > 0 && !selectedBrands.has(p.brandId)) return false;
       if (selectedRam.size > 0 && !selectedRam.has(String(p.ramGb))) return false;
       if (selectedColor && p.colorId !== selectedColor) return false;
-      if (q) {
-        const hay = `${p.title} ${p.description}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
+      if (selectedCategory && p.categoryId !== selectedCategory) return false;
+      if (q && !productMatchesSearch(p, q)) return false;
       return true;
     });
 
@@ -168,6 +202,7 @@ export const useFilterCatalogPresenter = () => {
     selectedBrands,
     selectedRam,
     selectedColor,
+    selectedCategory,
     search,
     sort,
   ]);
@@ -219,10 +254,15 @@ export const useFilterCatalogPresenter = () => {
     [globalMin, globalMax, priceMin],
   );
 
-  const onSearchChange = useCallback((e) => {
-    setSearch(e.target.value);
-    setPage(1);
-  }, []);
+  const onSearchChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setSearch(value);
+      setPage(1);
+      syncUrlParams({ q: value, category: selectedCategory });
+    },
+    [selectedCategory, syncUrlParams],
+  );
 
   const onSortChange = useCallback((e) => {
     setSort(e.target.value);
@@ -310,6 +350,15 @@ export const useFilterCatalogPresenter = () => {
         remove: resetPriceBounds,
       });
     }
+    if (selectedCategory) {
+      chips.push({
+        key: `category-${selectedCategory}`,
+        kind: "category",
+        id: selectedCategory,
+        label: t(`filterPage.categories.${selectedCategory}`, selectedCategory),
+        remove: clearCategory,
+      });
+    }
     return chips;
   }, [
     t,
@@ -317,6 +366,7 @@ export const useFilterCatalogPresenter = () => {
     selectedBrands,
     selectedRam,
     selectedColor,
+    selectedCategory,
     priceMin,
     priceMax,
     priceRangeActive,
@@ -325,6 +375,7 @@ export const useFilterCatalogPresenter = () => {
     removeRam,
     clearSelectedColor,
     resetPriceBounds,
+    clearCategory,
   ]);
 
   return {
@@ -341,6 +392,8 @@ export const useFilterCatalogPresenter = () => {
     selectedBrands,
     selectedRam,
     selectedColor,
+    selectedCategory,
+    clearCategory,
     toggleScreen,
     toggleBrand,
     toggleRam,

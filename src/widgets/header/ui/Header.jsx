@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FaSearch,
@@ -8,11 +8,33 @@ import {
   FaTimes,
   FaBars,
   FaChevronDown,
+  FaRegHeart,
 } from "react-icons/fa";
 import { useHeaderPresenter } from "features/header";
+import { ACCOUNT_STORAGE_EVENT, readAccountState } from "entities/user";
 import { useLanguage } from "contexts";
 import choozyMainLogo from "shared/assets/logos/choozyMainLogo.svg";
 import "./Header.css";
+
+function FavoritesCountBadge({ text }) {
+  if (text == null || text === "") {
+    return null;
+  }
+  const sizeModifier =
+    text.length >= 3
+      ? "header-favorites-count-badge--compact-wide"
+      : text.length >= 2
+        ? "header-favorites-count-badge--wide"
+        : "";
+  return (
+    <span
+      className={`header-favorites-count-badge${sizeModifier ? ` ${sizeModifier}` : ""}`}
+      aria-hidden="true"
+    >
+      {text}
+    </span>
+  );
+}
 
 const Header = ({
   isCompact = false,
@@ -22,6 +44,7 @@ const Header = ({
 }) => {
   const location = useLocation();
   const { t } = useLanguage();
+  const [wishlistCount, setWishlistCount] = useState(() => readAccountState().wishlistItems.length);
   const headerRef = useRef(null);
   const mobileBottomNavRef = useRef(null);
 
@@ -58,6 +81,15 @@ const Header = ({
       onCloseMobileMenu();
     }
   }, [onCloseMobileMenu]);
+
+  useEffect(() => {
+    const syncWishlistCount = () => {
+      setWishlistCount(readAccountState().wishlistItems.length);
+    };
+    syncWishlistCount();
+    window.addEventListener(ACCOUNT_STORAGE_EVENT, syncWishlistCount);
+    return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, syncWishlistCount);
+  }, []);
 
   useEffect(() => {
     const isTouchLikeDevice = () =>
@@ -150,14 +182,18 @@ const Header = ({
     () => (
       <a
         href="/"
-        className="no-underline flex justify-start"
+        className="flex shrink-0 justify-start no-underline"
         aria-label={t("header.brandAriaLabel")}
         title={t("header.brandTitle")}
       >
         <img
           src={choozyMainLogo}
           alt={t("header.brandAlt")}
-          className={`${isCompact ? "w-[38px] sm:w-[78px]" : "w-[44px] sm:w-[100px]"} h-auto transition-all duration-300`}
+          className={`h-auto shrink-0 transition-all duration-300 ${
+            isCompact
+              ? "w-[38px] sm:w-[72px] md:w-[78px] lg:w-[88px] 2xl:w-[100px]"
+              : "w-[44px] sm:w-[80px] md:w-[88px] lg:w-[96px] 2xl:w-[100px]"
+          }`}
           loading="eager"
         />
       </a>
@@ -169,12 +205,14 @@ const Header = ({
     () => (
       <nav
         aria-label={t("header.mainNavigationAriaLabel")}
-        className="hidden md:flex items-center gap-4 text-xs px-[10px] lg:px-[70px] 2xl:px-0"
+        className="hidden shrink-0 items-center gap-4 px-2 text-xs lg:flex lg:px-4 2xl:px-0"
       >
         <a
           href="/about"
-          className={`no-underline text-[#333] flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
-            isCompact ? "px-3 py-2 text-[11px] 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
+          className={`mx-[5px] flex min-w-0 items-center justify-center gap-1 rounded-pill text-[#333] no-underline transition-all duration-300 hover:bg-accent-blue hover:duration-150 hover:scale-[1.15] lg:scale-100 lg:hover:scale-105 2xl:mx-0 ${
+            isCompact
+              ? "px-3 py-2 text-[11px] lg:px-3 lg:py-2 2xl:px-4 2xl:py-2.5"
+              : "p-3 lg:p-3 2xl:px-5 2xl:py-3.5"
           }`}
           title={t("header.aboutLinkTitle")}
         >
@@ -188,7 +226,7 @@ const Header = ({
   const SearchSection = useMemo(
     () => (
       <form
-        className={`search-bar relative flex bg-input-bg rounded-pill grow border-[1.5px] border-accent-blue order-3 w-full md:order-none md:w-auto md:mt-0 md:ml-5 2xl:max-w-[400px] 2xl:ml-0 transition-all duration-300 ${
+        className={`search-bar relative flex min-w-0 grow bg-input-bg rounded-pill border-[1.5px] border-accent-blue order-3 w-full md:order-none md:mt-0 md:ml-3 md:w-auto md:max-w-[min(100%,280px)] lg:ml-4 lg:max-w-[min(100%,320px)] 2xl:ml-0 2xl:max-w-[400px] transition-all duration-300 ${
           isCompact ? "mt-1.5 sm:mt-2" : "mt-2 sm:mt-3"
         }`}
         role="search"
@@ -235,15 +273,17 @@ const Header = ({
 
         <button
           type="submit"
-          className={`bg-accent-blue border-none rounded-pill text-link-blue font-semibold cursor-pointer transition-all duration-200 hover:enabled:bg-[#c8d4ff] hover:enabled:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed 2xl:ml-0 ${
+          className={`shrink-0 rounded-pill border-none bg-accent-blue font-semibold text-link-blue transition-all duration-200 hover:enabled:scale-[1.02] hover:enabled:bg-[#c8d4ff] disabled:cursor-not-allowed disabled:opacity-70 2xl:ml-0 ${
             isCompact
-              ? "px-2.5 py-1.5 text-[11px] -ml-[76px] sm:px-3 sm:py-2 sm:text-xs sm:-ml-[86px] lg:-ml-4 2xl:px-4 2xl:py-2.5 2xl:text-[13px]"
-              : "px-3 py-2 text-xs -ml-[86px] sm:px-4 sm:py-3 sm:text-[13px] sm:-ml-[100px] lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm"
+              ? "-ml-[76px] px-2.5 py-1.5 text-[11px] sm:-ml-[86px] sm:px-3 sm:py-2 sm:text-xs md:-ml-12 md:px-2 md:py-2 lg:-ml-4 2xl:px-4 2xl:py-2.5 2xl:text-[13px]"
+              : "-ml-[86px] px-3 py-2 text-xs sm:-ml-[100px] sm:px-4 sm:py-3 sm:text-[13px] md:-ml-14 md:px-2.5 md:py-2.5 lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm"
           }`}
           aria-label={t("header.search.submitAriaLabel")}
           disabled={!searchQuery.trim()}
         >
-          {t("header.search.submitLabel")}
+          <span className="md:hidden">{t("header.search.submitLabel")}</span>
+          <FaSearch className="hidden md:inline 2xl:hidden" size={14} aria-hidden="true" />
+          <span className="hidden 2xl:inline">{t("header.search.submitLabel")}</span>
         </button>
 
         {showSuggestions && (
@@ -311,13 +351,13 @@ const Header = ({
         iconType: "compare",
       },
       {
-        href: "/favorites",
+        href: "/account/favorite",
         label: t("header.mobileBottomNav.favorites.label"),
         ariaLabel: t("header.mobileBottomNav.favorites.ariaLabel"),
         iconType: "favorites",
       },
       {
-        href: "/login",
+        href: "/account",
         label: t("header.mobileBottomNav.profile.label"),
         ariaLabel: t("header.mobileBottomNav.profile.ariaLabel"),
         iconType: "profile",
@@ -354,59 +394,66 @@ const Header = ({
     }
   }, []);
 
+  const favoritesCountBadge = (() => {
+    if (wishlistCount <= 0) return null;
+    if (wishlistCount > 999) return "999+";
+    return String(wishlistCount);
+  })();
+
+  const favoritesLinkAriaLabel = favoritesCountBadge
+    ? `${t("header.favoritesAriaLabel")}. ${t("header.favoritesCountForAria")}: ${favoritesCountBadge}.`
+    : t("header.favoritesAriaLabel");
+
+  const loginLinkClassName = isCompact
+    ? "tooltip-container relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-2.5 py-1.5 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-2.5 md:py-2 2xl:px-4 2xl:py-2"
+    : "tooltip-container relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-3 py-2 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-3 md:py-2.5 2xl:px-5 2xl:py-2.5";
+
   const UserNavigationSection = useMemo(
     () => (
       <nav
-        className={`flex items-center transition-all duration-300 ${isCompact ? "gap-1 sm:gap-1.5 md:gap-1.5 2xl:gap-3" : "gap-1.5 sm:gap-2 md:gap-[5px] 2xl:gap-4"}`}
+        className={`flex shrink-0 items-center transition-all duration-300 ${isCompact ? "gap-1 sm:gap-1.5 md:gap-1 2xl:gap-3" : "gap-1.5 sm:gap-2 md:gap-1 lg:gap-1.5 2xl:gap-4"}`}
         aria-label={t("header.userNavigationAriaLabel")}
       >
-        <a
-          href="/compare"
-          className={`tooltip-container relative no-underline text-[#333] hidden md:flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
-            isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
+        <Link
+          to="/compare"
+          className={`tooltip-container relative mx-[5px] hidden min-w-0 items-center justify-center gap-1 rounded-pill text-[#333] no-underline transition-all duration-300 hover:bg-accent-blue hover:duration-150 hover:scale-[1.15] md:flex lg:scale-100 lg:hover:scale-105 2xl:mx-0 ${
+            isCompact ? "p-2 2xl:px-4 2xl:py-2.5" : "p-2.5 2xl:px-5 2xl:py-3.5"
           }`}
           title={t("header.compareTitle")}
           aria-label={t("header.compareAriaLabel")}
         >
           <FaBalanceScale size={20} aria-hidden="true" />
-          <span className="hidden 2xl:inline 2xl:ml-[5px]">
+          <span className="hidden 2xl:ml-[5px] 2xl:inline">
             {t("header.compareLabel")}
           </span>
-        </a>
+        </Link>
 
-        <a
-          href="/favorites"
-          className={`tooltip-container relative no-underline text-[#333] hidden md:flex items-center rounded-pill gap-1 min-w-0 mx-[5px] justify-center scale-[1.1] hover:scale-[1.15] hover:duration-150 hover:bg-accent-blue lg:scale-100 lg:hover:scale-105 2xl:mx-0 transition-all duration-300 ${
-            isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
+        <Link
+          to="/account/favorite"
+          className={`tooltip-container relative mx-[5px] hidden min-w-0 items-center justify-center rounded-pill text-black no-underline transition-colors duration-200 hover:bg-accent-blue/40 hover:opacity-80 md:inline-flex 2xl:mx-0 2xl:gap-2 2xl:px-2 ${
+            isCompact ? "p-2 2xl:py-1.5" : "p-2.5 2xl:py-2"
           }`}
           title={t("header.favoritesTitle")}
-          aria-label={t("header.favoritesAriaLabel")}
+          aria-label={favoritesLinkAriaLabel}
         >
-          <img
-            src="/assets/Icons/heart.svg"
-            alt="Favorites icon"
-            width="24"
-            height="24"
-            aria-hidden="true"
-          />
-          <span className="hidden 2xl:inline 2xl:ml-[5px]">
-            {t("header.favoritesLabel")}
+          <span className="relative inline-flex shrink-0">
+            <FaRegHeart size={20} className="text-black" aria-hidden="true" />
+            <FavoritesCountBadge text={favoritesCountBadge} />
           </span>
-        </a>
+          <span className="hidden text-sm font-semibold tracking-tight text-black 2xl:inline">
+            <span className="whitespace-nowrap">{t("header.favoritesLabel")}</span>
+          </span>
+        </Link>
 
         <div className="hidden md:block">
           <Link
-            to="/login"
-            className={`tooltip-container relative flex items-center gap-1.5 bg-white border-[1.5px] border-navy rounded-[40px] text-active-blue no-underline min-w-0 mx-[5px] justify-center 2xl:mx-0 transition-all duration-300 ${
-              isCompact ? "p-2.5 2xl:px-4 2xl:py-2.5" : "p-3.5 2xl:px-5 2xl:py-3.5"
-            }`}
+            to="/account"
+            className={loginLinkClassName}
             title={t("header.loginTitle")}
             aria-label={t("header.loginAriaLabel")}
           >
-            <FaUser color="#152147" aria-hidden="true" />
-            <span className="hidden 2xl:inline 2xl:ml-[5px]">
-              {t("header.loginLabel")}
-            </span>
+            <FaUser className="text-black" size={18} aria-hidden="true" />
+            <span className="hidden whitespace-nowrap 2xl:inline">{t("header.loginLabel")}</span>
           </Link>
         </div>
 
@@ -419,13 +466,22 @@ const Header = ({
           aria-expanded={isMobileMenuOpen}
           onClick={handleMobileMenuToggle}
         >
-          {isMobileMenuOpen ? <FaTimes size={14} aria-hidden="true" /> : <FaBars size={14} aria-hidden="true" />}
+          {isMobileMenuOpen ? (
+            <FaTimes size={14} aria-hidden="true" />
+          ) : (
+            <FaBars size={14} aria-hidden="true" />
+          )}
         </button>
 
-        <div className="relative" aria-label={t("header.languageSelectionAriaLabel")}>
+        <div
+          className="relative"
+          data-language-switcher
+          aria-label={t("header.languageSelectionAriaLabel")}
+        >
           <button
+            type="button"
             onClick={toggleLanguageDropdown}
-            className="bg-transparent border-none cursor-pointer p-0 flex items-center gap-1"
+            className="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0"
             aria-label={`${t("header.currentLanguagePrefix")}: ${currentLanguage.alt}`}
             aria-expanded={isLanguageDropdownOpen}
             aria-haspopup="listbox"
@@ -447,38 +503,37 @@ const Header = ({
 
           {isLanguageDropdownOpen && (
             <div
-              className="absolute top-[calc(100%+8px)] right-1/2 translate-x-1/2 bg-white border border-[#ccc] shadow-[0_2px_8px_rgba(0,0,0,0.1)] z-50 rounded-xl py-1 md:right-0 md:translate-x-0"
+              className="absolute top-[calc(100%+8px)] right-1/2 z-50 min-w-[7.5rem] translate-x-1/2 overflow-hidden rounded-xl border border-[#d1d5db] bg-white py-1.5 shadow-[0_4px_14px_rgba(15,23,42,0.12)] md:right-0 md:translate-x-0"
               role="listbox"
               aria-label={t("header.selectLanguageAriaLabel")}
             >
-              {Object.entries(languages).map(([code, lang]) => (
-                <div
-                  key={code}
-                  className={`flex items-center justify-center whitespace-nowrap cursor-pointer transition-colors duration-200 hover:bg-[#f1f1f1] md:justify-start ${
-                    isCompact ? "px-2.5 py-1.5" : "px-3 py-2"
-                  }`}
-                  role="option"
-                  aria-selected={code === language}
-                  onClick={() => handleLanguageChange(code)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleLanguageChange(code);
-                    }
-                  }}
-                  tabIndex={0}
-                >
-                  <img
-                    src={`https://flagcdn.com/w40/${lang.flag}.png`}
-                    alt={lang.alt}
-                    width="24"
-                    height="16"
-                    className={`${isCompact ? "w-5 h-5" : "w-6 h-6"} rounded-full border border-[#ccc] flex-shrink-0 transition-all duration-300`}
-                    loading="lazy"
-                  />
-                  <span className={`hidden md:inline ml-2 ${isCompact ? "text-xs" : "text-sm"}`}>{lang.name}</span>
-                </div>
-              ))}
+              {Object.entries(languages).map(([code, lang]) => {
+                const isActive = code === language;
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    className={`flex w-full cursor-pointer items-center gap-2.5 whitespace-nowrap border-none px-3 py-2 text-start transition-colors hover:bg-[#f4f6fb] ${
+                      isActive ? "bg-[#f8fafc]" : "bg-transparent"
+                    } ${isCompact ? "py-1.5" : ""}`}
+                    role="option"
+                    aria-selected={isActive}
+                    onClick={() => handleLanguageChange(code)}
+                  >
+                    <img
+                      src={`https://flagcdn.com/w40/${lang.flag}.png`}
+                      alt={lang.alt}
+                      width="24"
+                      height="24"
+                      className={`${isCompact ? "h-5 w-5" : "h-6 w-6"} shrink-0 rounded-full border border-[#d1d5db] object-cover`}
+                      loading="lazy"
+                    />
+                    <span className={`font-bold text-[#171717] ${isCompact ? "text-xs" : "text-sm"}`}>
+                      {lang.name}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -494,6 +549,9 @@ const Header = ({
       languages,
       isCompact,
       handleMobileMenuToggle,
+      favoritesCountBadge,
+      favoritesLinkAriaLabel,
+      loginLinkClassName,
       t,
     ],
   );
@@ -508,7 +566,7 @@ const Header = ({
       }`}
       role="banner"
     >
-      <div className="flex flex-wrap items-center text-[#171717] font-bold justify-between cont-width-default md:flex-nowrap transition-all duration-300">
+      <div className="cont-width-default flex min-w-0 flex-wrap items-center justify-between gap-2 font-bold text-[#171717] transition-all duration-300 md:flex-nowrap md:gap-2 lg:gap-3">
         {LogoSection}
         {NavigationSection}
         {SearchSection}
@@ -547,7 +605,13 @@ const Header = ({
         <ul className="m-0 flex list-none items-end justify-around px-2 sm:px-4 pt-2 pb-2 sm:pb-2.5">
           {mobileBottomNavItems.map((item) => {
             const isActive =
-              item.href === "/" ? currentPath === "/" : currentPath.startsWith(item.href);
+              item.href === "/"
+                ? currentPath === "/"
+                : item.href === "/account/favorite"
+                  ? currentPath.startsWith("/account/favorite")
+                  : item.href === "/account"
+                    ? currentPath.startsWith("/account") && !currentPath.startsWith("/account/favorite")
+                    : currentPath.startsWith(item.href);
 
             return (
               <li key={item.href} className="flex-1">

@@ -1,77 +1,164 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } from "react-icons/fa";
+import { getProductDetailHref } from "entities/product-detail";
+import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
+import { ProductCardImage } from "shared/ui/product-card-image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/navigation";
 
-const PLACEHOLDER_IMG =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect fill='%23ddd' width='300' height='300'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em' font-size='14'%3ENo image%3C/text%3E%3C/svg%3E";
+const ACTION_BTN =
+  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/[0.06] bg-white text-[rgba(21,33,71,1)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-colors hover:bg-[#f8f9fc] active:scale-[0.98] sm:h-10 sm:w-10";
+
+const CAROUSEL_SHELL =
+  "grid w-full min-w-0 grid-cols-1 items-center md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-2 lg:gap-x-3";
+
+const CAROUSEL_TRACK = "min-w-0 overflow-hidden py-2";
+
+const NAV_BTN = `${ACTION_BTN} z-10 hidden shrink-0 self-center text-navy md:flex`;
+
+const wishlistMapFromStorage = () => {
+  const ids = new Set(readAccountState().wishlistItems.map((x) => x.id));
+  return Object.fromEntries([...ids].map((id) => [id, true]));
+};
 
 const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
   const safeItems = Array.isArray(items) ? items : [];
   const slideCount = safeItems.length;
-  const maxSlidesPerView = 5;
-  const loopEnabled = slideCount >= Math.max(8, maxSlidesPerView + 3);
+  const loopEnabled = slideCount > 5;
+  const swiperRef = useRef(null);
+  const [wishlist, setWishlist] = useState(wishlistMapFromStorage);
+  const [compare, setCompare] = useState(() => ({}));
+
+  useEffect(() => {
+    const sync = () => setWishlist(wishlistMapFromStorage());
+    window.addEventListener(ACCOUNT_STORAGE_EVENT, sync);
+    return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
+  }, []);
+
+  const toggleWishlist = useCallback((product, href) => {
+    toggleWishlistProduct({
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      image: product.image,
+      href,
+    });
+    setWishlist(wishlistMapFromStorage());
+  }, []);
+
+  const toggleCompare = useCallback((id) => {
+    setCompare((prev) => ({ ...prev, [id]: !prev[id] }));
+  }, []);
 
   return (
-    <section
-      className="my-5 sm:my-10 flex justify-center items-center"
-      aria-label={ariaLabel}
-    >
-      <div className="w-full relative px-1 sm:px-2 md:px-0 [&_.swiper-button-prev]:!hidden [&_.swiper-button-next]:!hidden md:[&_.swiper-button-prev]:!flex md:[&_.swiper-button-next]:!flex">
+    <section className="my-5 flex items-center justify-center sm:my-10" aria-label={ariaLabel}>
+      <div className={CAROUSEL_SHELL}>
+        <button
+          type="button"
+          className={NAV_BTN}
+          onClick={() => swiperRef.current?.slidePrev()}
+          aria-label="Previous product"
+        >
+          <FaChevronLeft className="h-4 w-4" aria-hidden />
+        </button>
+
+        <div className={CAROUSEL_TRACK}>
         <Swiper
-          modules={[Navigation]}
-          navigation
-          spaceBetween={10}
-          slidesPerView={Math.min(5, slideCount || 1)}
+          onSwiper={(instance) => {
+            swiperRef.current = instance;
+          }}
+          watchOverflow
+          slidesPerView={1.1}
+          spaceBetween={12}
           loop={loopEnabled}
           breakpoints={{
-            0: { slidesPerView: 1.05, spaceBetween: 8 },
-            320: { slidesPerView: 1.12, spaceBetween: 10 },
-            375: { slidesPerView: 1.2, spaceBetween: 10 },
-            480: { slidesPerView: 1.4, spaceBetween: 12 },
-            640: { slidesPerView: 2, spaceBetween: 14 },
+            375: { slidesPerView: 1.25, spaceBetween: 12 },
+            480: { slidesPerView: 1.45, spaceBetween: 14 },
+            640: { slidesPerView: 2, spaceBetween: 16 },
             768: { slidesPerView: 3, spaceBetween: 16 },
             1024: { slidesPerView: 4, spaceBetween: 18 },
             1280: { slidesPerView: 5, spaceBetween: 20 },
           }}
         >
-          {safeItems.map((product, index) => (
-            <SwiperSlide key={product.id || index} className="!flex justify-center m-0">
-              <figure
-                className="group cursor-pointer flex flex-col w-full max-w-[260px] min-h-[320px] m-0 transition-all duration-[400ms] sm:max-w-[280px] sm:min-h-[360px] md:w-[230px] md:max-w-[230px] md:min-h-[440px] 2xl:min-h-[440px]"
-                style={{ width: undefined }}
-                aria-labelledby={`product-title-${index}`}
-              >
-                <img
-                  src={product.image || PLACEHOLDER_IMG}
-                  alt={product.title}
-                  className="h-[170px] bg-[#f1f1f1] rounded-xl sm:rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] bg-contain bg-no-repeat bg-center transition-all duration-[400ms] group-hover:bg-hover-blue object-contain sm:h-[220px] md:h-[240px] 2xl:h-[285px]"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = PLACEHOLDER_IMG;
-                  }}
-                />
-                <figcaption className="mt-2.5 flex flex-col text-start grow">
-                  <h4
-                    id={`product-title-${index}`}
-                    className="text-navy text-xs font-semibold mt-2 mb-0 leading-tight line-clamp-2 sm:text-sm sm:mt-2.5 md:text-base md:mt-3.5"
+          {safeItems.map((product, index) => {
+            const detailPath = product.id != null ? getProductDetailHref(product.id, product.title) : null;
+            const inWishlist = Boolean(wishlist[product.id]);
+            const inCompare = Boolean(compare[product.id]);
+
+            return (
+              <SwiperSlide key={product.id || index} className="!h-auto">
+                <article className="group flex h-full flex-col text-start">
+                  <ProductCardImage
+                    variant="carousel"
+                    className="shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
+                    src={product.image}
+                    alt={product.title}
+                    href={detailPath || undefined}
                   >
-                    {product.title}
-                  </h4>
-                  <p
-                    className="my-1.5 text-[11px] text-text-muted overflow-hidden line-clamp-2 leading-[1.25em] sm:text-xs sm:my-2 md:text-sm md:my-2.5 md:leading-[1.2em]"
-                    title={product.description}
+                    <div className="pointer-events-auto absolute right-2.5 top-2.5 z-10 flex flex-col gap-2 sm:right-3 sm:top-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleCompare(product.id)}
+                        aria-pressed={inCompare}
+                        aria-label="Compare product"
+                        className={ACTION_BTN}
+                      >
+                        <FaBalanceScale className="h-4 w-4" aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toggleWishlist(product, detailPath || "")}
+                        aria-pressed={inWishlist}
+                        aria-label="Add product to wishlist"
+                        className={ACTION_BTN}
+                      >
+                        {inWishlist ? (
+                          <FaHeart className="h-4 w-4 text-active-blue" aria-hidden />
+                        ) : (
+                          <FaRegHeart className="h-4 w-4" aria-hidden />
+                        )}
+                      </button>
+                    </div>
+                  </ProductCardImage>
+
+                  <Link
+                    to={detailPath || "#"}
+                    className="mt-2.5 flex grow flex-col text-inherit no-underline outline-none sm:mt-3"
+                    aria-labelledby={`product-title-${index}`}
                   >
-                    {product.description}
-                  </p>
-                  <p className="text-navy text-sm font-semibold m-0 mt-auto 2xl:text-base">
-                    {product.price}
-                  </p>
-                </figcaption>
-              </figure>
-            </SwiperSlide>
-          ))}
+                    <h4
+                      id={`product-title-${index}`}
+                      className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base"
+                    >
+                      {product.title}
+                    </h4>
+                    <p
+                      className="my-1.5 line-clamp-2 overflow-hidden text-[11px] leading-[1.25em] text-text-muted sm:text-xs md:text-sm md:leading-[1.2em]"
+                      title={product.description}
+                    >
+                      {product.description}
+                    </p>
+                    <p className="m-0 mt-auto text-sm font-semibold text-navy 2xl:text-base">
+                      {product.price}
+                    </p>
+                  </Link>
+                </article>
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
+      </div>
+
+        <button
+          type="button"
+          className={NAV_BTN}
+          onClick={() => swiperRef.current?.slideNext()}
+          aria-label="Next product"
+        >
+          <FaChevronRight className="h-4 w-4" aria-hidden />
+        </button>
       </div>
     </section>
   );

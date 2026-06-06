@@ -1,0 +1,592 @@
+/** English mock copy — merged onto Armenian base. productRefreshed is intentionally omitted. */
+export const enOverrides = {
+  header: {
+    aboutLinkLabel: "About us",
+    search: {
+      placeholder: "Search",
+      submitLabel: "Search",
+      noResults: "No results found",
+    },
+    compareLabel: "Compare",
+    favoritesLabel: "Favorites",
+    favoritesCountForAria: "In favorites",
+    loginLabel: "Sign in",
+    mobileMenuTitle: "Menu",
+    mobileBottomNav: {
+      home: { label: "Home" },
+      compare: { label: "Compare" },
+      favorites: { label: "Favorites" },
+      profile: { label: "Sign in" },
+    },
+    mobileMenuItems: {
+      topProducts: "Top products",
+      varietyProducts: "Catalog",
+      contact: "Contact us",
+      aboutUs: "About us",
+      privacy: "Privacy policy",
+    },
+  },
+  navPanel: {
+    catalogLabel: "Catalog",
+    items: {
+      techElectronics: "Tech & electronics",
+      portableSpeakers: "Portable speakers",
+      homeAppliances: "Home appliances",
+      kitchenAppliances: "Kitchen appliances",
+      beautyCare: "Beauty & care",
+    },
+  },
+  gridCatalog: {
+    items: {
+      smartphones: "Smartphones",
+      speakers: "Portable speakers",
+      laptops: "Laptops",
+      headphones: "Headphones",
+    },
+  },
+  filterPage: {
+    mainAriaLabel: "Product catalog and filters",
+    sidebarAriaLabel: "Filters",
+    toolbarAriaLabel: "List tools",
+    searchPlaceholder: "Search in filters",
+    sortLabel: "Sort by",
+    sort: {
+      popular: "Most popular",
+      priceAsc: "Price: low to high",
+      priceDesc: "Price: high to low",
+    },
+    mobileOverlayTitle: "Filter",
+    closeOverlay: "Close",
+    overlaySearchPlaceholder: "Search filters",
+    applyFilters: "Apply",
+    removeChipAria: "Remove filter",
+    activeChipsAria: "Active filters",
+    categories: {
+      smartphones: "Smartphones",
+      laptops: "Laptops",
+      speakers: "Portable speakers",
+      headphones: "Headphones",
+      tablets: "Tablets",
+      tv: "TV",
+      wearables: "Wearables",
+      cameras: "Cameras",
+    },
+    filters: {
+      price: "Price",
+      priceMin: "Minimum",
+      priceMax: "Maximum",
+      screen: "Screen size",
+      brandTitle: "Brand",
+      color: "Color",
+      seeMore: "See more",
+      seeLess: "Show less",
+      screenSizes: {
+        inch11: "11 inch",
+        inch12: "12 inch",
+        inch13: "13 inch",
+        inch14: "14 inch",
+        inch15: "15 inch",
+      },
+      colorNames: {
+        black: "Black",
+        grey: "Gray",
+        white: "White",
+        navy: "Navy",
+      },
+    },
+    pagination: {
+      navAria: "Pagination",
+      prevAria: "Previous page",
+      nextAria: "Next page",
+      goToPage: "Page {{n}}",
+      showLabel: "Show",
+    },
+    empty: "No results found",
+  },
+  productShowcase: {
+    viewMoreLabel: "View more",
+  },
+  relatedProducts: {
+    title: "Related products",
+    viewMoreLabel: "View more",
+    sectionAriaLabel: "Related products section",
+    carouselAriaLabel: "Related products carousel",
+    compareAriaLabel: "Add or remove from compare",
+    wishlistAriaLabel: "Add or remove from favorites",
+  },
+  topProducts: { title: "Top products" },
+  variety: { title: "Catalog" },
+  carouselProducts: {
+    top: {
+      "top-1": {
+        description:
+          "Flagship iPhone with a bright OLED display, powerful camera system, and all-day battery life.",
+      },
+      "top-2": {
+        description:
+          "Premium noise-cancelling headphones with rich sound, soft cushions, and long battery life.",
+      },
+      "top-3": {
+        description:
+          "High-end Samsung phone with a sharp AMOLED screen, S Pen support, and advanced zoom camera.",
+      },
+      "top-4": {
+        description:
+          "Compact prime lens with a bright aperture for portraits, street photography, and low light.",
+      },
+      "top-5": {
+        description:
+          "Compact professional laptop with M-series performance, Liquid Retina XDR display, and fast SSD.",
+      },
+      "top-6": {
+        description:
+          "Slim 4K smart TV with vivid contrast, smooth motion, and built-in streaming apps.",
+      },
+    },
+    variety: {
+      "var-1": {
+        description:
+          "Fast iPhone with a pro camera system, durable titanium finish, and smooth iOS experience.",
+      },
+      "var-2": {
+        description:
+          "Compact earbuds with active noise cancellation, transparency mode, and spatial audio.",
+      },
+      "var-3": {
+        description:
+          "Rugged smartwatch with a bright display, advanced health tracking, and GPS features.",
+      },
+      "var-4": {
+        description:
+          "Large Android tablet for streaming, notes, drawing, and multitasking with a vivid display.",
+      },
+      "var-5": {
+        description:
+          "Thin and light MacBook with silent performance, long battery life, and a sharp Retina display.",
+      },
+      "var-6": {
+        description:
+          "Gaming laptop with a fast display, dedicated graphics, and strong cooling for modern games.",
+      },
+    },
+  },
+  servicesOverview: {
+    heading: "Our services",
+    listAriaLabel: "Services list",
+    items: {
+      aiPoweredSearch: {
+        title: "Everything in one place",
+        description:
+          "Choosy helps you search and compare prices across online stores. Electronics, computers, home appliances, auto parts, tools, travel gear, kids products, and more — find the best deal faster.",
+      },
+      smartRecommendations: {
+        title: "Flexible filters",
+        description:
+          "Filter by specs, compare models side by side, and use text search to find categories or products by name. Each product page includes descriptions, specs, photos, videos, and useful links.",
+      },
+      personalizedService: {
+        title: "Choosy everywhere",
+        description:
+          "3,000+ connected shops and 1.5M products with constantly updated data. Choose the right product and buy on the best terms. We operate in Ukraine, Poland, the US, the UK, Kazakhstan, and keep expanding.",
+      },
+    },
+  },
+  aboutUs: {
+    sectionAriaLabel: "About us",
+    title: "About us",
+    descriptionStart:
+      " is a new online marketplace for smart shoppers and sellers who value quality and personalization. With a curated catalog,",
+    descriptionEnd: " offers a smooth, convenient shopping experience.",
+    learnMoreLabel: "Learn more",
+    imageAlt: "Choosy marketplace illustration",
+    imageCaption: "Choosy — personalized shopping platform",
+  },
+  productDetail: {
+    mainImageAlt: "Apple MacBook Pro — product photo",
+    galleryAriaLabel: "Product image gallery",
+    galleryThumbAria: "Select image",
+    priceFrom: "From",
+    priceTo: "To",
+    currencySuffix: "AMD",
+    chartAriaLabel: "Price history chart",
+    tabFull: "Description",
+    specsSectionAriaLabel: "Technical specifications",
+    colors: {
+      black: "Black",
+      gray: "Gray",
+      white: "White",
+      blue: "Blue",
+    },
+    chart: {
+      months: {
+        jan: "Jan",
+        feb: "Feb",
+        mar: "Mar",
+        apr: "Apr",
+        may: "May",
+        jun: "Jun",
+        jul: "Jul",
+        aug: "Aug",
+        sep: "Sep",
+        oct: "Oct",
+        nov: "Nov",
+        dec: "Dec",
+      },
+    },
+    specsBrief: {
+      screenSize: "Screen size:",
+      storage: "Storage:",
+      ram: "Memory (RAM):",
+      battery: "Battery:",
+      year: "Year:",
+      microphoneValue: "Yes",
+      manufacturer: "Manufacturer:",
+    },
+    specsExtended: {
+      screenType: "Screen type:",
+      microphone: "Built-in microphone:",
+      technology: "Technology:",
+      matrix: "Pixel density:",
+      ssd: "SSD capacity:",
+      bluetooth: "Bluetooth version:",
+    },
+  },
+  productOffers: {
+    sectionAriaLabel: "Offers and map",
+    tabsAriaLabel: "Offer types",
+    tabs: { sites: "Sites", specs: "Specs" },
+    goToShopAria: "Open shop website",
+    offerDescription: "Choosy is a new online marketplace\nfor smart shoppers",
+    badges: { discount: "Discount", new: "New" },
+    map: { ariaLabel: "Yerevan stores map" },
+    bestOffers: {
+      sectionAriaLabel: "Best offers",
+      title: "Best offers",
+      tableAriaLabel: "Product offers table",
+      sortBy: "Sort by",
+      sortMenuAriaLabel: "Sort options",
+      openSortAriaLabel: "Open sort menu",
+      seeMore: "See more",
+      seeLess: "Show less",
+      variantsAriaLabel: "Configuration selection",
+      colorsAriaLabel: "Color selection",
+      sortOptions: {
+        priceAsc: "Price: low to high",
+        priceDesc: "Price: high to low",
+        popular: "Most popular",
+      },
+    },
+  },
+  account: {
+    pageTitle: "My account",
+    sidebarNavAria: "Account sections",
+    personalTabsAria: "Personal data tabs",
+    sidebar: {
+      personal: "Personal data",
+      wishlist: "Favorites",
+      recent: "Recently viewed",
+      subscription: "Subscription",
+      notifications: "Notifications",
+    },
+    innerTabs: { data: "Details", notifications: "Notifications" },
+    actions: {
+      edit: "Edit",
+      back: "Back",
+      cancel: "Cancel",
+      save: "Save",
+    },
+    fields: {
+      emailShort: "Email",
+      phoneShort: "Phone",
+      firstNameRequired: "First name*",
+      lastName: "Last name",
+      emailRequired: "Email*",
+      phoneRequired: "Phone (+374)*",
+      phoneLocalAria: "Phone without country code",
+    },
+    profile: { placeholderName: "User" },
+    avatar: {
+      uploadAria: "Upload profile photo",
+      remove: "Remove photo",
+    },
+    password: {
+      sectionTitle: "Change password",
+      old: "Current password",
+      new: "New password",
+      confirm: "Confirm new password",
+      tooShort: "Password must be at least 6 characters.",
+      mismatch: "Passwords do not match.",
+      wrongOld: "Current password is incorrect.",
+    },
+    notifications: {
+      items: {
+        priceDrops: {
+          title: "Price drops",
+          description: "Notify when favorite product prices drop.",
+        },
+        wishlistUpdates: {
+          title: "Favorites updates",
+          description: "Reminders about saved items and similar offers.",
+        },
+        accountNews: {
+          title: "Service news",
+          description: "Updates about new account features.",
+        },
+      },
+    },
+    notificationsPage: {
+      title: "Notifications",
+      tabsAria: "Notification section tabs",
+      tabs: { feed: "Notifications", settings: "Settings" },
+      settingsIntro: "Choose which notifications you want to receive.",
+      feed: {
+        sampleBody:
+          "Choosy is a new online marketplace for smart shoppers and sellers who value quality and personalization.",
+        items: {
+          recent: { title: "Lorem ipsum", timeLabel: "3 min" },
+          hour: { title: "Lorem ipsum", timeLabel: "1 h" },
+          dated: { title: "Lorem ipsum", timeLabel: "16.09.2025" },
+        },
+      },
+    },
+    wishlist: {
+      title: "Favorites",
+      empty: "Your list is empty.",
+      remove: "Remove",
+      confirmTitle: "Remove product?",
+      confirmMessage: "Are you sure you want to remove this item from favorites?",
+      confirmButton: "Confirm",
+      cancelButton: "Cancel",
+    },
+    recent: {
+      title: "Recently viewed",
+      empty: "You have not viewed anything yet.",
+      clear: "Clear history",
+      seeMore: "See more",
+      seeLess: "Show less",
+    },
+    subscription: {
+      title: "Subscription",
+      planCardTitle: "Subscription plan",
+      planNameLabel: "Name:",
+      planValueLabel: "Price:",
+      planMonthlyLabel: "Monthly:",
+      description: "Choose whether you want email news.",
+      toggleLabel: "Email news",
+    },
+    messages: {
+      profileSaved: "Profile saved.",
+      profileRequired: "Please fill in your name and email.",
+      passwordSaved: "Password updated.",
+      notificationsSaved: "Notification settings saved.",
+      subscriptionSaved: "Subscription updated.",
+      wishlistUpdated: "Favorites updated.",
+      dismissStatus: "Dismiss notification",
+      recentCleared: "History cleared.",
+      avatarSaved: "Profile photo saved.",
+      avatarRemoved: "Profile photo removed.",
+      avatarTooLarge: "Image is too large (max 200 KB).",
+    },
+  },
+  shopAccount: {
+    pageTitle: "Shop page",
+    sidebarNavAria: "Shop page sections",
+    shopTabsAria: "Shop details tabs",
+    sidebar: {
+      details: "Shop details",
+      products: "Product management",
+      statistics: "Statistics",
+      finance: "Finance",
+    },
+    innerTabs: { data: "Details", notifications: "Notifications" },
+    actions: {
+      edit: "Edit",
+      back: "Back",
+      cancel: "Cancel",
+      save: "Save",
+    },
+    fields: {
+      emailShort: "Email",
+      phoneShort: "Phone",
+      websiteShort: "Website",
+      shopNameRequired: "Shop name*",
+      description: "Description",
+      emailRequired: "Email*",
+      phoneRequired: "Phone (+374)*",
+      phoneLocalAria: "Phone without country code",
+      website: "Website URL",
+    },
+    avatar: {
+      uploadAria: "Upload shop logo",
+      remove: "Remove logo",
+    },
+    notifications: {
+      items: {
+        priceDrops: {
+          title: "Price drops",
+          description: "Alerts about your products and competitor prices.",
+        },
+        wishlistUpdates: {
+          title: "Saved products",
+          description: "When shoppers save your offers.",
+        },
+        accountNews: {
+          title: "Platform updates",
+          description: "Seller news and new features.",
+        },
+      },
+    },
+    notificationsPage: {
+      title: "Notifications",
+      tabsAria: "Notification section tabs",
+      tabs: { feed: "Notifications", settings: "Settings" },
+      settingsIntro: "Choose which notifications you want to receive.",
+      feed: {
+        sampleBody:
+          "Choosy is a new online marketplace for smart shoppers and sellers who value quality and personalization.",
+        items: {
+          recent: { title: "Lorem ipsum", timeLabel: "3 min" },
+          hour: { title: "Lorem ipsum", timeLabel: "1 h" },
+          dated: { title: "Lorem ipsum", timeLabel: "16.09.2025" },
+        },
+      },
+    },
+    products: {
+      sectionTitle: "Product management",
+      listTitle: "Products",
+      addProduct: "Add product",
+      addShort: "Add",
+      tableAria: "Products table",
+      tableHeaders: {
+        product: "Product",
+        available: "Available",
+        color: "Color",
+        price: "Price",
+        actions: "Actions",
+      },
+      edit: "Edit",
+      refresh: "Refresh",
+      editAria: "Edit product",
+      refreshAria: "Refresh product",
+      editPriceAria: "Edit price",
+      editFormTitle: "Edit product",
+      staleHint: 'Products are removed automatically if you do not click "Refresh" within 5 days.',
+      formTitle: "New product",
+      formHint: "Pick category, product, memory, colors, and availability. Enter price manually only.",
+      placeholders: {
+        category: "Select category",
+        product: "Select product",
+        productAfterCategory: "Select a category first",
+      },
+      noProductsInCategory: "No products in this category.",
+      catalogImageNote: "Image is taken from the catalog.",
+      fields: {
+        title: "Title*",
+        price: "Price*",
+        category: "Category*",
+        description: "Description",
+        image: "Image",
+        availability: "Availability",
+        memories: "Memory / configuration*",
+        colors: "Colors*",
+      },
+      availabilityOptions: {
+        inStock: "In stock",
+        outOfStock: "Out of stock",
+      },
+      addMemoryRow: "Add row",
+      removeMemoryRowAria: "Remove memory row",
+      addColorRow: "Add color",
+      removeColorRowAria: "Remove color",
+      uploadImage: "Upload image",
+      removeImage: "Remove image",
+      cancel: "Cancel",
+      save: "Save",
+      empty: 'No products yet. Click "Add product" to create one.',
+      viewInStore: "View in store",
+      deleteAria: "Delete product",
+      messages: {
+        required: "Fill in title and price.",
+        categoryRequired: "Select a category.",
+        productRequired: "Select a product.",
+        priceRequired: "Enter a price.",
+        memoryRequired: "Select at least one memory option.",
+        colorsRequired: "Select at least one color.",
+        productAdded: "Product added.",
+        productUpdated: "Product updated.",
+        priceUpdated: "Price updated.",
+        autoRemoved: "Products not refreshed for 5 days were removed.",
+        productRemoved: "Product removed.",
+        imageTooLarge: "Image is too large (max 200 KB).",
+      },
+      stock: { in: "In stock", out: "Out of stock" },
+    },
+    statistics: {
+      sectionTitle: "Statistics",
+      intro: "Summary of recent metrics (sample data until API is connected).",
+      chartAria: "Time series chart",
+      metricTabsAria: "Metric selection",
+      metrics: {
+        views: { label: "Views", summary: "200K" },
+        orders: { label: "Orders", summary: "10.8K" },
+        session: { label: "Avg. session", summary: "1m 11s" },
+        revenue: { label: "Revenue", summary: "֏2,812.36" },
+      },
+    },
+    finance: {
+      tabsAria: "Finance section tabs",
+      tabs: { plan: "Subscription plan", payments: "Payment history" },
+      addLabel: "Add",
+      addAria: "Add subscription plan",
+      planCardTitle: "Subscription plan",
+      planNameLabel: "Name:",
+      planValueLabel: "Price:",
+      planMonthlyLabel: "Monthly:",
+      paymentsEmpty: "Payment history will appear here soon.",
+      payments: {
+        tableAria: "Payment history table",
+        colDate: "Date",
+        colMethod: "Payment method",
+        colStatus: "Status",
+        colAmount: "Amount",
+        statusApproved: "Approved",
+        statusRejected: "Rejected",
+      },
+    },
+    placeholders: {
+      productsTitle: "Product management",
+      productsBody: "This section will soon let you add and edit products.",
+      statisticsTitle: "Statistics",
+      statisticsBody: "Sales and visit statistics will appear here soon.",
+      financeTitle: "Finance",
+      financeBody: "Financial summaries and payments will be available soon.",
+    },
+    messages: {
+      profileSaved: "Shop details saved.",
+      profileRequired: "Please fill in shop name and email.",
+      notificationsSaved: "Notification settings saved.",
+      avatarSaved: "Logo saved.",
+      avatarRemoved: "Logo removed.",
+      avatarTooLarge: "Image is too large (max 200 KB).",
+      dismissStatus: "Dismiss notification",
+    },
+  },
+  footer: {
+    columns: {
+      primary: {
+        home: "Home",
+        about: "About us",
+        catalog: "Catalog",
+      },
+      contact: {
+        contact: "Contact us",
+      },
+      legal: {
+        privacy: "Privacy",
+        terms: "Terms of service",
+      },
+    },
+  },
+};
+
+export default enOverrides;

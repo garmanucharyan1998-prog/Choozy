@@ -2,6 +2,10 @@
  * Demo catalog payload for product detail MVP (replace with API integration later).
  */
 
+import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProducts";
+import { mockTopProducts, mockVarietyProducts } from "shared/api/mocks/mockData";
+import { resolveProductRouteParam } from "./productRouteRegistry";
+
 const LAPTOP_IMAGE =
   "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1400&q=82";
 
@@ -18,10 +22,8 @@ export const mockProductDetail = {
   ],
   priceMinAmd: 800500,
   priceMaxAmd: 1079000,
-  /** Sample AMD amounts for chart columns (five months); max scale in UI is 400,000. */
+  /** Sample AMD amounts for the trailing months shown in the chart. */
   priceHistoryAmd: [250000, 260000, 200000, 320000, 240000],
-  /** Zero-based index of the highlighted bar (e.g. April). */
-  priceHistoryHighlightIndex: 3,
   /** Shown under «Հակիրճ նկարագրություն». */
   specsBriefRows: [
     { labelKey: "productDetail.specsBrief.screenSize", valueKey: "productDetail.specsBrief.screenSizeValue" },
@@ -40,4 +42,76 @@ export const mockProductDetail = {
     { labelKey: "productDetail.specsExtended.bluetooth", valueKey: "productDetail.specsExtended.bluetoothValue" },
     { labelKey: "productDetail.specsExtended.manufacturer", valueKey: "productDetail.specsExtended.manufacturerValue" },
   ],
+};
+
+/** Default route id when visiting `/singleproduct` without a segment. */
+export const defaultProductDetailRouteId = mockProductDetail.id;
+
+const repeatGallery = (imageUrl, count = 6) => Array.from({ length: count }, () => imageUrl);
+
+const parseAmdFromPriceString = (price) => {
+  if (price == null) return undefined;
+  if (typeof price === "number" && Number.isFinite(price)) return price;
+  const digits = String(price).replace(/[^\d]/g, "");
+  if (!digits) return undefined;
+  const n = Number(digits);
+  return Number.isFinite(n) ? n : undefined;
+};
+
+const findHomeCarouselProduct = (id) =>
+  mockVarietyProducts.find((p) => p.id === id) || mockTopProducts.find((p) => p.id === id);
+
+/**
+ * Resolves demo detail payload for `/singleproduct/:slug` (SEO slug~id) or legacy `/singleproduct/fp-1` ids.
+ * @param {string | undefined} routeProductId
+ */
+export const getProductDetailForRoute = (routeProductId) => {
+  const id =
+    routeProductId != null && String(routeProductId).trim() !== ""
+      ? resolveProductRouteParam(routeProductId)
+      : mockProductDetail.id;
+
+  const catalog = mockFilterProducts.find((p) => p.id === id);
+  if (catalog) {
+    const baseMin = mockProductDetail.priceMinAmd;
+    const scale = baseMin > 0 ? catalog.priceValue / baseMin : 1;
+    return {
+      ...mockProductDetail,
+      id: catalog.id,
+      listingTitle: catalog.title,
+      listingDescription: catalog.description,
+      galleryImageUrls: repeatGallery(catalog.image),
+      priceMinAmd: catalog.priceValue,
+      priceMaxAmd: Math.round(catalog.priceValue * (mockProductDetail.priceMaxAmd / mockProductDetail.priceMinAmd)),
+      priceHistoryAmd: mockProductDetail.priceHistoryAmd.map((v) => Math.round(v * scale)),
+    };
+  }
+
+  const homeProduct = findHomeCarouselProduct(id);
+  if (homeProduct) {
+    const priceMin = parseAmdFromPriceString(homeProduct.price) ?? mockProductDetail.priceMinAmd;
+    const baseMin = mockProductDetail.priceMinAmd;
+    const scale = baseMin > 0 ? priceMin / baseMin : 1;
+    return {
+      ...mockProductDetail,
+      id: homeProduct.id,
+      listingTitle: homeProduct.title,
+      listingDescription: homeProduct.description,
+      galleryImageUrls: repeatGallery(homeProduct.image),
+      priceMinAmd: priceMin,
+      priceMaxAmd: Math.round(priceMin * (mockProductDetail.priceMaxAmd / mockProductDetail.priceMinAmd)),
+      priceHistoryAmd: mockProductDetail.priceHistoryAmd.map((v) => Math.round(v * scale)),
+    };
+  }
+
+  if (id === mockProductDetail.id) {
+    return { ...mockProductDetail };
+  }
+
+  return {
+    ...mockProductDetail,
+    id,
+    listingTitle: "Apple MacBook Pro",
+    listingDescription: "Demo product for the detail page until API data is wired.",
+  };
 };

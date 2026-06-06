@@ -25,7 +25,7 @@ const HomePage = () => {
   } = useHomePagePresenter();
 
   return (
-    <div className="min-w-[320px] bg-white text-center">
+    <div className="flex min-h-screen min-w-[320px] flex-col bg-white text-center">
       <PageSeo title={t("homePage.seoTitle")} description={t("homePage.seoDescription")} path="/" />
       <button
         type="button"
@@ -63,7 +63,7 @@ const HomePage = () => {
         />
       </div>
 
-      <main className="bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
+      <main className="flex flex-1 flex-col bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
         <h1 className="sr-only">{t("homePage.mainHeading")}</h1>
         <GridCatalogWidget />
         <TopProductsWidget />
@@ -72,7 +72,9 @@ const HomePage = () => {
         <ServicesOverviewWidget />
       </main>
 
-      <FooterWidget />
+      <div className="mt-auto shrink-0">
+        <FooterWidget />
+      </div>
     </div>
   );
 };

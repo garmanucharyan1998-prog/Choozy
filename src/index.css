@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "Montserrat";
+  font-family: "MontserratArm";
   src: url("../src/fonts/Montserratarm-Black.otf") format("opentype");
   font-weight: 900;
   font-style: normal;
@@ -11,7 +11,7 @@
 }
 
 @font-face {
-  font-family: "Montserrat";
+  font-family: "MontserratArm";
   src: url("../src/fonts/Montserratarm-Bold.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
@@ -19,7 +19,7 @@
 }
 
 @font-face {
-  font-family: "Montserrat";
+  font-family: "MontserratArm";
   src: url("../src/fonts/Montserratarm-ExtraBold.otf") format("opentype");
   font-weight: 800;
   font-style: normal;
@@ -75,6 +75,15 @@
 }
 
 @layer base {
+  html[lang="am"] body {
+    font-family: MontserratArm, sans-serif;
+  }
+
+  html[lang="en"] body,
+  html[lang="ru"] body {
+    font-family: Montserrat, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
   body {
     @apply m-0 antialiased font-sans;
   }
