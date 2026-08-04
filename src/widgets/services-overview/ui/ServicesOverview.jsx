@@ -8,7 +8,7 @@ const ServicesOverview = () => {
 
   return (
     <section
-      className="min-h-fit cursor-default flex justify-center my-8 sm:my-[60px]"
+      className="mb-8 flex min-h-fit cursor-default justify-center pt-8 sm:mb-[60px] sm:pt-[60px]"
       aria-labelledby="services-overview-heading"
     >
       <div className="w-full cont-width-default">
@@ -29,23 +29,26 @@ const ServicesOverview = () => {
               aria-labelledby={`service-title-${service.id}`}
               aria-describedby={`service-desc-${service.id}`}
             >
-              <img
-                className="service-icon rounded-full flex items-center justify-center shrink-0 bg-gradient-to-br from-[#fef3c7] to-[#f59e0b] w-[56px] h-[56px] text-[1.75rem] mb-3 sm:w-[70px] sm:h-[70px] sm:text-[2.25rem] sm:mb-5 md:w-20 md:h-20 md:text-[2.5rem] md:mb-6 lg:w-[90px] lg:h-[90px] lg:text-[2.75rem] xl:w-20 xl:h-20 xl:text-[2.5rem] 2xl:w-[100px] 2xl:h-[100px] 2xl:text-[3rem] 2xl:mb-8"
-                src={service.icon}
-                alt={`${service.title} icon`}
-                aria-label={`${service.title} image`}
+              <div
+                className="service-icon rounded-full flex items-center justify-center shrink-0 bg-gradient-to-br from-[#fef3c7] to-[#f59e0b] w-[56px] h-[56px] text-[1.75rem] mb-3 bg-center bg-no-repeat sm:w-[70px] sm:h-[70px] sm:text-[2.25rem] sm:mb-5 md:w-20 md:h-20 md:text-[2.5rem] md:mb-6 lg:w-[90px] lg:h-[90px] lg:text-[2.75rem] xl:w-20 xl:h-20 xl:text-[2.5rem] 2xl:w-[100px] 2xl:h-[100px] 2xl:text-[3rem] 2xl:mb-8"
+                style={{
+                  backgroundImage: `url("${service.icon}")`,
+                  backgroundSize: "100% 100%",
+                }}
+                role="img"
+                aria-label={`${service.title} icon`}
               />
 
               <h3
                 id={`service-title-${service.id}`}
-                className="service-title font-system font-bold text-[#1a202c] leading-[1.3] text-lg mb-2 sm:text-[1.375rem] sm:mb-[0.875rem] md:text-2xl md:mb-4 lg:text-base xl:text-2xl 2xl:text-lg 2xl:mb-6"
+                className="service-title font-sans font-bold text-[#1a202c] leading-[1.3] text-lg mb-2 sm:text-[1.375rem] sm:mb-[0.875rem] md:text-2xl md:mb-4 lg:text-base xl:text-2xl 2xl:text-lg 2xl:mb-6"
               >
                 {service.title}
               </h3>
 
               <p
                 id={`service-desc-${service.id}`}
-                className="service-description font-system text-text-service m-0 grow text-[0.8rem] leading-[1.5] sm:text-[0.95rem] sm:leading-[1.6] md:text-base md:leading-[1.7] lg:text-sm xl:text-base"
+                className="service-description font-sans text-text-service m-0 grow text-[0.8rem] leading-[1.5] sm:text-[0.95rem] sm:leading-[1.6] md:text-base md:leading-[1.7] lg:text-sm xl:text-base"
               >
                 {service.description}
               </p>

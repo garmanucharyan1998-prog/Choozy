@@ -1,0 +1,19 @@
+.progressive-image {
+  display: contents;
+}
+
+.progressive-image__media {
+  transition: filter 280ms ease, opacity 280ms ease;
+}
+
+.progressive-image__media--preview {
+  filter: blur(8px);
+  transform: scale(1.02);
+  opacity: 0.95;
+}
+
+.progressive-image__media--ready {
+  filter: none;
+  transform: none;
+  opacity: 1;
+}

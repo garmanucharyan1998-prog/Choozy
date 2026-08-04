@@ -6,9 +6,11 @@ import { NavPanelWidget } from "widgets/nav-panel";
 import { ServicesOverviewWidget } from "widgets/services-overview";
 import { TopProductsWidget } from "widgets/top-products";
 import { VarietyWidget } from "widgets/variety";
+import { useLanguage } from "contexts";
 import { useHomePagePresenter } from "pages/home/presenter/useHomePagePresenter";
 
 const HomePage = () => {
+  const { t } = useLanguage();
   const {
     isCompactHeader,
     isMobileMenuOpen,
@@ -57,6 +59,7 @@ const HomePage = () => {
       </div>
 
       <main className="flex flex-1 flex-col bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
+        <h1 className="sr-only">{t("home.pageTitle")}</h1>
         <GridCatalogWidget />
         <TopProductsWidget />
         <AboutUsWidget />

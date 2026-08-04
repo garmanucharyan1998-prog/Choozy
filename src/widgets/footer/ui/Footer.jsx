@@ -58,9 +58,9 @@ const SocialLink = ({ href, label, iconPath }) => (
   </a>
 );
 
-const FooterLink = ({ href, label, id, withEmailIcon = false }) => (
+const FooterLink = ({ href, label, htmlId, withEmailIcon = false }) => (
   <a
-    id={id}
+    {...(htmlId ? { id: htmlId } : {})}
     href={href}
     className={`${textLinkClassName}${withEmailIcon ? " gap-2" : ""}`}
   >
@@ -112,7 +112,7 @@ const Footer = () => {
                 {column.map((link) => (
                   <FooterLink
                     key={`${link.id}-${link.href}`}
-                    id={link.id}
+                    htmlId={link.id === "privacy" ? "privacy" : undefined}
                     href={link.href}
                     label={link.label}
                     withEmailIcon={link.withEmailIcon}

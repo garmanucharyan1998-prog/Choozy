@@ -12,7 +12,7 @@ const SectionHead = ({ open, title, onToggle }) => (
     onClick={onToggle}
     className="flex w-full items-center justify-between gap-2 border-0 bg-transparent py-2 text-start text-base font-semibold text-navy"
   >
-    <span>{title}</span>
+    <h3 className="m-0 text-base font-semibold text-navy">{title}</h3>
     <FaChevronDown className={`h-4 w-4 shrink-0 text-link-blue transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
   </button>
 );
@@ -156,7 +156,7 @@ const FilterCatalogWidget = () => {
           onToggle={() => toggleSection("price")}
         />
         {sectionsOpen.price ? (
-          <div className="pb-4 pt-1">
+          <div className="flex flex-col gap-4 pb-4 pt-1">
             <div className="flex items-center gap-2">
               <label className="sr-only" htmlFor={`filter-price-min${idSuffix}`}>
                 {t("filterPage.filters.priceMin")}
@@ -184,23 +184,23 @@ const FilterCatalogWidget = () => {
                 onChange={(e) => setPriceMax(e.target.value)}
               />
             </div>
-            <div className="mt-4 flex flex-col gap-3">
-              <div>
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
                 <span className="text-xs text-text-muted">{t("filterPage.filters.priceMin")}</span>
                 <input
                   type="range"
-                  className="mt-1 w-full accent-navy"
+                  className="w-full accent-navy"
                   min={globalMin}
                   max={priceMax}
                   value={priceMin}
                   onChange={(e) => onMinRangeChange(e.target.value)}
                 />
               </div>
-              <div>
+              <div className="flex flex-col gap-1">
                 <span className="text-xs text-text-muted">{t("filterPage.filters.priceMax")}</span>
                 <input
                   type="range"
-                  className="mt-1 w-full accent-navy"
+                  className="w-full accent-navy"
                   min={priceMin}
                   max={globalMax}
                   value={priceMax}
@@ -219,7 +219,7 @@ const FilterCatalogWidget = () => {
           onToggle={() => toggleSection("screen")}
         />
         {sectionsOpen.screen ? (
-          <ul className="m-0 list-none space-y-2 p-0 pb-3 pt-1">
+          <ul className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1">
             {screenOptions.map((opt) => (
               <li key={opt.id}>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
@@ -247,7 +247,7 @@ const FilterCatalogWidget = () => {
         />
         {sectionsOpen.brand ? (
           <div className="pb-3 pt-1">
-            <ul className="m-0 list-none space-y-2 p-0">
+            <ul className="m-0 flex list-none flex-col gap-2 p-0">
               {brandOptionsForOverlay.map((opt) => (
                 <li key={opt.id}>
                   <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
@@ -267,7 +267,7 @@ const FilterCatalogWidget = () => {
             {BRAND_OPTIONS.length > 4 ? (
               <button
                 type="button"
-                className="mt-2 text-sm font-medium text-link-blue hover:text-navy"
+                className="pt-2 text-sm font-medium text-link-blue hover:text-navy"
                 onClick={() => setBrandExpanded((v) => !v)}
               >
                 {brandExpanded ? t("filterPage.filters.seeLess") : t("filterPage.filters.seeMore")}
@@ -284,7 +284,7 @@ const FilterCatalogWidget = () => {
           onToggle={() => toggleSection("ram")}
         />
         {sectionsOpen.ram ? (
-          <ul className="m-0 list-none space-y-2 p-0 pb-3 pt-1">
+          <ul className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1">
             {ramOptions.map((opt) => (
               <li key={opt.id}>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
@@ -339,15 +339,18 @@ const FilterCatalogWidget = () => {
       className="cont-width-default mx-auto w-full max-w-[1600px] py-6 text-start md:py-8"
       aria-label={t("filterPage.mainAriaLabel")}
     >
+      <h1 className="sr-only">{t("filterPage.pageTitle")}</h1>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
         <aside
           className="hidden w-full shrink-0 rounded-2xl border border-border-blue/60 bg-white p-4 shadow-sm sm:p-5 lg:block lg:w-[300px] xl:w-[320px]"
           aria-label={t("filterPage.sidebarAriaLabel")}
         >
+          <h2 className="sr-only">{t("filterPage.sidebarAriaLabel")}</h2>
           {renderFilterForm("")}
         </aside>
 
         <div className="min-w-0 flex-1">
+          <h2 className="sr-only">{t("filterPage.resultsHeading")}</h2>
           <div className="mb-3 flex flex-col gap-3 lg:hidden" aria-label={t("filterPage.toolbarAriaLabel")}>
             <div className="flex items-stretch gap-2">
               <button
@@ -501,7 +504,7 @@ const FilterCatalogWidget = () => {
               </div>
 
               <nav
-                className="mt-8 flex flex-col flex-wrap items-center justify-center gap-4 border-t border-border-blue/60 pt-6 sm:flex-row sm:gap-6"
+                className="flex flex-col flex-wrap items-center justify-center gap-4 border-t border-border-blue/60 pt-8 sm:flex-row sm:gap-6"
                 aria-label={t("filterPage.pagination.navAria")}
               >
                 <div className="flex flex-wrap items-center justify-center gap-2">

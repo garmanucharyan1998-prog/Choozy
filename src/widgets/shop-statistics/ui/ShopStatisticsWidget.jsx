@@ -36,9 +36,9 @@ const ShopStatisticsWidget = () => {
 
   return (
     <MainCard className="overflow-hidden p-0">
-      <div className="border-b border-[#e1e6ef] px-4 py-5 md:px-8 md:py-6">
+      <div className="flex flex-col gap-2 border-b border-[#e1e6ef] px-4 py-5 md:px-8 md:py-6">
         <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("shopAccount.statistics.sectionTitle")}</h2>
-        <p className="mt-2 m-0 text-sm leading-relaxed text-text-muted">{t("shopAccount.statistics.intro")}</p>
+        <p className="m-0 text-sm leading-relaxed text-text-muted">{t("shopAccount.statistics.intro")}</p>
       </div>
 
       <div
@@ -67,6 +67,7 @@ const ShopStatisticsWidget = () => {
                 }`}
                 aria-hidden="true"
               />
+              <span className="flex flex-col gap-1.5">
               <span
                 className={`text-xs font-medium leading-tight ${
                   selected ? "text-text-muted" : "text-text-muted"
@@ -75,11 +76,12 @@ const ShopStatisticsWidget = () => {
                 {t(labelKeys[index])}
               </span>
               <span
-                className={`mt-1.5 block text-lg font-bold tabular-nums leading-none md:text-xl ${
+                className={`block text-lg font-bold tabular-nums leading-none md:text-xl ${
                   selected ? "text-navy" : "font-semibold text-text-muted"
                 }`}
               >
                 {t(metric.summaryKey)}
+              </span>
               </span>
             </button>
           );

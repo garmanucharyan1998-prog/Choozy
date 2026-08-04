@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ProgressiveImage } from "shared/ui/progressive-image";
 import {
   PRODUCT_CARD_IMAGE_BG,
   PRODUCT_CARD_IMAGE_VARIANTS,
@@ -8,10 +9,12 @@ import {
 import "./ProductCardImage.css";
 
 /**
- * Product photo fills the card frame via background-size: cover (no letterbox padding).
+ * Product photo fills the card frame via object-fit: contain (full product visible).
+ * Uses a low-res preview first, then swaps to the original once loaded.
  */
 const ProductCardImage = ({
   src,
+  lowSrc,
   alt,
   href,
   external = false,
@@ -30,13 +33,8 @@ const ProductCardImage = ({
     setResolvedSrc(src || PRODUCT_CARD_PLACEHOLDER_IMG);
   }, [src]);
 
-  const shellStyle = {
-    backgroundImage: `url("${resolvedSrc}")`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-    ...(backgroundColor && backgroundColor !== "transparent" ? { backgroundColor } : {}),
-  };
+  const shellStyle =
+    backgroundColor && backgroundColor !== "transparent" ? { backgroundColor } : undefined;
 
   const useAnchor = external || (href && !href.startsWith("/"));
 
@@ -56,10 +54,12 @@ const ProductCardImage = ({
 
   return (
     <div className={`${styles.shell} ${className}`.trim()} style={shellStyle}>
-      <img
+      <ProgressiveImage
         src={resolvedSrc}
+        lowSrc={lowSrc}
         alt={alt}
-        className="sr-only"
+        imgClassName={styles.img}
+        loading="lazy"
         onError={() => setResolvedSrc(PRODUCT_CARD_PLACEHOLDER_IMG)}
       />
       {hitTarget}

@@ -1,5 +1,8 @@
 /** English mock copy — merged onto Armenian base. productRefreshed is intentionally omitted. */
 export const enOverrides = {
+  home: {
+    pageTitle: "Choosy — electronics online store",
+  },
   header: {
     aboutLinkLabel: "About us",
     search: {
@@ -37,6 +40,7 @@ export const enOverrides = {
     },
   },
   gridCatalog: {
+    heading: "Catalog",
     items: {
       smartphones: "Smartphones",
       speakers: "Portable speakers",
@@ -45,6 +49,8 @@ export const enOverrides = {
     },
   },
   filterPage: {
+    pageTitle: "Product catalog",
+    resultsHeading: "Results",
     mainAriaLabel: "Product catalog and filters",
     sidebarAriaLabel: "Filters",
     toolbarAriaLabel: "List tools",
@@ -586,6 +592,39 @@ export const enOverrides = {
         terms: "Terms of service",
       },
     },
+  },
+  auth: {
+    closeAria: "Close dialog",
+    backdropAria: "Close dialog",
+  },
+  register: {
+    title: "Registration",
+    subtitle: "Create a new account",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    confirmPasswordLabel: "Confirm password",
+    submit: "Register",
+    switchToLoginPrompt: "Already have an account?",
+    switchToLoginButton: "Sign in",
+    errors: {
+      required: "Please fill in all fields.",
+      passwordMismatch: "Passwords do not match.",
+    },
+  },
+  login: {
+    title: "Sign in",
+    subtitle: "Sign in to your personal account",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    submit: "Sign in",
+    switchToRegisterPrompt: "Don't have an account?",
+    switchToRegisterButton: "Register",
+    errors: {
+      required: "Please fill in all fields.",
+    },
+  },
+  scrollToTop: {
+    ariaLabel: "Scroll to top",
   },
 };
 

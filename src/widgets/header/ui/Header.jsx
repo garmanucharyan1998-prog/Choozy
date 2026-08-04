@@ -11,6 +11,7 @@ import {
   FaRegHeart,
 } from "react-icons/fa";
 import { useHeaderPresenter } from "features/header";
+import { LoginModal } from "features/login";
 import { ACCOUNT_STORAGE_EVENT, readAccountState } from "entities/user";
 import { useLanguage } from "contexts";
 import choozyMainLogo from "shared/assets/logos/choozyMainLogo.svg";
@@ -65,6 +66,10 @@ const Header = ({
     handleSuggestionClick,
     handleClearSearch,
     handleSearchFocus,
+    isLoginModalOpen,
+    openLoginModal,
+    closeLoginModal,
+    handleLoginSuccess,
   } = useHeaderPresenter();
 
   const handleMobileMenuToggle = useCallback(() => {
@@ -226,8 +231,8 @@ const Header = ({
   const SearchSection = useMemo(
     () => (
       <form
-        className={`search-bar relative flex min-w-0 grow bg-input-bg rounded-pill border-[1.5px] border-accent-blue order-3 w-full md:order-none md:mt-0 md:ml-3 md:w-auto md:max-w-[min(100%,280px)] lg:ml-4 lg:max-w-[min(100%,320px)] 2xl:ml-0 2xl:max-w-[400px] transition-all duration-300 ${
-          isCompact ? "mt-1.5 sm:mt-2" : "mt-2 sm:mt-3"
+        className={`search-bar relative flex min-w-0 grow bg-input-bg rounded-pill border-[1.5px] border-accent-blue order-3 w-full md:order-none md:ml-3 md:w-auto md:max-w-[min(100%,280px)] lg:ml-4 lg:max-w-[min(100%,320px)] 2xl:ml-0 2xl:max-w-[400px] transition-all duration-300 ${
+          isCompact ? "pt-1.5 sm:pt-2 md:pt-0" : "pt-2 sm:pt-3 md:pt-0"
         }`}
         role="search"
         onSubmit={handleSearchSubmit}
@@ -288,7 +293,7 @@ const Header = ({
 
         {showSuggestions && (
           <div
-            className="absolute top-full left-0 right-0 bg-subtle-bg border border-accent-blue rounded-[10px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-[1000] max-h-[280px] overflow-y-auto mt-2 py-2"
+            className="absolute top-[calc(100%+0.5rem)] left-0 right-0 bg-subtle-bg border border-accent-blue rounded-[10px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-[1000] max-h-[280px] overflow-y-auto py-2"
             role="listbox"
             aria-label={t("header.search.resultsAriaLabel")}
           >
@@ -361,6 +366,7 @@ const Header = ({
         label: t("header.mobileBottomNav.profile.label"),
         ariaLabel: t("header.mobileBottomNav.profile.ariaLabel"),
         iconType: "profile",
+        opensLogin: true,
       },
     ],
     [t],
@@ -446,15 +452,16 @@ const Header = ({
         </Link>
 
         <div className="hidden md:block">
-          <Link
-            to="/account"
+          <button
+            type="button"
             className={loginLinkClassName}
             title={t("header.loginTitle")}
             aria-label={t("header.loginAriaLabel")}
+            onClick={openLoginModal}
           >
             <FaUser className="text-black" size={18} aria-hidden="true" />
             <span className="hidden whitespace-nowrap 2xl:inline">{t("header.loginLabel")}</span>
-          </Link>
+          </button>
         </div>
 
         <button
@@ -552,6 +559,7 @@ const Header = ({
       favoritesCountBadge,
       favoritesLinkAriaLabel,
       loginLinkClassName,
+      openLoginModal,
       t,
     ],
   );
@@ -579,9 +587,9 @@ const Header = ({
         }`}
         aria-label={t("header.mobileNavigationAriaLabel")}
       >
-        <h3 className="m-0 mb-6 text-base font-semibold text-[#171717]">
+        <h2 className="m-0 mb-6 text-base font-semibold text-[#171717]">
           {t("header.mobileMenuTitle")}
-        </h3>
+        </h2>
         <nav className="flex flex-col gap-6 items-start" aria-label={t("header.mobileLinksAriaLabel")}>
           {mobileMenuItems.map((item) => (
             <a
@@ -615,29 +623,54 @@ const Header = ({
 
             return (
               <li key={item.href} className="flex-1">
-                <Link
-                  to={item.href}
-                  className="flex w-full flex-col items-center justify-center gap-1 py-1.5 no-underline transition-colors duration-200"
-                  aria-label={item.ariaLabel}
-                  aria-current={isActive ? "page" : undefined}
-                  onClick={handleMobileMenuClose}
-                >
-                  <span
-                    className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                      isActive ? "bg-[#152147]" : "bg-transparent"
-                    }`}
+                {item.opensLogin ? (
+                  <button
+                    type="button"
+                    className="flex w-full flex-col items-center justify-center gap-1 border-0 bg-transparent py-1.5 transition-colors duration-200"
+                    aria-label={item.ariaLabel}
+                    onClick={() => {
+                      handleMobileMenuClose();
+                      openLoginModal();
+                    }}
                   >
-                    {renderMobileBottomIcon(item.iconType, isActive)}
-                  </span>
-                  <span className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
-                    {item.label}
-                  </span>
-                </Link>
+                    <span className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-transparent transition-all duration-200">
+                      {renderMobileBottomIcon(item.iconType, false)}
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] font-medium text-[#6B738C]">
+                      {item.label}
+                    </span>
+                  </button>
+                ) : (
+                  <Link
+                    to={item.href}
+                    className="flex w-full flex-col items-center justify-center gap-1 py-1.5 no-underline transition-colors duration-200"
+                    aria-label={item.ariaLabel}
+                    aria-current={isActive ? "page" : undefined}
+                    onClick={handleMobileMenuClose}
+                  >
+                    <span
+                      className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full transition-all duration-200 ${
+                        isActive ? "bg-[#152147]" : "bg-transparent"
+                      }`}
+                    >
+                      {renderMobileBottomIcon(item.iconType, isActive)}
+                    </span>
+                    <span className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
+                      {item.label}
+                    </span>
+                  </Link>
+                )}
               </li>
             );
           })}
         </ul>
       </nav>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={closeLoginModal}
+        onSuccess={handleLoginSuccess}
+      />
     </header>
   );
 };

@@ -8,7 +8,7 @@ import { useRelatedProductsPresenter } from "features/related-products";
 import { ProductCardImage } from "shared/ui/product-card-image";
 import "swiper/css";
 
-const FONT_STACK = '"Montserrat arm", Montserrat, sans-serif';
+const FONT_STACK = "MontserratArm, Montserrat, sans-serif";
 
 const TITLE_TEXT_STYLE = {
   fontFamily: FONT_STACK,
@@ -83,7 +83,7 @@ const RelatedProductsWidget = () => {
   }, []);
 
   return (
-    <section aria-labelledby="related-products-title" className="mt-10 md:mt-14">
+    <section aria-labelledby="related-products-title">
       <div className="flex flex-wrap items-start justify-between gap-3 sm:items-center">
         <h2
           id="related-products-title"
@@ -99,7 +99,7 @@ const RelatedProductsWidget = () => {
         </a>
       </div>
 
-      <hr className="my-4 border-0 border-t border-border-blue md:my-6" />
+      <hr className="mb-4 border-0 border-t border-border-blue pt-4 md:mb-6 md:pt-6" />
 
       <div className={CAROUSEL_SHELL} aria-label={t("relatedProducts.carouselAriaLabel")}>
         <button
@@ -178,7 +178,7 @@ const RelatedProductsWidget = () => {
                     to={product.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-3 flex flex-col gap-1 no-underline outline-none"
+                    className="flex flex-col gap-1 pt-3 no-underline outline-none"
                   >
                     <h3 className="m-0 line-clamp-2" style={TITLE_TEXT_STYLE}>
                       {product.title}
@@ -190,7 +190,7 @@ const RelatedProductsWidget = () => {
                     >
                       {product.description}
                     </p>
-                    <p className="m-0 mt-0.5" style={PRICE_TEXT_STYLE}>
+                    <p className="m-0 pt-0.5" style={PRICE_TEXT_STYLE}>
                       {product.price}
                     </p>
                   </Link>

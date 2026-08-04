@@ -7,6 +7,9 @@ import { ruOverrides } from "./locales/ru.overrides.js";
  * Centralized UI text dictionary (am base + en/ru mock locales).
  */
 const am = {
+    home: {
+      pageTitle: "Choosy — էլեկտրոնիկայի առցանց խանութ",
+    },
     header: {
       brandAriaLabel: "Choozy - Main page",
       brandTitle: "Choozy - Electronics online store",
@@ -89,6 +92,7 @@ const am = {
       },
     },
     gridCatalog: {
+      heading: "Կատալոգ",
       items: {
         smartphones: "Սմարթֆոն",
         speakers: "Շարժական բարձրախոսներ",
@@ -97,6 +101,8 @@ const am = {
       },
     },
     filterPage: {
+      pageTitle: "Ապրանքների կատալոգ",
+      resultsHeading: "Արդյունքներ",
       mainAriaLabel: "Ապրանքների կատալոգ և ֆիլտրեր",
       sidebarAriaLabel: "Ֆիլտրեր",
       toolbarAriaLabel: "Ցանկի գործիքներ",
@@ -246,9 +252,9 @@ const am = {
       tabFull: "Նկարագրություն",
       specsSectionAriaLabel: "Տեխնիկական բնութագրեր",
       variants: {
-        v256a: "256GB / 12 GB",
-        v256b: "256GB / 12 GB",
-        v1tb: "1 TB / 12 GB",
+        v256a: "256 / 12gb",
+        v256b: "256 / 12gb",
+        v1tb: "1TB / 12gb",
       },
       colors: {
         black: "Սև",
@@ -589,7 +595,7 @@ const am = {
           image: "Նկար",
           availability: "Հասանելիություն",
           memories: "Հիշողություն / կոնֆիգուրացիա*",
-          memoryPlaceholder: "256GB / 12 GB",
+          memoryPlaceholder: "256 / 12gb",
           colors: "Գույներ*",
         },
         availabilityOptions: {
@@ -701,6 +707,39 @@ const am = {
         avatarRemoved: "Լոգոն հեռացվեց։",
         avatarTooLarge: "Նկարը չափազանց մեծ է (առավելագույնը 200 ԿԲ)։",
       },
+    },
+    auth: {
+      closeAria: "Փակել պատուհանը",
+      backdropAria: "Փակել պատուհանը",
+    },
+    register: {
+      title: "Գրանցում",
+      subtitle: "Ստեղծեք նոր հաշիվ",
+      emailLabel: "Էլ. հասցե",
+      passwordLabel: "Գաղտնաբառ",
+      confirmPasswordLabel: "Կրկնել գաղտնաբառը",
+      submit: "Գրանցվել",
+      switchToLoginPrompt: "Արդեն ունե՞ք հաշիվ",
+      switchToLoginButton: "Մուտք",
+      errors: {
+        required: "Լրացրեք բոլոր դաշտերը։",
+        passwordMismatch: "Գաղտնաբառերը չեն համընկնում։",
+      },
+    },
+    login: {
+      title: "Մուտք",
+      subtitle: "Մուտք գործեք ձեր անձնական հաշիվ",
+      emailLabel: "Էլ. հասցե",
+      passwordLabel: "Գաղտնաբառ",
+      submit: "Մուտք",
+      switchToRegisterPrompt: "Դեռ հաշիվ չունե՞ք",
+      switchToRegisterButton: "Գրանցվել",
+      errors: {
+        required: "Լրացրեք բոլոր դաշտերը։",
+      },
+    },
+    scrollToTop: {
+      ariaLabel: "Գնալ վերև",
     },
     footer: {
       columns: {

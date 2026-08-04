@@ -198,7 +198,8 @@ export const mockBrands = [
   { id: "dell", name: "Dell", logo: "💻", productCount: 1 },
 ];
 
-const PRODUCT_IMG_CROP = "auto=format&fit=crop&w=900&h=675&q=80";
+/** High-quality display crop; ProgressiveImage derives a tiny preview automatically. */
+const PRODUCT_IMG_CROP = "auto=format&fit=crop&w=1200&h=900&q=85";
 
 const PRODUCT_IMAGES = {
   iphoneOrange: `https://images.unsplash.com/photo-1592750475338-74b7b21085ab?${PRODUCT_IMG_CROP}`,

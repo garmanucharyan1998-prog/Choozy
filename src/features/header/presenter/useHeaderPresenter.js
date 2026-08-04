@@ -21,6 +21,7 @@ export const useHeaderPresenter = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showNoResults, setShowNoResults] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const currentLanguage = useMemo(
     () => LANGUAGES[language] || LANGUAGES[DEFAULT_LANGUAGE],
@@ -55,6 +56,20 @@ export const useHeaderPresenter = () => {
   const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
   }, []);
+
+  const openLoginModal = useCallback(() => {
+    setIsLanguageDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+    setIsLoginModalOpen(true);
+  }, []);
+
+  const closeLoginModal = useCallback(() => {
+    setIsLoginModalOpen(false);
+  }, []);
+
+  const handleLoginSuccess = useCallback(() => {
+    navigate("/account");
+  }, [navigate]);
 
   const handleSearchInputChange = useCallback(async (e) => {
     const query = e.target.value.trim();
@@ -174,6 +189,10 @@ export const useHeaderPresenter = () => {
     handleSuggestionClick,
     handleClearSearch,
     handleSearchFocus,
+    isLoginModalOpen,
+    openLoginModal,
+    closeLoginModal,
+    handleLoginSuccess,
   };
 };
 

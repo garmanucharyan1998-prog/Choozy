@@ -1,5 +1,8 @@
 /** Russian mock copy — merged onto Armenian base. productRefreshed is intentionally omitted. */
 export const ruOverrides = {
+  home: {
+    pageTitle: "Choosy — интернет-магазин электроники",
+  },
   header: {
     aboutLinkLabel: "О нас",
     search: {
@@ -37,6 +40,7 @@ export const ruOverrides = {
     },
   },
   gridCatalog: {
+    heading: "Каталог",
     items: {
       smartphones: "Смартфоны",
       speakers: "Портативные колонки",
@@ -45,6 +49,8 @@ export const ruOverrides = {
     },
   },
   filterPage: {
+    pageTitle: "Каталог товаров",
+    resultsHeading: "Результаты",
     mainAriaLabel: "Каталог товаров и фильтры",
     sidebarAriaLabel: "Фильтры",
     toolbarAriaLabel: "Инструменты списка",
@@ -588,6 +594,39 @@ export const ruOverrides = {
         terms: "Условия использования",
       },
     },
+  },
+  auth: {
+    closeAria: "Закрыть окно",
+    backdropAria: "Закрыть окно",
+  },
+  register: {
+    title: "Регистрация",
+    subtitle: "Создайте новый аккаунт",
+    emailLabel: "Эл. почта",
+    passwordLabel: "Пароль",
+    confirmPasswordLabel: "Подтвердите пароль",
+    submit: "Зарегистрироваться",
+    switchToLoginPrompt: "Уже есть аккаунт?",
+    switchToLoginButton: "Войти",
+    errors: {
+      required: "Заполните все поля.",
+      passwordMismatch: "Пароли не совпадают.",
+    },
+  },
+  login: {
+    title: "Вход",
+    subtitle: "Войдите в личный кабинет",
+    emailLabel: "Эл. почта",
+    passwordLabel: "Пароль",
+    submit: "Войти",
+    switchToRegisterPrompt: "Нет аккаунта?",
+    switchToRegisterButton: "Регистрация",
+    errors: {
+      required: "Заполните все поля.",
+    },
+  },
+  scrollToTop: {
+    ariaLabel: "Наверх",
   },
 };
 

@@ -2,7 +2,7 @@ import { FaBalanceScale, FaHeart, FaRegHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { ProductCardImage } from "shared/ui/product-card-image";
 
-const FONT_STACK = '"Montserrat arm", Montserrat, sans-serif';
+const FONT_STACK = "MontserratArm, Montserrat, sans-serif";
 
 const TITLE_STYLE = {
   fontFamily: FONT_STACK,
@@ -75,16 +75,18 @@ const ImgWrap = ({ listMode, product }) => (
   </ProductCardImage>
 );
 
-const ProductTextLink = ({ product, omitTopMargin }) => {
+const ProductTextLink = ({ product, omitTopPadding }) => {
   const inner = (
-    <div className={`${omitTopMargin ? "mt-0" : "mt-3"} flex min-w-0 flex-col gap-1 text-start`}>
+    <div
+      className={`flex min-w-0 flex-col gap-1 text-start ${omitTopPadding ? "" : "pt-3"}`}
+    >
       <h3 className="m-0 line-clamp-2" style={TITLE_STYLE}>
         {product.title}
       </h3>
       <p className="m-0 line-clamp-2" style={DESC_STYLE} title={product.description}>
         {product.description}
       </p>
-      <p className="m-0 mt-0.5" style={PRICE_STYLE}>
+      <p className="m-0 pt-0.5" style={PRICE_STYLE}>
         {product.price}
       </p>
     </div>
@@ -131,7 +133,7 @@ const FilterProductCard = ({
       <article className="flex flex-row gap-4 rounded-xl border border-border-blue/40 bg-white p-3 text-start shadow-sm sm:p-4">
         <ImgWrap listMode product={p} />
         <div className="flex min-w-0 flex-1 flex-col justify-center">
-          <ProductTextLink product={product} omitTopMargin />
+          <ProductTextLink product={product} omitTopPadding />
         </div>
       </article>
     );

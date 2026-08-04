@@ -1,8 +1,18 @@
 /* Favorites row — product count badge (avoids TSX parse issues with arbitrary Tailwind brackets) */
+.header-favorites-link__content {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.header-favorites-link__label {
+  display: none;
+}
+
 .header-favorites-count-badge {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 1.125rem;
   z-index: 10;
   box-sizing: border-box;
   display: grid;
@@ -10,9 +20,9 @@
   height: 1rem;
   width: 1rem;
   padding: 0;
-  transform: translate(42%, -48%);
+  transform: translate(-10%, -52%);
   border-radius: 0.25rem;
-  background-color: #000000;
+  background-color: #152147;
   font-size: 10px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -32,14 +42,36 @@
   font-size: 9px;
 }
 
+@media (min-width: 1440px) {
+  .header-favorites-link__label {
+    display: inline;
+    margin-left: 5px;
+  }
+
+  .header-favorites-count-badge {
+    left: auto;
+    right: 0;
+    transform: translate(12%, -78%);
+  }
+}
+
+.header-lang-switcher__text,
+.header-lang-switcher__chevron {
+  display: inline;
+}
+
 /* Webkit search input overrides — no Tailwind equivalent */
 .search-input::-webkit-search-cancel-button,
 .search-input::-webkit-search-decoration {
   display: none;
 }
 
+.header-search-submit {
+  white-space: nowrap;
+}
+
 /* Tooltip pseudo-elements — content: attr() has no Tailwind equivalent */
-@media (max-width: 1440px) {
+@media (max-width: 1439px) {
   .tooltip-container::after {
     content: attr(data-tooltip);
     position: absolute;

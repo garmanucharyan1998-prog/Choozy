@@ -194,15 +194,19 @@ const ProductTableRowActions = ({ onEdit, onRefresh, onDelete, editAriaLabel, re
   </div>
 );
 
-const NotificationFeedCard = ({ title, timeLabel, body }) => (
-  <article className="rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
+const NotificationFeedCard = ({ title, timeLabel, body, headingLevel = 3 }) => {
+  const HeadingTag = headingLevel === 4 ? "h4" : "h3";
+
+  return (
+  <article className="flex flex-col gap-3 rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
     <div className="flex items-start justify-between gap-3 border-b border-[#d9dfea] pb-3">
-      <h3 className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">{title}</h3>
+      <HeadingTag className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">{title}</HeadingTag>
       <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">{timeLabel}</span>
     </div>
-    <p className="m-0 mt-3 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
+    <p className="m-0 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
   </article>
-);
+  );
+};
 
 const ShopProductPriceButton = ({
   product,
@@ -262,10 +266,10 @@ const ToggleRow = ({ title, description, enabled, onToggle }) => (
     onClick={onToggle}
     aria-pressed={enabled}
   >
-    <span>
+    <span className="flex flex-col gap-1">
       <span className="block text-sm font-bold text-navy">{title}</span>
       {description ? (
-        <span className="mt-1 block text-xs leading-relaxed text-text-muted">{description}</span>
+        <span className="block text-xs leading-relaxed text-text-muted">{description}</span>
       ) : null}
     </span>
     <span
@@ -405,7 +409,7 @@ const ShopAccountDashboardWidget = () => {
   );
 
   const renderNotificationSettings = () => (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {notificationKeys.map((key) => (
         <ToggleRow
           key={key}
@@ -421,13 +425,14 @@ const ShopAccountDashboardWidget = () => {
   const renderShopNotificationsFeed = () => {
     const body = t("shopAccount.notificationsPage.feed.sampleBody");
     return (
-      <div className="space-y-3 sm:space-y-4" role="feed" aria-label={t("shopAccount.notificationsPage.title")}>
+      <div className="flex flex-col gap-3 sm:gap-4" role="feed" aria-label={t("shopAccount.notificationsPage.title")}>
         {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
           <NotificationFeedCard
             key={itemKey}
             title={t(`shopAccount.notificationsPage.feed.items.${itemKey}.title`)}
             timeLabel={t(`shopAccount.notificationsPage.feed.items.${itemKey}.timeLabel`)}
             body={body}
+            headingLevel={4}
           />
         ))}
       </div>
@@ -436,6 +441,7 @@ const ShopAccountDashboardWidget = () => {
 
   const renderShopNotificationsInner = () => (
     <>
+      <h3 className="sr-only">{t("shopAccount.notificationsPage.title")}</h3>
       <div className="border-b border-[#e1e6ef] px-3 pt-2 sm:px-5 md:px-8">
         <div
           className="grid w-full grid-cols-2 sm:flex sm:w-auto sm:gap-8"
@@ -503,10 +509,10 @@ const ShopAccountDashboardWidget = () => {
         </button>
       </div>
       {shopState.profile.description ? (
-        <p className="mt-5 text-sm leading-relaxed text-navy md:text-[15px]">{shopState.profile.description}</p>
+        <p className="pt-5 text-sm leading-relaxed text-navy md:text-[15px]">{shopState.profile.description}</p>
       ) : null}
-      <div className="my-5 border-t border-[#e1e6ef]" />
-      <dl className="space-y-[22.5px]">
+      <div className="mb-5 border-t border-[#e1e6ef] pt-5" />
+      <dl className="flex flex-col gap-[22.5px]">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <dt className="text-sm font-semibold text-text-muted">{t("shopAccount.fields.emailShort")}</dt>
           <dd className="text-sm font-bold text-navy">{shopState.profile.email || "—"}</dd>
@@ -582,11 +588,11 @@ const ShopAccountDashboardWidget = () => {
           </div>
         </label>
       </div>
-      <label className="mt-4 flex flex-col gap-1.5 text-start text-sm font-semibold text-navy sm:col-span-2">
+      <label className="flex flex-col gap-1.5 pt-4 text-start text-sm font-semibold text-navy sm:col-span-2">
         <span>{t("shopAccount.fields.website")}</span>
         <input name="website" type="text" value={profileDraft.website} onChange={updateProfileDraft} className={inputClass} />
       </label>
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 pt-6">
         <button
           type="button"
           onClick={cancelShopEdit}
@@ -603,6 +609,7 @@ const ShopAccountDashboardWidget = () => {
 
   const renderShopDetailsSection = () => (
     <MainCard className="w-full overflow-hidden p-0">
+      <h2 className="sr-only">{t("shopAccount.sidebar.details")}</h2>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e1e6ef] px-5 pt-5 md:px-8 md:pt-6">
         <div className="flex gap-6" role="tablist" aria-label={t("shopAccount.shopTabsAria")}>
           <button
@@ -752,13 +759,15 @@ const ShopAccountDashboardWidget = () => {
           key={product.id}
           className="flex flex-col gap-3 border-b border-border-blue px-4 py-4 last:border-b-0 sm:gap-4 sm:px-5 md:px-6"
         >
-          <button
-            type="button"
-            onClick={() => openProductEdit(product.id)}
-            className="m-0 w-full cursor-pointer border-0 bg-transparent p-0 text-start text-base font-bold leading-snug text-navy transition hover:text-link-blue hover:underline"
-          >
-            {product.title}
-          </button>
+          <h3 className="m-0">
+            <button
+              type="button"
+              onClick={() => openProductEdit(product.id)}
+              className="m-0 w-full cursor-pointer border-0 bg-transparent p-0 text-start text-base font-bold leading-snug text-navy transition hover:text-link-blue hover:underline"
+            >
+              {product.title}
+            </button>
+          </h3>
 
           {product.variants.length > 0 ? (
             <div
@@ -804,7 +813,7 @@ const ShopAccountDashboardWidget = () => {
 
     return (
       <MainCard className="w-full min-w-0 overflow-visible 2xl:overflow-hidden">
-        <div className="px-4 pt-4 sm:px-5 sm:pt-5 md:px-8 md:pt-6">
+        <div className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-5 sm:pt-5 md:gap-5 md:px-8 md:pt-6">
           <div className="flex flex-col gap-3 min-[425px]:flex-row min-[425px]:flex-wrap min-[425px]:items-center min-[425px]:justify-between">
             <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("shopAccount.products.listTitle")}</h2>
             <button
@@ -817,7 +826,7 @@ const ShopAccountDashboardWidget = () => {
             </button>
           </div>
           {sortedShopProducts.length > 0 ? (
-            <p className="m-0 mt-4 text-xs leading-relaxed text-text-muted md:mt-5">
+            <p className="m-0 text-xs leading-relaxed text-text-muted">
               {t("shopAccount.products.staleHint")}
             </p>
           ) : null}
@@ -825,7 +834,7 @@ const ShopAccountDashboardWidget = () => {
 
         {showProductForm ? (
           <form
-            className="relative z-[1] border-b border-[#e1e6ef] bg-[#fbfcff] px-4 py-4 sm:px-5 sm:py-5 md:px-8"
+            className="relative z-[1] flex flex-col gap-4 border-b border-[#e1e6ef] bg-[#fbfcff] px-4 py-4 sm:px-5 sm:py-5 md:px-8"
             onSubmit={submitProductForm}
           >
             <h3 className="mb-1 text-base font-bold text-navy">
@@ -905,18 +914,18 @@ const ShopAccountDashboardWidget = () => {
             </div>
 
             {selectedCatalogProduct?.image ? (
-              <div className="mt-4 flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 <img
                   src={selectedCatalogProduct.image}
                   alt=""
-                  className="h-16 w-16 shrink-0 rounded-lg border border-[#e1e6ef] object-cover"
+                  className="h-16 w-16 shrink-0 rounded-lg border border-[#e1e6ef] bg-white object-contain object-center"
                 />
                 <p className="m-0 text-xs leading-relaxed text-text-muted">{t("shopAccount.products.catalogImageNote")}</p>
               </div>
             ) : null}
 
-            <div className="mt-4 min-w-0">
-              <p className="mb-2 text-sm font-semibold text-navy">{t("shopAccount.products.fields.memories")}</p>
+            <div className="min-w-0">
+              <h4 className="mb-2 text-sm font-semibold text-navy">{t("shopAccount.products.fields.memories")}</h4>
               <div
                 className="flex flex-wrap gap-1.5 sm:gap-2"
                 role="group"
@@ -944,8 +953,8 @@ const ShopAccountDashboardWidget = () => {
               </div>
             </div>
 
-            <div className="mt-4 min-w-0">
-              <p className="mb-2 text-sm font-semibold text-navy">{t("shopAccount.products.fields.colors")}</p>
+            <div className="min-w-0">
+              <h4 className="mb-2 text-sm font-semibold text-navy">{t("shopAccount.products.fields.colors")}</h4>
               <div
                 className="grid grid-cols-1 gap-2 min-[425px]:grid-cols-2 md:gap-2.5 2xl:flex 2xl:flex-wrap 2xl:gap-3"
                 role="group"
@@ -977,7 +986,7 @@ const ShopAccountDashboardWidget = () => {
               </div>
             </div>
 
-            <div className="mt-6 flex flex-col-reverse gap-2 min-[425px]:flex-row min-[425px]:flex-wrap min-[425px]:gap-3">
+            <div className="flex flex-col-reverse gap-2 pt-2 min-[425px]:flex-row min-[425px]:flex-wrap min-[425px]:gap-3">
               <button
                 type="button"
                 onClick={cancelProductForm}
@@ -1000,7 +1009,7 @@ const ShopAccountDashboardWidget = () => {
             <p className="m-0 text-sm leading-relaxed text-text-muted">{t("shopAccount.products.empty")}</p>
           </div>
         ) : sortedShopProducts.length > 0 ? (
-          <div className="mt-4 w-full max-w-full md:mt-5">
+          <div className="w-full max-w-full pt-4 md:pt-5">
             <ul
               className="m-0 list-none overflow-hidden rounded-lg border border-[#eef1f6] bg-white p-0 xl:hidden"
               aria-label={t("shopAccount.products.tableAria")}
@@ -1054,15 +1063,17 @@ const ShopAccountDashboardWidget = () => {
                       className="border-b border-[#eef1f6] transition-colors last:border-b-0 hover:bg-[#fafbfd]"
                     >
                       <td className={productCellClass}>
-                        <button
-                          type="button"
-                          onClick={() => openProductEdit(product.id)}
-                          className="m-0 cursor-pointer border-0 bg-transparent p-0 text-start font-bold leading-snug text-[#0f172a] transition hover:text-navy hover:underline"
-                        >
-                          {product.title}
-                        </button>
+                        <h3 className="m-0 text-[length:inherit] font-[inherit] leading-[inherit]">
+                          <button
+                            type="button"
+                            onClick={() => openProductEdit(product.id)}
+                            className="m-0 cursor-pointer border-0 bg-transparent p-0 text-start font-bold leading-snug text-[#0f172a] transition hover:text-navy hover:underline"
+                          >
+                            {product.title}
+                          </button>
+                        </h3>
                         {product.variants.length > 0 ? (
-                          <div className="mt-2 flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-1.5 pt-2">
                             {product.variants.map((variant, vIdx) => (
                               <span key={`${product.id}-v-${vIdx}`} className={variantChipClassCompact}>
                                 {variant}

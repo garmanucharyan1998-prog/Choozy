@@ -2,6 +2,7 @@ import { useMemo, useRef } from "react";
 import { useProductDetailPresenter } from "features/product-detail";
 import { useLanguage } from "contexts";
 import { PriceHistoryChart } from "shared/ui/price-history-chart";
+import { ProgressiveImage } from "shared/ui/progressive-image";
 import { FaBalanceScale, FaHeart, FaRegHeart } from "react-icons/fa";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -123,7 +124,12 @@ const ProductDetailWidget = () => {
               aria-pressed={index === activeImageIndex}
               aria-label={t("productDetail.galleryThumbAria")}
             >
-              <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" />
+              <ProgressiveImage
+                src={src}
+                alt=""
+                imgClassName="h-full w-full object-contain object-center"
+                loading="lazy"
+              />
             </button>
           </SwiperSlide>
         ))}
@@ -132,7 +138,7 @@ const ProductDetailWidget = () => {
   );
 
   return (
-    <article className="w-full text-start">
+    <article className="flex w-full flex-col gap-8 text-start">
       <div className="flex w-full flex-col gap-4 sm:gap-5 lg:flex-row lg:items-stretch lg:gap-x-12">
         <div className="flex min-w-0 flex-1 flex-col gap-4 lg:min-h-0 lg:basis-[52%]">
           <figure
@@ -148,14 +154,15 @@ const ProductDetailWidget = () => {
             >
               {wishlist ? <FaHeart className="h-5 w-5 text-active-blue" /> : <FaRegHeart className="h-5 w-5" />}
             </button>
-            <img
+            <ProgressiveImage
               src={mainImageSrc}
               alt={t("productDetail.mainImageAlt")}
-              className="block max-h-[min(72vh,560px)] max-w-full object-contain object-center"
+              imgClassName="block max-h-[min(72vh,560px)] max-w-full object-contain object-center"
               width={1200}
               height={800}
               decoding="async"
               fetchPriority="high"
+              loading="eager"
             />
           </figure>
 
@@ -224,15 +231,15 @@ const ProductDetailWidget = () => {
             </div>
 
             <div className="flex flex-wrap gap-8 border-y border-border-blue py-4">
-              <div>
+              <div className="flex flex-col gap-1">
                 <p className="m-0 text-xs text-text-muted">{t("productDetail.priceFrom")}</p>
-                <p className="m-0 mt-1 text-xl font-semibold text-link-blue md:text-2xl">
+                <p className="m-0 text-xl font-semibold text-link-blue md:text-2xl">
                   {priceMinFormatted} {t("productDetail.currencySuffix")}
                 </p>
               </div>
-              <div>
+              <div className="flex flex-col gap-1">
                 <p className="m-0 text-xs text-text-muted">{t("productDetail.priceTo")}</p>
-                <p className="m-0 mt-1 text-xl font-semibold text-link-blue md:text-2xl">
+                <p className="m-0 text-xl font-semibold text-link-blue md:text-2xl">
                   {priceMaxFormatted} {t("productDetail.currencySuffix")}
                 </p>
               </div>
@@ -251,13 +258,13 @@ const ProductDetailWidget = () => {
         headingId: "product-detail-specs-heading-lg",
         gridClassName: specsGridLgColumnClassName,
         compact: true,
-        className: "mt-8 hidden min-w-0 border-t border-[#e6e9f2] pt-8 lg:block xl:hidden",
+        className: "hidden min-w-0 border-t border-[#e6e9f2] pt-8 lg:block xl:hidden",
       })}
 
       {renderDescriptionSection({
         headingId: "product-detail-specs-heading",
         gridClassName: specsGridFullClassName,
-        className: "mt-8 min-w-0 lg:hidden xl:block",
+        className: "min-w-0 border-t border-[#e6e9f2] pt-8 lg:hidden xl:block",
       })}
     </article>
   );
