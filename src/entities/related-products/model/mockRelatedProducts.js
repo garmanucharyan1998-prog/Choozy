@@ -7,7 +7,7 @@ import { getProductDetailHref } from "entities/product-detail";
 
 const DESC = "Recommended product with strong specs, realistic pricing, and a clean marketplace preview.";
 
-const IMG_CROP = "auto=format&fit=crop&w=900&h=675&q=80";
+const IMG_CROP = "auto=format&fit=crop&w=1200&h=900&q=85";
 
 const IMG = {
   iphoneOrange: `https://images.unsplash.com/photo-1592750475338-74b7b21085ab?${IMG_CROP}`,

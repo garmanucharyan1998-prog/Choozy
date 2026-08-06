@@ -16,7 +16,7 @@ const TopProducts = () => {
       loading={loading}
       error={error}
       onRetry={onRetry}
-      sectionClassName="flex justify-center my-5 py-5 bg-white lg:my-20 lg:py-10"
+      sectionClassName="mb-5 flex justify-center bg-white pb-5 pt-10 lg:mb-20 lg:pb-10 lg:pt-[7.5rem]"
     />
   );
 };

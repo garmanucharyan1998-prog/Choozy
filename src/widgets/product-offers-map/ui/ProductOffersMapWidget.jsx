@@ -17,28 +17,26 @@ const ProductOffersMapWidget = () => {
   );
 
   return (
-    <section
-      aria-labelledby="product-offers-map-title"
-      className="mt-10 md:mt-14"
-    >
+    <section aria-labelledby="product-offers-map-title">
       <h2 id="product-offers-map-title" className="sr-only">
         {t("productOffers.sectionAriaLabel")}
       </h2>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8 lg:items-stretch">
         <div
-          id="offers-panel"
-          className="min-w-0 rounded-2xl border border-border-blue p-4 md:p-6"
+          className="flex min-w-0 flex-col gap-5 rounded-2xl border border-border-blue p-4 md:p-6"
           style={{ backgroundColor: "rgba(245, 245, 245, 1)" }}
         >
-          <h3 className="m-0 text-lg font-semibold text-text-dark md:text-xl">
-            {t("productDetail.title")}
-          </h3>
-          <p className="m-0 mt-2 text-sm font-semibold text-navy md:text-base">
-            {t("productOffers.tabs.specs")}
-          </p>
+          <div className="flex flex-col gap-2">
+            <h3 className="m-0 text-lg font-semibold text-text-dark md:text-xl">
+              {t("productDetail.title")}
+            </h3>
+            <h4 className="m-0 text-sm font-semibold text-navy md:text-base">
+              {t("productOffers.tabs.specs")}
+            </h4>
+          </div>
 
-          <dl className="m-0 mt-5 flex flex-col gap-4">
+          <dl className="m-0 flex flex-col gap-4">
             {specsRows.map((row) => (
               <div
                 key={row.labelKey}

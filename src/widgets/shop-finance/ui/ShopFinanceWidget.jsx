@@ -29,7 +29,7 @@ const ShopFinanceWidget = () => {
   const [financeTab, setFinanceTab] = useState(FINANCE_TABS.PLAN);
 
   return (
-    <div className="space-y-4 md:space-y-5">
+    <div className="flex flex-col gap-4 md:gap-5">
       <div
         className="flex w-fit max-w-full items-center overflow-x-auto"
         role="tablist"
@@ -92,7 +92,7 @@ const ShopFinanceWidget = () => {
             {PAYMENT_HISTORY_ROWS.map((row) => (
               <li
                 key={row.id}
-                className="rounded-[12px] border border-[#E2E8F0] bg-white px-4 py-4 font-sans shadow-sm"
+                className="flex flex-col gap-3 rounded-[12px] border border-[#E2E8F0] bg-white px-4 py-4 font-sans shadow-sm"
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="m-0 min-w-0 flex-1 text-sm font-medium leading-snug text-navy">
@@ -102,7 +102,7 @@ const ShopFinanceWidget = () => {
                     {t("shopAccount.finance.payments.sampleAmount")}
                   </p>
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-3">
+                <div className="flex items-center justify-between gap-3">
                   <span className="text-xs leading-none text-[#64748B]">{t("shopAccount.finance.payments.sampleDate")}</span>
                   <PaymentStatusBadge status={row.status} t={t} />
                 </div>

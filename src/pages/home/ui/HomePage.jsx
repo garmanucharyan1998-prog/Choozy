@@ -1,5 +1,3 @@
-import { useLanguage } from "contexts";
-import { PageSeo } from "shared/lib/seo";
 import { AboutUsWidget } from "widgets/about-us";
 import { FooterWidget } from "widgets/footer";
 import { GridCatalogWidget } from "widgets/grid-catalog";
@@ -8,6 +6,7 @@ import { NavPanelWidget } from "widgets/nav-panel";
 import { ServicesOverviewWidget } from "widgets/services-overview";
 import { TopProductsWidget } from "widgets/top-products";
 import { VarietyWidget } from "widgets/variety";
+import { useLanguage } from "contexts";
 import { useHomePagePresenter } from "pages/home/presenter/useHomePagePresenter";
 
 const HomePage = () => {
@@ -26,16 +25,12 @@ const HomePage = () => {
 
   return (
     <div className="flex min-h-screen min-w-[320px] flex-col bg-white text-center">
-      <PageSeo title={t("homePage.seoTitle")} description={t("homePage.seoDescription")} path="/" />
-      <button
-        type="button"
-        className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[65] m-0 cursor-pointer border-0 bg-black/45 p-0 transition-opacity duration-[400ms] ease-in-out appearance-none md:hidden ${
-          isAnyMobilePanelOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+      <div
+        className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[65] bg-black/45 transition-opacity duration-[400ms] ease-in-out md:hidden ${
+          isAnyMobilePanelOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeAllMobilePanels}
-        aria-label={t("homePage.closeMobileBackdropAriaLabel")}
-        aria-hidden={!isAnyMobilePanelOpen}
-        tabIndex={isAnyMobilePanelOpen ? 0 : -1}
+        aria-hidden="true"
       />
 
       <div
@@ -64,7 +59,7 @@ const HomePage = () => {
       </div>
 
       <main className="flex flex-1 flex-col bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
-        <h1 className="sr-only">{t("homePage.mainHeading")}</h1>
+        <h1 className="sr-only">{t("home.pageTitle")}</h1>
         <GridCatalogWidget />
         <TopProductsWidget />
         <AboutUsWidget />

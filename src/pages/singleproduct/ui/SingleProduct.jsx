@@ -58,7 +58,7 @@ const SingleProduct = () => {
 
       <main className="flex flex-1 flex-col bg-white px-2.5 py-6 text-start sm:px-[15px] md:px-[30px] md:py-10 lg:px-[50px] 2xl:px-[100px]">
         <ProductOffersVariantFilterProvider>
-          <div className="cont-width-default mx-auto w-full">
+          <div className="cont-width-default mx-auto flex w-full flex-col gap-10 md:gap-14">
             <ProductDetailWidget />
             <ProductOffersMapWidget />
             <BestOffersWidget />

@@ -360,7 +360,7 @@ const BestOffersWidget = () => {
   );
 
   return (
-    <section aria-labelledby="best-offers-title" className="mt-10 md:mt-14">
+    <section aria-labelledby="best-offers-title">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <h2
           id="best-offers-title"
@@ -390,7 +390,7 @@ const BestOffersWidget = () => {
             <ul
               role="listbox"
               aria-label={t("productOffers.bestOffers.sortMenuAriaLabel")}
-              className="absolute right-0 top-full z-20 mt-2 w-56 list-none rounded-xl border border-border-blue bg-white p-1 shadow-lg"
+              className="absolute right-0 top-[calc(100%+0.5rem)] z-20 w-56 list-none rounded-xl border border-border-blue bg-white p-1 shadow-lg"
             >
               {sortOptions.map((option) => (
                 <li key={option.id}>
@@ -414,7 +414,7 @@ const BestOffersWidget = () => {
         </div>
       </header>
 
-      <hr className="my-4 border-0 border-t border-border-blue md:my-6" />
+      <hr className="mb-4 border-0 border-t border-border-blue pt-4 md:mb-6 md:pt-6" />
 
       <ul
         className="m-0 flex list-none flex-col p-0"
@@ -498,7 +498,7 @@ const BestOffersWidget = () => {
       </ul>
 
       {canLoadMore || canShowLess ? (
-        <div className="mt-4 flex justify-center md:justify-end">
+        <div className="flex justify-center pt-4 md:justify-end">
           {canShowLess ? (
             <button type="button" onClick={showLess} className={SEE_MORE_BTN_CLASS}>
               {t("productOffers.bestOffers.seeLess")}

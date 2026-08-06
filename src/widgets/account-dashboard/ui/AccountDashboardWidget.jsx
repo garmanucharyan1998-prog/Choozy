@@ -80,12 +80,12 @@ const AccountGridProductCard = ({
         </button>
       </div>
     </ProductCardImage>
-    <Link to={detailTo} className="mt-3 flex min-w-0 flex-col gap-1 no-underline outline-none">
+    <Link to={detailTo} className="flex min-w-0 flex-col gap-1 pt-3 no-underline outline-none">
       <h3 className="m-0 line-clamp-2 text-base font-bold text-[rgba(21,33,71,1)]">{item.title}</h3>
       <p className="m-0 line-clamp-2 text-sm text-[rgba(105,105,105,1)]" title={item.description}>
         {item.description}
       </p>
-      <p className="m-0 mt-0.5 text-base font-semibold text-link-blue">{item.price}</p>
+      <p className="m-0 pt-0.5 text-base font-semibold text-link-blue">{item.price}</p>
     </Link>
   </article>
 );
@@ -97,12 +97,12 @@ const MainCard = ({ children, className = "" }) => (
 );
 
 const NotificationFeedCard = ({ title, timeLabel, body }) => (
-  <article className="rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
+  <article className="flex flex-col gap-3 rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
     <div className="flex items-start justify-between gap-3 border-b border-[#d9dfea] pb-3">
       <h3 className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">{title}</h3>
       <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">{timeLabel}</span>
     </div>
-    <p className="m-0 mt-3 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
+    <p className="m-0 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
   </article>
 );
 
@@ -113,10 +113,10 @@ const ToggleRow = ({ title, description, enabled, onToggle }) => (
     onClick={onToggle}
     aria-pressed={enabled}
   >
-    <span>
+    <span className="flex flex-col gap-1">
       <span className="block text-sm font-bold text-navy">{title}</span>
       {description ? (
-        <span className="mt-1 block text-xs leading-relaxed text-text-muted">{description}</span>
+        <span className="block text-xs leading-relaxed text-text-muted">{description}</span>
       ) : null}
     </span>
     <span
@@ -253,17 +253,17 @@ const AccountDashboardWidget = () => {
           aria-label={t("account.wishlist.cancelButton")}
           onClick={cancelRemoveWishlistItem}
         />
-        <div className="relative z-[1] w-full max-w-md rounded-[12px] border border-[#e1e6ef] bg-white p-5 shadow-lg sm:p-6">
+        <div className="relative z-[1] flex w-full max-w-md flex-col gap-3 rounded-[12px] border border-[#e1e6ef] bg-white p-5 shadow-lg sm:p-6">
           <h2 id="wishlist-remove-title" className="m-0 text-lg font-bold text-navy">
             {t("account.wishlist.confirmTitle")}
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-text-muted">
+          <p className="m-0 text-sm leading-relaxed text-text-muted">
             {t("account.wishlist.confirmMessage")}
           </p>
           {pendingWishlistItem?.title ? (
-            <p className="mt-2 text-sm font-semibold text-navy">{pendingWishlistItem.title}</p>
+            <p className="m-0 text-sm font-semibold text-navy">{pendingWishlistItem.title}</p>
           ) : null}
-          <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-2 pt-3 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={cancelRemoveWishlistItem}
@@ -322,7 +322,7 @@ const AccountDashboardWidget = () => {
   );
 
   const renderNotificationSettings = () => (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-3">
       {notificationKeys.map((key) => (
         <ToggleRow
           key={key}
@@ -338,7 +338,7 @@ const AccountDashboardWidget = () => {
   const renderNotificationsFeed = () => {
     const body = t("account.notificationsPage.feed.sampleBody");
     return (
-      <div className="space-y-3 sm:space-y-4" role="feed" aria-label={t("account.notificationsPage.title")}>
+      <div className="flex flex-col gap-3 sm:gap-4" role="feed" aria-label={t("account.notificationsPage.title")}>
         {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
           <NotificationFeedCard
             key={itemKey}
@@ -367,8 +367,8 @@ const AccountDashboardWidget = () => {
           {t("account.actions.edit")}
         </button>
       </div>
-      <div className="my-5 border-t border-[#e1e6ef]" />
-      <dl className="space-y-[22.5px]">
+      <div className="mb-5 border-t border-[#e1e6ef] pt-5" />
+      <dl className="flex flex-col gap-[22.5px]">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <dt className="text-sm font-semibold text-text-muted">{t("account.fields.emailShort")}</dt>
           <dd className="text-sm font-bold text-navy">{accountState.profile.email || "—"}</dd>
@@ -427,7 +427,7 @@ const AccountDashboardWidget = () => {
         </label>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 pt-6 pb-8">
         <button
           type="button"
           onClick={cancelProfileEdit}
@@ -440,7 +440,7 @@ const AccountDashboardWidget = () => {
         </button>
       </div>
 
-      <div className="my-8 border-t border-[#e1e6ef]" />
+      <div className="border-t border-[#e1e6ef] pt-8">
       <h3 className="mb-4 text-base font-bold text-navy">{t("account.password.sectionTitle")}</h3>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
@@ -456,8 +456,8 @@ const AccountDashboardWidget = () => {
           <input name="confirmPassword" type="password" value={passwordDraft.confirmPassword} onChange={updatePasswordField} className={inputClass} />
         </label>
       </div>
-      {passwordErrorKey ? <p className="mt-3 text-sm font-semibold text-red-600">{t(passwordErrorKey)}</p> : null}
-      <div className="mt-6 flex flex-wrap gap-3">
+      {passwordErrorKey ? <p className="pt-3 text-sm font-semibold text-red-600">{t(passwordErrorKey)}</p> : null}
+      <div className="flex flex-wrap gap-3 pt-6">
         <button
           type="button"
           onClick={cancelPasswordEdit}
@@ -474,11 +474,13 @@ const AccountDashboardWidget = () => {
           {t("account.actions.save")}
         </button>
       </div>
+      </div>
     </form>
   );
 
   const renderPersonalSection = () => (
     <MainCard>
+      <h2 className="sr-only">{t("account.sidebar.personal")}</h2>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e1e6ef] px-5 pt-5 md:px-8 md:pt-6">
         <div className="flex gap-6" role="tablist" aria-label={t("account.personalTabsAria")}>
           <button
@@ -594,7 +596,7 @@ const AccountDashboardWidget = () => {
             })}
           </div>
           {canLoadMoreRecent || canShowLessRecent ? (
-            <div className="mt-4 flex justify-end gap-3">
+            <div className="flex justify-end gap-3 pt-4">
               {canShowLessRecent ? (
                 <button
                   type="button"
@@ -626,7 +628,7 @@ const AccountDashboardWidget = () => {
         <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("account.subscription.planCardTitle")}</h2>
       </div>
       <div className="border-t border-[#e1e6ef]" role="presentation" />
-      <dl className="m-0 space-y-4 px-5 py-5 md:space-y-5 md:px-8 md:py-6">
+      <dl className="m-0 flex flex-col gap-4 px-5 py-5 md:gap-5 md:px-8 md:py-6">
         <div className="flex flex-col gap-0.5 text-start sm:flex-row sm:items-baseline sm:gap-6">
           <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">{t("account.subscription.planNameLabel")}</dt>
           <dd className="m-0 text-base font-bold text-[#171717]">{t("account.subscription.planName")}</dd>
@@ -654,6 +656,7 @@ const AccountDashboardWidget = () => {
       case sidebarIds.NOTIFICATIONS:
         return (
           <MainCard className="overflow-hidden p-0">
+            <h2 className="sr-only">{t("account.notificationsPage.title")}</h2>
             <div className="border-b border-[#e1e6ef] px-3 pt-4 sm:px-5 sm:pt-5 md:px-8 md:pt-6">
               <div
                 className="grid w-full grid-cols-2 sm:flex sm:w-auto sm:gap-8"

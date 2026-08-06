@@ -1,8 +1,17 @@
-/* Product card photos — background cover fills frame (no grey letterboxing on portrait images) */
+/* Product card photos — object-fit: contain shows the full product without cropping */
 .product-card-image {
   position: relative;
   overflow: hidden;
   background-color: #ffffff;
+}
+
+.product-card-image__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .product-card-image--grid {

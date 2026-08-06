@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import choozyMainLogoWhite from "shared/assets/logos/choozyMainLogoWhite.svg";
 import { useLanguage } from "contexts";
 import "./Footer.css";
@@ -59,32 +58,20 @@ const SocialLink = ({ href, label, iconPath }) => (
   </a>
 );
 
-const FooterLink = ({ href, label, id, withEmailIcon = false }) => {
-  const isExternal = href.startsWith("http") || href.startsWith("mailto:");
-  const isHash = href.startsWith("#");
-  const className = `${textLinkClassName}${withEmailIcon ? " gap-2" : ""}`;
-  const emailIcon = withEmailIcon && (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-    </svg>
-  );
-
-  if (isExternal || isHash) {
-    return (
-      <a id={id} href={href} className={className}>
-        {emailIcon}
-        {label}
-      </a>
-    );
-  }
-
-  return (
-    <Link id={id} to={href} className={className}>
-      {emailIcon}
-      {label}
-    </Link>
-  );
-};
+const FooterLink = ({ href, label, htmlId, withEmailIcon = false }) => (
+  <a
+    {...(htmlId ? { id: htmlId } : {})}
+    href={href}
+    className={`${textLinkClassName}${withEmailIcon ? " gap-2" : ""}`}
+  >
+    {withEmailIcon && (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+      </svg>
+    )}
+    {label}
+  </a>
+);
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -103,7 +90,7 @@ const Footer = () => {
             <div>
               <img
                 src={choozyMainLogoWhite}
-                alt="Choozy"
+                alt="Choosy"
                 className="block h-[38px] sm:h-[47px] w-auto rounded mr-auto mb-auto"
               />
             </div>
@@ -119,16 +106,13 @@ const Footer = () => {
             </div>
           </div>
 
-          <nav
-            className="flex flex-col gap-3 w-full sm:gap-5 md:flex-row md:gap-10 md:w-auto md:flex-1 md:justify-end lg:gap-20 lg:px-20"
-            aria-label={t("footer.linksNavigationAriaLabel")}
-          >
+          <nav className="flex flex-col gap-3 w-full sm:gap-5 md:flex-row md:gap-10 md:w-auto md:flex-1 md:justify-end lg:gap-20 lg:px-20">
             {footerColumns.map((column) => (
               <div key={column[0].id} className={columnClassName}>
                 {column.map((link) => (
                   <FooterLink
                     key={`${link.id}-${link.href}`}
-                    id={link.id}
+                    htmlId={link.id === "privacy" ? "privacy" : undefined}
                     href={link.href}
                     label={link.label}
                     withEmailIcon={link.withEmailIcon}

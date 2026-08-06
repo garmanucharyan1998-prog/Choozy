@@ -125,17 +125,17 @@ const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
 
                   <Link
                     to={detailPath || "#"}
-                    className="mt-2.5 flex grow flex-col text-inherit no-underline outline-none sm:mt-3"
+                    className="flex grow flex-col gap-1.5 pt-2.5 text-inherit no-underline outline-none sm:pt-3"
                     aria-labelledby={`product-title-${index}`}
                   >
-                    <h4
+                    <h3
                       id={`product-title-${index}`}
                       className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base"
                     >
                       {product.title}
-                    </h4>
+                    </h3>
                     <p
-                      className="my-1.5 line-clamp-2 overflow-hidden text-[11px] leading-[1.25em] text-text-muted sm:text-xs md:text-sm md:leading-[1.2em]"
+                      className="m-0 line-clamp-2 overflow-hidden text-[11px] leading-[1.25em] text-text-muted sm:text-xs md:text-sm md:leading-[1.2em]"
                       title={product.description}
                     >
                       {product.description}

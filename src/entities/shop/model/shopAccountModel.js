@@ -87,7 +87,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["256GB / 12 GB", "256GB / 12 GB", "1 TB / 12 GB"],
+    variants: ["256 / 12gb", "256 / 12gb", "1TB / 12gb"],
     colors: [
       { id: "yellow", hex: "#E8B923" },
       { id: "black", hex: "#1c1c1e" },
@@ -110,7 +110,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["256GB / 12 GB", "512GB / 12 GB"],
+    variants: ["256 / 12gb", "512 / 12gb"],
     colors: [
       { id: "gray", hex: "#8E8E93" },
       { id: "black", hex: "#1c1c1e" },
@@ -133,7 +133,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["128GB / 16 GB", "256GB / 16 GB"],
+    variants: ["128 / 16gb", "256 / 16gb"],
     colors: [
       { id: "black", hex: "#1c1c1e" },
       { id: "white", hex: "#F5F5F7" },
@@ -156,7 +156,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["256GB / 16 GB", "512GB / 24 GB"],
+    variants: ["256 / 16gb", "512 / 24gb"],
     colors: [
       { id: "starlight", hex: "#F5F0E8" },
       { id: "silver", hex: "#E3E4E6" },
@@ -199,7 +199,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["256GB / 8 GB", "512GB / 8 GB"],
+    variants: ["256 / 8gb", "512 / 8gb"],
     colors: [
       { id: "space-black", hex: "#1c1c1e" },
       { id: "silver", hex: "#E3E4E6" },
@@ -242,7 +242,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["32GB / 1 TB", "64GB / 2 TB"],
+    variants: ["32 / 1TB", "64 / 2TB"],
     colors: [
       { id: "platinum", hex: "#E8E8E8" },
       { id: "graphite", hex: "#3A3A3C" },
@@ -263,7 +263,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["128GB / 8 GB", "256GB / 8 GB"],
+    variants: ["128 / 8gb", "256 / 8gb"],
     colors: [
       { id: "black", hex: "#1c1c1e" },
       { id: "white", hex: "#F5F5F7" },
@@ -370,7 +370,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["32GB / 1 TB", "16GB / 512 GB"],
+    variants: ["32 / 1TB", "16 / 512gb"],
     colors: [
       { id: "eclipse", hex: "#2B2B2D" },
       { id: "white", hex: "#F5F5F7" },

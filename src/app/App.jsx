@@ -7,6 +7,7 @@ import { FilterProduct } from "pages/filterproduct";
 import { LanguageProvider } from "contexts";
 import { SingleProduct } from "pages/singleproduct";
 import { getDefaultProductDetailPath } from "entities/product-detail";
+import { ScrollToTopButton, ScrollToTopOnNavigate } from "shared/ui/scroll-to-top";
 
 /**
  * Surfaces React render errors instead of a blank screen.
@@ -26,7 +27,7 @@ class RouteRenderErrorBoundary extends React.Component {
       return (
         <div className="min-h-[50vh] bg-white px-5 py-10 text-start font-sans">
           <p className="text-lg font-semibold text-red-700">Something went wrong while rendering this page.</p>
-          <pre className="mt-3 max-w-[90vw] whitespace-pre-wrap break-words text-sm text-[#333]">
+          <pre className="max-w-[90vw] whitespace-pre-wrap break-words pt-3 text-sm text-[#333]">
             {String(this.state.error?.message || this.state.error)}
           </pre>
         </div>
@@ -38,7 +39,7 @@ class RouteRenderErrorBoundary extends React.Component {
 
 const UnknownRoute = () => (
   <div className="min-h-[40vh] flex flex-col items-center justify-center gap-4 px-4 font-sans text-center text-text-dark">
-    <p className="text-lg">No page at this address.</p>
+    <h1 className="m-0 text-lg font-normal">No page at this address.</h1>
     <p className="text-text-muted">
       <Link className="text-link-blue underline" to="/">
         Home
@@ -59,6 +60,7 @@ const App = () => (
   <LanguageProvider>
     <BrowserRouter>
       <RouteRenderErrorBoundary>
+        <ScrollToTopOnNavigate />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/singleproduct" element={<Navigate to={getDefaultProductDetailPath()} replace />} />
@@ -76,6 +78,7 @@ const App = () => (
           <Route path="/account/shop-account" element={<ShopAccountPage />} />
           <Route path="*" element={<UnknownRoute />} />
         </Routes>
+        <ScrollToTopButton />
       </RouteRenderErrorBoundary>
     </BrowserRouter>
   </LanguageProvider>

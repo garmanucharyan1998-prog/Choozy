@@ -84,9 +84,9 @@ function NavPanel({
         aria-label={t("navPanel.mobileCatalogAriaLabel")}
       >
         <div className="flex items-center justify-between mb-7">
-          <h3 className="m-0 text-[26px] sm:text-[34px] leading-none font-semibold text-navy">
+          <h2 className="m-0 text-[26px] sm:text-[34px] leading-none font-semibold text-navy">
             {t("navPanel.catalogLabel")}
-          </h3>
+          </h2>
           <button
             type="button"
             onClick={handleCatalogClose}
