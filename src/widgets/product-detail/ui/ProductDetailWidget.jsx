@@ -52,42 +52,40 @@ const ProductDetailWidget = () => {
     onCompareClick,
   } = useProductDetailPresenter();
 
+  /** Real product name — without it every product page would share one H1. */
+  const productTitle = product.listingTitle || t("productDetail.title");
+
   const handleThumbnailActivate = (index) => {
     selectThumbnail(index);
     thumbSwiperRef.current?.slideTo(index);
   };
 
-  const currentChartMonthKeys = getTrailingMonthKeys(product.priceHistoryAmd.length || 5);
-
-  const priceChartData = useMemo(
-    () =>
-      currentChartMonthKeys.map((key, index) => ({
-        name: t(`productDetail.chart.months.${key}`),
-        amount: product.priceHistoryAmd[index] ?? 0,
-        highlight: index === currentChartMonthKeys.length - 1,
-      })),
-    [currentChartMonthKeys, product.priceHistoryAmd, t],
-  );
+  /**
+   * Month keys are derived inside the memo — building the array outside made it a new
+   * reference on every render, so the memo below never actually cached anything.
+   */
+  const priceChartData = useMemo(() => {
+    const monthKeys = getTrailingMonthKeys(product.priceHistoryAmd.length || 5);
+    return monthKeys.map((key, index) => ({
+      name: t(`productDetail.chart.months.${key}`),
+      amount: product.priceHistoryAmd[index] ?? 0,
+      highlight: index === monthKeys.length - 1,
+    }));
+  }, [product.priceHistoryAmd, t]);
 
   const specsGridFullClassName =
-    "m-0 grid grid-cols-2 gap-x-6 gap-y-5 md:gap-x-8 xl:grid-cols-3 xl:gap-x-10 xl:gap-y-6";
+    "m-0 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 sm:gap-y-5 md:gap-x-8 xl:grid-cols-3 xl:gap-x-10 xl:gap-y-6";
 
-  const specsGridLgColumnClassName =
-    "m-0 grid grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-3 sm:gap-x-6 sm:gap-y-5";
-
-  const renderSpecRows = (rows, compact = false) =>
+  const renderSpecRows = (rows) =>
     rows.map((row) => (
-      <div
-        key={row.labelKey}
-        className={`min-w-0 leading-relaxed ${compact ? "text-[13px] sm:text-sm" : "text-sm lg:text-[15px]"}`}
-      >
+      <div key={row.labelKey} className="min-w-0 text-sm leading-relaxed lg:text-[15px]">
         <dt className="inline font-normal text-text-muted">{t(row.labelKey)}</dt>
         <dd className="m-0 inline font-semibold text-text-dark"> {t(row.valueKey)}</dd>
       </div>
     ));
 
-  const renderDescriptionSection = ({ gridClassName, compact, className = "", headingId }) => (
-    <div className={className} aria-labelledby={headingId}>
+  const renderDescriptionSection = ({ gridClassName, className = "", headingId }) => (
+    <section className={className} aria-labelledby={headingId}>
       <h2
         id={headingId}
         className="m-0 inline-block border-b border-[#e6e9f2] pb-3 text-left text-sm font-semibold text-navy md:text-base"
@@ -96,9 +94,9 @@ const ProductDetailWidget = () => {
       </h2>
       <div className="pt-5 md:pt-6">
         <p className="sr-only">{t("productDetail.specsSectionAriaLabel")}</p>
-        <dl className={gridClassName}>{renderSpecRows(product.specsExtendedRows, compact)}</dl>
+        <dl className={gridClassName}>{renderSpecRows(product.specsExtendedRows)}</dl>
       </div>
-    </div>
+    </section>
   );
 
   const thumbSwiper = (
@@ -156,7 +154,7 @@ const ProductDetailWidget = () => {
             </button>
             <ProgressiveImage
               src={mainImageSrc}
-              alt={t("productDetail.mainImageAlt")}
+              alt={productTitle}
               imgClassName="block max-h-[min(72vh,560px)] max-w-full object-contain object-center"
               width={1200}
               height={800}
@@ -177,7 +175,7 @@ const ProductDetailWidget = () => {
               id="product-detail-title"
               className="m-0 text-2xl font-semibold text-text-dark md:text-[28px] lg:text-[30px]"
             >
-              {t("productDetail.title")}
+              {productTitle}
             </h1>
 
             <div className="flex flex-wrap gap-2" role="group" aria-label={t("productDetail.variantsAriaLabel")}>
@@ -254,17 +252,15 @@ const ProductDetailWidget = () => {
         </div>
       </div>
 
-      {renderDescriptionSection({
-        headingId: "product-detail-specs-heading-lg",
-        gridClassName: specsGridLgColumnClassName,
-        compact: true,
-        className: "hidden min-w-0 border-t border-[#e6e9f2] pt-8 lg:block xl:hidden",
-      })}
-
+      {/*
+        Rendered once. The block used to be output twice with different visibility
+        classes, so the whole spec table (and its headings) sat in the DOM in duplicate.
+        A single responsive grid covers every width instead.
+      */}
       {renderDescriptionSection({
         headingId: "product-detail-specs-heading",
         gridClassName: specsGridFullClassName,
-        className: "min-w-0 border-t border-[#e6e9f2] pt-8 lg:hidden xl:block",
+        className: "min-w-0 border-t border-[#e6e9f2] pt-8",
       })}
     </article>
   );

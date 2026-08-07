@@ -1,35 +1,21 @@
 /**
  * Nav Model — data for navigation panel.
  * MVP: Model — data access only, no UI logic.
+ *
+ * Items mirror the real filter catalog categories, so every entry is a crawlable link
+ * that lands on a populated listing. Labels reuse `filterPage.categories.*`, which is
+ * already translated for every locale — no separate (and previously English-only)
+ * aria strings are needed.
  */
 
-export const getNavItems = () => [
-  {
-    id: "tech-electronics",
-    labelKey: "navPanel.items.techElectronics",
-    aria: "Tech and Electronics",
-  },
-  {
-    id: "portable-speakers",
-    labelKey: "navPanel.items.portableSpeakers",
-    aria: "Portable Speakers",
-  },
-  {
-    id: "home-appliances",
-    labelKey: "navPanel.items.homeAppliances",
-    aria: "Home Appliances",
-  },
-  {
-    id: "kitchen-appliances",
-    labelKey: "navPanel.items.kitchenAppliances",
-    aria: "Kitchen Appliances",
-  },
-  {
-    id: "beauty-care",
-    labelKey: "navPanel.items.beautyCare",
-    aria: "Beauty and Care",
-  },
-];
+import { FILTER_CATEGORY_IDS } from "entities/filter-catalog/model/filterCatalogCategories";
+
+export const getNavItems = () =>
+  FILTER_CATEGORY_IDS.map((categoryId) => ({
+    id: categoryId,
+    labelKey: `filterPage.categories.${categoryId}`,
+    href: `/filter?category=${encodeURIComponent(categoryId)}`,
+  }));
 
 export const navModel = { getNavItems };
 export default navModel;

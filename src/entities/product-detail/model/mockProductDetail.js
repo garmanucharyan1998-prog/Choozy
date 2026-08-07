@@ -63,7 +63,11 @@ const findHomeCarouselProduct = (id) =>
 
 /**
  * Resolves demo detail payload for `/singleproduct/:slug` (SEO slug~id) or legacy `/singleproduct/fp-1` ids.
+ * Returns `null` for ids that match no product, so the route can render a real 404 instead of
+ * serving identical placeholder content on unlimited URLs.
+ *
  * @param {string | undefined} routeProductId
+ * @returns {object | null}
  */
 export const getProductDetailForRoute = (routeProductId) => {
   const id =
@@ -105,13 +109,8 @@ export const getProductDetailForRoute = (routeProductId) => {
   }
 
   if (id === mockProductDetail.id) {
-    return { ...mockProductDetail };
+    return { ...mockProductDetail, listingTitle: "Apple MacBook Pro" };
   }
 
-  return {
-    ...mockProductDetail,
-    id,
-    listingTitle: "Apple MacBook Pro",
-    listingDescription: "Demo product for the detail page until API data is wired.",
-  };
+  return null;
 };

@@ -1,11 +1,17 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { translations } from "shared/i18n";
 import {
   DEFAULT_LANGUAGE_CODE,
-  readStoredLanguage,
+  isSupportedLanguage,
   writeStoredLanguage,
 } from "shared/i18n/languageConfig";
-import { getHtmlLangForAppLanguage } from "shared/lib/locale";
+import {
+  getHtmlLangForAppLanguage,
+  getLanguageFromPath,
+  localizedPath,
+  stripLanguageFromPath,
+} from "shared/lib/locale";
 
 const FALLBACK_LANGUAGE = DEFAULT_LANGUAGE_CODE;
 const LanguageContext = createContext(null);
@@ -20,14 +26,28 @@ const resolveTextByPath = (dictionary, path) =>
 
 /**
  * Provides language state and translation helper for UI layers.
+ *
+ * The URL prefix is the single source of truth for the active language — this keeps
+ * prerendered HTML and client hydration in agreement. `localStorage` only records the
+ * user's preference so the language switcher can be restored on a later visit.
  */
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguageState] = useState(() => readStoredLanguage());
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const setLanguage = useCallback((nextLanguage) => {
-    setLanguageState(nextLanguage);
-    writeStoredLanguage(nextLanguage);
-  }, []);
+  const language = getLanguageFromPath(location.pathname);
+
+  const setLanguage = useCallback(
+    (nextLanguage) => {
+      if (!isSupportedLanguage(nextLanguage) || nextLanguage === language) {
+        return;
+      }
+      writeStoredLanguage(nextLanguage);
+      const bare = `${stripLanguageFromPath(location.pathname)}${location.search}${location.hash}`;
+      navigate(localizedPath(bare, nextLanguage));
+    },
+    [language, location.pathname, location.search, location.hash, navigate],
+  );
 
   useEffect(() => {
     if (typeof document !== "undefined") {

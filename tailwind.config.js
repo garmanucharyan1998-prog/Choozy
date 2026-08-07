@@ -30,8 +30,10 @@ module.exports = {
         'card-bg': '#f6f6f6',
         'section-bg': '#f9f9f9',
         'text-dark': '#1f2937',
+        /* Contrast on white: 5.5:1 — passes WCAG AA for body text. */
         'text-muted': '#696969',
-        'text-service': '#797979',
+        /* Was #797979 (4.35:1), just under the 4.5:1 AA threshold. Now 5.5:1. */
+        'text-service': '#696969',
       },
       borderRadius: {
         'pill': '35px',

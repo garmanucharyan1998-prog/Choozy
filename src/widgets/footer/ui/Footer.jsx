@@ -1,5 +1,6 @@
 import choozyMainLogoWhite from "shared/assets/logos/choozyMainLogoWhite.svg";
 import { useLanguage } from "contexts";
+import { LocalizedLink } from "shared/ui/link";
 import "./Footer.css";
 
 const socialLinks = [
@@ -58,19 +59,15 @@ const SocialLink = ({ href, label, iconPath }) => (
   </a>
 );
 
-const FooterLink = ({ href, label, htmlId, withEmailIcon = false }) => (
-  <a
-    {...(htmlId ? { id: htmlId } : {})}
-    href={href}
-    className={`${textLinkClassName}${withEmailIcon ? " gap-2" : ""}`}
-  >
+const FooterLink = ({ href, label, withEmailIcon = false }) => (
+  <LocalizedLink to={href} className={`${textLinkClassName}${withEmailIcon ? " gap-2" : ""}`}>
     {withEmailIcon && (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
       </svg>
     )}
     {label}
-  </a>
+  </LocalizedLink>
 );
 
 const Footer = () => {
@@ -112,7 +109,6 @@ const Footer = () => {
                 {column.map((link) => (
                   <FooterLink
                     key={`${link.id}-${link.href}`}
-                    htmlId={link.id === "privacy" ? "privacy" : undefined}
                     href={link.href}
                     label={link.label}
                     withEmailIcon={link.withEmailIcon}

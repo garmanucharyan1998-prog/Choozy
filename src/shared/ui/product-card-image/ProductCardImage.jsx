@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { ProgressiveImage } from "shared/ui/progressive-image";
 import {
   PRODUCT_CARD_IMAGE_BG,
@@ -9,17 +8,16 @@ import {
 import "./ProductCardImage.css";
 
 /**
- * Product photo fills the card frame via object-fit: contain (full product visible).
- * Uses a low-res preview first, then swaps to the original once loaded.
+ * Product photo frame — `object-fit: contain` keeps the whole product visible.
+ * Shows a low-res preview first, then swaps to the original once loaded.
+ *
+ * Intentionally NOT a link: cards use a single stretched link around the title, so the
+ * product is not announced twice by screen readers and crawlers see one anchor per card.
+ * Overlay actions are passed as `children`.
  */
 const ProductCardImage = ({
   src,
-  lowSrc,
   alt,
-  href,
-  external = false,
-  linkTarget,
-  linkRel,
   variant = "grid",
   backgroundColor = PRODUCT_CARD_IMAGE_BG,
   className = "",
@@ -36,33 +34,15 @@ const ProductCardImage = ({
   const shellStyle =
     backgroundColor && backgroundColor !== "transparent" ? { backgroundColor } : undefined;
 
-  const useAnchor = external || (href && !href.startsWith("/"));
-
-  const hitTarget =
-    href &&
-    (useAnchor ? (
-      <a
-        href={href}
-        target={linkTarget}
-        rel={linkRel}
-        className={styles.link}
-        aria-label={alt}
-      />
-    ) : (
-      <Link to={href} target={linkTarget} rel={linkRel} className={styles.link} aria-label={alt} />
-    ));
-
   return (
     <div className={`${styles.shell} ${className}`.trim()} style={shellStyle}>
       <ProgressiveImage
         src={resolvedSrc}
-        lowSrc={lowSrc}
         alt={alt}
         imgClassName={styles.img}
         loading="lazy"
         onError={() => setResolvedSrc(PRODUCT_CARD_PLACEHOLDER_IMG)}
       />
-      {hitTarget}
       {children}
     </div>
   );

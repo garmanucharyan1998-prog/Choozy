@@ -5,21 +5,49 @@ export const enOverrides = {
   },
   header: {
     aboutLinkLabel: "About us",
+    brandAriaLabel: "Choosy — home page",
+    brandTitle: "Choosy — electronics online store",
+    brandAlt: "Choosy — electronics online store logo",
+    mainNavigationAriaLabel: "Main navigation",
+    aboutLinkTitle: "Learn more about Choosy",
     search: {
       placeholder: "Search",
       submitLabel: "Search",
       noResults: "No results found",
+      formAriaLabel: "Product search",
+      inputAriaLabel: "Search for products and services",
+      helpText: "Enter at least 2 characters to search",
+      clearAriaLabel: "Clear search",
+      clearTitle: "Clear search field",
+      submitAriaLabel: "Run search",
+      resultsAriaLabel: "Search results",
+      selectSuggestionPrefix: "Select:",
     },
+    userNavigationAriaLabel: "User navigation",
+    compareTitle: "Compare products",
+    compareAriaLabel: "Compare selected products",
+    favoritesTitle: "Favorite products",
+    favoritesAriaLabel: "Go to favorite products",
+    loginTitle: "Sign in to account",
+    loginAriaLabel: "Sign in to personal account",
+    openMenuAriaLabel: "Open menu",
+    closeMenuAriaLabel: "Close menu",
+    languageSelectionAriaLabel: "Language selection",
+    currentLanguagePrefix: "Current language",
+    selectLanguageAriaLabel: "Select language",
+    mobileNavigationAriaLabel: "Mobile navigation menu",
+    mobileLinksAriaLabel: "Mobile links",
+    bottomNavigationAriaLabel: "Bottom mobile navigation",
     compareLabel: "Compare",
     favoritesLabel: "Favorites",
     favoritesCountForAria: "In favorites",
     loginLabel: "Sign in",
     mobileMenuTitle: "Menu",
     mobileBottomNav: {
-      home: { label: "Home" },
-      compare: { label: "Compare" },
-      favorites: { label: "Favorites" },
-      profile: { label: "Sign in" },
+      home: { label: "Home", ariaLabel: "Go to home page" },
+      compare: { label: "Compare", ariaLabel: "Go to product comparison" },
+      favorites: { label: "Favorites", ariaLabel: "Go to favorite products" },
+      profile: { label: "Sign in", ariaLabel: "Open personal account" },
     },
     mobileMenuItems: {
       topProducts: "Top products",
@@ -31,6 +59,11 @@ export const enOverrides = {
   },
   navPanel: {
     catalogLabel: "Catalog",
+    navAriaLabel: "Category navigation",
+    openCatalogAriaLabel: "Open catalog",
+    mobileCatalogAriaLabel: "Mobile catalog panel",
+    closeCatalogAriaLabel: "Close catalog",
+    catalogLinksAriaLabel: "Catalog links",
     items: {
       techElectronics: "Tech & electronics",
       portableSpeakers: "Portable speakers",
@@ -92,12 +125,15 @@ export const enOverrides = {
         inch13: "13 inch",
         inch14: "14 inch",
         inch15: "15 inch",
+        inch16: "16 inch",
       },
       colorNames: {
         black: "Black",
         grey: "Gray",
         white: "White",
         navy: "Navy",
+        blue: "Blue",
+        orange: "Orange",
       },
     },
     pagination: {
@@ -111,6 +147,9 @@ export const enOverrides = {
   },
   productShowcase: {
     viewMoreLabel: "View more",
+    retryLabel: "Retry",
+    loadingLabel: "Loading...",
+    loadErrorMessage: "Could not load products",
   },
   relatedProducts: {
     title: "Related products",
@@ -120,8 +159,8 @@ export const enOverrides = {
     compareAriaLabel: "Add or remove from compare",
     wishlistAriaLabel: "Add or remove from favorites",
   },
-  topProducts: { title: "Top products" },
-  variety: { title: "Catalog" },
+  topProducts: { title: "Top products", carouselAriaLabel: "Top products carousel" },
+  variety: { title: "Catalog", carouselAriaLabel: "Product range carousel" },
   carouselProducts: {
     top: {
       "top-1": {
@@ -241,6 +280,7 @@ export const enOverrides = {
     },
     specsBrief: {
       screenSize: "Screen size:",
+      screenSizeValue: "14 inch",
       storage: "Storage:",
       ram: "Memory (RAM):",
       battery: "Battery:",
@@ -253,6 +293,7 @@ export const enOverrides = {
       microphone: "Built-in microphone:",
       technology: "Technology:",
       matrix: "Pixel density:",
+      matrixValue: "1080p FaceTime HD camera",
       ssd: "SSD capacity:",
       bluetooth: "Bluetooth version:",
     },
@@ -323,6 +364,7 @@ export const enOverrides = {
       tooShort: "Password must be at least 6 characters.",
       mismatch: "Passwords do not match.",
       wrongOld: "Current password is incorrect.",
+      saveFailed: "Could not save the password. Please try again.",
     },
     notifications: {
       items: {
@@ -625,6 +667,62 @@ export const enOverrides = {
   },
   scrollToTop: {
     ariaLabel: "Scroll to top",
+  },
+  carousel: {
+    previousAriaLabel: "Previous product",
+    nextAriaLabel: "Next product",
+    compareAriaLabel: "Add to comparison or remove",
+    wishlistAddAriaLabel: "Add to favorites",
+    wishlistRemoveAriaLabel: "Remove from favorites",
+  },
+  breadcrumbs: { ariaLabel: "Breadcrumb" },
+  a11y: { skipToContent: "Skip to content" },
+  notFoundPage: {
+    seoTitle: "Page not found — Choosy",
+    seoDescription:
+      "The requested page does not exist or has been moved. Go back home or use the search.",
+    heading: "404",
+    message: "There is no page at this address.",
+    backHome: "Back to home",
+  },
+  comingSoon: {
+    message: "This page is coming soon.",
+    seoDescription: "This section is still in progress. It will be available on Choosy soon.",
+    titles: {
+      about: "About us",
+      catalog: "Catalog",
+      compare: "Compare",
+      products: "Products",
+      variety: "Product range",
+      privacyPolicy: "Privacy policy",
+      termsOfService: "Terms of service",
+    },
+  },
+  seo: {
+    siteName: "Choosy",
+    home: {
+      title: "Choosy — electronics and appliances marketplace",
+      description:
+        "Find electronics, home and kitchen appliances on Choosy, compare prices and shop with ease.",
+    },
+    filter: {
+      title: "Catalog and price comparison — Choosy",
+      description:
+        "Filter products by brand, price, screen and memory. Compare offers from stores across Armenia on Choosy.",
+    },
+    product: {
+      title: "{{title}} — prices and offers | Choosy",
+      description:
+        "{{title}}: {{priceMin}}–{{priceMax}} AMD. Compare prices from stores across Armenia and pick the best offer on Choosy.",
+    },
+    account: {
+      title: "Account — Choosy",
+      description: "Your favorites, recently viewed products and account settings.",
+    },
+    shopAccount: {
+      title: "Shop account — Choosy",
+      description: "Product management, statistics and finances for shops.",
+    },
   },
 };
 

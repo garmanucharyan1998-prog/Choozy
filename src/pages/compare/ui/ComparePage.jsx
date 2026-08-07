@@ -1,5 +1,5 @@
 import ComingSoon from "shared/ui/ComingSoon";
 
-const ComparePage = () => <ComingSoon title="Compare" />;
+const ComparePage = () => <ComingSoon titleKey="comingSoon.titles.compare" />;
 
 export default ComparePage;

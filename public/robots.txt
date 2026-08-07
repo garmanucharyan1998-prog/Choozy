@@ -1,5 +1,10 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Personal areas: no public content, and every page already sends `noindex`.
+Disallow: /account
+Disallow: /ru/account
+Disallow: /en/account
 
 Sitemap: https://choosy.com/sitemap.xml

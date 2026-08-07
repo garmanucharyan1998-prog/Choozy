@@ -2,57 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * WOFF2 only, and only the four weights the UI actually uses (400/500/600/700).
+ * The previous set shipped nine OTF files — about 1.6 MB — of which 100/200/300/800/900
+ * were never referenced. WOFF2 brings the remaining four to roughly 330 KB total.
+ */
 @font-face {
   font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-Black.otf") format("opentype");
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-Bold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-ExtraBold.otf") format("opentype");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-ExtraLight.otf") format("opentype");
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-Light.otf") format("opentype");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-Medium.otf") format("opentype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-Regular.otf") format("opentype");
+  src: url("./fonts/Montserratarm-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -60,7 +17,15 @@
 
 @font-face {
   font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-SemiBold.otf") format("opentype");
+  src: url("./fonts/Montserratarm-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MontserratArm";
+  src: url("./fonts/Montserratarm-SemiBold.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -68,8 +33,8 @@
 
 @font-face {
   font-family: "MontserratArm";
-  src: url("./fonts/Montserratarm-Thin.otf") format("opentype");
-  font-weight: 100;
+  src: url("./fonts/Montserratarm-Bold.woff2") format("woff2");
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -96,5 +61,26 @@
 @layer components {
   .cont-width-default {
     @apply w-full max-w-site mx-auto;
+  }
+
+  /*
+   * The header shell is absolutely positioned inside this spacer, so the spacer has to
+   * reserve its height. The measured value arrives as `--header-shell-height`; the
+   * fallbacks keep the first paint from collapsing to zero (which shifted the whole page).
+   */
+  .header-shell-spacer {
+    height: var(--header-shell-height, 132px);
+  }
+
+  @media (min-width: 768px) {
+    .header-shell-spacer {
+      height: var(--header-shell-height, 160px);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .header-shell-spacer {
+      height: var(--header-shell-height, 180px);
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   getCatalogProductById,
   getCatalogProductsByCategory,
@@ -20,6 +20,7 @@ import {
   writeShopAccountState,
 } from "entities/shop";
 import { useLanguage } from "contexts";
+import { stripLanguageFromPath, useLocalizedNavigate } from "shared/lib/locale";
 
 const SHOP_ACCOUNT_PATH_BY_SIDEBAR = {
   [SHOP_SIDEBAR_IDS.DETAILS]: "/account/shop-account",
@@ -29,7 +30,7 @@ const SHOP_ACCOUNT_PATH_BY_SIDEBAR = {
 };
 
 const sidebarIdFromPathname = (pathname) => {
-  const base = pathname.replace(/\/$/, "") || "/account/shop-account";
+  const base = stripLanguageFromPath(pathname).replace(/\/$/, "") || "/account/shop-account";
   if (base === "/account/shop-account/products") return SHOP_SIDEBAR_IDS.PRODUCTS;
   if (base === "/account/shop-account/statistics") return SHOP_SIDEBAR_IDS.STATISTICS;
   if (base === "/account/shop-account/finance") return SHOP_SIDEBAR_IDS.FINANCE;
@@ -106,7 +107,7 @@ const productToDraft = (product, t) => {
 export const useShopAccountPresenter = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useLocalizedNavigate();
 
   const [shopState, setShopState] = useState(() => readShopAccountState());
   const [activeSidebarId, setActiveSidebarId] = useState(() => sidebarIdFromPathname(location.pathname));

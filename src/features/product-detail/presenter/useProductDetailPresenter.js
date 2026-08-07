@@ -10,6 +10,7 @@ import {
   productDetailVariantIdToFilterKey,
   useProductOffersVariantFilter,
 } from "contexts";
+import { getLanguageFromPath, localizedPath } from "shared/lib/locale";
 
 const formatAmd = (amount) =>
   typeof amount === "number" ? amount.toLocaleString("en-US") : "";
@@ -27,10 +28,15 @@ export const useProductDetailPresenter = () => {
 
   const canonicalPath = useMemo(() => getCanonicalProductDetailPath(product), [product]);
 
+  /**
+   * Normalises legacy/mistyped slugs onto the canonical URL — while preserving the
+   * language prefix, which a bare `navigate(canonicalPath)` would strip.
+   */
   useEffect(() => {
-    const path = location.pathname;
-    if (path !== canonicalPath) {
-      navigate(canonicalPath, { replace: true });
+    const language = getLanguageFromPath(location.pathname);
+    const target = localizedPath(canonicalPath, language);
+    if (location.pathname !== target) {
+      navigate(target, { replace: true });
     }
   }, [canonicalPath, location.pathname, navigate]);
 

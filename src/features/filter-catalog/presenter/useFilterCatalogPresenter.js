@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLanguage } from "contexts";
 import {
@@ -18,23 +18,92 @@ const boundsFromProducts = () => {
   return { globalMin: Math.min(...vals), globalMax: Math.max(...vals) };
 };
 
+const SORT_VALUES = ["popular", "priceAsc", "priceDesc"];
+const PAGE_SIZES = [12, 20, 40];
+const DEFAULT_PAGE_SIZE = 20;
+
+/** Comma-separated multi-value params, filtered against the known option ids. */
+const readSet = (searchParams, key, allowedIds) => {
+  const raw = searchParams.get(key);
+  if (!raw) return new Set();
+  const allowed = new Set(allowedIds);
+  return new Set(
+    raw
+      .split(",")
+      .map((v) => v.trim())
+      .filter((v) => allowed.has(v)),
+  );
+};
+
+const readNumber = (searchParams, key, fallback) => {
+  const raw = searchParams.get(key);
+  if (raw == null || raw === "") return fallback;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : fallback;
+};
+
 export const useFilterCatalogPresenter = () => {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const { globalMin, globalMax } = useMemo(boundsFromProducts, []);
 
-  const [priceMin, setPriceMin] = useState(globalMin);
-  const [priceMax, setPriceMax] = useState(globalMax);
-  const [selectedScreens, setSelectedScreens] = useState(() => new Set());
-  const [selectedBrands, setSelectedBrands] = useState(() => new Set());
-  const [selectedRam, setSelectedRam] = useState(() => new Set());
-  const [selectedColor, setSelectedColor] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("popular");
+  /**
+   * Every facet lives in the URL: results stay shareable, the back button works,
+   * and crawlers can reach pages beyond the first one.
+   */
+  const selectedScreens = useMemo(
+    () => readSet(searchParams, "screen", SCREEN_SIZE_OPTIONS.map((o) => o.id)),
+    [searchParams],
+  );
+  const selectedBrands = useMemo(
+    () => readSet(searchParams, "brand", BRAND_OPTIONS.map((o) => o.id)),
+    [searchParams],
+  );
+  const selectedRam = useMemo(
+    () => readSet(searchParams, "ram", RAM_OPTIONS.map((o) => o.id)),
+    [searchParams],
+  );
+  const selectedColor = useMemo(() => {
+    const value = searchParams.get("color");
+    return COLOR_OPTIONS.some((o) => o.id === value) ? value : null;
+  }, [searchParams]);
+  const selectedCategory = useMemo(() => {
+    const value = searchParams.get("category");
+    return isValidFilterCategoryId(value) ? value : null;
+  }, [searchParams]);
+  const sort = useMemo(() => {
+    const value = searchParams.get("sort");
+    return SORT_VALUES.includes(value) ? value : "popular";
+  }, [searchParams]);
+  const pageSize = useMemo(() => {
+    const value = readNumber(searchParams, "perPage", DEFAULT_PAGE_SIZE);
+    return PAGE_SIZES.includes(value) ? value : DEFAULT_PAGE_SIZE;
+  }, [searchParams]);
+  const priceMin = useMemo(
+    () => clamp(readNumber(searchParams, "priceMin", globalMin), globalMin, globalMax),
+    [searchParams, globalMin, globalMax],
+  );
+  const priceMax = useMemo(
+    () => clamp(readNumber(searchParams, "priceMax", globalMax), globalMin, globalMax),
+    [searchParams, globalMin, globalMax],
+  );
+  const urlQuery = searchParams.get("q") ?? "";
+
+  /**
+   * The input keeps its own draft so typing is never rewritten by the URL round-trip
+   * (a trailing space used to disappear because the URL stores the trimmed value).
+   */
+  const [searchDraft, setSearchDraft] = useState(urlQuery);
+  const lastSyncedQueryRef = useRef(urlQuery);
+
+  useEffect(() => {
+    if (urlQuery !== lastSyncedQueryRef.current) {
+      lastSyncedQueryRef.current = urlQuery;
+      setSearchDraft(urlQuery);
+    }
+  }, [urlQuery]);
+
   const [viewMode, setViewMode] = useState("grid");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
   const [sectionsOpen, setSectionsOpen] = useState(() => ({
     price: true,
     screen: true,
@@ -44,142 +113,106 @@ export const useFilterCatalogPresenter = () => {
   }));
   const [brandExpanded, setBrandExpanded] = useState(false);
 
-  const syncUrlParams = useCallback(
-    ({ q, category }) => {
+  /**
+   * Writes params, dropping any that equal their default so canonical URLs stay short.
+   * Any facet change resets pagination unless `page` is set explicitly.
+   */
+  const updateParams = useCallback(
+    (patch, { resetPage = true } = {}) => {
       const next = new URLSearchParams(searchParams);
-      if (q !== undefined) {
-        const trimmed = q.trim();
-        if (trimmed) next.set("q", trimmed);
-        else next.delete("q");
-      }
-      if (category !== undefined) {
-        if (category && isValidFilterCategoryId(category)) next.set("category", category);
-        else next.delete("category");
+
+      Object.entries(patch).forEach(([key, value]) => {
+        const isEmpty =
+          value == null ||
+          value === "" ||
+          (value instanceof Set && value.size === 0) ||
+          (Array.isArray(value) && value.length === 0);
+
+        if (isEmpty) {
+          next.delete(key);
+          return;
+        }
+        if (value instanceof Set) {
+          next.set(key, [...value].join(","));
+          return;
+        }
+        next.set(key, String(value));
+      });
+
+      if (resetPage && !("page" in patch)) {
+        next.delete("page");
       }
       setSearchParams(next, { replace: true });
     },
     [searchParams, setSearchParams],
   );
 
-  useEffect(() => {
-    const q = searchParams.get("q") ?? "";
-    const categoryParam = searchParams.get("category");
-    setSearch(q);
-    setSelectedCategory(isValidFilterCategoryId(categoryParam) ? categoryParam : null);
-    setPage(1);
-  }, [searchParams]);
+  const toggleInSet = useCallback(
+    (key, currentSet, id) => {
+      const nextSet = new Set(currentSet);
+      if (nextSet.has(id)) nextSet.delete(id);
+      else nextSet.add(id);
+      updateParams({ [key]: nextSet });
+    },
+    [updateParams],
+  );
 
-  const clearCategory = useCallback(() => {
-    setSelectedCategory(null);
-    setPage(1);
-    syncUrlParams({ category: null, q: search });
-  }, [search, syncUrlParams]);
+  const toggleScreen = useCallback(
+    (id) => toggleInSet("screen", selectedScreens, id),
+    [toggleInSet, selectedScreens],
+  );
+  const toggleBrand = useCallback(
+    (id) => toggleInSet("brand", selectedBrands, id),
+    [toggleInSet, selectedBrands],
+  );
+  const toggleRam = useCallback(
+    (id) => toggleInSet("ram", selectedRam, id),
+    [toggleInSet, selectedRam],
+  );
+
+  const setColor = useCallback(
+    (id) => updateParams({ color: selectedColor === id ? null : id }),
+    [updateParams, selectedColor],
+  );
+
+  const removeScreen = useCallback(
+    (id) => {
+      const next = new Set(selectedScreens);
+      next.delete(id);
+      updateParams({ screen: next });
+    },
+    [updateParams, selectedScreens],
+  );
+  const removeBrand = useCallback(
+    (id) => {
+      const next = new Set(selectedBrands);
+      next.delete(id);
+      updateParams({ brand: next });
+    },
+    [updateParams, selectedBrands],
+  );
+  const removeRam = useCallback(
+    (id) => {
+      const next = new Set(selectedRam);
+      next.delete(id);
+      updateParams({ ram: next });
+    },
+    [updateParams, selectedRam],
+  );
+
+  const clearSelectedColor = useCallback(() => updateParams({ color: null }), [updateParams]);
+  const clearCategory = useCallback(() => updateParams({ category: null }), [updateParams]);
+  const resetPriceBounds = useCallback(
+    () => updateParams({ priceMin: null, priceMax: null }),
+    [updateParams],
+  );
 
   const toggleSection = useCallback((key) => {
     setSectionsOpen((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-  const toggleScreen = useCallback((id) => {
-    setSelectedScreens((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-    setPage(1);
-  }, []);
-
-  const toggleBrand = useCallback((id) => {
-    setSelectedBrands((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-    setPage(1);
-  }, []);
-
-  const toggleRam = useCallback((id) => {
-    setSelectedRam((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-    setPage(1);
-  }, []);
-
-  const setColor = useCallback((id) => {
-    setSelectedColor((prev) => (prev === id ? null : id));
-    setPage(1);
-  }, []);
-
-  const removeScreen = useCallback((id) => {
-    setSelectedScreens((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-    setPage(1);
-  }, []);
-
-  const removeBrand = useCallback((id) => {
-    setSelectedBrands((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-    setPage(1);
-  }, []);
-
-  const removeRam = useCallback((id) => {
-    setSelectedRam((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-    setPage(1);
-  }, []);
-
-  const clearSelectedColor = useCallback(() => {
-    setSelectedColor(null);
-    setPage(1);
-  }, []);
-
-  const resetPriceBounds = useCallback(() => {
-    setPriceMin(globalMin);
-    setPriceMax(globalMax);
-    setPage(1);
-  }, [globalMin, globalMax]);
-
-  const screenCounts = useMemo(() => {
-    const map = {};
-    mockFilterProducts.forEach((p) => {
-      const k = String(p.screenInch);
-      map[k] = (map[k] || 0) + 1;
-    });
-    return map;
-  }, []);
-
-  const brandCounts = useMemo(() => {
-    const map = {};
-    mockFilterProducts.forEach((p) => {
-      map[p.brandId] = (map[p.brandId] || 0) + 1;
-    });
-    return map;
-  }, []);
-
-  const ramCounts = useMemo(() => {
-    const map = {};
-    mockFilterProducts.forEach((p) => {
-      const k = String(p.ramGb);
-      map[k] = (map[k] || 0) + 1;
-    });
-    return map;
-  }, []);
-
   const filteredProducts = useMemo(() => {
-    const q = search.trim();
+    const q = urlQuery.trim();
     let list = mockFilterProducts.filter((p) => {
       if (p.priceValue < priceMin || p.priceValue > priceMax) return false;
       if (selectedScreens.size > 0 && !selectedScreens.has(String(p.screenInch))) return false;
@@ -203,76 +236,104 @@ export const useFilterCatalogPresenter = () => {
     selectedRam,
     selectedColor,
     selectedCategory,
-    search,
+    urlQuery,
     sort,
   ]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
+  const page = clamp(readNumber(searchParams, "page", 1), 1, totalPages);
 
-  useEffect(() => {
-    setPage((p) => clamp(p, 1, totalPages));
-  }, [totalPages]);
+  const setPage = useCallback(
+    (updater) => {
+      const nextPage = typeof updater === "function" ? updater(page) : updater;
+      const safePage = clamp(Number(nextPage) || 1, 1, totalPages);
+      updateParams({ page: safePage === 1 ? null : safePage }, { resetPage: false });
+    },
+    [page, totalPages, updateParams],
+  );
 
   const pageItems = useMemo(() => {
     const start = (page - 1) * pageSize;
     return filteredProducts.slice(start, start + pageSize);
   }, [filteredProducts, page, pageSize]);
 
+  /**
+   * Counts reflect the current selection (every other facet applied), so the numbers in
+   * brackets match what clicking the option would actually return.
+   */
+  const countsFor = useCallback(
+    (facetKey, valueOf) => {
+      const base = mockFilterProducts.filter((p) => {
+        if (p.priceValue < priceMin || p.priceValue > priceMax) return false;
+        if (facetKey !== "screen" && selectedScreens.size > 0 && !selectedScreens.has(String(p.screenInch)))
+          return false;
+        if (facetKey !== "brand" && selectedBrands.size > 0 && !selectedBrands.has(p.brandId)) return false;
+        if (facetKey !== "ram" && selectedRam.size > 0 && !selectedRam.has(String(p.ramGb))) return false;
+        if (selectedColor && p.colorId !== selectedColor) return false;
+        if (selectedCategory && p.categoryId !== selectedCategory) return false;
+        const q = urlQuery.trim();
+        if (q && !productMatchesSearch(p, q)) return false;
+        return true;
+      });
+
+      const map = {};
+      base.forEach((p) => {
+        const key = valueOf(p);
+        map[key] = (map[key] || 0) + 1;
+      });
+      return map;
+    },
+    [priceMin, priceMax, selectedScreens, selectedBrands, selectedRam, selectedColor, selectedCategory, urlQuery],
+  );
+
+  const screenCounts = useMemo(
+    () => countsFor("screen", (p) => String(p.screenInch)),
+    [countsFor],
+  );
+  const brandCounts = useMemo(() => countsFor("brand", (p) => p.brandId), [countsFor]);
+  const ramCounts = useMemo(() => countsFor("ram", (p) => String(p.ramGb)), [countsFor]);
+
   const setPriceMinSafe = useCallback(
     (v) => {
       const n = clamp(Number(v) || 0, globalMin, globalMax);
-      setPriceMin(Math.min(n, priceMax));
-      setPage(1);
+      const next = Math.min(n, priceMax);
+      updateParams({ priceMin: next === globalMin ? null : next });
     },
-    [globalMin, globalMax, priceMax],
+    [globalMin, globalMax, priceMax, updateParams],
   );
 
   const setPriceMaxSafe = useCallback(
     (v) => {
       const n = clamp(Number(v) || 0, globalMin, globalMax);
-      setPriceMax(Math.max(n, priceMin));
-      setPage(1);
+      const next = Math.max(n, priceMin);
+      updateParams({ priceMax: next === globalMax ? null : next });
     },
-    [globalMin, globalMax, priceMin],
-  );
-
-  const onMinRangeChange = useCallback(
-    (v) => {
-      const n = clamp(Number(v), globalMin, globalMax);
-      setPriceMin(Math.min(n, priceMax));
-      setPage(1);
-    },
-    [globalMin, globalMax, priceMax],
-  );
-
-  const onMaxRangeChange = useCallback(
-    (v) => {
-      const n = clamp(Number(v), globalMin, globalMax);
-      setPriceMax(Math.max(n, priceMin));
-      setPage(1);
-    },
-    [globalMin, globalMax, priceMin],
+    [globalMin, globalMax, priceMin, updateParams],
   );
 
   const onSearchChange = useCallback(
     (e) => {
       const value = e.target.value;
-      setSearch(value);
-      setPage(1);
-      syncUrlParams({ q: value, category: selectedCategory });
+      setSearchDraft(value);
+      const trimmed = value.trim();
+      lastSyncedQueryRef.current = trimmed;
+      updateParams({ q: trimmed || null });
     },
-    [selectedCategory, syncUrlParams],
+    [updateParams],
   );
 
-  const onSortChange = useCallback((e) => {
-    setSort(e.target.value);
-    setPage(1);
-  }, []);
+  const onSortChange = useCallback(
+    (e) => updateParams({ sort: e.target.value === "popular" ? null : e.target.value }),
+    [updateParams],
+  );
 
-  const onPageSizeChange = useCallback((e) => {
-    setPageSize(Number(e.target.value));
-    setPage(1);
-  }, []);
+  const onPageSizeChange = useCallback(
+    (e) => {
+      const value = Number(e.target.value);
+      updateParams({ perPage: value === DEFAULT_PAGE_SIZE ? null : value });
+    },
+    [updateParams],
+  );
 
   const sortOptions = useMemo(
     () => [
@@ -283,14 +344,26 @@ export const useFilterCatalogPresenter = () => {
     [],
   );
 
-  const pageSizeOptions = useMemo(() => [12, 20, 40], []);
+  const pageSizeOptions = useMemo(() => PAGE_SIZES, []);
 
-  const visibleBrandOptions = useMemo(() => {
-    const list = BRAND_OPTIONS;
-    return brandExpanded ? list : list.slice(0, 4);
-  }, [brandExpanded]);
+  const visibleBrandOptions = useMemo(
+    () => (brandExpanded ? BRAND_OPTIONS : BRAND_OPTIONS.slice(0, 4)),
+    [brandExpanded],
+  );
 
   const priceRangeActive = priceMin > globalMin || priceMax < globalMax;
+
+  /** Builds a URL for a given page — pagination renders real links for crawlers. */
+  const buildPageHref = useCallback(
+    (targetPage) => {
+      const next = new URLSearchParams(searchParams);
+      if (targetPage <= 1) next.delete("page");
+      else next.set("page", String(targetPage));
+      const qs = next.toString();
+      return qs ? `/filter?${qs}` : "/filter";
+    },
+    [searchParams],
+  );
 
   const activeFilterChips = useMemo(() => {
     const chips = [];
@@ -386,8 +459,8 @@ export const useFilterCatalogPresenter = () => {
     priceMax,
     setPriceMin: setPriceMinSafe,
     setPriceMax: setPriceMaxSafe,
-    onMinRangeChange,
-    onMaxRangeChange,
+    onMinRangeChange: setPriceMinSafe,
+    onMaxRangeChange: setPriceMaxSafe,
     selectedScreens,
     selectedBrands,
     selectedRam,
@@ -398,7 +471,7 @@ export const useFilterCatalogPresenter = () => {
     toggleBrand,
     toggleRam,
     setColor,
-    search,
+    search: searchDraft,
     onSearchChange,
     sort,
     onSortChange,
@@ -406,6 +479,7 @@ export const useFilterCatalogPresenter = () => {
     setViewMode,
     page,
     setPage,
+    buildPageHref,
     pageSize,
     onPageSizeChange,
     sectionsOpen,

@@ -4,40 +4,30 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Choozy-ում գտեք էլեկտրոնիկա, կենցաղային և խոհանոցային տեխնիկա, համեմատեք գներ և գնումներ կատարեք հարմարավետ։"
-    />
-    <link rel="canonical" href="https://choosy.com/" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://choosy.com/" />
-    <meta property="og:title" content="Choozy՝ էլեկտրոնիկայի և տեխնիկայի առցանց շուկա" />
-    <meta
-      property="og:description"
-      content="Choozy-ում գտեք էլեկտրոնիկա, կենցաղային և խոհանոցային տեխնիկա, համեմատեք գներ և գնումներ կատարեք հարմարավետ։"
-    />
-    <meta property="og:image" content="https://choosy.com/logo512.png" />
-    <meta property="og:locale" content="hy_AM" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Choozy՝ էլեկտրոնիկայի և տեխնիկայի առցանց շուկա" />
-    <meta
-      name="twitter:description"
-      content="Choozy-ում գտեք էլեկտրոնիկա, կենցաղային և խոհանոցային տեխնիկա, համեմատեք գներ և գնումներ կատարեք հարմարավետ։"
-    />
-    <meta name="twitter:image" content="https://choosy.com/logo512.png" />
+    <meta name="theme-color" content="#152147" />
+
+    <!--
+      Page metadata (description, robots, canonical, hreflang, og:*, twitter:*) is owned by
+      `PageSeo` — do NOT duplicate it here. Under React 19 those tags are hoisted into <head>
+      by React itself, so a copy in this shell would survive as a second canonical/hreflang set
+      rather than being replaced. The prerender step bakes the rendered tags into the shipped
+      HTML, which is what crawlers and social scrapers read.
+      Only shell-level, page-independent tags belong below.
+    -->
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <title>Choozy՝ էլեկտրոնիկայի և տեխնիկայի առցանց շուկա</title>
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <link rel="dns-prefetch" href="https://flagcdn.com" />
+    <!--
+      No <title> here on purpose: React hoists the one from `PageSeo` into <head> AFTER any
+      shell tag, so a static title would sit first in the document and win in search results.
+      The prerender step writes the real per-page title into each shipped HTML file.
+    -->
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>Այս կայքի աշխատանքի համար անհրաժեշտ է միացնել JavaScript-ը։</noscript>
     <div id="root"></div>
   </body>
 </html>

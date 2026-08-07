@@ -1,4 +1,5 @@
 import { useLanguage } from "contexts";
+import { LocalizedLink } from "shared/ui/link";
 
 const ABOUT_US_IMAGE = "/assets/images/AboutUs/AboutUs.jpg";
 
@@ -18,31 +19,29 @@ const AboutUs = () => {
             <strong>Choosy</strong>
             {t("aboutUs.descriptionEnd")}
           </p>
-          <a
-            href="/about"
-            role="button"
+          <LocalizedLink
+            to="/about"
             className="flex w-fit mx-auto px-2.5 py-2 bg-navy text-white text-xs no-underline rounded-pill font-medium leading-none tracking-normal transition-colors duration-300 hover:bg-navy-light hover:shadow-[#15214760_0_0_10px] sm:px-3 sm:py-2.5 sm:text-sm lg:text-base lg:px-4 lg:py-3.5 lg:mx-0"
           >
             {t("aboutUs.learnMoreLabel")}
-          </a>
+          </LocalizedLink>
         </div>
 
-        <figure className="relative w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden group">
+        {/*
+          One request only: the photo used to be loaded twice — once as a hidden <img>
+          and again as a CSS background on the overlay.
+        */}
+        <figure className="relative m-0 w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden group">
           <img
             src={ABOUT_US_IMAGE}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none invisible w-full h-full object-cover rounded-2xl sm:rounded-3xl max-h-[220px] sm:max-h-[280px] lg:max-h-none"
+            alt={t("aboutUs.imageAlt")}
+            width="1200"
+            height="800"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover rounded-2xl sm:rounded-3xl transition-transform duration-[400ms] motion-reduce:transition-none group-hover:scale-105 max-h-[220px] sm:max-h-[280px] lg:max-h-none"
           />
-          <div
-            role="img"
-            aria-label={t("aboutUs.imageAlt")}
-            className="absolute inset-0 rounded-2xl sm:rounded-3xl transition-all duration-[400ms] group-hover:scale-105 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url("${ABOUT_US_IMAGE}")` }}
-          />
-          <figcaption className="sr-only">
-            {t("aboutUs.imageCaption")}
-          </figcaption>
+          <figcaption className="sr-only">{t("aboutUs.imageCaption")}</figcaption>
         </figure>
       </article>
     </section>

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { Link } from "react-router-dom";
 import { FaArrowLeft, FaBalanceScale, FaHeart, FaPen, FaRegHeart, FaTimes, FaUpload } from "react-icons/fa";
 import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
 import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
 import { ProductCardImage } from "shared/ui/product-card-image";
+import { LocalizedLink } from "shared/ui/link";
 
 const sidebarItems = [
   { id: SIDEBAR_IDS.PERSONAL, labelKey: "account.sidebar.personal" },
@@ -53,9 +53,9 @@ const AccountGridProductCard = ({
   compareAria,
   heartAria,
 }) => (
-  <article className="flex flex-col text-start">
-    <ProductCardImage src={item.image} alt={item.title} href={detailTo}>
-      <div className="pointer-events-auto absolute right-2 top-2 z-10 flex flex-col gap-1.5 xl:right-3 xl:top-3 xl:gap-2">
+  <article className="relative flex flex-col text-start">
+    <ProductCardImage src={item.image} alt={item.title}>
+      <div className="pointer-events-auto absolute right-2 top-2 z-20 flex flex-col gap-1.5 xl:right-3 xl:top-3 xl:gap-2">
         <button
           type="button"
           onClick={onToggleCompare}
@@ -80,13 +80,17 @@ const AccountGridProductCard = ({
         </button>
       </div>
     </ProductCardImage>
-    <Link to={detailTo} className="flex min-w-0 flex-col gap-1 pt-3 no-underline outline-none">
-      <h3 className="m-0 line-clamp-2 text-base font-bold text-[rgba(21,33,71,1)]">{item.title}</h3>
-      <p className="m-0 line-clamp-2 text-sm text-[rgba(105,105,105,1)]" title={item.description}>
+    {/* One stretched link per card — the title stays the anchor text. */}
+    <LocalizedLink
+      to={detailTo}
+      className="flex min-w-0 flex-col gap-1 pt-3 no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
+    >
+      <h3 className="m-0 line-clamp-2 text-sm font-bold text-navy sm:text-base">{item.title}</h3>
+      <p className="m-0 line-clamp-2 text-xs text-text-muted sm:text-sm" title={item.description}>
         {item.description}
       </p>
-      <p className="m-0 pt-0.5 text-base font-semibold text-link-blue">{item.price}</p>
-    </Link>
+      <p className="m-0 pt-0.5 text-sm font-semibold text-link-blue sm:text-base">{item.price}</p>
+    </LocalizedLink>
   </article>
 );
 

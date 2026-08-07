@@ -5,21 +5,49 @@ export const ruOverrides = {
   },
   header: {
     aboutLinkLabel: "О нас",
+    brandAriaLabel: "Choosy — главная страница",
+    brandTitle: "Choosy — интернет-магазин электроники",
+    brandAlt: "Логотип Choosy — интернет-магазин электроники",
+    mainNavigationAriaLabel: "Основная навигация",
+    aboutLinkTitle: "Узнать больше о компании Choosy",
     search: {
       placeholder: "Поиск",
       submitLabel: "Поиск",
       noResults: "Результаты не найдены",
+      formAriaLabel: "Поиск товаров",
+      inputAriaLabel: "Искать товары и услуги",
+      helpText: "Введите не менее 2 символов для поиска",
+      clearAriaLabel: "Очистить поиск",
+      clearTitle: "Очистить поле поиска",
+      submitAriaLabel: "Выполнить поиск",
+      resultsAriaLabel: "Результаты поиска",
+      selectSuggestionPrefix: "Выбрать:",
     },
+    userNavigationAriaLabel: "Навигация пользователя",
+    compareTitle: "Сравнить товары",
+    compareAriaLabel: "Сравнить выбранные товары",
+    favoritesTitle: "Избранные товары",
+    favoritesAriaLabel: "Перейти к избранным товарам",
+    loginTitle: "Войти в аккаунт",
+    loginAriaLabel: "Войти в личный кабинет",
+    openMenuAriaLabel: "Открыть меню",
+    closeMenuAriaLabel: "Закрыть меню",
+    languageSelectionAriaLabel: "Выбор языка",
+    currentLanguagePrefix: "Текущий язык",
+    selectLanguageAriaLabel: "Выбрать язык",
+    mobileNavigationAriaLabel: "Мобильное меню навигации",
+    mobileLinksAriaLabel: "Мобильные ссылки",
+    bottomNavigationAriaLabel: "Нижняя мобильная навигация",
     compareLabel: "Сравнить",
     favoritesLabel: "Избранное",
     favoritesCountForAria: "В избранном",
     loginLabel: "Вход",
     mobileMenuTitle: "Меню",
     mobileBottomNav: {
-      home: { label: "Главная" },
-      compare: { label: "Сравнить" },
-      favorites: { label: "Избранное" },
-      profile: { label: "Вход" },
+      home: { label: "Главная", ariaLabel: "Перейти на главную страницу" },
+      compare: { label: "Сравнить", ariaLabel: "Перейти к сравнению товаров" },
+      favorites: { label: "Избранное", ariaLabel: "Перейти к избранным товарам" },
+      profile: { label: "Вход", ariaLabel: "Открыть личный кабинет" },
     },
     mobileMenuItems: {
       topProducts: "Топ товары",
@@ -31,6 +59,11 @@ export const ruOverrides = {
   },
   navPanel: {
     catalogLabel: "Каталог",
+    navAriaLabel: "Навигация по категориям",
+    openCatalogAriaLabel: "Открыть каталог",
+    mobileCatalogAriaLabel: "Мобильная панель каталога",
+    closeCatalogAriaLabel: "Закрыть каталог",
+    catalogLinksAriaLabel: "Ссылки каталога",
     items: {
       techElectronics: "Техника и электроника",
       portableSpeakers: "Портативные колонки",
@@ -92,6 +125,7 @@ export const ruOverrides = {
         inch13: "13 дюймов",
         inch14: "14 дюймов",
         inch15: "15 дюймов",
+        inch16: "16 дюймов",
       },
       colorNames: {
         black: "Чёрный",
@@ -111,6 +145,9 @@ export const ruOverrides = {
   },
   productShowcase: {
     viewMoreLabel: "Смотреть ещё",
+    retryLabel: "Повторить",
+    loadingLabel: "Загрузка...",
+    loadErrorMessage: "Не удалось загрузить товары",
   },
   relatedProducts: {
     title: "Похожие товары",
@@ -120,8 +157,8 @@ export const ruOverrides = {
     compareAriaLabel: "Добавить или убрать из сравнения",
     wishlistAriaLabel: "Добавить или убрать из избранного",
   },
-  topProducts: { title: "Топ товары" },
-  variety: { title: "Ассортимент" },
+  topProducts: { title: "Топ товары", carouselAriaLabel: "Карусель топовых товаров" },
+  variety: { title: "Ассортимент", carouselAriaLabel: "Карусель товаров ассортимента" },
   carouselProducts: {
     top: {
       "top-1": {
@@ -241,6 +278,7 @@ export const ruOverrides = {
     },
     specsBrief: {
       screenSize: "Размер экрана:",
+      screenSizeValue: "14 дюймов",
       storage: "Память:",
       ram: "ОЗУ:",
       battery: "Батарея:",
@@ -252,6 +290,7 @@ export const ruOverrides = {
       screenType: "Тип экрана:",
       microphone: "Встроенный микрофон:",
       technology: "Технология:",
+      matrixValue: "Камера 1080p FaceTime HD",
       matrix: "Плотность пикселей:",
       ssd: "Объём SSD:",
       bluetooth: "Версия Bluetooth:",
@@ -323,6 +362,7 @@ export const ruOverrides = {
       tooShort: "Пароль должен быть не короче 6 символов.",
       mismatch: "Пароли не совпадают.",
       wrongOld: "Неверный текущий пароль.",
+      saveFailed: "Не удалось сохранить пароль. Попробуйте ещё раз.",
     },
     notifications: {
       items: {
@@ -627,6 +667,62 @@ export const ruOverrides = {
   },
   scrollToTop: {
     ariaLabel: "Наверх",
+  },
+  carousel: {
+    previousAriaLabel: "Предыдущий товар",
+    nextAriaLabel: "Следующий товар",
+    compareAriaLabel: "Добавить к сравнению или убрать",
+    wishlistAddAriaLabel: "Добавить в избранное",
+    wishlistRemoveAriaLabel: "Убрать из избранного",
+  },
+  breadcrumbs: { ariaLabel: "Навигационная цепочка" },
+  a11y: { skipToContent: "Перейти к содержимому" },
+  notFoundPage: {
+    seoTitle: "Страница не найдена — Choosy",
+    seoDescription:
+      "Запрошенная страница не существует или была перемещена. Вернитесь на главную или воспользуйтесь поиском.",
+    heading: "404",
+    message: "По этому адресу страницы нет.",
+    backHome: "Вернуться на главную",
+  },
+  comingSoon: {
+    message: "Страница скоро появится.",
+    seoDescription: "Этот раздел пока в разработке. Скоро он будет доступен на Choosy.",
+    titles: {
+      about: "О нас",
+      catalog: "Каталог",
+      compare: "Сравнение",
+      products: "Товары",
+      variety: "Ассортимент",
+      privacyPolicy: "Политика конфиденциальности",
+      termsOfService: "Условия использования",
+    },
+  },
+  seo: {
+    siteName: "Choosy",
+    home: {
+      title: "Choosy — маркетплейс электроники и техники",
+      description:
+        "Находите электронику, бытовую и кухонную технику на Choosy, сравнивайте цены и покупайте удобно.",
+    },
+    filter: {
+      title: "Каталог и сравнение цен — Choosy",
+      description:
+        "Подбирайте товары по бренду, цене, экрану и памяти. Сравнивайте предложения магазинов Армении на Choosy.",
+    },
+    product: {
+      title: "{{title}} — цены и предложения | Choosy",
+      description:
+        "{{title}}: {{priceMin}}–{{priceMax}} AMD. Сравните цены магазинов Армении и выберите лучшее предложение на Choosy.",
+    },
+    account: {
+      title: "Личный кабинет — Choosy",
+      description: "Ваше избранное, просмотренные товары и настройки аккаунта.",
+    },
+    shopAccount: {
+      title: "Кабинет магазина — Choosy",
+      description: "Управление товарами, статистика и финансы для магазинов.",
+    },
   },
 };
 

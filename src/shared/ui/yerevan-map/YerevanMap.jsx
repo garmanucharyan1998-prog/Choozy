@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
@@ -23,22 +23,24 @@ const OSM_ATTRIBUTION =
 const MapResizeAndRecenter = ({ centerLat, centerLng, zoom, layoutKey }) => {
   const map = useMap();
 
-  const syncView = useCallback(() => {
-    map.invalidateSize({ animate: false });
-    map.setView([centerLat, centerLng], zoom, { animate: false });
-  }, [map, centerLat, centerLng, zoom]);
-
+  /**
+   * Resize only refreshes Leaflet's cached size. Re-centering here as well meant any
+   * container resize (orientation change, a sibling column growing) threw away the
+   * pan/zoom the user had just performed.
+   */
   useEffect(() => {
     const el = map.getContainer();
+    const invalidate = () => map.invalidateSize({ animate: false });
+
     if (!el || typeof ResizeObserver === "undefined") {
-      const t = window.setTimeout(syncView, 0);
+      const t = window.setTimeout(invalidate, 0);
       return () => window.clearTimeout(t);
     }
 
     let raf = 0;
     const schedule = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(syncView);
+      raf = requestAnimationFrame(invalidate);
     };
 
     const ro = new ResizeObserver(schedule);
@@ -49,7 +51,12 @@ const MapResizeAndRecenter = ({ centerLat, centerLng, zoom, layoutKey }) => {
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [map, syncView, layoutKey]);
+  }, [map, layoutKey]);
+
+  /** The view follows the props — i.e. only when the target location actually changes. */
+  useEffect(() => {
+    map.setView([centerLat, centerLng], zoom, { animate: false });
+  }, [map, centerLat, centerLng, zoom]);
 
   return null;
 };

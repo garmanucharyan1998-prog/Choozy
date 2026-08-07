@@ -5,16 +5,31 @@ import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProd
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useFilterCatalogPresenter } from "features/filter-catalog";
 import FilterProductCard from "shared/ui/filter-product-card/FilterProductCard";
+import { LocalizedLink } from "shared/ui/link";
 
-const SectionHead = ({ open, title, onToggle }) => (
-  <button
-    type="button"
-    onClick={onToggle}
-    className="flex w-full items-center justify-between gap-2 border-0 bg-transparent py-2 text-start text-base font-semibold text-navy"
-  >
-    <h3 className="m-0 text-base font-semibold text-navy">{title}</h3>
-    <FaChevronDown className={`h-4 w-4 shrink-0 text-link-blue transition-transform ${open ? "rotate-180" : ""}`} aria-hidden />
-  </button>
+const PAGE_LINK_IDLE =
+  "inline-block rounded-lg border border-border-blue px-3 py-2 text-sm text-navy no-underline hover:bg-hover-blue";
+
+/**
+ * The heading stays outside the button: a heading nested in a button is not exposed as a
+ * heading by assistive tech, which broke the sidebar's document outline.
+ */
+const SectionHead = ({ open, title, onToggle, panelId }) => (
+  <h3 className="m-0">
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={open}
+      aria-controls={panelId}
+      className="flex w-full items-center justify-between gap-2 border-0 bg-transparent py-2 text-start text-base font-semibold text-navy"
+    >
+      {title}
+      <FaChevronDown
+        className={`h-4 w-4 shrink-0 text-link-blue transition-transform ${open ? "rotate-180" : ""}`}
+        aria-hidden
+      />
+    </button>
+  </h3>
 );
 
 const wishlistMapFromStorage = () => {
@@ -48,7 +63,7 @@ const FilterCatalogWidget = () => {
     viewMode,
     setViewMode,
     page,
-    setPage,
+    buildPageHref,
     pageSize,
     onPageSizeChange,
     sectionsOpen,
@@ -87,6 +102,25 @@ const FilterCatalogWidget = () => {
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prev;
+    };
+  }, [mobileFilterOpen]);
+
+  /** Escape closes the drawer and focus returns to the button that opened it. */
+  useEffect(() => {
+    if (!mobileFilterOpen) return undefined;
+    const opener = document.activeElement;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setMobileFilterOpen(false);
+        setOverlayOptionQuery("");
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      if (opener instanceof HTMLElement) {
+        opener.focus();
+      }
     };
   }, [mobileFilterOpen]);
 
@@ -154,9 +188,10 @@ const FilterCatalogWidget = () => {
           open={sectionsOpen.price}
           title={t("filterPage.filters.price")}
           onToggle={() => toggleSection("price")}
+          panelId={`filter-panel-price${idSuffix}`}
         />
         {sectionsOpen.price ? (
-          <div className="flex flex-col gap-4 pb-4 pt-1">
+          <div id={`filter-panel-price${idSuffix}`} className="flex flex-col gap-4 pb-4 pt-1">
             <div className="flex items-center gap-2">
               <label className="sr-only" htmlFor={`filter-price-min${idSuffix}`}>
                 {t("filterPage.filters.priceMin")}
@@ -185,7 +220,7 @@ const FilterCatalogWidget = () => {
               />
             </div>
             <div className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1">
+              <label className="flex flex-col gap-1">
                 <span className="text-xs text-text-muted">{t("filterPage.filters.priceMin")}</span>
                 <input
                   type="range"
@@ -193,10 +228,11 @@ const FilterCatalogWidget = () => {
                   min={globalMin}
                   max={priceMax}
                   value={priceMin}
+                  aria-valuetext={`${priceMin} AMD`}
                   onChange={(e) => onMinRangeChange(e.target.value)}
                 />
-              </div>
-              <div className="flex flex-col gap-1">
+              </label>
+              <label className="flex flex-col gap-1">
                 <span className="text-xs text-text-muted">{t("filterPage.filters.priceMax")}</span>
                 <input
                   type="range"
@@ -204,9 +240,10 @@ const FilterCatalogWidget = () => {
                   min={priceMin}
                   max={globalMax}
                   value={priceMax}
+                  aria-valuetext={`${priceMax} AMD`}
                   onChange={(e) => onMaxRangeChange(e.target.value)}
                 />
-              </div>
+              </label>
             </div>
           </div>
         ) : null}
@@ -217,9 +254,10 @@ const FilterCatalogWidget = () => {
           open={sectionsOpen.screen}
           title={t("filterPage.filters.screen")}
           onToggle={() => toggleSection("screen")}
+          panelId={`filter-panel-screen${idSuffix}`}
         />
         {sectionsOpen.screen ? (
-          <ul className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1">
+          <ul id={`filter-panel-screen${idSuffix}`} className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1">
             {screenOptions.map((opt) => (
               <li key={opt.id}>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
@@ -244,9 +282,10 @@ const FilterCatalogWidget = () => {
           open={sectionsOpen.brand}
           title={t("filterPage.filters.brandTitle")}
           onToggle={() => toggleSection("brand")}
+          panelId={`filter-panel-brand${idSuffix}`}
         />
         {sectionsOpen.brand ? (
-          <div className="pb-3 pt-1">
+          <div id={`filter-panel-brand${idSuffix}`} className="pb-3 pt-1">
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
               {brandOptionsForOverlay.map((opt) => (
                 <li key={opt.id}>
@@ -282,9 +321,10 @@ const FilterCatalogWidget = () => {
           open={sectionsOpen.ram}
           title={t("filterPage.filters.ram")}
           onToggle={() => toggleSection("ram")}
+          panelId={`filter-panel-ram${idSuffix}`}
         />
         {sectionsOpen.ram ? (
-          <ul className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1">
+          <ul id={`filter-panel-ram${idSuffix}`} className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1">
             {ramOptions.map((opt) => (
               <li key={opt.id}>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
@@ -309,9 +349,10 @@ const FilterCatalogWidget = () => {
           open={sectionsOpen.color}
           title={t("filterPage.filters.color")}
           onToggle={() => toggleSection("color")}
+          panelId={`filter-panel-color${idSuffix}`}
         />
         {sectionsOpen.color ? (
-          <div className="flex flex-wrap gap-3 pb-2 pt-2">
+          <div id={`filter-panel-color${idSuffix}`} className="flex flex-wrap gap-3 pb-2 pt-2">
             {colorOptions.map((opt) => {
               const selected = selectedColor === opt.id;
               return (
@@ -324,7 +365,8 @@ const FilterCatalogWidget = () => {
                   }`}
                   style={{ backgroundColor: opt.hex }}
                   aria-pressed={selected}
-                  title={t(`filterPage.filters.colorNames.${opt.id}`)}
+                  aria-label={t(`filterPage.filters.colorNames.${opt.id}`, opt.id)}
+                  title={t(`filterPage.filters.colorNames.${opt.id}`, opt.id)}
                 />
               );
             })}
@@ -335,10 +377,7 @@ const FilterCatalogWidget = () => {
   );
 
   return (
-    <div
-      className="cont-width-default mx-auto w-full max-w-[1600px] py-6 text-start md:py-8"
-      aria-label={t("filterPage.mainAriaLabel")}
-    >
+    <div className="cont-width-default mx-auto w-full max-w-[1600px] py-6 text-start md:py-8">
       <h1 className="sr-only">{t("filterPage.pageTitle")}</h1>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
         <aside
@@ -351,7 +390,11 @@ const FilterCatalogWidget = () => {
 
         <div className="min-w-0 flex-1">
           <h2 className="sr-only">{t("filterPage.resultsHeading")}</h2>
-          <div className="mb-3 flex flex-col gap-3 lg:hidden" aria-label={t("filterPage.toolbarAriaLabel")}>
+          <div
+            className="mb-3 flex flex-col gap-3 lg:hidden"
+            role="group"
+            aria-label={t("filterPage.toolbarAriaLabel")}
+          >
             <div className="flex items-stretch gap-2">
               <button
                 type="button"
@@ -401,17 +444,23 @@ const FilterCatalogWidget = () => {
               value={search}
               onChange={onSearchChange}
               placeholder={t("filterPage.searchPlaceholder")}
+              aria-label={t("filterPage.searchPlaceholder")}
               className="h-11 w-full rounded-xl border border-border-blue px-4 text-sm text-navy"
             />
           </div>
 
-          <div className="mb-4 hidden flex-col gap-3 lg:flex" aria-label={t("filterPage.toolbarAriaLabel")}>
+          <div
+            className="mb-4 hidden flex-col gap-3 lg:flex"
+            role="group"
+            aria-label={t("filterPage.toolbarAriaLabel")}
+          >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <input
                 type="search"
                 value={search}
                 onChange={onSearchChange}
                 placeholder={t("filterPage.searchPlaceholder")}
+                aria-label={t("filterPage.searchPlaceholder")}
                 className="h-11 w-full min-w-0 max-w-xl rounded-xl border border-border-blue px-4 text-sm text-navy"
               />
               <div className="flex flex-wrap items-center gap-3">
@@ -456,6 +505,7 @@ const FilterCatalogWidget = () => {
           {activeFilterChips.length > 0 ? (
             <div
               className="mb-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              role="group"
               aria-label={t("filterPage.activeChipsAria")}
             >
               {activeFilterChips.map((chip) => (
@@ -478,7 +528,9 @@ const FilterCatalogWidget = () => {
           ) : null}
 
           {totalResults === 0 ? (
-            <p className="py-12 text-center text-text-muted">{t("filterPage.empty")}</p>
+            <p className="py-12 text-center text-text-muted" role="status">
+              {t("filterPage.empty")}
+            </p>
           ) : (
             <>
               <div
@@ -503,31 +555,36 @@ const FilterCatalogWidget = () => {
                 ))}
               </div>
 
+              {/* Real links, so pages beyond the first are reachable and shareable. */}
               <nav
                 className="flex flex-col flex-wrap items-center justify-center gap-4 border-t border-border-blue/60 pt-8 sm:flex-row sm:gap-6"
                 aria-label={t("filterPage.pagination.navAria")}
               >
                 <div className="flex flex-wrap items-center justify-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page <= 1}
-                    className="rounded-lg border border-border-blue px-3 py-2 text-sm text-navy disabled:opacity-40"
-                    aria-label={t("filterPage.pagination.prevAria")}
-                  >
-                    ‹
-                  </button>
+                  {page > 1 ? (
+                    <LocalizedLink
+                      to={buildPageHref(page - 1)}
+                      rel="prev"
+                      className={PAGE_LINK_IDLE}
+                      aria-label={t("filterPage.pagination.prevAria")}
+                    >
+                      ‹
+                    </LocalizedLink>
+                  ) : (
+                    <span className={`${PAGE_LINK_IDLE} opacity-40`} aria-hidden="true">
+                      ‹
+                    </span>
+                  )}
                   {pageNumbers.map((item, idx) =>
                     item === "ellipsis" ? (
                       <span key={`e-${idx}`} className="px-1 text-text-muted">
                         …
                       </span>
                     ) : (
-                      <button
+                      <LocalizedLink
                         key={item}
-                        type="button"
-                        onClick={() => setPage(item)}
-                        className={`min-w-[2.25rem] rounded-lg px-3 py-2 text-sm font-semibold ${
+                        to={buildPageHref(item)}
+                        className={`min-w-[2.25rem] rounded-lg px-3 py-2 text-center text-sm font-semibold no-underline ${
                           page === item
                             ? "border border-navy bg-navy text-white shadow-sm"
                             : "border border-border-blue text-navy hover:bg-hover-blue"
@@ -536,18 +593,23 @@ const FilterCatalogWidget = () => {
                         aria-current={page === item ? "page" : undefined}
                       >
                         {item}
-                      </button>
+                      </LocalizedLink>
                     ),
                   )}
-                  <button
-                    type="button"
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page >= totalPages}
-                    className="rounded-lg border border-border-blue px-3 py-2 text-sm text-navy disabled:opacity-40"
-                    aria-label={t("filterPage.pagination.nextAria")}
-                  >
-                    ›
-                  </button>
+                  {page < totalPages ? (
+                    <LocalizedLink
+                      to={buildPageHref(page + 1)}
+                      rel="next"
+                      className={PAGE_LINK_IDLE}
+                      aria-label={t("filterPage.pagination.nextAria")}
+                    >
+                      ›
+                    </LocalizedLink>
+                  ) : (
+                    <span className={`${PAGE_LINK_IDLE} opacity-40`} aria-hidden="true">
+                      ›
+                    </span>
+                  )}
                 </div>
                 <label className="flex items-center gap-2 text-sm text-navy">
                   <span>{t("filterPage.pagination.showLabel")}:</span>

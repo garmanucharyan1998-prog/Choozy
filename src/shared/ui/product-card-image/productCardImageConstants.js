@@ -6,22 +6,14 @@ export const PRODUCT_CARD_IMAGE_BG = "transparent";
 export const PRODUCT_CARD_IMAGE_VARIANTS = {
   grid: {
     shell: "product-card-image product-card-image--grid",
-    link: "product-card-image__link",
     img: "product-card-image__media",
   },
   carousel: {
     shell: "product-card-image product-card-image--carousel",
-    link: "product-card-image__link",
     img: "product-card-image__media",
   },
   list: {
     shell: "product-card-image product-card-image--list",
-    link: "product-card-image__link",
     img: "product-card-image__media",
   },
-};
-
-export const handleProductCardImageError = (event) => {
-  event.target.onerror = null;
-  event.target.src = PRODUCT_CARD_PLACEHOLDER_IMG;
 };

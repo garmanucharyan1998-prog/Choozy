@@ -21,9 +21,23 @@ const formatTick = (value) =>
  *
  * @param {{ name: string; amount: number; highlight: boolean }[]} data
  */
+/** Rounds up to a clean step so the axis ends on a readable number. */
+const niceCeiling = (value) => {
+  if (!Number.isFinite(value) || value <= 0) return 100000;
+  const magnitude = 10 ** Math.floor(Math.log10(value));
+  const step = magnitude / 2;
+  return Math.ceil(value / step) * step;
+};
+
 const PriceHistoryChart = ({ data, ariaLabel }) => {
-  const maxY = 400000;
-  const yTicks = [100000, 200000, 300000, 400000];
+  /**
+   * Derived from the data instead of a fixed 400 000 ceiling: prices scale per product,
+   * so expensive items had bars running past the top of the axis while cheap ones were
+   * squashed into invisible slivers.
+   */
+  const amounts = (data || []).map((d) => d.amount).filter((n) => Number.isFinite(n));
+  const maxY = niceCeiling(Math.max(...amounts, 0) * 1.1);
+  const yTicks = [1, 2, 3, 4].map((i) => Math.round((maxY / 4) * i));
 
   return (
     <div className="h-[280px] w-full min-w-0" role="img" aria-label={ariaLabel}>

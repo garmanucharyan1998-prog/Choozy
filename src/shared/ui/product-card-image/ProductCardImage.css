@@ -46,9 +46,3 @@
   }
 }
 
-.product-card-image__link {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: block;
-}

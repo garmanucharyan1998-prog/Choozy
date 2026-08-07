@@ -1,5 +1,12 @@
+/*
+ * Clears the fixed mobile bottom navigation. It also shifts up by
+ * `--mobile-viewport-offset-bottom` when browser chrome appears, so both variables
+ * have to be accounted for — otherwise the nav covered the copyright line.
+ */
 .footer-bottom-bar {
-  padding-bottom: var(--mobile-bottom-nav-height, 0px);
+  padding-bottom: calc(
+    var(--mobile-bottom-nav-height, 0px) + var(--mobile-viewport-offset-bottom, 0px)
+  );
 }
 
 @media (min-width: 768px) {

@@ -174,12 +174,18 @@ export const defaultRecentlyViewed = [
   },
 ];
 
+/**
+ * A fresh visitor starts with empty lists: seeding the wishlist made the header badge
+ * claim "8" before anything was saved, and it desynced prerendered HTML from the
+ * hydrated client whenever real data existed.
+ * `defaultWishlistItems` / `defaultRecentlyViewed` are kept as demo fixtures.
+ */
 export const defaultAccountState = {
   profile: { ...defaultProfile },
   avatarDataUrl: "",
   notificationPrefs: { ...defaultNotificationPrefs },
-  wishlistItems: defaultWishlistItems.map((item) => ({ ...item })),
-  recentlyViewed: defaultRecentlyViewed.map((item) => ({ ...item })),
+  wishlistItems: [],
+  recentlyViewed: [],
   subscriptionOptIn: false,
   passwordHash: "",
 };
@@ -233,7 +239,7 @@ const MAX_RECENTLY_VIEWED = 12;
 const normalizeAccountState = (raw) => {
   const value = raw && typeof raw === "object" ? raw : {};
 
-  const rawWishlist = Array.isArray(value.wishlistItems) ? value.wishlistItems : defaultWishlistItems.map((x) => ({ ...x }));
+  const rawWishlist = Array.isArray(value.wishlistItems) ? value.wishlistItems : [];
 
   return {
     profile: {
@@ -246,7 +252,7 @@ const normalizeAccountState = (raw) => {
       ...(value.notificationPrefs && typeof value.notificationPrefs === "object" ? value.notificationPrefs : {}),
     },
     wishlistItems: rawWishlist.map((item) => normalizeWishlistItem(item)).filter((item) => item.id),
-    recentlyViewed: (Array.isArray(value.recentlyViewed) ? value.recentlyViewed : defaultRecentlyViewed.map((x) => ({ ...x })))
+    recentlyViewed: (Array.isArray(value.recentlyViewed) ? value.recentlyViewed : [])
       .map((item) => normalizeRecentItem(item))
       .filter((item) => item.id),
     subscriptionOptIn: Boolean(value.subscriptionOptIn),
@@ -276,7 +282,15 @@ export const writeAccountState = (partialOrFn) => {
   });
 
   if (isBrowser()) {
-    window.localStorage.setItem(ACCOUNT_STORAGE_KEY, JSON.stringify(next));
+    try {
+      window.localStorage.setItem(ACCOUNT_STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /**
+       * Quota exceeded (a large avatar data URL) or storage disabled in private mode.
+       * The write is lost, but the in-memory state below still drives the UI — throwing
+       * here used to take the whole page down.
+       */
+    }
     window.dispatchEvent(new CustomEvent(ACCOUNT_STORAGE_EVENT));
   }
 

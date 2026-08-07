@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   ACCOUNT_STORAGE_EVENT,
   hashPassword,
@@ -9,6 +9,7 @@ import {
   writeAccountState,
 } from "entities/user";
 import { useLanguage } from "contexts";
+import { stripLanguageFromPath, useLocalizedNavigate } from "shared/lib/locale";
 
 const emptyPasswordDraft = () => ({
   oldPassword: "",
@@ -25,7 +26,7 @@ const ACCOUNT_PATH_BY_SIDEBAR = {
 };
 
 const sidebarIdFromPathname = (pathname) => {
-  const base = pathname.replace(/\/$/, "") || "/account";
+  const base = stripLanguageFromPath(pathname).replace(/\/$/, "") || "/account";
   if (base === "/account/favorite") return SIDEBAR_IDS.WISHLIST;
   if (base === "/account/recent") return SIDEBAR_IDS.RECENT;
   if (base === "/account/subscription") return SIDEBAR_IDS.SUBSCRIPTION;
@@ -36,7 +37,7 @@ const sidebarIdFromPathname = (pathname) => {
 export const useAccountPresenter = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useLocalizedNavigate();
 
   const [accountState, setAccountState] = useState(() => readAccountState());
   const [activeSidebarId, setActiveSidebarId] = useState(() => sidebarIdFromPathname(location.pathname));
@@ -170,18 +171,27 @@ export const useAccountPresenter = () => {
 
     const current = readAccountState();
 
-    if (current.passwordHash) {
-      const oldHash = await hashPassword(oldPassword);
-      if (oldHash !== current.passwordHash) {
-        setPasswordErrorKey("account.password.wrongOld");
-        return;
+    /**
+     * `hashPassword` uses `crypto.subtle`, which only exists in a secure context — over
+     * plain HTTP it throws, and without this guard the rejection was swallowed and the
+     * user got no feedback at all.
+     */
+    try {
+      if (current.passwordHash) {
+        const oldHash = await hashPassword(oldPassword);
+        if (oldHash !== current.passwordHash) {
+          setPasswordErrorKey("account.password.wrongOld");
+          return;
+        }
       }
-    }
 
-    const newHash = await hashPassword(newPassword);
-    persist((state) => ({ ...state, passwordHash: newHash }));
-    setPasswordDraft(emptyPasswordDraft());
-    setStatusKey("account.messages.passwordSaved");
+      const newHash = await hashPassword(newPassword);
+      persist((state) => ({ ...state, passwordHash: newHash }));
+      setPasswordDraft(emptyPasswordDraft());
+      setStatusKey("account.messages.passwordSaved");
+    } catch {
+      setPasswordErrorKey("account.password.saveFailed");
+    }
   }, [passwordDraft, persist]);
 
   const cancelPasswordEdit = useCallback(() => {

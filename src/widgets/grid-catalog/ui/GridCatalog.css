@@ -13,7 +13,14 @@
 .item-4 { grid-area: 2 / 2 / 3 / 3; }
 .item-5 { grid-area: 2 / 3 / 3 / 5; }
 
-@media (max-width: 1280px) {
+/*
+ * Upper bounds stop just below the Tailwind breakpoints (xl = 1280px, lg = 1024px,
+ * md = 768px, sm = 480px). With `max-width: 1280px` both this block and Tailwind's
+ * `xl:` utilities applied at exactly 1280px, so `xl:aspect-auto` removed the aspect
+ * ratio while the row height was `auto` — the tiles collapsed to the height of their
+ * caption and the images disappeared.
+ */
+@media (max-width: 1279.98px) {
   .grid-catalog {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: unset;
@@ -28,7 +35,7 @@
   .item-6 { grid-area: 2 / 3 / 3 / 4; }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1023.98px) {
   .grid-catalog {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: unset;
@@ -44,19 +51,19 @@
   .item-5 { grid-area: 3 / 2 / 4 / 3; }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767.98px) {
   .grid-catalog {
     gap: 8px;
   }
 }
 
-@media (max-width: 425px) {
+@media (max-width: 479.98px) {
   .grid-catalog {
     gap: 6px;
   }
 }
 
-@media (max-width: 375px) {
+@media (max-width: 379.98px) {
   .grid-catalog {
     grid-template-columns: 1fr;
     grid-template-rows: none;

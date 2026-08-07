@@ -17,7 +17,8 @@ const NotFoundPage = () => {
       />
       <section className="flex flex-col items-center justify-center min-h-[60vh] gap-6 py-20 text-center">
         <h1 className="text-6xl font-bold text-navy">{t("notFoundPage.heading")}</h1>
-        <p className="text-gray-400 text-lg">{t("notFoundPage.message")}</p>
+        {/* text-gray-400 was ~2.8:1 on white — well below AA. */}
+        <p className="text-text-muted text-lg">{t("notFoundPage.message")}</p>
         <Link
           to="/"
           className="px-6 py-3 bg-navy text-white rounded-pill text-sm font-semibold no-underline hover:opacity-80 transition-opacity"

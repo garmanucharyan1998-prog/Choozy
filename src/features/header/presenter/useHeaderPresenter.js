@@ -3,17 +3,17 @@
  * Manages search state, language state, passes to View.
  */
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { searchModel } from "entities/search";
 import { headerModel } from "entities/header";
 import { useLanguage } from "contexts";
+import { useLocalizedNavigate } from "shared/lib/locale";
 
 const { LANGUAGES, DEFAULT_LANGUAGE, MOBILE_MENU_ITEMS } = headerModel;
 const { MIN_QUERY_LENGTH } = searchModel;
 
 export const useHeaderPresenter = () => {
-  const navigate = useNavigate();
+  const navigate = useLocalizedNavigate();
   const { language, setLanguage, t } = useLanguage();
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,6 +22,8 @@ export const useHeaderPresenter = () => {
   const [showNoResults, setShowNoResults] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  /** Last query sent for suggestions — lets us drop out-of-order responses. */
+  const lastSuggestionQueryRef = useRef("");
 
   const currentLanguage = useMemo(
     () => LANGUAGES[language] || LANGUAGES[DEFAULT_LANGUAGE],
@@ -72,12 +74,18 @@ export const useHeaderPresenter = () => {
   }, [navigate]);
 
   const handleSearchInputChange = useCallback(async (e) => {
-    const query = e.target.value.trim();
-    setSearchQuery(query);
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    const query = value.trim();
+    lastSuggestionQueryRef.current = query;
 
     if (query.length >= MIN_QUERY_LENGTH) {
       try {
         const response = await searchModel.fetchSuggestions(query);
+        if (lastSuggestionQueryRef.current !== query) {
+          return;
+        }
         if (response.success) {
           const hasResults = response.data.length > 0;
           setSearchSuggestions(response.data);
@@ -85,6 +93,9 @@ export const useHeaderPresenter = () => {
           setShowSuggestions(true);
         }
       } catch {
+        if (lastSuggestionQueryRef.current !== query) {
+          return;
+        }
         setSearchSuggestions([]);
         setShowNoResults(true);
         setShowSuggestions(true);
@@ -123,6 +134,7 @@ export const useHeaderPresenter = () => {
   );
 
   const handleClearSearch = useCallback(() => {
+    lastSuggestionQueryRef.current = "";
     setSearchQuery("");
     setSearchSuggestions([]);
     setShowSuggestions(false);
@@ -130,10 +142,16 @@ export const useHeaderPresenter = () => {
   }, []);
 
   const handleSearchFocus = useCallback(() => {
-    if (searchQuery.length >= MIN_QUERY_LENGTH) {
+    if (searchQuery.trim().length >= MIN_QUERY_LENGTH) {
       setShowSuggestions(true);
     }
   }, [searchQuery]);
+
+  const handleSearchKeyDown = useCallback((e) => {
+    if (e.key === "Escape") {
+      setShowSuggestions(false);
+    }
+  }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -189,6 +207,7 @@ export const useHeaderPresenter = () => {
     handleSuggestionClick,
     handleClearSearch,
     handleSearchFocus,
+    handleSearchKeyDown,
     isLoginModalOpen,
     openLoginModal,
     closeLoginModal,

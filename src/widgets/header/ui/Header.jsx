@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   FaSearch,
   FaHome,
@@ -14,6 +14,8 @@ import { useHeaderPresenter } from "features/header";
 import { LoginModal } from "features/login";
 import { ACCOUNT_STORAGE_EVENT, readAccountState } from "entities/user";
 import { useLanguage } from "contexts";
+import { LocalizedLink } from "shared/ui/link";
+import { stripLanguageFromPath } from "shared/lib/locale";
 import choozyMainLogo from "shared/assets/logos/choozyMainLogo.svg";
 import "./Header.css";
 
@@ -66,6 +68,7 @@ const Header = ({
     handleSuggestionClick,
     handleClearSearch,
     handleSearchFocus,
+    handleSearchKeyDown,
     isLoginModalOpen,
     openLoginModal,
     closeLoginModal,
@@ -185,8 +188,8 @@ const Header = ({
 
   const LogoSection = useMemo(
     () => (
-      <a
-        href="/"
+      <LocalizedLink
+        to="/"
         className="flex shrink-0 justify-start no-underline"
         aria-label={t("header.brandAriaLabel")}
         title={t("header.brandTitle")}
@@ -201,7 +204,7 @@ const Header = ({
           }`}
           loading="eager"
         />
-      </a>
+      </LocalizedLink>
     ),
     [isCompact, t],
   );
@@ -212,8 +215,8 @@ const Header = ({
         aria-label={t("header.mainNavigationAriaLabel")}
         className="hidden shrink-0 items-center gap-4 px-2 text-xs lg:flex lg:px-4 2xl:px-0"
       >
-        <a
-          href="/about"
+        <LocalizedLink
+          to="/about"
           className={`mx-[5px] flex min-w-0 items-center justify-center gap-1 rounded-pill text-[#333] no-underline transition-all duration-300 hover:bg-accent-blue hover:duration-150 hover:scale-[1.15] lg:scale-100 lg:hover:scale-105 2xl:mx-0 ${
             isCompact
               ? "px-3 py-2 text-[11px] lg:px-3 lg:py-2 2xl:px-4 2xl:py-2.5"
@@ -222,7 +225,7 @@ const Header = ({
           title={t("header.aboutLinkTitle")}
         >
           {t("header.aboutLinkLabel")}
-        </a>
+        </LocalizedLink>
       </nav>
     ),
     [isCompact, t],
@@ -231,15 +234,17 @@ const Header = ({
   const SearchSection = useMemo(
     () => (
       <form
-        className={`search-bar relative flex min-w-0 grow bg-input-bg rounded-pill border-[1.5px] border-accent-blue order-3 w-full md:order-none md:ml-3 md:w-auto md:max-w-[min(100%,280px)] lg:ml-4 lg:max-w-[min(100%,320px)] 2xl:ml-0 2xl:max-w-[400px] transition-all duration-300 ${
-          isCompact ? "pt-1.5 sm:pt-2 md:pt-0" : "pt-2 sm:pt-3 md:pt-0"
+        className={`search-bar relative order-3 flex w-full min-w-0 grow items-center rounded-pill border-[1.5px] border-accent-blue bg-input-bg p-1 transition-all duration-300 md:order-none md:mt-0 md:ml-3 md:w-auto md:max-w-[min(100%,280px)] lg:ml-4 lg:max-w-[min(100%,320px)] 2xl:ml-0 2xl:max-w-[400px] ${
+          isCompact
+            ? "mt-1 h-10 gap-1.5 pl-3 sm:gap-2 2xl:h-11 2xl:pl-4"
+            : "mt-1 h-11 gap-1.5 pl-3 sm:gap-2 sm:pl-4 2xl:h-[52px] 2xl:pl-5"
         }`}
         role="search"
         onSubmit={handleSearchSubmit}
         aria-label={t("header.search.formAriaLabel")}
       >
         <FaSearch
-          className={`text-[#888] self-center text-xs sm:text-sm transition-all duration-300 ${isCompact ? "mr-1 ml-2 sm:mr-1.5 sm:ml-3" : "mr-1.5 ml-2.5 sm:mr-2 sm:ml-[18px]"}`}
+          className="shrink-0 text-xs text-[#888] transition-all duration-300 sm:text-sm"
           aria-hidden="true"
         />
         <input
@@ -248,14 +253,17 @@ const Header = ({
           placeholder={t("header.search.placeholder")}
           aria-label={t("header.search.inputAriaLabel")}
           aria-describedby="search-help"
-          className={`search-input border-none bg-subtle-bg grow text-xs sm:text-sm outline-none transition-all duration-300 ${
-            isCompact ? "p-1.5 sm:p-2 2xl:p-2.5" : "p-2 sm:p-3 2xl:p-4"
-          }`}
+          aria-controls="header-search-suggestions"
+          aria-expanded={showSuggestions}
+          aria-autocomplete="list"
+          role="combobox"
+          /* Placeholder was #8a8f9c (~3.1:1 on the input background) — below AA. */
+          className="search-input min-w-0 flex-1 border-none bg-transparent p-0 text-xs leading-none text-[#171717] outline-none transition-all duration-300 placeholder:text-[#6b7280] sm:text-sm"
           value={searchQuery}
           onChange={handleSearchInputChange}
           onFocus={handleSearchFocus}
+          onKeyDown={handleSearchKeyDown}
           autoComplete="off"
-          style={{ WebkitAppearance: "none" }}
           maxLength="100"
         />
         <div id="search-help" className="sr-only">
@@ -265,34 +273,37 @@ const Header = ({
         {searchQuery && (
           <button
             type="button"
-            className={`bg-transparent border-none text-[#888] cursor-pointer flex items-center justify-center rounded-full transition-all duration-200 hover:bg-input-bg hover:text-[#666] lg:mr-0 ${
-              isCompact ? "p-1.5 mr-2" : "p-2 mr-5"
-            }`}
+            className="flex aspect-square h-full shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-[#888] transition-colors duration-200 hover:bg-white hover:text-[#666]"
             onClick={handleClearSearch}
             aria-label={t("header.search.clearAriaLabel")}
             title={t("header.search.clearTitle")}
           >
-            <FaTimes aria-hidden="true" />
+            <FaTimes size={isCompact ? 12 : 13} aria-hidden="true" />
           </button>
         )}
 
         <button
           type="submit"
-          className={`shrink-0 rounded-pill border-none bg-accent-blue font-semibold text-link-blue transition-all duration-200 hover:enabled:scale-[1.02] hover:enabled:bg-[#c8d4ff] disabled:cursor-not-allowed disabled:opacity-70 2xl:ml-0 ${
+          className={`header-search-submit flex h-full shrink-0 items-center justify-center rounded-pill border-none bg-accent-blue font-semibold text-link-blue transition-all duration-200 hover:enabled:bg-[#c8d4ff] disabled:cursor-not-allowed disabled:opacity-70 md:aspect-square md:rounded-full md:px-0 2xl:aspect-auto 2xl:rounded-pill ${
             isCompact
-              ? "-ml-[76px] px-2.5 py-1.5 text-[11px] sm:-ml-[86px] sm:px-3 sm:py-2 sm:text-xs md:-ml-12 md:px-2 md:py-2 lg:-ml-4 2xl:px-4 2xl:py-2.5 2xl:text-[13px]"
-              : "-ml-[86px] px-3 py-2 text-xs sm:-ml-[100px] sm:px-4 sm:py-3 sm:text-[13px] md:-ml-14 md:px-2.5 md:py-2.5 lg:-ml-5 2xl:px-5 2xl:py-3.5 2xl:text-sm"
+              ? "px-3 text-[11px] sm:px-4 sm:text-xs 2xl:px-4 2xl:text-[13px]"
+              : "px-3.5 text-xs sm:px-5 sm:text-[13px] 2xl:px-5 2xl:text-sm"
           }`}
           aria-label={t("header.search.submitAriaLabel")}
           disabled={!searchQuery.trim()}
         >
           <span className="md:hidden">{t("header.search.submitLabel")}</span>
-          <FaSearch className="hidden md:inline 2xl:hidden" size={14} aria-hidden="true" />
+          <FaSearch
+            className="hidden md:inline 2xl:hidden"
+            size={isCompact ? 13 : 14}
+            aria-hidden="true"
+          />
           <span className="hidden 2xl:inline">{t("header.search.submitLabel")}</span>
         </button>
 
         {showSuggestions && (
           <div
+            id="header-search-suggestions"
             className="absolute top-[calc(100%+0.5rem)] left-0 right-0 bg-subtle-bg border border-accent-blue rounded-[10px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] z-[1000] max-h-[280px] overflow-y-auto py-2"
             role="listbox"
             aria-label={t("header.search.resultsAriaLabel")}
@@ -336,6 +347,7 @@ const Header = ({
       handleClearSearch,
       handleSuggestionClick,
       handleSearchFocus,
+      handleSearchKeyDown,
       isCompact,
       t,
     ],
@@ -411,8 +423,8 @@ const Header = ({
     : t("header.favoritesAriaLabel");
 
   const loginLinkClassName = isCompact
-    ? "tooltip-container relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-2.5 py-1.5 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-2.5 md:py-2 2xl:px-4 2xl:py-2"
-    : "tooltip-container relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-3 py-2 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-3 md:py-2.5 2xl:px-5 2xl:py-2.5";
+    ? "relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-2.5 py-1.5 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-2.5 md:py-2 2xl:px-4 2xl:py-2"
+    : "relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-3 py-2 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-3 md:py-2.5 2xl:px-5 2xl:py-2.5";
 
   const UserNavigationSection = useMemo(
     () => (
@@ -420,9 +432,9 @@ const Header = ({
         className={`flex shrink-0 items-center transition-all duration-300 ${isCompact ? "gap-1 sm:gap-1.5 md:gap-1 2xl:gap-3" : "gap-1.5 sm:gap-2 md:gap-1 lg:gap-1.5 2xl:gap-4"}`}
         aria-label={t("header.userNavigationAriaLabel")}
       >
-        <Link
+        <LocalizedLink
           to="/compare"
-          className={`tooltip-container relative mx-[5px] hidden min-w-0 items-center justify-center gap-1 rounded-pill text-[#333] no-underline transition-all duration-300 hover:bg-accent-blue hover:duration-150 hover:scale-[1.15] md:flex lg:scale-100 lg:hover:scale-105 2xl:mx-0 ${
+          className={`relative mx-[5px] hidden min-w-0 items-center justify-center gap-1 rounded-pill text-[#333] no-underline transition-all duration-300 hover:bg-accent-blue hover:duration-150 hover:scale-[1.15] md:flex lg:scale-100 lg:hover:scale-105 2xl:mx-0 ${
             isCompact ? "p-2 2xl:px-4 2xl:py-2.5" : "p-2.5 2xl:px-5 2xl:py-3.5"
           }`}
           title={t("header.compareTitle")}
@@ -432,11 +444,11 @@ const Header = ({
           <span className="hidden 2xl:ml-[5px] 2xl:inline">
             {t("header.compareLabel")}
           </span>
-        </Link>
+        </LocalizedLink>
 
-        <Link
+        <LocalizedLink
           to="/account/favorite"
-          className={`tooltip-container relative mx-[5px] hidden min-w-0 items-center justify-center rounded-pill text-black no-underline transition-colors duration-200 hover:bg-accent-blue/40 hover:opacity-80 md:inline-flex 2xl:mx-0 2xl:gap-2 2xl:px-2 ${
+          className={`relative mx-[5px] hidden min-w-0 items-center justify-center rounded-pill text-black no-underline transition-colors duration-200 hover:bg-accent-blue/40 hover:opacity-80 md:inline-flex 2xl:mx-0 2xl:gap-2 2xl:px-2 ${
             isCompact ? "p-2 2xl:py-1.5" : "p-2.5 2xl:py-2"
           }`}
           title={t("header.favoritesTitle")}
@@ -449,7 +461,7 @@ const Header = ({
           <span className="hidden text-sm font-semibold tracking-tight text-black 2xl:inline">
             <span className="whitespace-nowrap">{t("header.favoritesLabel")}</span>
           </span>
-        </Link>
+        </LocalizedLink>
 
         <div className="hidden md:block">
           <button
@@ -493,13 +505,15 @@ const Header = ({
             aria-expanded={isLanguageDropdownOpen}
             aria-haspopup="listbox"
           >
+            {/* Square render box, so the 4:3 flag is cropped rather than squashed. */}
             <img
               src={`https://flagcdn.com/w40/${currentLanguage.flag}.png`}
-              alt={currentLanguage.alt}
+              alt=""
               width="24"
-              height="16"
-              className={`${isCompact ? "w-4 h-4 sm:w-5 sm:h-5" : "w-5 h-5 sm:w-6 sm:h-6"} rounded-full border border-[#ccc] transition-all duration-300`}
+              height="24"
+              className={`${isCompact ? "w-4 h-4 sm:w-5 sm:h-5" : "w-5 h-5 sm:w-6 sm:h-6"} rounded-full border border-[#ccc] object-cover transition-all duration-300`}
               loading="lazy"
+              aria-hidden="true"
             />
             <span className={`font-semibold text-[#171717] md:hidden ${isCompact ? "text-[10px] sm:text-[11px]" : "text-[11px] sm:text-xs"}`}>{currentLanguage.name}</span>
             <FaChevronDown
@@ -564,7 +578,8 @@ const Header = ({
     ],
   );
 
-  const currentPath = location.pathname;
+  /** Compared against language-agnostic hrefs, so the prefix must go first. */
+  const currentPath = stripLanguageFromPath(location.pathname);
 
   return (
     <header
@@ -586,20 +601,21 @@ const Header = ({
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-label={t("header.mobileNavigationAriaLabel")}
+        inert={!isMobileMenuOpen}
       >
         <h2 className="m-0 mb-6 text-base font-semibold text-[#171717]">
           {t("header.mobileMenuTitle")}
         </h2>
         <nav className="flex flex-col gap-6 items-start" aria-label={t("header.mobileLinksAriaLabel")}>
           {mobileMenuItems.map((item) => (
-            <a
+            <LocalizedLink
               key={item.id}
-              href={item.href}
+              to={item.href}
               className="block w-full text-left text-[#171717] no-underline text-sm font-medium"
               onClick={handleMobileMenuClose}
             >
               {item.label}
-            </a>
+            </LocalizedLink>
           ))}
         </nav>
       </aside>
@@ -641,7 +657,7 @@ const Header = ({
                     </span>
                   </button>
                 ) : (
-                  <Link
+                  <LocalizedLink
                     to={item.href}
                     className="flex w-full flex-col items-center justify-center gap-1 py-1.5 no-underline transition-colors duration-200"
                     aria-label={item.ariaLabel}
@@ -658,7 +674,7 @@ const Header = ({
                     <span className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
                       {item.label}
                     </span>
-                  </Link>
+                  </LocalizedLink>
                 )}
               </li>
             );

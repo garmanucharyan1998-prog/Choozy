@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } from "react-icons/fa";
 import { getProductDetailHref } from "entities/product-detail";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
+import { useLanguage } from "contexts";
 import { ProductCardImage } from "shared/ui/product-card-image";
+import { LocalizedLink } from "shared/ui/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
@@ -22,10 +23,12 @@ const wishlistMapFromStorage = () => {
   return Object.fromEntries([...ids].map((id) => [id, true]));
 };
 
-const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
+const Carousel = ({ items, ariaLabel }) => {
+  const { t } = useLanguage();
   const safeItems = Array.isArray(items) ? items : [];
   const slideCount = safeItems.length;
-  const loopEnabled = slideCount > 5;
+  /** Swiper needs more slides than the widest `slidesPerView` (5) to loop without gaps. */
+  const loopEnabled = slideCount > 10;
   const swiperRef = useRef(null);
   const [wishlist, setWishlist] = useState(wishlistMapFromStorage);
   const [compare, setCompare] = useState(() => ({}));
@@ -59,7 +62,7 @@ const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
           type="button"
           className={NAV_BTN}
           onClick={() => swiperRef.current?.slidePrev()}
-          aria-label="Previous product"
+          aria-label={t("carousel.previousAriaLabel")}
         >
           <FaChevronLeft className="h-4 w-4" aria-hidden />
         </button>
@@ -89,20 +92,19 @@ const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
 
             return (
               <SwiperSlide key={product.id || index} className="!h-auto">
-                <article className="group flex h-full flex-col text-start">
+                <article className="group relative flex h-full flex-col text-start">
                   <ProductCardImage
                     variant="carousel"
                     className="shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
                     src={product.image}
                     alt={product.title}
-                    href={detailPath || undefined}
                   >
-                    <div className="pointer-events-auto absolute right-2.5 top-2.5 z-10 flex flex-col gap-2 sm:right-3 sm:top-3">
+                    <div className="pointer-events-auto absolute right-2.5 top-2.5 z-20 flex flex-col gap-2 sm:right-3 sm:top-3">
                       <button
                         type="button"
                         onClick={() => toggleCompare(product.id)}
                         aria-pressed={inCompare}
-                        aria-label="Compare product"
+                        aria-label={t("carousel.compareAriaLabel")}
                         className={ACTION_BTN}
                       >
                         <FaBalanceScale className="h-4 w-4" aria-hidden />
@@ -111,7 +113,11 @@ const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
                         type="button"
                         onClick={() => toggleWishlist(product, detailPath || "")}
                         aria-pressed={inWishlist}
-                        aria-label="Add product to wishlist"
+                        aria-label={
+                          inWishlist
+                            ? t("carousel.wishlistRemoveAriaLabel")
+                            : t("carousel.wishlistAddAriaLabel")
+                        }
                         className={ACTION_BTN}
                       >
                         {inWishlist ? (
@@ -123,15 +129,13 @@ const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
                     </div>
                   </ProductCardImage>
 
-                  <Link
-                    to={detailPath || "#"}
-                    className="flex grow flex-col gap-1.5 pt-2.5 text-inherit no-underline outline-none sm:pt-3"
-                    aria-labelledby={`product-title-${index}`}
+                  {/* Single stretched link: the anchor text stays the product title,
+                      while `after:inset-0` keeps the whole card clickable. */}
+                  <LocalizedLink
+                    to={detailPath}
+                    className="flex grow flex-col gap-1.5 pt-2.5 text-inherit no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:pt-3"
                   >
-                    <h3
-                      id={`product-title-${index}`}
-                      className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base"
-                    >
+                    <h3 className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base">
                       {product.title}
                     </h3>
                     <p
@@ -143,7 +147,7 @@ const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
                     <p className="m-0 mt-auto text-sm font-semibold text-navy 2xl:text-base">
                       {product.price}
                     </p>
-                  </Link>
+                  </LocalizedLink>
                 </article>
               </SwiperSlide>
             );
@@ -155,7 +159,7 @@ const Carousel = ({ items, ariaLabel = "Top products carousel" }) => {
           type="button"
           className={NAV_BTN}
           onClick={() => swiperRef.current?.slideNext()}
-          aria-label="Next product"
+          aria-label={t("carousel.nextAriaLabel")}
         >
           <FaChevronRight className="h-4 w-4" aria-hidden />
         </button>

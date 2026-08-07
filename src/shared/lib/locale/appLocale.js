@@ -1,11 +1,13 @@
 /**
- * Single source of truth for app locale → `<html lang>` and `og:locale`.
- * Used by LanguageContext and PageSeo; add new locales only here.
+ * Single source of truth for app locale → `<html lang>`, `og:locale` and `hreflang`.
+ * Used by LanguageContext, PageSeo and the sitemap generator; add new locales only here.
  * html `lang` uses a BCP 47 primary subtag (e.g. hy).
  * Open Graph `og:locale` expects language_REGION (e.g. hy_AM) for social parsers.
  */
 export const APP_LOCALE = {
   am: { htmlLang: "hy", ogLocale: "hy_AM" },
+  en: { htmlLang: "en", ogLocale: "en_US" },
+  ru: { htmlLang: "ru", ogLocale: "ru_RU" },
 };
 
 export const getHtmlLangForAppLanguage = (appLang) => APP_LOCALE[appLang]?.htmlLang ?? appLang;

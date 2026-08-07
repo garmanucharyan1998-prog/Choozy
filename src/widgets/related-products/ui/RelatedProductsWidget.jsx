@@ -1,41 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useLanguage } from "contexts";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useRelatedProductsPresenter } from "features/related-products";
 import { ProductCardImage } from "shared/ui/product-card-image";
+import { LocalizedLink } from "shared/ui/link";
 import "swiper/css";
 
-const FONT_STACK = "MontserratArm, Montserrat, sans-serif";
-
-const TITLE_TEXT_STYLE = {
-  fontFamily: FONT_STACK,
-  fontWeight: 700,
-  fontSize: "16px",
-  lineHeight: "24px",
-  letterSpacing: 0,
-  color: "rgba(21, 33, 71, 1)",
-};
-
-const DESC_TEXT_STYLE = {
-  fontFamily: FONT_STACK,
-  fontWeight: 400,
-  fontSize: "14px",
-  lineHeight: "24px",
-  letterSpacing: 0,
-  color: "rgba(105, 105, 105, 1)",
-};
-
-const PRICE_TEXT_STYLE = {
-  fontFamily: FONT_STACK,
-  fontWeight: 600,
-  fontSize: "16px",
-  lineHeight: "24px",
-  letterSpacing: 0,
-  color: "rgba(21, 33, 71, 1)",
-};
+/** Responsive type scale — fixed inline px would not shrink on narrow screens. */
+const TITLE_TEXT_CLASS = "m-0 line-clamp-2 text-sm font-bold leading-snug text-navy sm:text-base";
+const DESC_TEXT_CLASS = "m-0 line-clamp-2 text-xs leading-snug text-text-muted sm:text-sm";
+const PRICE_TEXT_CLASS = "m-0 pt-0.5 text-sm font-semibold text-navy sm:text-base";
 
 const ACTION_BTN =
   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/[0.06] bg-white text-[rgba(21,33,71,1)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-colors hover:bg-[#f8f9fc] active:scale-[0.98]";
@@ -91,22 +67,22 @@ const RelatedProductsWidget = () => {
         >
           {t("relatedProducts.title")}
         </h2>
-        <a
-          href="/products"
+        <LocalizedLink
+          to="/products"
           className="text-sm font-medium text-link-blue no-underline transition-colors hover:text-navy md:text-sm lg:text-base"
         >
           {t("relatedProducts.viewMoreLabel")}
-        </a>
+        </LocalizedLink>
       </div>
 
       <hr className="mb-4 border-0 border-t border-border-blue pt-4 md:mb-6 md:pt-6" />
 
-      <div className={CAROUSEL_SHELL} aria-label={t("relatedProducts.carouselAriaLabel")}>
+      <div className={CAROUSEL_SHELL} role="group" aria-label={t("relatedProducts.carouselAriaLabel")}>
         <button
           type="button"
           className={NAV_BTN}
           onClick={() => swiperRef.current?.slidePrev()}
-          aria-label="Previous related product"
+          aria-label={t("carousel.previousAriaLabel")}
         >
           <FaChevronLeft className="h-4 w-4" aria-hidden />
         </button>
@@ -116,8 +92,9 @@ const RelatedProductsWidget = () => {
             onSwiper={(instance) => {
               swiperRef.current = instance;
             }}
-            loop
-            watchOverflow={false}
+            /* Looping needs comfortably more slides than the widest slidesPerView (4). */
+            loop={items.length > 8}
+            watchOverflow
             slidesPerView={1.15}
             spaceBetween={14}
             breakpoints={{
@@ -132,15 +109,9 @@ const RelatedProductsWidget = () => {
 
               return (
                 <SwiperSlide key={product.id} className="!h-auto">
-                  <article className="flex h-full flex-col text-start">
-                  <ProductCardImage
-                    src={product.image}
-                    alt={product.title}
-                    href={product.href}
-                    linkTarget="_blank"
-                    linkRel="noopener noreferrer"
-                  >
-                    <div className="pointer-events-auto absolute right-3 top-3 z-10 flex flex-col gap-2">
+                  <article className="relative flex h-full flex-col text-start">
+                  <ProductCardImage src={product.image} alt={product.title}>
+                    <div className="pointer-events-auto absolute right-3 top-3 z-20 flex flex-col gap-2">
                       <button
                         type="button"
                         onClick={(e) => {
@@ -174,26 +145,17 @@ const RelatedProductsWidget = () => {
                     </div>
                   </ProductCardImage>
 
-                  <Link
+                  {/* One stretched link per card — keeps the product title as the anchor text. */}
+                  <LocalizedLink
                     to={product.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-col gap-1 pt-3 no-underline outline-none"
+                    className="flex flex-col gap-1 pt-3 no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
                   >
-                    <h3 className="m-0 line-clamp-2" style={TITLE_TEXT_STYLE}>
-                      {product.title}
-                    </h3>
-                    <p
-                      className="m-0 line-clamp-2"
-                      style={DESC_TEXT_STYLE}
-                      title={product.description}
-                    >
+                    <h3 className={TITLE_TEXT_CLASS}>{product.title}</h3>
+                    <p className={DESC_TEXT_CLASS} title={product.description}>
                       {product.description}
                     </p>
-                    <p className="m-0 pt-0.5" style={PRICE_TEXT_STYLE}>
-                      {product.price}
-                    </p>
-                  </Link>
+                    <p className={PRICE_TEXT_CLASS}>{product.price}</p>
+                  </LocalizedLink>
                 </article>
               </SwiperSlide>
             );
@@ -205,7 +167,7 @@ const RelatedProductsWidget = () => {
           type="button"
           className={NAV_BTN}
           onClick={() => swiperRef.current?.slideNext()}
-          aria-label="Next related product"
+          aria-label={t("carousel.nextAriaLabel")}
         >
           <FaChevronRight className="h-4 w-4" aria-hidden />
         </button>

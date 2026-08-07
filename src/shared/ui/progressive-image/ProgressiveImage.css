@@ -2,18 +2,25 @@
   display: contents;
 }
 
+/*
+ * Fade-in driven purely by CSS. A JS/state-driven class would differ between the
+ * prerendered HTML and the first client render and break hydration.
+ */
 .progressive-image__media {
-  transition: filter 280ms ease, opacity 280ms ease;
+  animation: progressive-image-fade-in 240ms ease-out both;
 }
 
-.progressive-image__media--preview {
-  filter: blur(8px);
-  transform: scale(1.02);
-  opacity: 0.95;
+@keyframes progressive-image-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.progressive-image__media--ready {
-  filter: none;
-  transform: none;
-  opacity: 1;
+@media (prefers-reduced-motion: reduce) {
+  .progressive-image__media {
+    animation: none;
+  }
 }

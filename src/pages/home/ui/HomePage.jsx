@@ -7,10 +7,12 @@ import { ServicesOverviewWidget } from "widgets/services-overview";
 import { TopProductsWidget } from "widgets/top-products";
 import { VarietyWidget } from "widgets/variety";
 import { useLanguage } from "contexts";
+import { PageSeo } from "shared/lib/seo";
 import { useHomePagePresenter } from "pages/home/presenter/useHomePagePresenter";
+import { buildHomeJsonLd } from "pages/home/model/homeJsonLd";
 
 const HomePage = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const {
     isCompactHeader,
     isMobileMenuOpen,
@@ -21,10 +23,21 @@ const HomePage = () => {
     toggleMobileCatalog,
     closeMobileCatalog,
     closeAllMobilePanels,
+    headerShellRef,
   } = useHomePagePresenter();
 
   return (
     <div className="flex min-h-screen min-w-[320px] flex-col bg-white text-center">
+      <PageSeo
+        title={t("seo.home.title")}
+        description={t("seo.home.description")}
+        path="/"
+        jsonLd={buildHomeJsonLd({
+          language,
+          siteName: t("seo.siteName"),
+          description: t("seo.home.description"),
+        })}
+      />
       <div
         className={`fixed inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[65] bg-black/45 transition-opacity duration-[400ms] ease-in-out md:hidden ${
           isAnyMobilePanelOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
@@ -33,32 +46,35 @@ const HomePage = () => {
         aria-hidden="true"
       />
 
-      <div
-        className={`sticky top-0 z-[70] relative bg-white transition-all duration-300 ${
-          isCompactHeader ? "shadow-[0_6px_18px_rgba(0,0,0,0.08)]" : ""
-        }`}
-      >
-        <HeaderWidget
-          isCompact={isCompactHeader}
-          isMobileMenuOpen={isMobileMenuOpen}
-          onToggleMobileMenu={toggleMobileMenu}
-          onCloseMobileMenu={closeMobileMenu}
-        />
+      <div className="header-shell-spacer sticky top-0 z-[70] shrink-0">
         <div
-          className={`absolute inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[5] bg-black/35 transition-opacity duration-[400ms] ease-in-out pointer-events-none md:hidden ${
-            isAnyMobilePanelOpen ? "opacity-100" : "opacity-0"
+          ref={headerShellRef}
+          className={`absolute inset-x-0 top-0 bg-white transition-all duration-300 ${
+            isCompactHeader ? "shadow-[0_6px_18px_rgba(0,0,0,0.08)]" : ""
           }`}
-          aria-hidden="true"
-        />
-        <NavPanelWidget
-          isCompact={isCompactHeader}
-          isMobileCatalogOpen={isMobileCatalogOpen}
-          onToggleMobileCatalog={toggleMobileCatalog}
-          onCloseMobileCatalog={closeMobileCatalog}
-        />
+        >
+          <HeaderWidget
+            isCompact={isCompactHeader}
+            isMobileMenuOpen={isMobileMenuOpen}
+            onToggleMobileMenu={toggleMobileMenu}
+            onCloseMobileMenu={closeMobileMenu}
+          />
+          <div
+            className={`absolute inset-x-0 top-[var(--header-height,72px)] bottom-0 z-[5] bg-black/35 transition-opacity duration-[400ms] ease-in-out pointer-events-none md:hidden ${
+              isAnyMobilePanelOpen ? "opacity-100" : "opacity-0"
+            }`}
+            aria-hidden="true"
+          />
+          <NavPanelWidget
+            isCompact={isCompactHeader}
+            isMobileCatalogOpen={isMobileCatalogOpen}
+            onToggleMobileCatalog={toggleMobileCatalog}
+            onCloseMobileCatalog={closeMobileCatalog}
+          />
+        </div>
       </div>
 
-      <main className="flex flex-1 flex-col bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
+      <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
         <h1 className="sr-only">{t("home.pageTitle")}</h1>
         <GridCatalogWidget />
         <TopProductsWidget />

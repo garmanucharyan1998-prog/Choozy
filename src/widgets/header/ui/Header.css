@@ -1,14 +1,4 @@
 /* Favorites row — product count badge (avoids TSX parse issues with arbitrary Tailwind brackets) */
-.header-favorites-link__content {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.header-favorites-link__label {
-  display: none;
-}
-
 .header-favorites-count-badge {
   position: absolute;
   top: 0;
@@ -43,11 +33,6 @@
 }
 
 @media (min-width: 1440px) {
-  .header-favorites-link__label {
-    display: inline;
-    margin-left: 5px;
-  }
-
   .header-favorites-count-badge {
     left: auto;
     right: 0;
@@ -55,62 +40,29 @@
   }
 }
 
-.header-lang-switcher__text,
-.header-lang-switcher__chevron {
-  display: inline;
+/*
+ * Webkit search input overrides — no Tailwind equivalent.
+ * Kept in CSS rather than an inline style: browsers normalise `-webkit-appearance`
+ * to `appearance` in the DOM, so an inline value never matched the prerendered
+ * markup and failed hydration.
+ */
+.search-input {
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-/* Webkit search input overrides — no Tailwind equivalent */
 .search-input::-webkit-search-cancel-button,
 .search-input::-webkit-search-decoration {
   display: none;
 }
 
-.header-search-submit {
-  white-space: nowrap;
+/* iOS Safari zooms the whole page when a focused field is under 16px */
+@media (max-width: 767.98px) {
+  .search-input {
+    font-size: 16px;
+  }
 }
 
-/* Tooltip pseudo-elements — content: attr() has no Tailwind equivalent */
-@media (max-width: 1439px) {
-  .tooltip-container::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #333;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.3s, visibility 0.3s;
-    z-index: 1000;
-  }
-
-  .tooltip-container::before {
-    content: "";
-    position: absolute;
-    bottom: -29px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 5px solid #333;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.3s, visibility 0.3s;
-    z-index: 1000;
-  }
-
-  .tooltip-container:hover::after,
-  .tooltip-container:hover::before {
-    display: none;
-  }
+.header-search-submit {
+  white-space: nowrap;
 }

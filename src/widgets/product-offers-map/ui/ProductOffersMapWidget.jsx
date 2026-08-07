@@ -1,11 +1,23 @@
 import { useMemo } from "react";
+import { useParams } from "react-router-dom";
 import { useLanguage } from "contexts";
 import { useProductOffersPresenter } from "features/product-offers";
+import { getProductDetailForRoute } from "entities/product-detail";
 import { YerevanMap } from "shared/ui/yerevan-map";
 
 const ProductOffersMapWidget = () => {
   const { t } = useLanguage();
+  const { productId } = useParams();
   const { specsRows, mapCenter, mapMarkers } = useProductOffersPresenter();
+
+  /**
+   * Resolved directly from the route (a pure lookup) rather than through the detail
+   * presenter, which owns side effects like the recently-viewed history.
+   */
+  const productTitle = useMemo(() => {
+    const product = getProductDetailForRoute(productId);
+    return product?.listingTitle || t("productDetail.title");
+  }, [productId, t]);
 
   const markersWithTitles = useMemo(
     () =>
@@ -29,7 +41,7 @@ const ProductOffersMapWidget = () => {
         >
           <div className="flex flex-col gap-2">
             <h3 className="m-0 text-lg font-semibold text-text-dark md:text-xl">
-              {t("productDetail.title")}
+              {productTitle}
             </h3>
             <h4 className="m-0 text-sm font-semibold text-navy md:text-base">
               {t("productOffers.tabs.specs")}

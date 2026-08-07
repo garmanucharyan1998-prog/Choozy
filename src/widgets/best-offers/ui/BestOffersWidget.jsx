@@ -48,58 +48,12 @@ const ALIGNED_VARIANT_PILL =
 const ALIGNED_PRICE_CELL_CLASS =
   "flex min-w-0 items-center justify-end justify-self-end self-center";
 
-const WIDE_SHOP_ROW_CLASS = "flex items-center gap-3";
 
 const SHOP_META_COLUMN_CLASS = "flex min-w-0 flex-col justify-center gap-1";
 
 /** Min-height matches sibling logo box so URL centers when badge is missing. */
 const SHOP_META_H_14_CLASS = `${SHOP_META_COLUMN_CLASS} min-h-14`;
-const SHOP_META_H_16_CLASS = `${SHOP_META_COLUMN_CLASS} min-h-16`;
-const WIDE_SHOP_META_CLASS = SHOP_META_H_16_CLASS;
-const MEDIUM_SHOP_META_CLASS = SHOP_META_H_14_CLASS;
 const MOBILE_SHOP_META_CLASS = SHOP_META_H_14_CLASS;
-
-const WIDE_LOGO_BOX_CLASS =
-  "flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-border-blue bg-white p-2";
-
-const OPTIONS_STACK_CLASS =
-  "mx-auto flex w-max max-w-full flex-col items-start gap-2";
-
-/* Laptop (lg / 1024px–1439px) */
-const LAPTOP_ROW_CLASS =
-  "hidden border-b border-border-blue py-4 lg:hidden";
-
-const LAPTOP_LEFT_CLASS =
-  "flex min-w-0 shrink-0 flex-col gap-2 lg:w-[min(38%,17.5rem)] lg:max-w-[17.5rem]";
-
-const LAPTOP_DESC_CLASS =
-  "m-0 min-w-0 w-full line-clamp-2 overflow-hidden text-ellipsis text-[13px] leading-[1.35] text-text-muted";
-
-const LAPTOP_CENTER_CLASS =
-  "flex min-w-0 flex-1 flex-col items-center justify-center gap-2 px-1 lg:gap-2.5 lg:px-2";
-
-const LAPTOP_VARIANTS_CLASS =
-  "flex max-w-full flex-wrap items-center justify-center gap-1.5 lg:flex-nowrap";
-
-const LAPTOP_PRICE_CLASS = "ml-auto shrink-0 self-center pl-1";
-
-/* Medium row retired — stacked card (MOBILE_ROW) covers md–2xl */
-const MEDIUM_ROW_CLASS = "hidden border-b border-border-blue py-4";
-
-const MEDIUM_LEFT_CLASS =
-  "flex min-w-0 shrink-0 basis-[34%] flex-col gap-1.5 max-w-[11rem]";
-
-const MEDIUM_LOGO_BOX_CLASS =
-  "flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-border-blue bg-white p-1.5";
-
-const MEDIUM_CENTER_CLASS =
-  "flex min-w-0 flex-1 flex-col items-center justify-center gap-1.5";
-
-const MEDIUM_VARIANTS_CLASS =
-  "flex max-w-full flex-wrap items-center justify-center gap-1";
-
-const MEDIUM_DESC_CLASS =
-  "m-0 min-w-0 w-full line-clamp-2 overflow-hidden text-ellipsis text-[12px] leading-[1.3] text-text-muted";
 
 const MOBILE_OPTIONS_STACK_CLASS =
   "flex w-max max-w-full flex-col items-start gap-3";
@@ -185,7 +139,7 @@ const BestOffersWidget = () => {
 
   const renderLogoMark = (logoLabel, boxClassName) => (
     <div className={boxClassName}>
-      <span className="text-center text-xs font-extrabold uppercase tracking-tight text-navy sm:text-sm">
+      <span className="text-center text-xs font-bold uppercase tracking-tight text-navy sm:text-sm">
         {logoLabel}
       </span>
     </div>
@@ -194,12 +148,16 @@ const BestOffersWidget = () => {
   const renderShopMeta = (offer, metaClassName) => (
     <div className={metaClassName}>
       {offer.badgeKey ? renderBadge(offer.badgeKey) : null}
+      {/*
+        Commercial outbound links: `nofollow sponsored` keeps them from passing ranking
+        signals. No `aria-label` — it used to override the visible shop name, so every
+        offer link was announced identically ("go to shop").
+      */}
       <a
         href={offer.url}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="nofollow sponsored noopener noreferrer"
         className={OFFER_SHOP_LINK_CLASS}
-        aria-label={t("productOffers.goToShopAria")}
       >
         {offer.shopUrlLabel}
       </a>
@@ -237,57 +195,6 @@ const BestOffersWidget = () => {
     );
   };
 
-  const renderWideOfferRow = ({
-    rowClass,
-    leftClass,
-    descClass,
-    centerClass,
-    colorsClass,
-    priceClass,
-    borderClass,
-    offer,
-    activeVariantIndex,
-    colorIndex,
-    keyPrefix,
-    logoBoxClass = WIDE_LOGO_BOX_CLASS,
-    shopMetaClass = WIDE_SHOP_META_CLASS,
-    variantsClass = LAPTOP_VARIANTS_CLASS,
-    optionsStackClass = OPTIONS_STACK_CLASS,
-  }) => (
-    <div className={`${rowClass} ${borderClass}`}>
-      <div className={leftClass}>
-        <div className={WIDE_SHOP_ROW_CLASS}>
-          {renderLogoMark(offer.logoLabel, logoBoxClass)}
-          {renderShopMeta(offer, shopMetaClass)}
-        </div>
-        {renderOfferDescription(offer.descriptionKey, descClass)}
-      </div>
-
-      <div className={centerClass}>
-        <div className={optionsStackClass}>
-          <div className={variantsClass}>
-            {offer.variantKeys.map((variantKey, variantIndex) => (
-              <button
-                key={`${offer.id}-${keyPrefix}-${variantKey}-${variantIndex}`}
-                type="button"
-                onClick={() => selectVariantForOffer(offer.id, variantIndex)}
-                aria-pressed={activeVariantIndex === variantIndex}
-                className={`${VARIANT_PILL_BASE} ${
-                  activeVariantIndex === variantIndex ? VARIANT_PILL_ACTIVE : VARIANT_PILL_IDLE
-                }`}
-              >
-                {t(variantKey)}
-              </button>
-            ))}
-          </div>
-          {renderColorRow(offer, colorIndex, colorsClass)}
-        </div>
-      </div>
-
-      <div className={priceClass}>{renderPrice(offer)}</div>
-    </div>
-  );
-
   const renderColorRow = (offer, colorIndex, rowClassName = COLORS_ROW_ONE_LINE_CLASS) => (
     <div
       role="group"
@@ -302,8 +209,8 @@ const BestOffersWidget = () => {
             type="button"
             onClick={() => selectColorForOffer(offer.id, index)}
             aria-pressed={isActive}
-            aria-label={color.id}
-            title={color.id}
+            aria-label={t(`filterPage.filters.colorNames.${color.id}`, color.id)}
+            title={t(`filterPage.filters.colorNames.${color.id}`, color.id)}
             className={`${COLOR_SWATCH_BASE} ${
               isActive ? "ring-2 ring-offset-2 ring-[rgba(242,201,76,1)]" : ""
             }`}
@@ -440,39 +347,12 @@ const BestOffersWidget = () => {
                 colorIndex,
               })}
 
-              {/* 1024–1439px (lg) */}
-              {renderWideOfferRow({
-                rowClass: LAPTOP_ROW_CLASS,
-                leftClass: LAPTOP_LEFT_CLASS,
-                descClass: LAPTOP_DESC_CLASS,
-                centerClass: LAPTOP_CENTER_CLASS,
-                colorsClass: COLORS_ROW_ONE_LINE_CLASS,
-                priceClass: LAPTOP_PRICE_CLASS,
-                variantsClass: LAPTOP_VARIANTS_CLASS,
-                borderClass,
-                offer,
-                activeVariantIndex,
-                colorIndex,
-                keyPrefix: "lg",
-              })}
-
-              {/* 768–1023px (md) */}
-              {renderWideOfferRow({
-                rowClass: MEDIUM_ROW_CLASS,
-                leftClass: MEDIUM_LEFT_CLASS,
-                descClass: MEDIUM_DESC_CLASS,
-                centerClass: MEDIUM_CENTER_CLASS,
-                colorsClass: COLORS_ROW_ONE_LINE_CLASS,
-                priceClass: LAPTOP_PRICE_CLASS,
-                logoBoxClass: MEDIUM_LOGO_BOX_CLASS,
-                shopMetaClass: MEDIUM_SHOP_META_CLASS,
-                variantsClass: MEDIUM_VARIANTS_CLASS,
-                borderClass,
-                offer,
-                activeVariantIndex,
-                colorIndex,
-                keyPrefix: "md",
-              })}
+              {/*
+                Two layouts, not four. The former "lg" and "md" rows carried both
+                `hidden` and a `*:hidden` utility, so they never displayed at any width
+                while still rendering — every offer (and its shop link) appeared in the
+                DOM four times. Below 1440px the stacked card below is what shows.
+              */}
 
               {/* Stacked card below 2xl (mobile + tablet, e.g. 1044px) */}
               <div className={`${MOBILE_ROW_CLASS} ${borderClass}`}>
