@@ -1,20 +1,19 @@
 import { FilterCatalogWidget } from "widgets/filter-catalog";
-import { useLanguage } from "contexts";
-import { PageSeo } from "shared/lib/seo";
+import { getTranslator } from "shared/i18n";
+import { buildPageMeta } from "shared/lib/seo";
+import { getLanguageFromPath } from "shared/lib/locale";
 
-const FilterProduct = () => {
-  const { t } = useLanguage();
+export function meta({ location }) {
+  const language = getLanguageFromPath(location.pathname);
+  const t = getTranslator(language);
+  return buildPageMeta({
+    title: t("seo.filter.title"),
+    description: t("seo.filter.description"),
+    language,
+    path: "/filter",
+  });
+}
 
-  return (
-    <>
-      <PageSeo
-        title={t("seo.filter.title")}
-        description={t("seo.filter.description")}
-        path="/filter"
-      />
-      <FilterCatalogWidget />
-    </>
-  );
-};
+const FilterProduct = () => <FilterCatalogWidget />;
 
 export default FilterProduct;

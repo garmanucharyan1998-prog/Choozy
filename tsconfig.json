@@ -11,11 +11,19 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+    /**
+     * Lets TS resolve `./+types/root` (imported from src/root.tsx) against the
+     * generated `.react-router/types/src/+types/root.ts` — react-router's typegen
+     * writes route-specific types into a mirrored tree here rather than alongside
+     * the route files themselves.
+     */
+    "rootDirs": [".", "./.react-router/types"]
   },
-  "include": ["src"]
+  "include": ["src", ".react-router/types"]
 }

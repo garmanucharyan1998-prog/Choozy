@@ -1,21 +1,20 @@
 import { ShopAccountDashboardWidget } from "widgets/shop-account-dashboard";
-import { useLanguage } from "contexts";
-import { PageSeo } from "shared/lib/seo";
+import { getTranslator } from "shared/i18n";
+import { buildPageMeta } from "shared/lib/seo";
+import { getLanguageFromPath } from "shared/lib/locale";
 
-const ShopAccountPage = () => {
-  const { t } = useLanguage();
+export function meta({ location }) {
+  const language = getLanguageFromPath(location.pathname);
+  const t = getTranslator(language);
+  return buildPageMeta({
+    title: t("seo.shopAccount.title"),
+    description: t("seo.shopAccount.description"),
+    language,
+    path: "/account/shop-account",
+    noIndex: true,
+  });
+}
 
-  return (
-    <>
-      <PageSeo
-        title={t("seo.shopAccount.title")}
-        description={t("seo.shopAccount.description")}
-        path="/account/shop-account"
-        noIndex
-      />
-      <ShopAccountDashboardWidget />
-    </>
-  );
-};
+const ShopAccountPage = () => <ShopAccountDashboardWidget />;
 
 export default ShopAccountPage;

@@ -11,6 +11,9 @@
 # production
 /build
 
+# react-router typegen output
+/.react-router
+
 # misc
 .DS_Store
 .env.local

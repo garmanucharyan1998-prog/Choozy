@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import { FooterWidget } from "widgets/footer";
 import { HeaderWidget } from "widgets/header";
 import { NavPanelWidget } from "widgets/nav-panel";

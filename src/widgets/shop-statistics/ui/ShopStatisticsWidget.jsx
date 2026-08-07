@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { useLanguage } from "contexts";
 import { demoShopStatisticsMetrics } from "../model/demoShopStatistics";
@@ -15,6 +15,15 @@ const MainCard = ({ children, className = "" }) => (
 const ShopStatisticsWidget = () => {
   const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
+  /**
+   * `ResponsiveContainer` measures its container to size the chart — meaningless during
+   * SSR (no layout engine on the server), where it renders `width(-1) height(-1)` and
+   * Recharts logs a console warning. Server and the client's first render both show the
+   * placeholder div at the same height, so there's no layout shift or hydration mismatch;
+   * the real chart only mounts after.
+   */
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => setHasMounted(true), []);
 
   const active = demoShopStatisticsMetrics[activeIndex] ?? demoShopStatisticsMetrics[0];
   const chartData = active.series;
@@ -98,39 +107,46 @@ const ShopStatisticsWidget = () => {
           role="img"
           aria-label={t("shopAccount.statistics.chartAria")}
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 12, right: 8, left: 4, bottom: 4 }}>
-              <CartesianGrid stroke={GRID_STROKE} strokeDasharray="0" vertical={false} horizontal />
-              <XAxis
-                dataKey="day"
-                type="number"
-                domain={["dataMin", "dataMax"]}
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: "#696969", fontSize: 11 }}
-                allowDecimals={false}
-              />
-              <YAxis
-                orientation="right"
-                domain={active.yDomain}
-                ticks={active.yTicks}
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: "#696969", fontSize: 11 }}
-                width={40}
-                tickFormatter={(v) => (typeof v === "number" ? v.toLocaleString("hy-AM") : v)}
-              />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke={LINE_STROKE}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, fill: LINE_STROKE, stroke: "#fff", strokeWidth: 2 }}
-                isAnimationActive={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {hasMounted && (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 12, right: 8, left: 4, bottom: 4 }}>
+                <CartesianGrid
+                  stroke={GRID_STROKE}
+                  strokeDasharray="0"
+                  vertical={false}
+                  horizontal
+                />
+                <XAxis
+                  dataKey="day"
+                  type="number"
+                  domain={["dataMin", "dataMax"]}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: "#696969", fontSize: 11 }}
+                  allowDecimals={false}
+                />
+                <YAxis
+                  orientation="right"
+                  domain={active.yDomain}
+                  ticks={active.yTicks}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: "#696969", fontSize: 11 }}
+                  width={40}
+                  tickFormatter={(v) => (typeof v === "number" ? v.toLocaleString("hy-AM") : v)}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke={LINE_STROKE}
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4, fill: LINE_STROKE, stroke: "#fff", strokeWidth: 2 }}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </MainCard>

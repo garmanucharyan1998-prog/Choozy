@@ -9,3 +9,4 @@ export {
   writeStoredLanguage,
 } from "./languageConfig";
 export { buildLocale } from "./mergeLocale";
+export { getTranslator } from "./getTranslator";

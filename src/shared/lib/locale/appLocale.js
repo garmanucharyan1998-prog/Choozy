@@ -1,6 +1,6 @@
 /**
  * Single source of truth for app locale → `<html lang>`, `og:locale` and `hreflang`.
- * Used by LanguageContext, PageSeo and the sitemap generator; add new locales only here.
+ * Used by LanguageContext, buildPageMeta and the sitemap generator; add new locales only here.
  * html `lang` uses a BCP 47 primary subtag (e.g. hy).
  * Open Graph `og:locale` expects language_REGION (e.g. hy_AM) for social parsers.
  */

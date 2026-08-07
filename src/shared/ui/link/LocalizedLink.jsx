@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useLanguage } from "contexts";
 import { localizedPath } from "shared/lib/locale";
 

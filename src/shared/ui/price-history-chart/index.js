@@ -1,1 +1,1 @@
-export { default as PriceHistoryChart } from "./PriceHistoryChart";
+export { default as PriceHistoryChart } from "./PriceHistoryChartClientOnly";

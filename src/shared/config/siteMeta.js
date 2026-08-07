@@ -1,9 +1,9 @@
 /**
  * Canonical site origin for meta tags (OG, Twitter, sitemap alignment).
- * Set REACT_APP_SITE_URL in production (e.g. https://choosy.com).
+ * Set VITE_SITE_URL in production (e.g. https://choosy.com).
  */
 export const getSiteBaseUrl = () => {
-  const fromEnv = process.env.REACT_APP_SITE_URL;
+  const fromEnv = import.meta.env.VITE_SITE_URL;
   if (typeof fromEnv === "string" && fromEnv.trim()) {
     return fromEnv.replace(/\/$/, "");
   }

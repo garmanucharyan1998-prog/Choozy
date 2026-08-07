@@ -3,6 +3,7 @@ const react = require("eslint-plugin-react");
 const reactHooks = require("eslint-plugin-react-hooks");
 const boundaries = require("eslint-plugin-boundaries");
 const globals = require("globals");
+const tsParser = require("@typescript-eslint/parser");
 
 /**
  * Independent lint gate (`npm run lint`), separate from CRA's own build-time
@@ -33,6 +34,19 @@ const globals = require("globals");
  * this config exists to catch, so this isn't optional.
  */
 const elementTypes = [
+  /**
+   * `root.tsx` and `routes.ts` (React Router's framework convention requires them at
+   * the `appDirectory` root, not under `app/**`) are NOT covered by this pattern —
+   * eslint-plugin-boundaries only supports "folder mode" for `boundaries/elements`
+   * (confirmed via its own debug output: a bare top-level file never resolves to a
+   * known element, no matter how the pattern is written), so they're invisible to
+   * `boundaries/dependencies` regardless. Verified by hand instead: `root.tsx` only
+   * imports `contexts` and `shared/*` (plus `react-router` itself) — consistent with
+   * the `app` layer's allowances below. `routes.ts` imports only `@react-router/dev/routes`;
+   * its `pages/*`/`widgets/*` references are string path literals for the framework's
+   * route config, not ES imports, so there's nothing for a linter to check there at all.
+   * Re-check `root.tsx` by hand if its imports change.
+   */
   { type: "app", pattern: "app/**" },
   { type: "pages", pattern: "pages/*/**", capture: ["slice"] },
   { type: "widgets", pattern: "widgets/*/**", capture: ["slice"] },
@@ -57,10 +71,19 @@ module.exports = [
     },
   },
   {
-    files: ["src/**/*.{js,jsx}"],
+    /**
+     * `.ts`/`.tsx` included alongside `.js`/`.jsx` so `root.tsx`/`routes.ts` (framework
+     * entry points, real import relationships worth boundary-checking) aren't silently
+     * skipped — the default parser can't parse TS syntax (e.g. `satisfies`) at all, so
+     * without this they'd just be invisible to every rule below, not merely unchecked.
+     * `@typescript-eslint/parser` is a superset of the default JS parser, so it's safe
+     * to use for the plain `.js`/`.jsx` files in this block too.
+     */
+    files: ["src/**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module",
+      parser: tsParser,
       parserOptions: { ecmaFeatures: { jsx: true } },
       globals: { ...globals.browser, ...globals.node, ...globals.es2021, ...globals.jest },
     },

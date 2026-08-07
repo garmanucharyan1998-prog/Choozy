@@ -4,7 +4,7 @@
  */
 
 import { useMemo } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router";
 import { navModel } from "entities/navigation";
 import { useLanguage } from "contexts";
 import { stripLanguageFromPath } from "shared/lib/locale";

@@ -1,5 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import { LanguageProvider } from "contexts";
 import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProducts";
 import { useFilterCatalogPresenter } from "./useFilterCatalogPresenter";

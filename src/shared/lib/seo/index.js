@@ -1,4 +1,4 @@
-export { PageSeo } from "./PageSeo";
+export { buildPageMeta } from "./buildPageMeta";
 export {
   getIndexableRoutes,
   getLocalizedRouteInventory,

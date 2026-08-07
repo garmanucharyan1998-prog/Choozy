@@ -1,35 +1,37 @@
-import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { translations } from "shared/i18n";
-import {
-  DEFAULT_LANGUAGE_CODE,
-  isSupportedLanguage,
-  writeStoredLanguage,
-} from "shared/i18n/languageConfig";
-import {
-  getHtmlLangForAppLanguage,
-  getLanguageFromPath,
-  localizedPath,
-  stripLanguageFromPath,
-} from "shared/lib/locale";
+import { createContext, useCallback, useContext, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router";
+import { getTranslator } from "shared/i18n/getTranslator";
+import { isSupportedLanguage, writeStoredLanguage } from "shared/i18n/languageConfig";
+import { getLanguageFromPath, localizedPath, stripLanguageFromPath } from "shared/lib/locale";
 
-const FALLBACK_LANGUAGE = DEFAULT_LANGUAGE_CODE;
+/**
+ * @typedef {{
+ *   language: string,
+ *   setLanguage: (nextLanguage: string) => void,
+ *   t: (path: string, fallback?: string) => string,
+ * }} LanguageContextValue
+ */
+
+/**
+ * Explicit generic, not just `createContext(null)`: without it, TS infers the context's
+ * type as exactly `null`, and `useLanguage`'s `if (!context) throw` guard below narrows
+ * the remaining type to `never` — real files that consume `t`/`language`/`setLanguage`
+ * from TypeScript (like `root.tsx`) would then fail to compile with "not callable, type
+ * never has no call signatures" despite the code being correct at runtime.
+ * @type {import("react").Context<LanguageContextValue | null>}
+ */
 const LanguageContext = createContext(null);
-
-const resolveTextByPath = (dictionary, path) =>
-  path.split(".").reduce((acc, segment) => {
-    if (acc && typeof acc === "object") {
-      return acc[segment];
-    }
-    return undefined;
-  }, dictionary);
 
 /**
  * Provides language state and translation helper for UI layers.
  *
  * The URL prefix is the single source of truth for the active language — this keeps
- * prerendered HTML and client hydration in agreement. `localStorage` only records the
+ * the SSR'd HTML and client hydration in agreement. `localStorage` only records the
  * user's preference so the language switcher can be restored on a later visit.
+ *
+ * `<html lang>` is computed directly in `root.tsx`'s `Layout` from the same URL, not
+ * patched in here via an effect — with real SSR there's no reason to wait for a client
+ * mount to get it right.
  */
 export const LanguageProvider = ({ children }) => {
   const location = useLocation();
@@ -49,31 +51,7 @@ export const LanguageProvider = ({ children }) => {
     [language, location.pathname, location.search, location.hash, navigate],
   );
 
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = getHtmlLangForAppLanguage(language);
-    }
-  }, [language]);
-
-  const t = useCallback(
-    (path, fallback = "") => {
-      const localizedDictionary = translations[language] || {};
-      const fallbackDictionary = translations[FALLBACK_LANGUAGE] || {};
-      const localizedValue = resolveTextByPath(localizedDictionary, path);
-
-      if (typeof localizedValue === "string") {
-        return localizedValue;
-      }
-
-      const fallbackValue = resolveTextByPath(fallbackDictionary, path);
-      if (typeof fallbackValue === "string") {
-        return fallbackValue;
-      }
-
-      return fallback || path;
-    },
-    [language],
-  );
+  const t = useMemo(() => getTranslator(language), [language]);
 
   const value = useMemo(
     () => ({

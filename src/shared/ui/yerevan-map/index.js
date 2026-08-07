@@ -1,1 +1,1 @@
-export { default as YerevanMap } from "./YerevanMap";
+export { default as YerevanMap } from "./YerevanMapClientOnly";

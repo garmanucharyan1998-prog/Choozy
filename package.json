@@ -3,39 +3,33 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-router/node": "^7.18.2",
+    "@react-router/serve": "^7.18.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "isbot": "^5.2.1",
     "leaflet": "^1.9.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.6.0",
     "react-leaflet": "^5.0.0",
-    "react-router-dom": "^7.14.1",
-    "react-scripts": "5.0.1",
+    "react-router": "^7.18.2",
     "recharts": "^3.8.1",
-    "swiper": "^11.2.6",
-    "web-vitals": "^2.1.4"
+    "swiper": "^11.2.6"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "postbuild": "node scripts/prerender.mjs",
-    "prerender": "node scripts/prerender.mjs",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "react-router dev",
+    "build": "react-router build",
+    "start": "react-router-serve ./build/server/index.js",
+    "typegen": "react-router typegen",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint . --report-unused-disable-directives",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{js,jsx,css}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,css}\""
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
-      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
-      "^react-router$": "<rootDir>/node_modules/react-router/dist/development/index.js"
-    }
+    "typecheck": "react-router typegen && tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,css}\""
   },
   "browserslist": {
     "production": [
@@ -51,17 +45,25 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@react-router/dev": "^7.18.2",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@typescript-eslint/parser": "^8.66.0",
+    "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.27",
     "eslint": "^9.39.5",
     "eslint-plugin-boundaries": "^7.1.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.9.0",
+    "jsdom": "^30.0.1",
     "postcss": "^8.5.8",
     "prettier": "^3.9.6",
-    "puppeteer": "^25.5.0",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
-    "wawoff2": "^2.0.1"
+    "vite": "^8.2.1",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.10"
   }
 }

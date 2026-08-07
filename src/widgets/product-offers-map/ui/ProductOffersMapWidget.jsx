@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useLanguage } from "contexts";
 import { useProductOffersPresenter } from "features/product-offers";
 import { getProductDetailForRoute } from "entities/product-detail";
