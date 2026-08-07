@@ -678,6 +678,10 @@ export const enOverrides = {
   },
   breadcrumbs: { ariaLabel: "Breadcrumb" },
   a11y: { skipToContent: "Skip to content" },
+  errorBoundary: {
+    heading: "Something went wrong",
+    message: "An error occurred while rendering this page. Try refreshing, or come back later.",
+  },
   notFoundPage: {
     seoTitle: "Page not found — Choosy",
     seoDescription:

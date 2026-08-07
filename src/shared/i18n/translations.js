@@ -777,6 +777,10 @@ const am = {
   a11y: {
     skipToContent: "Անցնել բովանդակությանը",
   },
+  errorBoundary: {
+    heading: "Ինչ-որ բան այնպես չգնաց",
+    message: "Այս էջը ցուցադրելիս սխալ առաջացավ։ Փորձեք թարմացնել էջը կամ վերադառնալ ավելի ուշ։",
+  },
   notFoundPage: {
     seoTitle: "Էջը չի գտնվել — Choosy",
     seoDescription:

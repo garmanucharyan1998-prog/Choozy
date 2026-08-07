@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { HomePage } from "pages/home";
 import { LanguageProvider, useLanguage } from "contexts";
 import { NotFoundPage } from "pages/not-found";
+import { SiteShell } from "widgets/site-shell";
 import { getDefaultProductDetailPath } from "entities/product-detail";
 import { ScrollToTopButton, ScrollToTopOnNavigate } from "shared/ui/scroll-to-top";
 import { DEFAULT_LANGUAGE_CODE, SUPPORTED_LANGUAGE_CODES } from "shared/i18n/languageConfig";
@@ -43,6 +44,24 @@ const PREFIXED_LANGUAGES = SUPPORTED_LANGUAGE_CODES.filter(
 );
 
 /**
+ * Fallback markup for `RouteRenderErrorBoundary`, split out as a function component
+ * because the boundary itself must be a class (only classes support
+ * `getDerivedStateFromError`) and classes can't call the `useLanguage` hook.
+ */
+const RouteRenderErrorFallback = ({ error }) => {
+  const { t } = useLanguage();
+  return (
+    <div className="min-h-[50vh] bg-white px-5 py-10 text-start font-sans">
+      <p className="text-lg font-semibold text-red-700">{t("errorBoundary.heading")}</p>
+      <p className="pt-1 text-sm text-text-muted">{t("errorBoundary.message")}</p>
+      <pre className="max-w-[90vw] whitespace-pre-wrap break-words pt-3 text-sm text-[#333]">
+        {String(error?.message || error)}
+      </pre>
+    </div>
+  );
+};
+
+/**
  * Surfaces React render errors instead of a blank screen.
  */
 class RouteRenderErrorBoundary extends React.Component {
@@ -57,16 +76,7 @@ class RouteRenderErrorBoundary extends React.Component {
 
   render() {
     if (this.state.error) {
-      return (
-        <div className="min-h-[50vh] bg-white px-5 py-10 text-start font-sans">
-          <p className="text-lg font-semibold text-red-700">
-            Something went wrong while rendering this page.
-          </p>
-          <pre className="max-w-[90vw] whitespace-pre-wrap break-words pt-3 text-sm text-[#333]">
-            {String(this.state.error?.message || this.state.error)}
-          </pre>
-        </div>
-      );
+      return <RouteRenderErrorFallback error={this.state.error} />;
     }
     return this.props.children;
   }
@@ -100,33 +110,82 @@ const DefaultProductRedirect = () => <LocalizedNavigate to={getDefaultProductDet
 /**
  * Route table, declared once and mounted for every language.
  * Paths are language-agnostic; the prefix is added when mounting.
+ *
+ * `shell` picks which `SiteShell` variant (see below) a route renders inside — every
+ * route needs one, so the header/nav/footer chrome is never accidentally skipped
+ * (that used to happen for the "coming soon" placeholders and the 404 page, which
+ * had no chrome at all and no way back to the site short of the browser's back button).
  */
 const ROUTE_DEFINITIONS = [
-  { path: "/", element: <HomePage /> },
-  { path: "/singleproduct", element: <DefaultProductRedirect /> },
-  { path: "/singleproduct/:productId", element: <SingleProduct /> },
-  { path: "/filter", element: <FilterProduct /> },
-  { path: "/login", element: <LocalizedNavigate to="/account" /> },
-  { path: "/favorites", element: <LocalizedNavigate to="/account/favorite" /> },
-  { path: "/account", element: <AccountPage /> },
-  { path: "/account/favorite", element: <AccountPage /> },
-  { path: "/account/recent", element: <AccountPage /> },
-  { path: "/account/subscription", element: <AccountPage /> },
-  { path: "/account/notifications", element: <AccountPage /> },
-  { path: "/account/shop-account", element: <ShopAccountPage /> },
-  { path: "/account/shop-account/products", element: <ShopAccountPage /> },
-  { path: "/account/shop-account/statistics", element: <ShopAccountPage /> },
-  { path: "/account/shop-account/finance", element: <ShopAccountPage /> },
-  { path: "/about", element: <AboutPage /> },
-  { path: "/catalog", element: <CatalogPage /> },
-  { path: "/compare", element: <ComparePage /> },
-  { path: "/products", element: <ProductsPage /> },
-  { path: "/variety", element: <VarietyPage /> },
-  { path: "/privacy-policy", element: <PrivacyPolicyPage /> },
-  { path: "/terms-of-service", element: <TermsOfServicePage /> },
+  { path: "/", element: <HomePage />, shell: "white" },
+  { path: "/singleproduct", element: <DefaultProductRedirect />, shell: "white" },
+  { path: "/singleproduct/:productId", element: <SingleProduct />, shell: "white" },
+  { path: "/filter", element: <FilterProduct />, shell: "white" },
+  { path: "/login", element: <LocalizedNavigate to="/account" />, shell: "white" },
+  { path: "/favorites", element: <LocalizedNavigate to="/account/favorite" />, shell: "white" },
+  /**
+   * `/*` covers every tab (`/account/favorite`, `/account/recent`, ...) with one route
+   * instead of five siblings — the presenter already derives the active tab from
+   * `location.pathname` itself (see `sidebarIdFromPathname` in `useAccountPresenter`),
+   * so route matching doesn't need to enumerate every sub-path. React Router ranks the
+   * more specific `/account/shop-account/*` above this one, so it still wins for those URLs.
+   */
+  { path: "/account/*", element: <AccountPage />, shell: "subtle" },
+  { path: "/account/shop-account/*", element: <ShopAccountPage />, shell: "subtle" },
+  { path: "/about", element: <AboutPage />, shell: "white" },
+  { path: "/catalog", element: <CatalogPage />, shell: "white" },
+  { path: "/compare", element: <ComparePage />, shell: "white" },
+  { path: "/products", element: <ProductsPage />, shell: "white" },
+  { path: "/variety", element: <VarietyPage />, shell: "white" },
+  { path: "/privacy-policy", element: <PrivacyPolicyPage />, shell: "white" },
+  { path: "/terms-of-service", element: <TermsOfServicePage />, shell: "white" },
 ];
 
+const SHELL_VARIANTS = ["white", "subtle"];
+
 const prefixRoutePath = (language, path) => (path === "/" ? `/${language}` : `/${language}${path}`);
+
+/** All language variants of a path: `["/", "/ru", "/en"]` for `"/"`. */
+const LANGUAGE_VARIANTS = [null, ...PREFIXED_LANGUAGES];
+
+/**
+ * Builds the full nested route tree once, at module scope, instead of re-mapping
+ * `ROUTE_DEFINITIONS` into `<Route>` elements on every render of `AppRoutes`.
+ *
+ * For each language variant, routes are grouped by `shell` under one `SiteShell`
+ * layout route per variant, so the header/nav/footer instance is shared by every
+ * page that needs the same chrome instead of one being mounted per page.
+ */
+const buildRouteTree = () => {
+  const shellGroups = LANGUAGE_VARIANTS.flatMap((language) =>
+    SHELL_VARIANTS.map((shell) => {
+      const routesForGroup = ROUTE_DEFINITIONS.filter((route) => route.shell === shell);
+      return (
+        <Route
+          key={`shell-${language ?? "default"}-${shell}`}
+          element={<SiteShell mainBackground={shell} />}
+        >
+          {routesForGroup.map((route) => (
+            <Route
+              key={`${language ?? "default"}${route.path}`}
+              path={language ? prefixRoutePath(language, route.path) : route.path}
+              element={route.element}
+            />
+          ))}
+        </Route>
+      );
+    }),
+  );
+
+  return [
+    ...shellGroups,
+    <Route key="not-found-shell" element={<SiteShell mainBackground="white" />}>
+      <Route path="*" element={<NotFoundPage />} />
+    </Route>,
+  ];
+};
+
+const ROUTE_TREE = buildRouteTree();
 
 /**
  * `LanguageProvider` derives the language from the URL, so it must sit inside the router.
@@ -138,21 +197,7 @@ const AppRoutes = () => (
       <ScrollToTopOnNavigate />
       {/* `null` fallback: prerendered pages hydrate instantly, and a spinner would only flash. */}
       <Suspense fallback={null}>
-        <Routes>
-          {ROUTE_DEFINITIONS.map((route) => (
-            <Route key={route.path} path={route.path} element={route.element} />
-          ))}
-          {PREFIXED_LANGUAGES.flatMap((language) =>
-            ROUTE_DEFINITIONS.map((route) => (
-              <Route
-                key={`${language}${route.path}`}
-                path={prefixRoutePath(language, route.path)}
-                element={route.element}
-              />
-            )),
-          )}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <Routes>{ROUTE_TREE}</Routes>
       </Suspense>
       <ScrollToTopButton />
     </RouteRenderErrorBoundary>

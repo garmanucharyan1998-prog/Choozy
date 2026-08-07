@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 /**
- * Home page presenter.
+ * Site shell presenter — sticky header/nav chrome shared by every page.
  * Keeps page-level state and interaction rules out of the view.
  */
-export const useHomePagePresenter = () => {
+export const useSiteShellPresenter = () => {
   const [isCompactHeader, setIsCompactHeader] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileCatalogOpen, setIsMobileCatalogOpen] = useState(false);
@@ -217,4 +217,4 @@ export const useHomePagePresenter = () => {
   };
 };
 
-export default useHomePagePresenter;
+export default useSiteShellPresenter;

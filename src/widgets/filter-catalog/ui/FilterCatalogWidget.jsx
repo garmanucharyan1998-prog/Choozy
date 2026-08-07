@@ -417,7 +417,8 @@ const FilterCatalogWidget = () => {
                 <select
                   value={sort}
                   onChange={onSortChange}
-                  className="h-11 w-full min-w-0 rounded-xl border border-border-blue bg-white px-3 text-sm text-navy"
+                  title={t(sortOptions.find((o) => o.value === sort)?.labelKey)}
+                  className="h-11 w-full min-w-0 truncate rounded-xl border border-border-blue bg-white px-3 text-xs text-navy"
                 >
                   {sortOptions.map((o) => (
                     <option key={o.value} value={o.value}>

@@ -674,6 +674,11 @@ export const ruOverrides = {
   },
   breadcrumbs: { ariaLabel: "Навигационная цепочка" },
   a11y: { skipToContent: "Перейти к содержимому" },
+  errorBoundary: {
+    heading: "Что-то пошло не так",
+    message:
+      "При отображении этой страницы произошла ошибка. Попробуйте обновить страницу или вернуться позже.",
+  },
   notFoundPage: {
     seoTitle: "Страница не найдена — Choosy",
     seoDescription:
