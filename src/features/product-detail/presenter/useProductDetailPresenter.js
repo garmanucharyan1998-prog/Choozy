@@ -5,15 +5,16 @@ import {
   getProductDetailForRoute,
   getProductDetailHref,
 } from "entities/product-detail";
-import { ACCOUNT_STORAGE_EVENT, isWishlistProductId, pushRecentlyViewedProduct, toggleWishlistProduct } from "entities/user";
 import {
-  productDetailVariantIdToFilterKey,
-  useProductOffersVariantFilter,
-} from "contexts";
+  ACCOUNT_STORAGE_EVENT,
+  isWishlistProductId,
+  pushRecentlyViewedProduct,
+  toggleWishlistProduct,
+} from "entities/user";
+import { productDetailVariantIdToFilterKey, useProductOffersVariantFilter } from "contexts";
 import { getLanguageFromPath, localizedPath } from "shared/lib/locale";
 
-const formatAmd = (amount) =>
-  typeof amount === "number" ? amount.toLocaleString("en-US") : "";
+const formatAmd = (amount) => (typeof amount === "number" ? amount.toLocaleString("en-US") : "");
 
 /**
  * Presenter for the product detail page (demo data + local UI state).

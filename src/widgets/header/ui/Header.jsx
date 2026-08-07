@@ -111,7 +111,10 @@ const Header = ({
 
     const updateMobileBottomNavHeight = () => {
       const mobileBottomNavHeight = mobileBottomNavRef.current?.offsetHeight ?? 0;
-      document.documentElement.style.setProperty("--mobile-bottom-nav-height", `${mobileBottomNavHeight}px`);
+      document.documentElement.style.setProperty(
+        "--mobile-bottom-nav-height",
+        `${mobileBottomNavHeight}px`,
+      );
     };
 
     /**
@@ -129,7 +132,10 @@ const Header = ({
         return;
       }
 
-      const layoutViewportHeight = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+      const layoutViewportHeight = Math.max(
+        window.innerHeight || 0,
+        document.documentElement.clientHeight || 0,
+      );
       const viewportBottom = window.visualViewport.offsetTop + window.visualViewport.height;
       const viewportBottomOffset = Math.max(0, layoutViewportHeight - viewportBottom);
 
@@ -329,7 +335,11 @@ const Header = ({
                 </div>
               ))
             ) : showNoResults ? (
-              <div className="px-5 py-4 text-sm text-[#666] text-center" role="status" aria-live="polite">
+              <div
+                className="px-5 py-4 text-sm text-[#666] text-center"
+                role="status"
+                aria-live="polite"
+              >
                 {t("header.search.noResults")}
               </div>
             ) : null}
@@ -393,7 +403,13 @@ const Header = ({
       case "home":
         return <FaHome size={commonIconSize} className={commonIconClassName} aria-hidden="true" />;
       case "compare":
-        return <FaBalanceScale size={commonIconSize} className={commonIconClassName} aria-hidden="true" />;
+        return (
+          <FaBalanceScale
+            size={commonIconSize}
+            className={commonIconClassName}
+            aria-hidden="true"
+          />
+        );
       case "favorites":
         return (
           <img
@@ -441,9 +457,7 @@ const Header = ({
           aria-label={t("header.compareAriaLabel")}
         >
           <FaBalanceScale size={20} aria-hidden="true" />
-          <span className="hidden 2xl:ml-[5px] 2xl:inline">
-            {t("header.compareLabel")}
-          </span>
+          <span className="hidden 2xl:ml-[5px] 2xl:inline">{t("header.compareLabel")}</span>
         </LocalizedLink>
 
         <LocalizedLink
@@ -481,7 +495,9 @@ const Header = ({
           className={`md:hidden flex items-center justify-center rounded-full bg-[#eceff3] text-navy border-none cursor-pointer transition-all duration-300 ease-in-out hover:bg-accent-blue hover:scale-105 ${
             isCompact ? "w-6 h-6 sm:w-7 sm:h-7" : "w-7 h-7 sm:w-8 sm:h-8"
           }`}
-          aria-label={isMobileMenuOpen ? t("header.closeMenuAriaLabel") : t("header.openMenuAriaLabel")}
+          aria-label={
+            isMobileMenuOpen ? t("header.closeMenuAriaLabel") : t("header.openMenuAriaLabel")
+          }
           aria-expanded={isMobileMenuOpen}
           onClick={handleMobileMenuToggle}
         >
@@ -515,7 +531,11 @@ const Header = ({
               loading="lazy"
               aria-hidden="true"
             />
-            <span className={`font-semibold text-[#171717] md:hidden ${isCompact ? "text-[10px] sm:text-[11px]" : "text-[11px] sm:text-xs"}`}>{currentLanguage.name}</span>
+            <span
+              className={`font-semibold text-[#171717] md:hidden ${isCompact ? "text-[10px] sm:text-[11px]" : "text-[11px] sm:text-xs"}`}
+            >
+              {currentLanguage.name}
+            </span>
             <FaChevronDown
               className={`text-[#171717] md:hidden transition-transform duration-200 ${isCompact ? "text-[8px] sm:text-[9px]" : "text-[9px] sm:text-[10px]"} ${isLanguageDropdownOpen ? "rotate-180" : ""}`}
               aria-hidden="true"
@@ -549,7 +569,9 @@ const Header = ({
                       className={`${isCompact ? "h-5 w-5" : "h-6 w-6"} shrink-0 rounded-full border border-[#d1d5db] object-cover`}
                       loading="lazy"
                     />
-                    <span className={`font-bold text-[#171717] ${isCompact ? "text-xs" : "text-sm"}`}>
+                    <span
+                      className={`font-bold text-[#171717] ${isCompact ? "text-xs" : "text-sm"}`}
+                    >
                       {lang.name}
                     </span>
                   </button>
@@ -606,7 +628,10 @@ const Header = ({
         <h2 className="m-0 mb-6 text-base font-semibold text-[#171717]">
           {t("header.mobileMenuTitle")}
         </h2>
-        <nav className="flex flex-col gap-6 items-start" aria-label={t("header.mobileLinksAriaLabel")}>
+        <nav
+          className="flex flex-col gap-6 items-start"
+          aria-label={t("header.mobileLinksAriaLabel")}
+        >
           {mobileMenuItems.map((item) => (
             <LocalizedLink
               key={item.id}
@@ -634,7 +659,8 @@ const Header = ({
                 : item.href === "/account/favorite"
                   ? currentPath.startsWith("/account/favorite")
                   : item.href === "/account"
-                    ? currentPath.startsWith("/account") && !currentPath.startsWith("/account/favorite")
+                    ? currentPath.startsWith("/account") &&
+                      !currentPath.startsWith("/account/favorite")
                     : currentPath.startsWith(item.href);
 
             return (
@@ -671,7 +697,9 @@ const Header = ({
                     >
                       {renderMobileBottomIcon(item.iconType, isActive)}
                     </span>
-                    <span className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}>
+                    <span
+                      className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}
+                    >
                       {item.label}
                     </span>
                   </LocalizedLink>

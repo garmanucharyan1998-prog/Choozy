@@ -40,7 +40,9 @@ export const useAccountPresenter = () => {
   const navigate = useLocalizedNavigate();
 
   const [accountState, setAccountState] = useState(() => readAccountState());
-  const [activeSidebarId, setActiveSidebarId] = useState(() => sidebarIdFromPathname(location.pathname));
+  const [activeSidebarId, setActiveSidebarId] = useState(() =>
+    sidebarIdFromPathname(location.pathname),
+  );
   const [personalInnerTab, setPersonalInnerTab] = useState(PERSONAL_INNER_TABS.DATA);
   const [isPersonalEditMode, setIsPersonalEditMode] = useState(false);
   const [profileDraft, setProfileDraft] = useState(() => readAccountState().profile);

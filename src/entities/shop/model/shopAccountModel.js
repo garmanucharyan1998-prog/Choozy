@@ -443,12 +443,17 @@ export const normalizeShopProduct = (raw) => {
   }
 
   const availability =
-    base.availability === "out_of_stock" || base.availability === "in_stock" ? base.availability : "in_stock";
+    base.availability === "out_of_stock" || base.availability === "in_stock"
+      ? base.availability
+      : "in_stock";
 
   const descriptionKey =
-    typeof base.descriptionKey === "string" && base.descriptionKey.trim() ? base.descriptionKey.trim() : "";
+    typeof base.descriptionKey === "string" && base.descriptionKey.trim()
+      ? base.descriptionKey.trim()
+      : "";
 
-  let badgeKey = typeof base.badgeKey === "string" && base.badgeKey.trim() ? base.badgeKey.trim() : "";
+  let badgeKey =
+    typeof base.badgeKey === "string" && base.badgeKey.trim() ? base.badgeKey.trim() : "";
   if (badgeKey && !BADGE_KEY_WHITELIST.has(badgeKey)) {
     badgeKey = "";
   }
@@ -462,7 +467,8 @@ export const normalizeShopProduct = (raw) => {
   }
 
   const createdAt = typeof base.createdAt === "number" ? base.createdAt : Date.now();
-  const lastRefreshedAt = typeof base.lastRefreshedAt === "number" ? base.lastRefreshedAt : Date.now();
+  const lastRefreshedAt =
+    typeof base.lastRefreshedAt === "number" ? base.lastRefreshedAt : Date.now();
 
   return {
     id: idRaw,
@@ -508,7 +514,8 @@ const normalizeShopProfile = (raw) => {
   const value = raw && typeof raw === "object" ? raw : {};
   return {
     shopName: typeof value.shopName === "string" ? value.shopName : defaultShopProfile.shopName,
-    description: typeof value.description === "string" ? value.description : defaultShopProfile.description,
+    description:
+      typeof value.description === "string" ? value.description : defaultShopProfile.description,
     email: typeof value.email === "string" ? value.email : defaultShopProfile.email,
     phoneLocal:
       typeof value.phoneLocal === "string"
@@ -526,7 +533,9 @@ const normalizeShopAccountState = (raw) => {
     avatarDataUrl: typeof value.avatarDataUrl === "string" ? value.avatarDataUrl : "",
     notificationPrefs: {
       ...defaultShopNotificationPrefs,
-      ...(value.notificationPrefs && typeof value.notificationPrefs === "object" ? value.notificationPrefs : {}),
+      ...(value.notificationPrefs && typeof value.notificationPrefs === "object"
+        ? value.notificationPrefs
+        : {}),
     },
     shopProducts: pruneStaleShopProducts(rawProducts.map(normalizeShopProduct).filter((p) => p.id)),
   };

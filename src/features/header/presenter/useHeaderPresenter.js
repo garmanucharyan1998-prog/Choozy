@@ -38,13 +38,16 @@ export const useHeaderPresenter = () => {
     [t],
   );
 
-  const handleLanguageChange = useCallback((langCode) => {
-    if (!LANGUAGES[langCode]) {
-      return;
-    }
-    setLanguage(langCode);
-    setIsLanguageDropdownOpen(false);
-  }, [setLanguage]);
+  const handleLanguageChange = useCallback(
+    (langCode) => {
+      if (!LANGUAGES[langCode]) {
+        return;
+      }
+      setLanguage(langCode);
+      setIsLanguageDropdownOpen(false);
+    },
+    [setLanguage],
+  );
 
   const toggleLanguageDropdown = useCallback(() => {
     setIsLanguageDropdownOpen((prev) => !prev);

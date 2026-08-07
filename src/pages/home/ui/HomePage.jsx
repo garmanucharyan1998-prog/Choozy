@@ -74,7 +74,11 @@ const HomePage = () => {
         </div>
       </div>
 
-      <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex flex-1 flex-col bg-white px-2.5 sm:px-[15px] md:px-[30px] lg:px-[50px] 2xl:px-[100px]"
+      >
         <h1 className="sr-only">{t("home.pageTitle")}</h1>
         <GridCatalogWidget />
         <TopProductsWidget />

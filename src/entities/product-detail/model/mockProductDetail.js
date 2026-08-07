@@ -26,21 +26,51 @@ export const mockProductDetail = {
   priceHistoryAmd: [250000, 260000, 200000, 320000, 240000],
   /** Shown under «Հակիրճ նկարագրություն». */
   specsBriefRows: [
-    { labelKey: "productDetail.specsBrief.screenSize", valueKey: "productDetail.specsBrief.screenSizeValue" },
-    { labelKey: "productDetail.specsBrief.storage", valueKey: "productDetail.specsBrief.storageValue" },
+    {
+      labelKey: "productDetail.specsBrief.screenSize",
+      valueKey: "productDetail.specsBrief.screenSizeValue",
+    },
+    {
+      labelKey: "productDetail.specsBrief.storage",
+      valueKey: "productDetail.specsBrief.storageValue",
+    },
     { labelKey: "productDetail.specsBrief.ram", valueKey: "productDetail.specsBrief.ramValue" },
-    { labelKey: "productDetail.specsBrief.battery", valueKey: "productDetail.specsBrief.batteryValue" },
+    {
+      labelKey: "productDetail.specsBrief.battery",
+      valueKey: "productDetail.specsBrief.batteryValue",
+    },
     { labelKey: "productDetail.specsBrief.year", valueKey: "productDetail.specsBrief.yearValue" },
   ],
   /** Shown under «Նկարագրություն». */
   specsExtendedRows: [
-    { labelKey: "productDetail.specsExtended.screenType", valueKey: "productDetail.specsExtended.screenTypeValue" },
-    { labelKey: "productDetail.specsExtended.microphone", valueKey: "productDetail.specsExtended.microphoneValue" },
-    { labelKey: "productDetail.specsExtended.technology", valueKey: "productDetail.specsExtended.technologyValue" },
-    { labelKey: "productDetail.specsExtended.matrix", valueKey: "productDetail.specsExtended.matrixValue" },
-    { labelKey: "productDetail.specsExtended.ssd", valueKey: "productDetail.specsExtended.ssdValue" },
-    { labelKey: "productDetail.specsExtended.bluetooth", valueKey: "productDetail.specsExtended.bluetoothValue" },
-    { labelKey: "productDetail.specsExtended.manufacturer", valueKey: "productDetail.specsExtended.manufacturerValue" },
+    {
+      labelKey: "productDetail.specsExtended.screenType",
+      valueKey: "productDetail.specsExtended.screenTypeValue",
+    },
+    {
+      labelKey: "productDetail.specsExtended.microphone",
+      valueKey: "productDetail.specsExtended.microphoneValue",
+    },
+    {
+      labelKey: "productDetail.specsExtended.technology",
+      valueKey: "productDetail.specsExtended.technologyValue",
+    },
+    {
+      labelKey: "productDetail.specsExtended.matrix",
+      valueKey: "productDetail.specsExtended.matrixValue",
+    },
+    {
+      labelKey: "productDetail.specsExtended.ssd",
+      valueKey: "productDetail.specsExtended.ssdValue",
+    },
+    {
+      labelKey: "productDetail.specsExtended.bluetooth",
+      valueKey: "productDetail.specsExtended.bluetoothValue",
+    },
+    {
+      labelKey: "productDetail.specsExtended.manufacturer",
+      valueKey: "productDetail.specsExtended.manufacturerValue",
+    },
   ],
 };
 
@@ -86,7 +116,9 @@ export const getProductDetailForRoute = (routeProductId) => {
       listingDescription: catalog.description,
       galleryImageUrls: repeatGallery(catalog.image),
       priceMinAmd: catalog.priceValue,
-      priceMaxAmd: Math.round(catalog.priceValue * (mockProductDetail.priceMaxAmd / mockProductDetail.priceMinAmd)),
+      priceMaxAmd: Math.round(
+        catalog.priceValue * (mockProductDetail.priceMaxAmd / mockProductDetail.priceMinAmd),
+      ),
       priceHistoryAmd: mockProductDetail.priceHistoryAmd.map((v) => Math.round(v * scale)),
     };
   }
@@ -103,7 +135,9 @@ export const getProductDetailForRoute = (routeProductId) => {
       listingDescription: homeProduct.description,
       galleryImageUrls: repeatGallery(homeProduct.image),
       priceMinAmd: priceMin,
-      priceMaxAmd: Math.round(priceMin * (mockProductDetail.priceMaxAmd / mockProductDetail.priceMinAmd)),
+      priceMaxAmd: Math.round(
+        priceMin * (mockProductDetail.priceMaxAmd / mockProductDetail.priceMinAmd),
+      ),
       priceHistoryAmd: mockProductDetail.priceHistoryAmd.map((v) => Math.round(v * scale)),
     };
   }

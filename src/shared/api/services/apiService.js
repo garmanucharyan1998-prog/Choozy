@@ -1,4 +1,3 @@
-
 import {
   mockProducts,
   mockArmenianSuggestions,
@@ -30,7 +29,9 @@ export const searchProducts = async (query, options = {}) => {
       ...product.tags,
       ...(product.specs.connectivity || []),
       ...(product.specs.colors || []),
-    ].join(" ").toLowerCase();
+    ]
+      .join(" ")
+      .toLowerCase();
 
     return searchableText.includes(searchQuery);
   });
@@ -64,8 +65,7 @@ export const searchProducts = async (query, options = {}) => {
 
   if (options.priceRange) {
     filteredResults = filteredResults.filter(
-      (item) => item.priceNum >= options.priceRange.min &&
-      item.priceNum <= options.priceRange.max,
+      (item) => item.priceNum >= options.priceRange.min && item.priceNum <= options.priceRange.max,
     );
   }
 
@@ -74,9 +74,8 @@ export const searchProducts = async (query, options = {}) => {
     data: filteredResults,
     total: filteredResults.length,
     query: searchQuery,
-    message: filteredResults.length > 0
-      ? `Found ${filteredResults.length} results`
-      : "Nothing found",
+    message:
+      filteredResults.length > 0 ? `Found ${filteredResults.length} results` : "Nothing found",
   };
 };
 

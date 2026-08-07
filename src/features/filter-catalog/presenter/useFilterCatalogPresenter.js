@@ -52,15 +52,30 @@ export const useFilterCatalogPresenter = () => {
    * and crawlers can reach pages beyond the first one.
    */
   const selectedScreens = useMemo(
-    () => readSet(searchParams, "screen", SCREEN_SIZE_OPTIONS.map((o) => o.id)),
+    () =>
+      readSet(
+        searchParams,
+        "screen",
+        SCREEN_SIZE_OPTIONS.map((o) => o.id),
+      ),
     [searchParams],
   );
   const selectedBrands = useMemo(
-    () => readSet(searchParams, "brand", BRAND_OPTIONS.map((o) => o.id)),
+    () =>
+      readSet(
+        searchParams,
+        "brand",
+        BRAND_OPTIONS.map((o) => o.id),
+      ),
     [searchParams],
   );
   const selectedRam = useMemo(
-    () => readSet(searchParams, "ram", RAM_OPTIONS.map((o) => o.id)),
+    () =>
+      readSet(
+        searchParams,
+        "ram",
+        RAM_OPTIONS.map((o) => o.id),
+      ),
     [searchParams],
   );
   const selectedColor = useMemo(() => {
@@ -265,10 +280,16 @@ export const useFilterCatalogPresenter = () => {
     (facetKey, valueOf) => {
       const base = mockFilterProducts.filter((p) => {
         if (p.priceValue < priceMin || p.priceValue > priceMax) return false;
-        if (facetKey !== "screen" && selectedScreens.size > 0 && !selectedScreens.has(String(p.screenInch)))
+        if (
+          facetKey !== "screen" &&
+          selectedScreens.size > 0 &&
+          !selectedScreens.has(String(p.screenInch))
+        )
           return false;
-        if (facetKey !== "brand" && selectedBrands.size > 0 && !selectedBrands.has(p.brandId)) return false;
-        if (facetKey !== "ram" && selectedRam.size > 0 && !selectedRam.has(String(p.ramGb))) return false;
+        if (facetKey !== "brand" && selectedBrands.size > 0 && !selectedBrands.has(p.brandId))
+          return false;
+        if (facetKey !== "ram" && selectedRam.size > 0 && !selectedRam.has(String(p.ramGb)))
+          return false;
         if (selectedColor && p.colorId !== selectedColor) return false;
         if (selectedCategory && p.categoryId !== selectedCategory) return false;
         const q = urlQuery.trim();
@@ -283,13 +304,19 @@ export const useFilterCatalogPresenter = () => {
       });
       return map;
     },
-    [priceMin, priceMax, selectedScreens, selectedBrands, selectedRam, selectedColor, selectedCategory, urlQuery],
+    [
+      priceMin,
+      priceMax,
+      selectedScreens,
+      selectedBrands,
+      selectedRam,
+      selectedColor,
+      selectedCategory,
+      urlQuery,
+    ],
   );
 
-  const screenCounts = useMemo(
-    () => countsFor("screen", (p) => String(p.screenInch)),
-    [countsFor],
-  );
+  const screenCounts = useMemo(() => countsFor("screen", (p) => String(p.screenInch)), [countsFor]);
   const brandCounts = useMemo(() => countsFor("brand", (p) => p.brandId), [countsFor]);
   const ramCounts = useMemo(() => countsFor("ram", (p) => String(p.ramGb)), [countsFor]);
 

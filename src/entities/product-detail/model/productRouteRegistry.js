@@ -51,7 +51,6 @@ export function resolveProductRouteParam(routeParam) {
 export function getCanonicalProductDetailPath(product) {
   const pid = String(product?.id ?? "").trim();
   const title =
-    product?.listingTitle ||
-    (pid === DEFAULT_DETAIL_PRODUCT_ID ? "Apple MacBook Pro" : "Product");
+    product?.listingTitle || (pid === DEFAULT_DETAIL_PRODUCT_ID ? "Apple MacBook Pro" : "Product");
   return getProductDetailHref(pid || DEFAULT_DETAIL_PRODUCT_ID, title);
 }

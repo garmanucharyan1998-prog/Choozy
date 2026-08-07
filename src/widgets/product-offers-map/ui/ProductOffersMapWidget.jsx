@@ -40,9 +40,7 @@ const ProductOffersMapWidget = () => {
           style={{ backgroundColor: "rgba(245, 245, 245, 1)" }}
         >
           <div className="flex flex-col gap-2">
-            <h3 className="m-0 text-lg font-semibold text-text-dark md:text-xl">
-              {productTitle}
-            </h3>
+            <h3 className="m-0 text-lg font-semibold text-text-dark md:text-xl">{productTitle}</h3>
             <h4 className="m-0 text-sm font-semibold text-navy md:text-base">
               {t("productOffers.tabs.specs")}
             </h4>
@@ -50,10 +48,7 @@ const ProductOffersMapWidget = () => {
 
           <dl className="m-0 flex flex-col gap-4">
             {specsRows.map((row) => (
-              <div
-                key={row.labelKey}
-                className="flex items-baseline justify-between gap-4"
-              >
+              <div key={row.labelKey} className="flex items-baseline justify-between gap-4">
                 <dt className="text-sm font-normal text-text-muted md:text-base">
                   {t(row.labelKey)}
                 </dt>

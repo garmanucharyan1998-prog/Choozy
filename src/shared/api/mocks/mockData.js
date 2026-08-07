@@ -104,8 +104,8 @@ export const mockProducts = [
     category: "electronics",
     type: "tablet",
     brand: "Apple",
-    model: "iPad Pro 13\" M4",
-    title: "iPad Pro 13\" M4",
+    model: 'iPad Pro 13" M4',
+    title: 'iPad Pro 13" M4',
     price: 1199,
     priceNum: 1199,
     currency: "USD",
@@ -178,7 +178,7 @@ export const mockPopularSearches = [
   "Samsung Galaxy S25 Ultra",
   "Sony WH-1000XM6",
   "PlayStation 5 Pro",
-  "iPad Pro 13\" M4",
+  'iPad Pro 13" M4',
 ];
 
 export const mockCategories = [

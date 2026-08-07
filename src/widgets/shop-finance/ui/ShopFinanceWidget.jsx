@@ -51,7 +51,9 @@ const ShopFinanceWidget = () => {
           role="tab"
           aria-selected={financeTab === FINANCE_TABS.PAYMENTS}
           className={`touch-manipulation shrink-0 self-center border-b-2 px-2 pb-2 align-middle text-center font-sans text-[14px] leading-[100%] tracking-normal text-[rgba(21,33,71,1)] transition-colors duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:px-3 ${
-            financeTab === FINANCE_TABS.PAYMENTS ? "border-navy font-medium" : "border-[#b8b8b8] font-normal"
+            financeTab === FINANCE_TABS.PAYMENTS
+              ? "border-navy font-medium"
+              : "border-[#b8b8b8] font-normal"
           }`}
           onClick={() => setFinanceTab(FINANCE_TABS.PAYMENTS)}
         >
@@ -65,20 +67,34 @@ const ShopFinanceWidget = () => {
             className="box-border flex h-[220px] w-full max-w-[353px] flex-col gap-5 rounded-[20px] border border-[rgb(221,227,248)] bg-white p-5"
             role="tabpanel"
           >
-            <h2 className="m-0 shrink-0 font-sans text-base font-medium leading-6 text-navy">{t("shopAccount.finance.planCardTitle")}</h2>
+            <h2 className="m-0 shrink-0 font-sans text-base font-medium leading-6 text-navy">
+              {t("shopAccount.finance.planCardTitle")}
+            </h2>
             <div className="h-px w-full shrink-0 bg-[rgb(221,227,248)]" role="presentation" />
             <dl className="m-0 flex flex-col gap-5 text-start">
               <div className="flex flex-wrap items-baseline gap-x-1">
-                <dt className="m-0 font-sans text-[14px] font-normal leading-normal text-navy">{t("shopAccount.finance.planNameLabel")}</dt>
-                <dd className="m-0 py-0 px-2 font-sans text-lg font-bold leading-normal text-navy">{t("shopAccount.finance.planName")}</dd>
+                <dt className="m-0 font-sans text-[14px] font-normal leading-normal text-navy">
+                  {t("shopAccount.finance.planNameLabel")}
+                </dt>
+                <dd className="m-0 py-0 px-2 font-sans text-lg font-bold leading-normal text-navy">
+                  {t("shopAccount.finance.planName")}
+                </dd>
               </div>
               <div className="flex flex-wrap items-baseline gap-x-1">
-                <dt className="m-0 font-sans text-[14px] font-normal leading-normal text-navy">{t("shopAccount.finance.planValueLabel")}</dt>
-                <dd className="m-0 py-0 px-2 font-sans text-lg font-bold leading-normal text-navy">{t("shopAccount.finance.planTotal")}</dd>
+                <dt className="m-0 font-sans text-[14px] font-normal leading-normal text-navy">
+                  {t("shopAccount.finance.planValueLabel")}
+                </dt>
+                <dd className="m-0 py-0 px-2 font-sans text-lg font-bold leading-normal text-navy">
+                  {t("shopAccount.finance.planTotal")}
+                </dd>
               </div>
               <div className="flex flex-wrap items-baseline gap-x-1">
-                <dt className="m-0 font-sans text-[14px] font-normal leading-normal text-navy">{t("shopAccount.finance.planMonthlyLabel")}</dt>
-                <dd className="m-0 py-0 px-2 font-sans text-lg font-bold leading-normal text-navy">{t("shopAccount.finance.planMonthly")}</dd>
+                <dt className="m-0 font-sans text-[14px] font-normal leading-normal text-navy">
+                  {t("shopAccount.finance.planMonthlyLabel")}
+                </dt>
+                <dd className="m-0 py-0 px-2 font-sans text-lg font-bold leading-normal text-navy">
+                  {t("shopAccount.finance.planMonthly")}
+                </dd>
               </div>
             </dl>
           </div>
@@ -103,7 +119,9 @@ const ShopFinanceWidget = () => {
                   </p>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs leading-none text-[#64748B]">{t("shopAccount.finance.payments.sampleDate")}</span>
+                  <span className="text-xs leading-none text-[#64748B]">
+                    {t("shopAccount.finance.payments.sampleDate")}
+                  </span>
                   <PaymentStatusBadge status={row.status} t={t} />
                 </div>
               </li>
@@ -149,7 +167,9 @@ const ShopFinanceWidget = () => {
                     key={row.id}
                     className="border-b border-[#E2E8F0] transition-colors last:border-b-0 hover:bg-[#F8FAFC]/60"
                   >
-                    <td className="px-4 py-4 text-[#64748B] sm:px-5 sm:py-5">{t("shopAccount.finance.payments.sampleDate")}</td>
+                    <td className="px-4 py-4 text-[#64748B] sm:px-5 sm:py-5">
+                      {t("shopAccount.finance.payments.sampleDate")}
+                    </td>
                     <td className="px-4 py-4 font-bold text-navy sm:px-5 sm:py-5">
                       {t(`shopAccount.finance.payments.rows.${row.methodId}`)}
                     </td>

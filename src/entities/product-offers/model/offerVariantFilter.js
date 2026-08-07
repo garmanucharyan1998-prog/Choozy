@@ -14,9 +14,7 @@ export const offerMatchesVariantFilter = (offer, globalVariantKey) => {
   if (!globalVariantKey) return true;
   const family = getVariantStorageFamily(globalVariantKey);
   if (!family || !Array.isArray(offer.supportedVariantKeys)) return false;
-  return offer.supportedVariantKeys.some(
-    (key) => getVariantStorageFamily(key) === family,
-  );
+  return offer.supportedVariantKeys.some((key) => getVariantStorageFamily(key) === family);
 };
 
 export const resolveOfferVariantIndex = (offer, globalVariantKey, fallbackIndex = 0) => {
@@ -29,9 +27,7 @@ export const resolveOfferVariantIndex = (offer, globalVariantKey, fallbackIndex 
 
   const family = getVariantStorageFamily(globalVariantKey);
   const familyIndex = offer.variantKeys.findIndex(
-    (key) =>
-      offer.supportedVariantKeys?.includes(key) &&
-      getVariantStorageFamily(key) === family,
+    (key) => offer.supportedVariantKeys?.includes(key) && getVariantStorageFamily(key) === family,
   );
 
   return familyIndex >= 0 ? familyIndex : fallbackIndex;

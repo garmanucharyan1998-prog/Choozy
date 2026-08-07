@@ -15,8 +15,7 @@ import { getCanonicalProductDetailPath, getProductDetailForRoute } from "entitie
 import { buildProductJsonLd } from "pages/singleproduct/model/productJsonLd";
 import { useHomePagePresenter } from "pages/home/presenter/useHomePagePresenter";
 
-const formatAmd = (amount) =>
-  typeof amount === "number" ? amount.toLocaleString("en-US") : "";
+const formatAmd = (amount) => (typeof amount === "number" ? amount.toLocaleString("en-US") : "");
 
 const SingleProduct = () => {
   const { productId } = useParams();
@@ -107,7 +106,11 @@ const SingleProduct = () => {
         </div>
       </div>
 
-      <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col bg-white px-2.5 py-6 pb-[calc(var(--mobile-bottom-nav-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] md:py-10 lg:px-[50px] lg:pb-10 2xl:px-[100px]">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex flex-1 flex-col bg-white px-2.5 py-6 pb-[calc(var(--mobile-bottom-nav-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] md:py-10 lg:px-[50px] lg:pb-10 2xl:px-[100px]"
+      >
         <ProductOffersVariantFilterProvider>
           <div className="cont-width-default mx-auto flex w-full flex-col gap-10 md:gap-14">
             <Breadcrumbs

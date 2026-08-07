@@ -1,13 +1,13 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from 'app/App';
-import reportWebVitals from 'reportWebVitals';
-import { getLocalizedRouteInventory, getPrerenderRouteInventory } from 'shared/lib/seo';
-import { SUPPORTED_LANGUAGE_CODES } from 'shared/i18n/languageConfig';
-import { getHtmlLangForAppLanguage } from 'shared/lib/locale';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "app/App";
+import reportWebVitals from "reportWebVitals";
+import { getLocalizedRouteInventory, getPrerenderRouteInventory } from "shared/lib/seo";
+import { SUPPORTED_LANGUAGE_CODES } from "shared/i18n/languageConfig";
+import { getHtmlLangForAppLanguage } from "shared/lib/locale";
 
-const container = document.getElementById('root');
+const container = document.getElementById("root");
 
 const tree = (
   <React.StrictMode>
@@ -26,7 +26,7 @@ if (container.hasChildNodes()) {
 }
 
 /** Route lists for the build-time prerender + sitemap generator (harmless at runtime). */
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   /** Indexable only — sitemap.xml. */
   window.__CHOOSY_ROUTE_INVENTORY__ = getLocalizedRouteInventory();
   /** Everything that needs an HTML file, so no route falls back to the home page. */

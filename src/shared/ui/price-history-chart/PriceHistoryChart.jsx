@@ -1,19 +1,10 @@
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 const BAR_NAVY = "#152147";
 const BAR_MUTED = "#dadfe8";
 const GRID_STROKE = "#dde3f8";
 
-const formatTick = (value) =>
-  typeof value === "number" ? value.toLocaleString("en-US") : "";
+const formatTick = (value) => (typeof value === "number" ? value.toLocaleString("en-US") : "");
 
 /**
  * Mini price history column chart — dashed horizontal grid, rounded bar tops,
@@ -47,12 +38,7 @@ const PriceHistoryChart = ({ data, ariaLabel }) => {
           margin={{ top: 12, right: 8, left: 4, bottom: 8 }}
           barCategoryGap="22%"
         >
-          <CartesianGrid
-            stroke={GRID_STROKE}
-            strokeDasharray="3 3"
-            vertical={false}
-            horizontal
-          />
+          <CartesianGrid stroke={GRID_STROKE} strokeDasharray="3 3" vertical={false} horizontal />
           <XAxis
             dataKey="name"
             tickLine={false}
@@ -71,7 +57,10 @@ const PriceHistoryChart = ({ data, ariaLabel }) => {
           />
           <Bar dataKey="amount" radius={[14, 14, 0, 0]} maxBarSize={56}>
             {data.map((entry, index) => (
-              <Cell key={`cell-${entry.name}-${index}`} fill={entry.highlight ? BAR_NAVY : BAR_MUTED} />
+              <Cell
+                key={`cell-${entry.name}-${index}`}
+                fill={entry.highlight ? BAR_NAVY : BAR_MUTED}
+              />
             ))}
           </Bar>
         </BarChart>

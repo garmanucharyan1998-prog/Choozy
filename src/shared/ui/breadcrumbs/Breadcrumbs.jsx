@@ -19,11 +19,17 @@ const Breadcrumbs = ({ items }) => {
           return (
             <li key={`${item.label}-${index}`} className="flex min-w-0 items-center gap-2">
               {isLast || !item.href ? (
-                <span className="truncate text-text-dark" aria-current={isLast ? "page" : undefined}>
+                <span
+                  className="truncate text-text-dark"
+                  aria-current={isLast ? "page" : undefined}
+                >
                   {item.label}
                 </span>
               ) : (
-                <LocalizedLink to={item.href} className="text-link-blue no-underline hover:underline">
+                <LocalizedLink
+                  to={item.href}
+                  className="text-link-blue no-underline hover:underline"
+                >
                   {item.label}
                 </LocalizedLink>
               )}

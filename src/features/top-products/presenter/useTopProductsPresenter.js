@@ -11,13 +11,13 @@ import { localizeCarouselItems } from "shared/i18n/mapCarouselDescriptions";
 
 export const useTopProductsPresenter = () => {
   const { t } = useLanguage();
-  const { items: rawItems, loading, error, onRetry } = useAsyncItemsPresenter(
-    productModel.getTopProducts,
-  );
-  const items = useMemo(
-    () => localizeCarouselItems(rawItems, t),
-    [rawItems, t],
-  );
+  const {
+    items: rawItems,
+    loading,
+    error,
+    onRetry,
+  } = useAsyncItemsPresenter(productModel.getTopProducts);
+  const items = useMemo(() => localizeCarouselItems(rawItems, t), [rawItems, t]);
 
   return { items, loading, error, onRetry };
 };

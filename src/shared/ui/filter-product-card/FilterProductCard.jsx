@@ -3,8 +3,10 @@ import { ProductCardImage } from "shared/ui/product-card-image";
 import { LocalizedLink } from "shared/ui/link";
 
 /** Responsive type scale — fixed inline px stayed oversized in the 2-column mobile grid. */
-const TITLE_CLASS = "m-0 line-clamp-2 text-xs font-bold leading-tight text-navy sm:text-sm md:text-base";
-const DESC_CLASS = "m-0 line-clamp-2 text-[11px] leading-snug text-text-muted sm:text-xs md:text-sm";
+const TITLE_CLASS =
+  "m-0 line-clamp-2 text-xs font-bold leading-tight text-navy sm:text-sm md:text-base";
+const DESC_CLASS =
+  "m-0 line-clamp-2 text-[11px] leading-snug text-text-muted sm:text-xs md:text-sm";
 const PRICE_CLASS = "m-0 pt-0.5 text-sm font-semibold text-navy md:text-base";
 
 const ACTION_BTN =

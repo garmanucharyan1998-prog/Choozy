@@ -165,7 +165,14 @@ const PRODUCT_ROW_ACTION_BTN_CLASS =
 const PRODUCT_ROW_ACTIONS_GROUP_CLASS =
   "inline-flex shrink-0 items-center gap-2 rounded-lg border border-[#e8ecf3] bg-[#f7f9fc] p-0.5";
 
-const ProductTableRowActions = ({ onEdit, onRefresh, onDelete, editAriaLabel, refreshAriaLabel, deleteAriaLabel }) => (
+const ProductTableRowActions = ({
+  onEdit,
+  onRefresh,
+  onDelete,
+  editAriaLabel,
+  refreshAriaLabel,
+  deleteAriaLabel,
+}) => (
   <div className={PRODUCT_ROW_ACTIONS_GROUP_CLASS} role="group">
     <button
       type="button"
@@ -198,13 +205,17 @@ const NotificationFeedCard = ({ title, timeLabel, body, headingLevel = 3 }) => {
   const HeadingTag = headingLevel === 4 ? "h4" : "h3";
 
   return (
-  <article className="flex flex-col gap-3 rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
-    <div className="flex items-start justify-between gap-3 border-b border-[#d9dfea] pb-3">
-      <HeadingTag className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">{title}</HeadingTag>
-      <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">{timeLabel}</span>
-    </div>
-    <p className="m-0 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
-  </article>
+    <article className="flex flex-col gap-3 rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
+      <div className="flex items-start justify-between gap-3 border-b border-[#d9dfea] pb-3">
+        <HeadingTag className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">
+          {title}
+        </HeadingTag>
+        <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">
+          {timeLabel}
+        </span>
+      </div>
+      <p className="m-0 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
+    </article>
   );
 };
 
@@ -379,7 +390,9 @@ const ShopAccountDashboardWidget = () => {
         {shopState.avatarDataUrl ? (
           <img src={shopState.avatarDataUrl} alt="" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-navy/40">?</div>
+          <div className="flex h-full w-full items-center justify-center text-2xl font-bold text-navy/40">
+            ?
+          </div>
         )}
       </div>
       {editable ? (
@@ -425,7 +438,11 @@ const ShopAccountDashboardWidget = () => {
   const renderShopNotificationsFeed = () => {
     const body = t("shopAccount.notificationsPage.feed.sampleBody");
     return (
-      <div className="flex flex-col gap-3 sm:gap-4" role="feed" aria-label={t("shopAccount.notificationsPage.title")}>
+      <div
+        className="flex flex-col gap-3 sm:gap-4"
+        role="feed"
+        aria-label={t("shopAccount.notificationsPage.title")}
+      >
         {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
           <NotificationFeedCard
             key={itemKey}
@@ -481,7 +498,9 @@ const ShopAccountDashboardWidget = () => {
           renderShopNotificationsFeed()
         ) : (
           <>
-            <p className="mb-4 text-sm leading-relaxed text-text-muted sm:mb-6">{t("shopAccount.notificationsPage.settingsIntro")}</p>
+            <p className="mb-4 text-sm leading-relaxed text-text-muted sm:mb-6">
+              {t("shopAccount.notificationsPage.settingsIntro")}
+            </p>
             {renderNotificationSettings()}
           </>
         )}
@@ -497,7 +516,9 @@ const ShopAccountDashboardWidget = () => {
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-4">
           {renderShopAvatar()}
-          <p className="font-sans text-[16px] font-medium leading-[24px] text-[#171717]">{shopState.profile.shopName}</p>
+          <p className="font-sans text-[16px] font-medium leading-[24px] text-[#171717]">
+            {shopState.profile.shopName}
+          </p>
         </div>
         <button
           type="button"
@@ -509,20 +530,28 @@ const ShopAccountDashboardWidget = () => {
         </button>
       </div>
       {shopState.profile.description ? (
-        <p className="pt-5 text-sm leading-relaxed text-navy md:text-[15px]">{shopState.profile.description}</p>
+        <p className="pt-5 text-sm leading-relaxed text-navy md:text-[15px]">
+          {shopState.profile.description}
+        </p>
       ) : null}
       <div className="mb-5 border-t border-[#e1e6ef] pt-5" />
       <dl className="flex flex-col gap-[22.5px]">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dt className="text-sm font-semibold text-text-muted">{t("shopAccount.fields.emailShort")}</dt>
+          <dt className="text-sm font-semibold text-text-muted">
+            {t("shopAccount.fields.emailShort")}
+          </dt>
           <dd className="text-sm font-bold text-navy">{shopState.profile.email || "—"}</dd>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dt className="text-sm font-semibold text-text-muted">{t("shopAccount.fields.phoneShort")}</dt>
+          <dt className="text-sm font-semibold text-text-muted">
+            {t("shopAccount.fields.phoneShort")}
+          </dt>
           <dd className="text-sm font-bold text-navy">{formattedPhone}</dd>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dt className="text-sm font-semibold text-text-muted">{t("shopAccount.fields.websiteShort")}</dt>
+          <dt className="text-sm font-semibold text-text-muted">
+            {t("shopAccount.fields.websiteShort")}
+          </dt>
           <dd className="min-w-0 text-sm font-bold">
             {shopState.profile.website ? (
               <a
@@ -547,14 +576,24 @@ const ShopAccountDashboardWidget = () => {
       <div className="mb-6 flex items-center gap-4">
         {renderShopAvatar(true)}
         {shopState.avatarDataUrl ? (
-          <button type="button" className="text-xs font-semibold text-link-blue underline" onClick={clearAvatar}>
+          <button
+            type="button"
+            className="text-xs font-semibold text-link-blue underline"
+            onClick={clearAvatar}
+          >
             {t("shopAccount.avatar.remove")}
           </button>
         ) : null}
       </div>
       <label className="mb-4 flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
         <span>{t("shopAccount.fields.shopNameRequired")}</span>
-        <input name="shopName" value={profileDraft.shopName} onChange={updateProfileDraft} className={inputClass} required />
+        <input
+          name="shopName"
+          value={profileDraft.shopName}
+          onChange={updateProfileDraft}
+          className={inputClass}
+          required
+        />
       </label>
       <label className="mb-4 flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
         <span>{t("shopAccount.fields.description")}</span>
@@ -568,7 +607,14 @@ const ShopAccountDashboardWidget = () => {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
           <span>{t("shopAccount.fields.emailRequired")}</span>
-          <input name="email" type="email" value={profileDraft.email} onChange={updateProfileDraft} className={inputClass} required />
+          <input
+            name="email"
+            type="email"
+            value={profileDraft.email}
+            onChange={updateProfileDraft}
+            className={inputClass}
+            required
+          />
         </label>
         <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
           <span>{t("shopAccount.fields.phoneRequired")}</span>
@@ -590,7 +636,13 @@ const ShopAccountDashboardWidget = () => {
       </div>
       <label className="flex flex-col gap-1.5 pt-4 text-start text-sm font-semibold text-navy sm:col-span-2">
         <span>{t("shopAccount.fields.website")}</span>
-        <input name="website" type="text" value={profileDraft.website} onChange={updateProfileDraft} className={inputClass} />
+        <input
+          name="website"
+          type="text"
+          value={profileDraft.website}
+          onChange={updateProfileDraft}
+          className={inputClass}
+        />
       </label>
       <div className="flex flex-wrap gap-3 pt-6">
         <button
@@ -600,7 +652,10 @@ const ShopAccountDashboardWidget = () => {
         >
           {t("shopAccount.actions.cancel")}
         </button>
-        <button type="submit" className="rounded-pill bg-navy px-6 py-2.5 text-sm font-bold text-white transition hover:bg-active-blue">
+        <button
+          type="submit"
+          className="rounded-pill bg-navy px-6 py-2.5 text-sm font-bold text-white transition hover:bg-active-blue"
+        >
           {t("shopAccount.actions.save")}
         </button>
       </div>
@@ -617,7 +672,9 @@ const ShopAccountDashboardWidget = () => {
             role="tab"
             aria-selected={shopInnerTab === innerTabs.DATA}
             className={`border-b-2 pb-3 text-sm font-bold transition ${
-              shopInnerTab === innerTabs.DATA ? "border-navy text-navy" : "border-transparent text-text-muted"
+              shopInnerTab === innerTabs.DATA
+                ? "border-navy text-navy"
+                : "border-transparent text-text-muted"
             }`}
             onClick={() => selectShopInnerTab(innerTabs.DATA)}
           >
@@ -628,7 +685,9 @@ const ShopAccountDashboardWidget = () => {
             role="tab"
             aria-selected={shopInnerTab === innerTabs.NOTIFICATIONS}
             className={`border-b-2 pb-3 text-sm font-bold transition ${
-              shopInnerTab === innerTabs.NOTIFICATIONS ? "border-navy text-navy" : "border-transparent text-text-muted"
+              shopInnerTab === innerTabs.NOTIFICATIONS
+                ? "border-navy text-navy"
+                : "border-transparent text-text-muted"
             }`}
             onClick={() => selectShopInnerTab(innerTabs.NOTIFICATIONS)}
           >
@@ -636,19 +695,21 @@ const ShopAccountDashboardWidget = () => {
           </button>
         </div>
         {isShopEditMode && shopInnerTab === innerTabs.DATA ? (
-          <button type="button" onClick={exitShopEdit} className="inline-flex items-center gap-2 text-sm font-bold text-navy">
+          <button
+            type="button"
+            onClick={exitShopEdit}
+            className="inline-flex items-center gap-2 text-sm font-bold text-navy"
+          >
             <FaArrowLeft size={12} aria-hidden="true" />
             {t("shopAccount.actions.back")}
           </button>
         ) : null}
       </div>
-      {shopInnerTab === innerTabs.NOTIFICATIONS ? (
-        renderShopNotificationsInner()
-      ) : isShopEditMode ? (
-        renderShopEditMode()
-      ) : (
-        renderShopReadMode()
-      )}
+      {shopInnerTab === innerTabs.NOTIFICATIONS
+        ? renderShopNotificationsInner()
+        : isShopEditMode
+          ? renderShopEditMode()
+          : renderShopReadMode()}
     </MainCard>
   );
 
@@ -792,12 +853,16 @@ const ShopAccountDashboardWidget = () => {
               {inStock ? t("shopAccount.products.stock.in") : t("shopAccount.products.stock.out")}
             </span>
             {product.colors.length > 0 ? (
-              <div className="min-w-0 flex-1">{renderProductColorSwatches(product, { card: true })}</div>
+              <div className="min-w-0 flex-1">
+                {renderProductColorSwatches(product, { card: true })}
+              </div>
             ) : null}
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="min-w-0 shrink-0">{renderProductPriceEditor(product, { card: true })}</div>
+            <div className="min-w-0 shrink-0">
+              {renderProductPriceEditor(product, { card: true })}
+            </div>
             <ProductTableRowActions
               onEdit={() => openProductEdit(product.id)}
               onRefresh={() => refreshShopProduct(product.id)}
@@ -815,7 +880,9 @@ const ShopAccountDashboardWidget = () => {
       <MainCard className="w-full min-w-0 overflow-visible 2xl:overflow-hidden">
         <div className="flex flex-col gap-3 px-4 pt-4 sm:gap-4 sm:px-5 sm:pt-5 md:gap-5 md:px-8 md:pt-6">
           <div className="flex flex-col gap-3 min-[425px]:flex-row min-[425px]:flex-wrap min-[425px]:items-center min-[425px]:justify-between">
-            <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("shopAccount.products.listTitle")}</h2>
+            <h2 className="m-0 text-lg font-bold text-navy md:text-xl">
+              {t("shopAccount.products.listTitle")}
+            </h2>
             <button
               type="button"
               onClick={openProductForm}
@@ -842,7 +909,9 @@ const ShopAccountDashboardWidget = () => {
                 ? t("shopAccount.products.editFormTitle")
                 : t("shopAccount.products.formTitle")}
             </h3>
-            <p className="mb-4 text-sm leading-relaxed text-text-muted">{t("shopAccount.products.formHint")}</p>
+            <p className="mb-4 text-sm leading-relaxed text-text-muted">
+              {t("shopAccount.products.formHint")}
+            </p>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="flex min-w-0 flex-col gap-1.5 text-start text-sm font-semibold text-navy md:col-span-2">
                 <span>{t("shopAccount.products.fields.category")}</span>
@@ -920,12 +989,16 @@ const ShopAccountDashboardWidget = () => {
                   alt=""
                   className="h-16 w-16 shrink-0 rounded-lg border border-[#e1e6ef] bg-white object-contain object-center"
                 />
-                <p className="m-0 text-xs leading-relaxed text-text-muted">{t("shopAccount.products.catalogImageNote")}</p>
+                <p className="m-0 text-xs leading-relaxed text-text-muted">
+                  {t("shopAccount.products.catalogImageNote")}
+                </p>
               </div>
             ) : null}
 
             <div className="min-w-0">
-              <h4 className="mb-2 text-sm font-semibold text-navy">{t("shopAccount.products.fields.memories")}</h4>
+              <h4 className="mb-2 text-sm font-semibold text-navy">
+                {t("shopAccount.products.fields.memories")}
+              </h4>
               <div
                 className="flex flex-wrap gap-1.5 sm:gap-2"
                 role="group"
@@ -954,7 +1027,9 @@ const ShopAccountDashboardWidget = () => {
             </div>
 
             <div className="min-w-0">
-              <h4 className="mb-2 text-sm font-semibold text-navy">{t("shopAccount.products.fields.colors")}</h4>
+              <h4 className="mb-2 text-sm font-semibold text-navy">
+                {t("shopAccount.products.fields.colors")}
+              </h4>
               <div
                 className="grid grid-cols-1 gap-2 min-[425px]:grid-cols-2 md:gap-2.5 2xl:flex 2xl:flex-wrap 2xl:gap-3"
                 role="group"
@@ -971,7 +1046,9 @@ const ShopAccountDashboardWidget = () => {
                       aria-pressed={selected}
                       title={label}
                       className={`flex min-w-0 items-center gap-2 rounded-md border px-2 py-1.5 text-left text-xs font-medium transition ${
-                        selected ? "border-2 border-navy" : "border-[#e1e6ef] bg-white hover:border-link-blue"
+                        selected
+                          ? "border-2 border-navy"
+                          : "border-[#e1e6ef] bg-white hover:border-link-blue"
                       }`}
                     >
                       <span
@@ -1006,7 +1083,9 @@ const ShopAccountDashboardWidget = () => {
 
         {sortedShopProducts.length === 0 && !showProductForm ? (
           <div className="px-4 py-5 sm:px-5 md:p-8">
-            <p className="m-0 text-sm leading-relaxed text-text-muted">{t("shopAccount.products.empty")}</p>
+            <p className="m-0 text-sm leading-relaxed text-text-muted">
+              {t("shopAccount.products.empty")}
+            </p>
           </div>
         ) : sortedShopProducts.length > 0 ? (
           <div className="w-full max-w-full pt-4 md:pt-5">
@@ -1018,100 +1097,113 @@ const ShopAccountDashboardWidget = () => {
             </ul>
 
             <div className="hidden overflow-x-auto rounded-lg border border-[#eef1f6] pb-5 [-webkit-overflow-scrolling:touch] xl:block xl:pb-8">
-            <table
-              className="w-full min-w-[36rem] table-fixed border-collapse text-sm"
-              aria-label={t("shopAccount.products.tableAria")}
-            >
-              <thead>
-                <tr className="border-b border-[#e8ecf3] bg-[#f6f8fc] text-[#64748b]">
-                  <th
-                    scope="col"
-                    className={`w-[40%] ${productCellClass} text-start text-xs font-semibold tracking-wide`}
-                  >
-                    {t("shopAccount.products.tableHeaders.product")}
-                  </th>
-                  <th scope="col" className={`w-[14%] ${productCellClass} text-center text-xs font-semibold`}>
-                    {t("shopAccount.products.tableHeaders.available")}
-                  </th>
-                  <th scope="col" className={`w-[18%] ${productCellClass} text-center text-xs font-semibold`}>
-                    {t("shopAccount.products.tableHeaders.color")}
-                  </th>
-                  <th scope="col" className={`w-[28%] ${productCellClass}`}>
-                    <div className="flex items-center justify-end gap-3">
-                      <span className="min-w-0 flex-1 text-center text-xs font-semibold">
-                        {t("shopAccount.products.tableHeaders.price")}
-                      </span>
-                      <div
-                        className={`${PRODUCT_ROW_ACTIONS_GROUP_CLASS} invisible pointer-events-none`}
-                        aria-hidden="true"
-                      >
-                        <span className="h-7 w-7" />
-                        <span className="h-7 w-7" />
-                        <span className="h-7 w-7" />
-                      </div>
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedShopProducts.map((product) => {
-                  const inStock = product.availability !== "out_of_stock";
-
-                  return (
-                    <tr
-                      key={product.id}
-                      className="border-b border-[#eef1f6] transition-colors last:border-b-0 hover:bg-[#fafbfd]"
+              <table
+                className="w-full min-w-[36rem] table-fixed border-collapse text-sm"
+                aria-label={t("shopAccount.products.tableAria")}
+              >
+                <thead>
+                  <tr className="border-b border-[#e8ecf3] bg-[#f6f8fc] text-[#64748b]">
+                    <th
+                      scope="col"
+                      className={`w-[40%] ${productCellClass} text-start text-xs font-semibold tracking-wide`}
                     >
-                      <td className={productCellClass}>
-                        <h3 className="m-0 text-[length:inherit] font-[inherit] leading-[inherit]">
-                          <button
-                            type="button"
-                            onClick={() => openProductEdit(product.id)}
-                            className="m-0 cursor-pointer border-0 bg-transparent p-0 text-start font-bold leading-snug text-[#0f172a] transition hover:text-navy hover:underline"
-                          >
-                            {product.title}
-                          </button>
-                        </h3>
-                        {product.variants.length > 0 ? (
-                          <div className="flex flex-wrap gap-1.5 pt-2">
-                            {product.variants.map((variant, vIdx) => (
-                              <span key={`${product.id}-v-${vIdx}`} className={variantChipClassCompact}>
-                                {variant}
-                              </span>
-                            ))}
-                          </div>
-                        ) : null}
-                      </td>
-                      <td className={`${productCellClass} text-center`}>
-                        <span
-                          className={`inline-block whitespace-nowrap rounded-full px-3 py-0.5 text-[11px] font-semibold ${
-                            inStock ? "bg-[#dcfce7] text-[#166534]" : "bg-[#fce7f3] text-[#6d3459]"
-                          }`}
-                        >
-                          {inStock ? t("shopAccount.products.stock.in") : t("shopAccount.products.stock.out")}
+                      {t("shopAccount.products.tableHeaders.product")}
+                    </th>
+                    <th
+                      scope="col"
+                      className={`w-[14%] ${productCellClass} text-center text-xs font-semibold`}
+                    >
+                      {t("shopAccount.products.tableHeaders.available")}
+                    </th>
+                    <th
+                      scope="col"
+                      className={`w-[18%] ${productCellClass} text-center text-xs font-semibold`}
+                    >
+                      {t("shopAccount.products.tableHeaders.color")}
+                    </th>
+                    <th scope="col" className={`w-[28%] ${productCellClass}`}>
+                      <div className="flex items-center justify-end gap-3">
+                        <span className="min-w-0 flex-1 text-center text-xs font-semibold">
+                          {t("shopAccount.products.tableHeaders.price")}
                         </span>
-                      </td>
-                      <td className={productCellClass}>{renderProductColorSwatches(product)}</td>
-                      <td className={`${productCellClass} overflow-visible`}>
-                        <div className="flex items-center justify-end gap-3">
-                          <div className="min-w-0 flex-1 text-end">
-                            {renderProductPriceEditor(product)}
-                          </div>
-                          <ProductTableRowActions
-                            onEdit={() => openProductEdit(product.id)}
-                            onRefresh={() => refreshShopProduct(product.id)}
-                            onDelete={() => removeShopProduct(product.id)}
-                            editAriaLabel={t("shopAccount.products.editAria")}
-                            refreshAriaLabel={t("shopAccount.products.refreshAria")}
-                            deleteAriaLabel={t("shopAccount.products.deleteAria")}
-                          />
+                        <div
+                          className={`${PRODUCT_ROW_ACTIONS_GROUP_CLASS} invisible pointer-events-none`}
+                          aria-hidden="true"
+                        >
+                          <span className="h-7 w-7" />
+                          <span className="h-7 w-7" />
+                          <span className="h-7 w-7" />
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedShopProducts.map((product) => {
+                    const inStock = product.availability !== "out_of_stock";
+
+                    return (
+                      <tr
+                        key={product.id}
+                        className="border-b border-[#eef1f6] transition-colors last:border-b-0 hover:bg-[#fafbfd]"
+                      >
+                        <td className={productCellClass}>
+                          <h3 className="m-0 text-[length:inherit] font-[inherit] leading-[inherit]">
+                            <button
+                              type="button"
+                              onClick={() => openProductEdit(product.id)}
+                              className="m-0 cursor-pointer border-0 bg-transparent p-0 text-start font-bold leading-snug text-[#0f172a] transition hover:text-navy hover:underline"
+                            >
+                              {product.title}
+                            </button>
+                          </h3>
+                          {product.variants.length > 0 ? (
+                            <div className="flex flex-wrap gap-1.5 pt-2">
+                              {product.variants.map((variant, vIdx) => (
+                                <span
+                                  key={`${product.id}-v-${vIdx}`}
+                                  className={variantChipClassCompact}
+                                >
+                                  {variant}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                        </td>
+                        <td className={`${productCellClass} text-center`}>
+                          <span
+                            className={`inline-block whitespace-nowrap rounded-full px-3 py-0.5 text-[11px] font-semibold ${
+                              inStock
+                                ? "bg-[#dcfce7] text-[#166534]"
+                                : "bg-[#fce7f3] text-[#6d3459]"
+                            }`}
+                          >
+                            {inStock
+                              ? t("shopAccount.products.stock.in")
+                              : t("shopAccount.products.stock.out")}
+                          </span>
+                        </td>
+                        <td className={productCellClass}>{renderProductColorSwatches(product)}</td>
+                        <td className={`${productCellClass} overflow-visible`}>
+                          <div className="flex items-center justify-end gap-3">
+                            <div className="min-w-0 flex-1 text-end">
+                              {renderProductPriceEditor(product)}
+                            </div>
+                            <ProductTableRowActions
+                              onEdit={() => openProductEdit(product.id)}
+                              onRefresh={() => refreshShopProduct(product.id)}
+                              onDelete={() => removeShopProduct(product.id)}
+                              editAriaLabel={t("shopAccount.products.editAria")}
+                              refreshAriaLabel={t("shopAccount.products.refreshAria")}
+                              deleteAriaLabel={t("shopAccount.products.deleteAria")}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
         ) : null}
@@ -1134,7 +1226,10 @@ const ShopAccountDashboardWidget = () => {
   };
 
   return (
-    <section className="w-full min-w-0 py-4 md:py-6 2xl:py-10" aria-labelledby="shop-account-page-heading">
+    <section
+      className="w-full min-w-0 py-4 md:py-6 2xl:py-10"
+      aria-labelledby="shop-account-page-heading"
+    >
       <div className="cont-width-default mx-auto min-w-0">
         <h1
           id="shop-account-page-heading"

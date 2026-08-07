@@ -32,7 +32,12 @@ const footerColumnsConfig = [
   ],
   [
     { id: "contact", href: "#contact", labelKey: "footer.columns.contact.contact" },
-    { id: "email", href: "mailto:info@choosy.com", labelKey: "footer.columns.contact.email", withEmailIcon: true },
+    {
+      id: "email",
+      href: "mailto:info@choosy.com",
+      labelKey: "footer.columns.contact.email",
+      withEmailIcon: true,
+    },
   ],
   [
     { id: "privacy", href: "/privacy-policy", labelKey: "footer.columns.legal.privacy" },

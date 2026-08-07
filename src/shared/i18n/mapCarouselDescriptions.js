@@ -4,7 +4,7 @@
 export const localizeCarouselItems = (items, t) =>
   items.map((item) => ({
     ...item,
-    description: item.descriptionKey ? t(item.descriptionKey) : item.description ?? "",
+    description: item.descriptionKey ? t(item.descriptionKey) : (item.description ?? ""),
   }));
 
 export default localizeCarouselItems;

@@ -15,13 +15,7 @@ import { getCanonicalProductDetailPath } from "entities/product-detail";
  *   homeLabel: string,
  * }} params
  */
-export const buildProductJsonLd = ({
-  product,
-  language,
-  description,
-  catalogLabel,
-  homeLabel,
-}) => {
+export const buildProductJsonLd = ({ product, language, description, catalogLabel, homeLabel }) => {
   const base = getSiteBaseUrl() || DEFAULT_SITE_BASE_URL;
   const productPath = getCanonicalProductDetailPath(product);
   const productUrl = `${base}${localizedPath(productPath, language)}`;

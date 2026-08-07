@@ -64,7 +64,11 @@ const FilterProduct = () => {
         </div>
       </div>
 
-      <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col bg-white px-2.5 pb-[calc(var(--mobile-bottom-nav-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] lg:px-[50px] lg:pb-8 2xl:px-[100px]">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex flex-1 flex-col bg-white px-2.5 pb-[calc(var(--mobile-bottom-nav-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] lg:px-[50px] lg:pb-8 2xl:px-[100px]"
+      >
         <FilterCatalogWidget />
       </main>
 

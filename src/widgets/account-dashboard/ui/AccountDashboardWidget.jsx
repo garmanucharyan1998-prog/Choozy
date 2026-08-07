@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { FaArrowLeft, FaBalanceScale, FaHeart, FaPen, FaRegHeart, FaTimes, FaUpload } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaBalanceScale,
+  FaHeart,
+  FaPen,
+  FaRegHeart,
+  FaTimes,
+  FaUpload,
+} from "react-icons/fa";
 import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
 import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
@@ -103,8 +111,12 @@ const MainCard = ({ children, className = "" }) => (
 const NotificationFeedCard = ({ title, timeLabel, body }) => (
   <article className="flex flex-col gap-3 rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
     <div className="flex items-start justify-between gap-3 border-b border-[#d9dfea] pb-3">
-      <h3 className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">{title}</h3>
-      <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">{timeLabel}</span>
+      <h3 className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">
+        {title}
+      </h3>
+      <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">
+        {timeLabel}
+      </span>
     </div>
     <p className="m-0 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
   </article>
@@ -201,7 +213,10 @@ const AccountDashboardWidget = () => {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pendingWishlistRemoveId, cancelRemoveWishlistItem]);
 
-  const wishlistIds = useMemo(() => new Set(accountState.wishlistItems.map((w) => w.id)), [accountState.wishlistItems]);
+  const wishlistIds = useMemo(
+    () => new Set(accountState.wishlistItems.map((w) => w.id)),
+    [accountState.wishlistItems],
+  );
 
   const visibleRecentlyViewed = useMemo(
     () => accountState.recentlyViewed.slice(0, recentVisibleCount),
@@ -250,7 +265,12 @@ const AccountDashboardWidget = () => {
   const renderWishlistRemoveDialog = () => {
     if (!pendingWishlistRemoveId) return null;
     return (
-      <div className="fixed inset-0 z-[90] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="wishlist-remove-title">
+      <div
+        className="fixed inset-0 z-[90] flex items-center justify-center p-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="wishlist-remove-title"
+      >
         <button
           type="button"
           className="absolute inset-0 bg-black/45"
@@ -342,7 +362,11 @@ const AccountDashboardWidget = () => {
   const renderNotificationsFeed = () => {
     const body = t("account.notificationsPage.feed.sampleBody");
     return (
-      <div className="flex flex-col gap-3 sm:gap-4" role="feed" aria-label={t("account.notificationsPage.title")}>
+      <div
+        className="flex flex-col gap-3 sm:gap-4"
+        role="feed"
+        aria-label={t("account.notificationsPage.title")}
+      >
         {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
           <NotificationFeedCard
             key={itemKey}
@@ -360,7 +384,9 @@ const AccountDashboardWidget = () => {
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-4">
           {renderAvatar()}
-          <p className="font-sans text-[16px] font-medium leading-[24px] text-[#171717]">{displayFullName}</p>
+          <p className="font-sans text-[16px] font-medium leading-[24px] text-[#171717]">
+            {displayFullName}
+          </p>
         </div>
         <button
           type="button"
@@ -374,11 +400,15 @@ const AccountDashboardWidget = () => {
       <div className="mb-5 border-t border-[#e1e6ef] pt-5" />
       <dl className="flex flex-col gap-[22.5px]">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dt className="text-sm font-semibold text-text-muted">{t("account.fields.emailShort")}</dt>
+          <dt className="text-sm font-semibold text-text-muted">
+            {t("account.fields.emailShort")}
+          </dt>
           <dd className="text-sm font-bold text-navy">{accountState.profile.email || "—"}</dd>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <dt className="text-sm font-semibold text-text-muted">{t("account.fields.phoneShort")}</dt>
+          <dt className="text-sm font-semibold text-text-muted">
+            {t("account.fields.phoneShort")}
+          </dt>
           <dd className="text-sm font-bold text-navy">{formattedPhone}</dd>
         </div>
       </dl>
@@ -393,7 +423,11 @@ const AccountDashboardWidget = () => {
       <div className="mb-6 flex items-center gap-4">
         {renderAvatar(true)}
         {accountState.avatarDataUrl ? (
-          <button type="button" className="text-xs font-semibold text-link-blue underline" onClick={clearAvatar}>
+          <button
+            type="button"
+            className="text-xs font-semibold text-link-blue underline"
+            onClick={clearAvatar}
+          >
             {t("account.avatar.remove")}
           </button>
         ) : null}
@@ -402,15 +436,33 @@ const AccountDashboardWidget = () => {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
           <span>{t("account.fields.firstNameRequired")}</span>
-          <input name="firstName" value={profileDraft.firstName} onChange={updateProfileDraft} className={inputClass} required />
+          <input
+            name="firstName"
+            value={profileDraft.firstName}
+            onChange={updateProfileDraft}
+            className={inputClass}
+            required
+          />
         </label>
         <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
           <span>{t("account.fields.lastName")}</span>
-          <input name="lastName" value={profileDraft.lastName} onChange={updateProfileDraft} className={inputClass} />
+          <input
+            name="lastName"
+            value={profileDraft.lastName}
+            onChange={updateProfileDraft}
+            className={inputClass}
+          />
         </label>
         <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
           <span>{t("account.fields.emailRequired")}</span>
-          <input name="email" type="email" value={profileDraft.email} onChange={updateProfileDraft} className={inputClass} required />
+          <input
+            name="email"
+            type="email"
+            value={profileDraft.email}
+            onChange={updateProfileDraft}
+            className={inputClass}
+            required
+          />
         </label>
         <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
           <span>{t("account.fields.phoneRequired")}</span>
@@ -439,45 +491,68 @@ const AccountDashboardWidget = () => {
         >
           {t("account.actions.cancel")}
         </button>
-        <button type="submit" className="rounded-pill bg-navy px-6 py-2.5 text-sm font-bold text-white transition hover:bg-active-blue">
+        <button
+          type="submit"
+          className="rounded-pill bg-navy px-6 py-2.5 text-sm font-bold text-white transition hover:bg-active-blue"
+        >
           {t("account.actions.save")}
         </button>
       </div>
 
       <div className="border-t border-[#e1e6ef] pt-8">
-      <h3 className="mb-4 text-base font-bold text-navy">{t("account.password.sectionTitle")}</h3>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
-          <span>{t("account.password.old")}</span>
-          <input name="oldPassword" type="password" value={passwordDraft.oldPassword} onChange={updatePasswordField} className={inputClass} />
-        </label>
-        <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
-          <span>{t("account.password.new")}</span>
-          <input name="newPassword" type="password" value={passwordDraft.newPassword} onChange={updatePasswordField} className={inputClass} />
-        </label>
-        <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy sm:col-span-2 sm:max-w-[50%]">
-          <span>{t("account.password.confirm")}</span>
-          <input name="confirmPassword" type="password" value={passwordDraft.confirmPassword} onChange={updatePasswordField} className={inputClass} />
-        </label>
-      </div>
-      {passwordErrorKey ? <p className="pt-3 text-sm font-semibold text-red-600">{t(passwordErrorKey)}</p> : null}
-      <div className="flex flex-wrap gap-3 pt-6">
-        <button
-          type="button"
-          onClick={cancelPasswordEdit}
-          className="rounded-pill border-0 bg-transparent px-2 py-2 text-sm font-bold text-text-muted underline-offset-4 hover:underline"
-        >
-          {t("account.actions.cancel")}
-        </button>
-        <button
-          type="button"
-          disabled={passwordSaveDisabled}
-          onClick={() => void savePassword()}
-          className="rounded-pill bg-navy px-6 py-2.5 text-sm font-bold text-white transition hover:bg-active-blue disabled:cursor-not-allowed disabled:opacity-45"
-        >
-          {t("account.actions.save")}
-        </button>
-      </div>
+        <h3 className="mb-4 text-base font-bold text-navy">{t("account.password.sectionTitle")}</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
+            <span>{t("account.password.old")}</span>
+            <input
+              name="oldPassword"
+              type="password"
+              value={passwordDraft.oldPassword}
+              onChange={updatePasswordField}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
+            <span>{t("account.password.new")}</span>
+            <input
+              name="newPassword"
+              type="password"
+              value={passwordDraft.newPassword}
+              onChange={updatePasswordField}
+              className={inputClass}
+            />
+          </label>
+          <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy sm:col-span-2 sm:max-w-[50%]">
+            <span>{t("account.password.confirm")}</span>
+            <input
+              name="confirmPassword"
+              type="password"
+              value={passwordDraft.confirmPassword}
+              onChange={updatePasswordField}
+              className={inputClass}
+            />
+          </label>
+        </div>
+        {passwordErrorKey ? (
+          <p className="pt-3 text-sm font-semibold text-red-600">{t(passwordErrorKey)}</p>
+        ) : null}
+        <div className="flex flex-wrap gap-3 pt-6">
+          <button
+            type="button"
+            onClick={cancelPasswordEdit}
+            className="rounded-pill border-0 bg-transparent px-2 py-2 text-sm font-bold text-text-muted underline-offset-4 hover:underline"
+          >
+            {t("account.actions.cancel")}
+          </button>
+          <button
+            type="button"
+            disabled={passwordSaveDisabled}
+            onClick={() => void savePassword()}
+            className="rounded-pill bg-navy px-6 py-2.5 text-sm font-bold text-white transition hover:bg-active-blue disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            {t("account.actions.save")}
+          </button>
+        </div>
       </div>
     </form>
   );
@@ -492,7 +567,9 @@ const AccountDashboardWidget = () => {
             role="tab"
             aria-selected={personalInnerTab === innerTabs.DATA}
             className={`border-b-2 pb-3 text-sm font-bold transition ${
-              personalInnerTab === innerTabs.DATA ? "border-navy text-navy" : "border-transparent text-text-muted"
+              personalInnerTab === innerTabs.DATA
+                ? "border-navy text-navy"
+                : "border-transparent text-text-muted"
             }`}
             onClick={() => selectPersonalInnerTab(innerTabs.DATA)}
           >
@@ -503,7 +580,9 @@ const AccountDashboardWidget = () => {
             role="tab"
             aria-selected={personalInnerTab === innerTabs.NOTIFICATIONS}
             className={`border-b-2 pb-3 text-sm font-bold transition ${
-              personalInnerTab === innerTabs.NOTIFICATIONS ? "border-navy text-navy" : "border-transparent text-text-muted"
+              personalInnerTab === innerTabs.NOTIFICATIONS
+                ? "border-navy text-navy"
+                : "border-transparent text-text-muted"
             }`}
             onClick={() => selectPersonalInnerTab(innerTabs.NOTIFICATIONS)}
           >
@@ -511,7 +590,11 @@ const AccountDashboardWidget = () => {
           </button>
         </div>
         {isPersonalEditMode && personalInnerTab === innerTabs.DATA ? (
-          <button type="button" onClick={exitPersonalEdit} className="inline-flex items-center gap-2 text-sm font-bold text-navy">
+          <button
+            type="button"
+            onClick={exitPersonalEdit}
+            className="inline-flex items-center gap-2 text-sm font-bold text-navy"
+          >
             <FaArrowLeft size={12} aria-hidden="true" />
             {t("account.actions.back")}
           </button>
@@ -536,7 +619,9 @@ const AccountDashboardWidget = () => {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
           {accountState.wishlistItems.map((item) => {
             const detailTo =
-              item.href && item.href.startsWith("/") ? item.href : getProductDetailHref(item.id, item.title);
+              item.href && item.href.startsWith("/")
+                ? item.href
+                : getProductDetailHref(item.id, item.title);
             return (
               <AccountGridProductCard
                 key={item.id}
@@ -561,7 +646,11 @@ const AccountDashboardWidget = () => {
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("account.recent.title")}</h2>
         {accountState.recentlyViewed.length > 0 ? (
-          <button type="button" onClick={clearRecentlyViewed} className="text-sm font-bold text-link-blue underline">
+          <button
+            type="button"
+            onClick={clearRecentlyViewed}
+            className="text-sm font-bold text-link-blue underline"
+          >
             {t("account.recent.clear")}
           </button>
         ) : null}
@@ -573,7 +662,9 @@ const AccountDashboardWidget = () => {
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {visibleRecentlyViewed.map((item) => {
               const detailTo =
-                item.href && item.href.startsWith("/") ? item.href : getProductDetailHref(item.id, item.title);
+                item.href && item.href.startsWith("/")
+                  ? item.href
+                  : getProductDetailHref(item.id, item.title);
               const inWishlist = wishlistIds.has(item.id);
               return (
                 <AccountGridProductCard
@@ -629,21 +720,35 @@ const AccountDashboardWidget = () => {
   const renderSubscription = () => (
     <MainCard className="overflow-hidden p-0">
       <div className="px-5 py-4 md:px-8 md:py-5">
-        <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("account.subscription.planCardTitle")}</h2>
+        <h2 className="m-0 text-lg font-bold text-navy md:text-xl">
+          {t("account.subscription.planCardTitle")}
+        </h2>
       </div>
       <div className="border-t border-[#e1e6ef]" role="presentation" />
       <dl className="m-0 flex flex-col gap-4 px-5 py-5 md:gap-5 md:px-8 md:py-6">
         <div className="flex flex-col gap-0.5 text-start sm:flex-row sm:items-baseline sm:gap-6">
-          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">{t("account.subscription.planNameLabel")}</dt>
-          <dd className="m-0 text-base font-bold text-[#171717]">{t("account.subscription.planName")}</dd>
+          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">
+            {t("account.subscription.planNameLabel")}
+          </dt>
+          <dd className="m-0 text-base font-bold text-[#171717]">
+            {t("account.subscription.planName")}
+          </dd>
         </div>
         <div className="flex flex-col gap-0.5 text-start sm:flex-row sm:items-baseline sm:gap-6">
-          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">{t("account.subscription.planValueLabel")}</dt>
-          <dd className="m-0 text-base font-bold text-[#171717]">{t("account.subscription.planTotal")}</dd>
+          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">
+            {t("account.subscription.planValueLabel")}
+          </dt>
+          <dd className="m-0 text-base font-bold text-[#171717]">
+            {t("account.subscription.planTotal")}
+          </dd>
         </div>
         <div className="flex flex-col gap-0.5 text-start sm:flex-row sm:items-baseline sm:gap-6">
-          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">{t("account.subscription.planMonthlyLabel")}</dt>
-          <dd className="m-0 text-base font-bold text-[#171717]">{t("account.subscription.planMonthly")}</dd>
+          <dt className="m-0 shrink-0 text-sm font-normal text-text-muted">
+            {t("account.subscription.planMonthlyLabel")}
+          </dt>
+          <dd className="m-0 text-base font-bold text-[#171717]">
+            {t("account.subscription.planMonthly")}
+          </dd>
         </div>
       </dl>
     </MainCard>
@@ -700,7 +805,9 @@ const AccountDashboardWidget = () => {
                 renderNotificationsFeed()
               ) : (
                 <>
-                  <p className="mb-4 text-sm leading-relaxed text-text-muted sm:mb-6">{t("account.notificationsPage.settingsIntro")}</p>
+                  <p className="mb-4 text-sm leading-relaxed text-text-muted sm:mb-6">
+                    {t("account.notificationsPage.settingsIntro")}
+                  </p>
                   {renderNotificationSettings()}
                 </>
               )}
@@ -716,13 +823,19 @@ const AccountDashboardWidget = () => {
   return (
     <section className="w-full py-6 md:py-10" aria-labelledby="account-page-heading">
       <div className="cont-width-default mx-auto">
-        <h1 id="account-page-heading" className="mb-5 text-start text-2xl font-bold text-navy md:text-[26px]">
+        <h1
+          id="account-page-heading"
+          className="mb-5 text-start text-2xl font-bold text-navy md:text-[26px]"
+        >
           {t("account.pageTitle")}
         </h1>
 
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-6">
           <aside className="w-full shrink-0 lg:w-[280px]">
-            <nav className="rounded-[12px] border border-[#e1e6ef] bg-white p-2 shadow-sm" aria-label={t("account.sidebarNavAria")}>
+            <nav
+              className="rounded-[12px] border border-[#e1e6ef] bg-white p-2 shadow-sm"
+              aria-label={t("account.sidebarNavAria")}
+            >
               <ul className="m-0 flex list-none flex-row gap-1 overflow-x-auto p-0 lg:flex-col lg:overflow-visible">
                 {sidebarItems.map((item) => {
                   const active = activeSidebarId === item.id;

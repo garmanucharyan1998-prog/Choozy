@@ -3,9 +3,30 @@
  */
 
 const SYNONYM_EXPANSIONS = [
-  { keys: ["notebook", "notebooks", "նոութբուկ", "նոթբուք", "նոթբուքեր", "laptop", "laptops"], tokens: ["macbook", "laptop", "thinkpad", "spectre", "latitude", "omen", "yoga", "legion", "chromebook", "xps", "book"] },
-  { keys: ["smartphone", "smartphones", "սմարթֆոն", "phone", "phones", "հեռախոս"], tokens: ["iphone", "galaxy", "pixel", "smartphone"] },
-  { keys: ["speaker", "speakers", "բարձրախոս", "շարժական", "headphone", "headphones"], tokens: ["headphone", "headphones", "wh-", "wireless", "earbud", "airpods", "xm"] },
+  {
+    keys: ["notebook", "notebooks", "նոութբուկ", "նոթբուք", "նոթբուքեր", "laptop", "laptops"],
+    tokens: [
+      "macbook",
+      "laptop",
+      "thinkpad",
+      "spectre",
+      "latitude",
+      "omen",
+      "yoga",
+      "legion",
+      "chromebook",
+      "xps",
+      "book",
+    ],
+  },
+  {
+    keys: ["smartphone", "smartphones", "սմարթֆոն", "phone", "phones", "հեռախոս"],
+    tokens: ["iphone", "galaxy", "pixel", "smartphone"],
+  },
+  {
+    keys: ["speaker", "speakers", "բարձրախոս", "շարժական", "headphone", "headphones"],
+    tokens: ["headphone", "headphones", "wh-", "wireless", "earbud", "airpods", "xm"],
+  },
   { keys: ["tablet", "tablets", "պլանշետ"], tokens: ["ipad", "tab", "tablet"] },
   { keys: ["watch", "ժամացույց"], tokens: ["watch", "ultra"] },
 ];
@@ -28,7 +49,10 @@ export const expandSearchTokens = (q) => {
   tokens.add(normalized);
 
   SYNONYM_EXPANSIONS.forEach(({ keys, tokens: extra }) => {
-    const matches = keys.some((key) => normalized.includes(key) || [...tokens].some((t) => key.includes(t) || t.includes(key)));
+    const matches = keys.some(
+      (key) =>
+        normalized.includes(key) || [...tokens].some((t) => key.includes(t) || t.includes(key)),
+    );
     if (matches) {
       extra.forEach((t) => tokens.add(t));
     }

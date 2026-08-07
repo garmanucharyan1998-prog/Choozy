@@ -7,7 +7,11 @@ const AboutUs = () => {
   const { t } = useLanguage();
 
   return (
-    <section id="about-us" className="mb-6 flex justify-center gap-3 sm:mb-10 sm:gap-5 lg:mb-[120px] lg:pt-[120px]" aria-label={t("aboutUs.sectionAriaLabel")}>
+    <section
+      id="about-us"
+      className="mb-6 flex justify-center gap-3 sm:mb-10 sm:gap-5 lg:mb-[120px] lg:pt-[120px]"
+      aria-label={t("aboutUs.sectionAriaLabel")}
+    >
       <article className="flex flex-col text-center items-center gap-4 sm:gap-8 cont-width-default lg:grid lg:grid-cols-2 lg:text-left lg:items-center">
         <div className="flex flex-col justify-center gap-2 box-border bg-section-bg p-3 h-full rounded-2xl max-h-[250px] sm:gap-2.5 sm:p-3.5 sm:rounded-[32px] sm:max-h-[280px] md:gap-4 md:p-8 lg:gap-8 lg:p-9 lg:max-h-none">
           <h2 className="mx-auto m-0 text-base font-semibold sm:text-lg md:text-xl lg:text-[2rem] lg:mx-0">
@@ -15,8 +19,7 @@ const AboutUs = () => {
           </h2>
           <p className="text-[11px] text-[#333] m-0 leading-normal sm:text-xs md:text-sm lg:text-base lg:leading-6 lg:font-normal lg:text-left">
             <strong>Choosy</strong>
-            {t("aboutUs.descriptionStart")}{" "}
-            <strong>Choosy</strong>
+            {t("aboutUs.descriptionStart")} <strong>Choosy</strong>
             {t("aboutUs.descriptionEnd")}
           </p>
           <LocalizedLink

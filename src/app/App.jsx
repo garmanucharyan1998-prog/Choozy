@@ -26,7 +26,9 @@ const ShopAccountPage = lazy(() =>
 const AboutPage = lazy(() => import("pages/about").then((m) => ({ default: m.AboutPage })));
 const CatalogPage = lazy(() => import("pages/catalog").then((m) => ({ default: m.CatalogPage })));
 const ComparePage = lazy(() => import("pages/compare").then((m) => ({ default: m.ComparePage })));
-const ProductsPage = lazy(() => import("pages/products").then((m) => ({ default: m.ProductsPage })));
+const ProductsPage = lazy(() =>
+  import("pages/products").then((m) => ({ default: m.ProductsPage })),
+);
 const VarietyPage = lazy(() => import("pages/variety").then((m) => ({ default: m.VarietyPage })));
 const PrivacyPolicyPage = lazy(() =>
   import("pages/privacy-policy").then((m) => ({ default: m.PrivacyPolicyPage })),
@@ -57,7 +59,9 @@ class RouteRenderErrorBoundary extends React.Component {
     if (this.state.error) {
       return (
         <div className="min-h-[50vh] bg-white px-5 py-10 text-start font-sans">
-          <p className="text-lg font-semibold text-red-700">Something went wrong while rendering this page.</p>
+          <p className="text-lg font-semibold text-red-700">
+            Something went wrong while rendering this page.
+          </p>
           <pre className="max-w-[90vw] whitespace-pre-wrap break-words pt-3 text-sm text-[#333]">
             {String(this.state.error?.message || this.state.error)}
           </pre>

@@ -68,92 +68,93 @@ const Carousel = ({ items, ariaLabel }) => {
         </button>
 
         <div className={CAROUSEL_TRACK}>
-        <Swiper
-          onSwiper={(instance) => {
-            swiperRef.current = instance;
-          }}
-          watchOverflow
-          slidesPerView={1.1}
-          spaceBetween={12}
-          loop={loopEnabled}
-          breakpoints={{
-            375: { slidesPerView: 1.25, spaceBetween: 12 },
-            480: { slidesPerView: 1.45, spaceBetween: 14 },
-            640: { slidesPerView: 2, spaceBetween: 16 },
-            768: { slidesPerView: 3, spaceBetween: 16 },
-            1024: { slidesPerView: 4, spaceBetween: 18 },
-            1280: { slidesPerView: 5, spaceBetween: 20 },
-          }}
-        >
-          {safeItems.map((product, index) => {
-            const detailPath = product.id != null ? getProductDetailHref(product.id, product.title) : null;
-            const inWishlist = Boolean(wishlist[product.id]);
-            const inCompare = Boolean(compare[product.id]);
+          <Swiper
+            onSwiper={(instance) => {
+              swiperRef.current = instance;
+            }}
+            watchOverflow
+            slidesPerView={1.1}
+            spaceBetween={12}
+            loop={loopEnabled}
+            breakpoints={{
+              375: { slidesPerView: 1.25, spaceBetween: 12 },
+              480: { slidesPerView: 1.45, spaceBetween: 14 },
+              640: { slidesPerView: 2, spaceBetween: 16 },
+              768: { slidesPerView: 3, spaceBetween: 16 },
+              1024: { slidesPerView: 4, spaceBetween: 18 },
+              1280: { slidesPerView: 5, spaceBetween: 20 },
+            }}
+          >
+            {safeItems.map((product, index) => {
+              const detailPath =
+                product.id != null ? getProductDetailHref(product.id, product.title) : null;
+              const inWishlist = Boolean(wishlist[product.id]);
+              const inCompare = Boolean(compare[product.id]);
 
-            return (
-              <SwiperSlide key={product.id || index} className="!h-auto">
-                <article className="group relative flex h-full flex-col text-start">
-                  <ProductCardImage
-                    variant="carousel"
-                    className="shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
-                    src={product.image}
-                    alt={product.title}
-                  >
-                    <div className="pointer-events-auto absolute right-2.5 top-2.5 z-20 flex flex-col gap-2 sm:right-3 sm:top-3">
-                      <button
-                        type="button"
-                        onClick={() => toggleCompare(product.id)}
-                        aria-pressed={inCompare}
-                        aria-label={t("carousel.compareAriaLabel")}
-                        className={ACTION_BTN}
-                      >
-                        <FaBalanceScale className="h-4 w-4" aria-hidden />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => toggleWishlist(product, detailPath || "")}
-                        aria-pressed={inWishlist}
-                        aria-label={
-                          inWishlist
-                            ? t("carousel.wishlistRemoveAriaLabel")
-                            : t("carousel.wishlistAddAriaLabel")
-                        }
-                        className={ACTION_BTN}
-                      >
-                        {inWishlist ? (
-                          <FaHeart className="h-4 w-4 text-active-blue" aria-hidden />
-                        ) : (
-                          <FaRegHeart className="h-4 w-4" aria-hidden />
-                        )}
-                      </button>
-                    </div>
-                  </ProductCardImage>
-
-                  {/* Single stretched link: the anchor text stays the product title,
-                      while `after:inset-0` keeps the whole card clickable. */}
-                  <LocalizedLink
-                    to={detailPath}
-                    className="flex grow flex-col gap-1.5 pt-2.5 text-inherit no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:pt-3"
-                  >
-                    <h3 className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base">
-                      {product.title}
-                    </h3>
-                    <p
-                      className="m-0 line-clamp-2 overflow-hidden text-[11px] leading-[1.25em] text-text-muted sm:text-xs md:text-sm md:leading-[1.2em]"
-                      title={product.description}
+              return (
+                <SwiperSlide key={product.id || index} className="!h-auto">
+                  <article className="group relative flex h-full flex-col text-start">
+                    <ProductCardImage
+                      variant="carousel"
+                      className="shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
+                      src={product.image}
+                      alt={product.title}
                     >
-                      {product.description}
-                    </p>
-                    <p className="m-0 mt-auto text-sm font-semibold text-navy 2xl:text-base">
-                      {product.price}
-                    </p>
-                  </LocalizedLink>
-                </article>
-              </SwiperSlide>
-            );
-          })}
-        </Swiper>
-      </div>
+                      <div className="pointer-events-auto absolute right-2.5 top-2.5 z-20 flex flex-col gap-2 sm:right-3 sm:top-3">
+                        <button
+                          type="button"
+                          onClick={() => toggleCompare(product.id)}
+                          aria-pressed={inCompare}
+                          aria-label={t("carousel.compareAriaLabel")}
+                          className={ACTION_BTN}
+                        >
+                          <FaBalanceScale className="h-4 w-4" aria-hidden />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleWishlist(product, detailPath || "")}
+                          aria-pressed={inWishlist}
+                          aria-label={
+                            inWishlist
+                              ? t("carousel.wishlistRemoveAriaLabel")
+                              : t("carousel.wishlistAddAriaLabel")
+                          }
+                          className={ACTION_BTN}
+                        >
+                          {inWishlist ? (
+                            <FaHeart className="h-4 w-4 text-active-blue" aria-hidden />
+                          ) : (
+                            <FaRegHeart className="h-4 w-4" aria-hidden />
+                          )}
+                        </button>
+                      </div>
+                    </ProductCardImage>
+
+                    {/* Single stretched link: the anchor text stays the product title,
+                      while `after:inset-0` keeps the whole card clickable. */}
+                    <LocalizedLink
+                      to={detailPath}
+                      className="flex grow flex-col gap-1.5 pt-2.5 text-inherit no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:pt-3"
+                    >
+                      <h3 className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base">
+                        {product.title}
+                      </h3>
+                      <p
+                        className="m-0 line-clamp-2 overflow-hidden text-[11px] leading-[1.25em] text-text-muted sm:text-xs md:text-sm md:leading-[1.2em]"
+                        title={product.description}
+                      >
+                        {product.description}
+                      </p>
+                      <p className="m-0 mt-auto text-sm font-semibold text-navy 2xl:text-base">
+                        {product.price}
+                      </p>
+                    </LocalizedLink>
+                  </article>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+        </div>
 
         <button
           type="button"

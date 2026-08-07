@@ -18,8 +18,7 @@ const ALIGNED_ROW_CLASS =
 const ALIGNED_LOGO_BOX_CLASS =
   "flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-lg border border-border-blue bg-white p-2";
 
-const ALIGNED_META_CLASS =
-  "flex min-h-[4.5rem] min-w-0 flex-col justify-center gap-1";
+const ALIGNED_META_CLASS = "flex min-h-[4.5rem] min-w-0 flex-col justify-center gap-1";
 
 const ALIGNED_DESC_CELL_CLASS = "flex min-w-0 items-center self-center";
 
@@ -30,11 +29,9 @@ const ALIGNED_DESC_CLASS =
 const DESKTOP_OPTIONS_CELL_CLASS =
   "flex min-w-0 flex-1 items-center justify-self-stretch gap-5 2xl:gap-6";
 
-const ALIGNED_MEMORY_WRAP_CLASS =
-  "flex min-w-0 flex-1 items-center justify-center";
+const ALIGNED_MEMORY_WRAP_CLASS = "flex min-w-0 flex-1 items-center justify-center";
 
-const ALIGNED_VARIANTS_CLASS =
-  "flex shrink-0 flex-nowrap items-center justify-center gap-1.5";
+const ALIGNED_VARIANTS_CLASS = "flex shrink-0 flex-nowrap items-center justify-center gap-1.5";
 
 const COLORS_GRID_1440_CLASS =
   "grid w-fit shrink-0 grid-cols-3 place-items-center gap-x-2 gap-y-1.5";
@@ -48,15 +45,13 @@ const ALIGNED_VARIANT_PILL =
 const ALIGNED_PRICE_CELL_CLASS =
   "flex min-w-0 items-center justify-end justify-self-end self-center";
 
-
 const SHOP_META_COLUMN_CLASS = "flex min-w-0 flex-col justify-center gap-1";
 
 /** Min-height matches sibling logo box so URL centers when badge is missing. */
 const SHOP_META_H_14_CLASS = `${SHOP_META_COLUMN_CLASS} min-h-14`;
 const MOBILE_SHOP_META_CLASS = SHOP_META_H_14_CLASS;
 
-const MOBILE_OPTIONS_STACK_CLASS =
-  "flex w-max max-w-full flex-col items-start gap-3";
+const MOBILE_OPTIONS_STACK_CLASS = "flex w-max max-w-full flex-col items-start gap-3";
 
 const MOBILE_COLORS_ROW_CLASS = COLORS_ROW_ONE_LINE_CLASS;
 
@@ -66,12 +61,10 @@ const MOBILE_ROW_CLASS = "flex flex-col gap-4 border-b border-border-blue py-4 2
 const MOBILE_LOGO_BOX_CLASS =
   "flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-border-blue bg-white p-1.5";
 
-
 const MOBILE_PRICE_CLASS = "text-xl font-semibold text-text-dark";
 
 const MOBILE_DESC_CLASS =
   "m-0 line-clamp-3 overflow-hidden text-ellipsis text-sm leading-snug text-text-muted";
-
 
 const OFFER_SHOP_LINK_CLASS =
   "text-sm font-semibold leading-snug text-link-blue underline-offset-2 hover:underline";
@@ -269,10 +262,7 @@ const BestOffersWidget = () => {
   return (
     <section aria-labelledby="best-offers-title">
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <h2
-          id="best-offers-title"
-          className="m-0 text-xl font-semibold text-text-dark md:text-2xl"
-        >
+        <h2 id="best-offers-title" className="m-0 text-xl font-semibold text-text-dark md:text-2xl">
           {t("productOffers.bestOffers.title")}
         </h2>
 

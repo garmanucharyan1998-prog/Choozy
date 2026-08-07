@@ -77,7 +77,11 @@ const RelatedProductsWidget = () => {
 
       <hr className="mb-4 border-0 border-t border-border-blue pt-4 md:mb-6 md:pt-6" />
 
-      <div className={CAROUSEL_SHELL} role="group" aria-label={t("relatedProducts.carouselAriaLabel")}>
+      <div
+        className={CAROUSEL_SHELL}
+        role="group"
+        aria-label={t("relatedProducts.carouselAriaLabel")}
+      >
         <button
           type="button"
           className={NAV_BTN}
@@ -110,55 +114,55 @@ const RelatedProductsWidget = () => {
               return (
                 <SwiperSlide key={product.id} className="!h-auto">
                   <article className="relative flex h-full flex-col text-start">
-                  <ProductCardImage src={product.image} alt={product.title}>
-                    <div className="pointer-events-auto absolute right-3 top-3 z-20 flex flex-col gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleCompare(product.id);
-                        }}
-                        aria-pressed={inCompare}
-                        aria-label={t("relatedProducts.compareAriaLabel")}
-                        className={ACTION_BTN}
-                      >
-                        <FaBalanceScale className="h-4 w-4" aria-hidden />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleWishlist(product);
-                        }}
-                        aria-pressed={inWishlist}
-                        aria-label={t("relatedProducts.wishlistAriaLabel")}
-                        className={ACTION_BTN}
-                      >
-                        {inWishlist ? (
-                          <FaHeart className="h-4 w-4 text-active-blue" aria-hidden />
-                        ) : (
-                          <FaRegHeart className="h-4 w-4" aria-hidden />
-                        )}
-                      </button>
-                    </div>
-                  </ProductCardImage>
+                    <ProductCardImage src={product.image} alt={product.title}>
+                      <div className="pointer-events-auto absolute right-3 top-3 z-20 flex flex-col gap-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleCompare(product.id);
+                          }}
+                          aria-pressed={inCompare}
+                          aria-label={t("relatedProducts.compareAriaLabel")}
+                          className={ACTION_BTN}
+                        >
+                          <FaBalanceScale className="h-4 w-4" aria-hidden />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleWishlist(product);
+                          }}
+                          aria-pressed={inWishlist}
+                          aria-label={t("relatedProducts.wishlistAriaLabel")}
+                          className={ACTION_BTN}
+                        >
+                          {inWishlist ? (
+                            <FaHeart className="h-4 w-4 text-active-blue" aria-hidden />
+                          ) : (
+                            <FaRegHeart className="h-4 w-4" aria-hidden />
+                          )}
+                        </button>
+                      </div>
+                    </ProductCardImage>
 
-                  {/* One stretched link per card — keeps the product title as the anchor text. */}
-                  <LocalizedLink
-                    to={product.href}
-                    className="flex flex-col gap-1 pt-3 no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
-                  >
-                    <h3 className={TITLE_TEXT_CLASS}>{product.title}</h3>
-                    <p className={DESC_TEXT_CLASS} title={product.description}>
-                      {product.description}
-                    </p>
-                    <p className={PRICE_TEXT_CLASS}>{product.price}</p>
-                  </LocalizedLink>
-                </article>
-              </SwiperSlide>
-            );
+                    {/* One stretched link per card — keeps the product title as the anchor text. */}
+                    <LocalizedLink
+                      to={product.href}
+                      className="flex flex-col gap-1 pt-3 no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
+                    >
+                      <h3 className={TITLE_TEXT_CLASS}>{product.title}</h3>
+                      <p className={DESC_TEXT_CLASS} title={product.description}>
+                        {product.description}
+                      </p>
+                      <p className={PRICE_TEXT_CLASS}>{product.price}</p>
+                    </LocalizedLink>
+                  </article>
+                </SwiperSlide>
+              );
             })}
           </Swiper>
         </div>

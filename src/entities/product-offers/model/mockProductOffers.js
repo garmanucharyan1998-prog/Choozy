@@ -15,10 +15,7 @@ const SHARED_VARIANT_KEYS = [
   "productDetail.variants.v1tb",
 ];
 
-const VARIANT_KEYS_256 = [
-  "productDetail.variants.v256a",
-  "productDetail.variants.v256b",
-];
+const VARIANT_KEYS_256 = ["productDetail.variants.v256a", "productDetail.variants.v256b"];
 
 const VARIANT_KEYS_1TB = ["productDetail.variants.v1tb"];
 

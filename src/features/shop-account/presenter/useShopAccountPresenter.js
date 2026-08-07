@@ -110,9 +110,13 @@ export const useShopAccountPresenter = () => {
   const navigate = useLocalizedNavigate();
 
   const [shopState, setShopState] = useState(() => readShopAccountState());
-  const [activeSidebarId, setActiveSidebarId] = useState(() => sidebarIdFromPathname(location.pathname));
+  const [activeSidebarId, setActiveSidebarId] = useState(() =>
+    sidebarIdFromPathname(location.pathname),
+  );
   const [shopInnerTab, setShopInnerTab] = useState(SHOP_INNER_TABS.DATA);
-  const [notificationsPageTab, setNotificationsPageTab] = useState(SHOP_NOTIFICATIONS_PAGE_TABS.FEED);
+  const [notificationsPageTab, setNotificationsPageTab] = useState(
+    SHOP_NOTIFICATIONS_PAGE_TABS.FEED,
+  );
   const [isShopEditMode, setIsShopEditMode] = useState(false);
   const [profileDraft, setProfileDraft] = useState(() => emptyProfileDraft());
   const [statusKey, setStatusKey] = useState("");
@@ -471,9 +475,7 @@ export const useShopAccountPresenter = () => {
       persist((state) => ({
         ...state,
         shopProducts: state.shopProducts.map((entry) =>
-          entry.id === productId
-            ? normalizeShopProduct({ ...entry, lastRefreshedAt: now })
-            : entry,
+          entry.id === productId ? normalizeShopProduct({ ...entry, lastRefreshedAt: now }) : entry,
         ),
       }));
       setStatusKey("shopAccount.products.messages.productRefreshed");
@@ -491,9 +493,7 @@ export const useShopAccountPresenter = () => {
       persist((state) => ({
         ...state,
         shopProducts: state.shopProducts.map((entry) =>
-          entry.id === productId
-            ? normalizeShopProduct({ ...entry, price, priceAmd })
-            : entry,
+          entry.id === productId ? normalizeShopProduct({ ...entry, price, priceAmd }) : entry,
         ),
       }));
       setStatusKey("shopAccount.products.messages.priceUpdated");

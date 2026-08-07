@@ -520,7 +520,8 @@ export const enOverrides = {
       editFormTitle: "Edit product",
       staleHint: 'Products are removed automatically if you do not click "Refresh" within 5 days.',
       formTitle: "New product",
-      formHint: "Pick category, product, memory, colors, and availability. Enter price manually only.",
+      formHint:
+        "Pick category, product, memory, colors, and availability. Enter price manually only.",
       placeholders: {
         category: "Select category",
         product: "Select product",

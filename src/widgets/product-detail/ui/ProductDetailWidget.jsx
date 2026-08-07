@@ -14,7 +14,20 @@ const THUMB_WRAP =
 const THUMB_ACTIVE = "border-navy ring-2 ring-offset-1 ring-navy";
 const THUMB_IDLE = "border-transparent hover:border-border-blue";
 
-const CHART_MONTH_KEYS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+const CHART_MONTH_KEYS = [
+  "jan",
+  "feb",
+  "mar",
+  "apr",
+  "may",
+  "jun",
+  "jul",
+  "aug",
+  "sep",
+  "oct",
+  "nov",
+  "dec",
+];
 const SWIPER_MODULES = [Navigation];
 const SWIPER_THUMB_BREAKPOINTS = {
   480: { slidesPerView: 4 },
@@ -26,7 +39,8 @@ const getTrailingMonthKeys = (count = 5, date = new Date()) => {
   const currentMonthIndex = date.getMonth();
   return Array.from({ length: count }, (_, index) => {
     const offset = count - 1 - index;
-    const monthIndex = (currentMonthIndex - offset + CHART_MONTH_KEYS.length) % CHART_MONTH_KEYS.length;
+    const monthIndex =
+      (currentMonthIndex - offset + CHART_MONTH_KEYS.length) % CHART_MONTH_KEYS.length;
     return CHART_MONTH_KEYS[monthIndex];
   });
 };
@@ -150,7 +164,11 @@ const ProductDetailWidget = () => {
               aria-pressed={wishlist}
               aria-label={t("productDetail.wishlistAriaLabel")}
             >
-              {wishlist ? <FaHeart className="h-5 w-5 text-active-blue" /> : <FaRegHeart className="h-5 w-5" />}
+              {wishlist ? (
+                <FaHeart className="h-5 w-5 text-active-blue" />
+              ) : (
+                <FaRegHeart className="h-5 w-5" />
+              )}
             </button>
             <ProgressiveImage
               src={mainImageSrc}
@@ -164,7 +182,10 @@ const ProductDetailWidget = () => {
             />
           </figure>
 
-          <div className="min-w-0 shrink-0 lg:mt-auto" aria-label={t("productDetail.galleryAriaLabel")}>
+          <div
+            className="min-w-0 shrink-0 lg:mt-auto"
+            aria-label={t("productDetail.galleryAriaLabel")}
+          >
             {thumbSwiper}
           </div>
         </div>
@@ -178,7 +199,11 @@ const ProductDetailWidget = () => {
               {productTitle}
             </h1>
 
-            <div className="flex flex-wrap gap-2" role="group" aria-label={t("productDetail.variantsAriaLabel")}>
+            <div
+              className="flex flex-wrap gap-2"
+              role="group"
+              aria-label={t("productDetail.variantsAriaLabel")}
+            >
               {variantIds.map((variantId, index) => (
                 <button
                   key={variantId}
@@ -246,7 +271,10 @@ const ProductDetailWidget = () => {
 
           <div className="w-full shrink-0 lg:mt-auto">
             <div className="rounded-xl border border-border-blue bg-white px-2 py-4 shadow-sm sm:px-4">
-              <PriceHistoryChart data={priceChartData} ariaLabel={t("productDetail.chartAriaLabel")} />
+              <PriceHistoryChart
+                data={priceChartData}
+                ariaLabel={t("productDetail.chartAriaLabel")}
+              />
             </div>
           </div>
         </div>

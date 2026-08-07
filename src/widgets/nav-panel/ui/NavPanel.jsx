@@ -28,10 +28,15 @@ function NavPanel({
   return (
     <div
       className={`relative flex bg-transparent text-[#171717] px-3 sm:px-5 lg:px-[50px] 2xl:px-[100px] transition-all duration-300 ${
-        isCompact ? "pt-2 pb-3 sm:pt-2.5 sm:pb-5 mb-2 border-b-[3px] border-navy" : "py-3 sm:py-5 mb-3 border-b-0"
+        isCompact
+          ? "pt-2 pb-3 sm:pt-2.5 sm:pb-5 mb-2 border-b-[3px] border-navy"
+          : "py-3 sm:py-5 mb-3 border-b-0"
       }`}
     >
-      <nav className="flex items-center w-full cont-width-default" aria-label={t("navPanel.navAriaLabel")}>
+      <nav
+        className="flex items-center w-full cont-width-default"
+        aria-label={t("navPanel.navAriaLabel")}
+      >
         <div className="shrink-0">
           {/*
             Below md this button opens the slide-in catalog panel; from md up the

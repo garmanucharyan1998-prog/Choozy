@@ -249,7 +249,9 @@ const normalizeAccountState = (raw) => {
     avatarDataUrl: typeof value.avatarDataUrl === "string" ? value.avatarDataUrl : "",
     notificationPrefs: {
       ...defaultNotificationPrefs,
-      ...(value.notificationPrefs && typeof value.notificationPrefs === "object" ? value.notificationPrefs : {}),
+      ...(value.notificationPrefs && typeof value.notificationPrefs === "object"
+        ? value.notificationPrefs
+        : {}),
     },
     wishlistItems: rawWishlist.map((item) => normalizeWishlistItem(item)).filter((item) => item.id),
     recentlyViewed: (Array.isArray(value.recentlyViewed) ? value.recentlyViewed : [])

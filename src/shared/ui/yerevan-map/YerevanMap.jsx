@@ -73,19 +73,16 @@ const MapResizeAndRecenter = ({ centerLat, centerLng, zoom, layoutKey }) => {
  * }} props
  */
 const YerevanMap = ({ center, zoom, markers = [], ariaLabel, layoutKey }) => {
-  const safeCenter = center && typeof center.lat === "number" && typeof center.lng === "number"
-    ? [center.lat, center.lng]
-    : [40.1792, 44.4991];
-  const safeZoom = typeof zoom === "number" ? zoom : center?.zoom ?? 11;
+  const safeCenter =
+    center && typeof center.lat === "number" && typeof center.lng === "number"
+      ? [center.lat, center.lng]
+      : [40.1792, 44.4991];
+  const safeZoom = typeof zoom === "number" ? zoom : (center?.zoom ?? 11);
   const centerLat = safeCenter[0];
   const centerLng = safeCenter[1];
 
   return (
-    <div
-      className="h-full w-full min-h-[320px]"
-      role="region"
-      aria-label={ariaLabel}
-    >
+    <div className="h-full w-full min-h-[320px]" role="region" aria-label={ariaLabel}>
       <MapContainer
         center={safeCenter}
         zoom={safeZoom}

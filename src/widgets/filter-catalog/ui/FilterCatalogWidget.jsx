@@ -178,7 +178,9 @@ const FilterCatalogWidget = () => {
   const overlayQueryLower = overlayOptionQuery.trim().toLowerCase();
   const brandOptionsForOverlay = useMemo(() => {
     if (!overlayQueryLower) return visibleBrandOptions;
-    return visibleBrandOptions.filter((opt) => t(opt.labelKey).toLowerCase().includes(overlayQueryLower));
+    return visibleBrandOptions.filter((opt) =>
+      t(opt.labelKey).toLowerCase().includes(overlayQueryLower),
+    );
   }, [visibleBrandOptions, overlayQueryLower, t]);
 
   const renderFilterForm = (idSuffix) => (
@@ -257,7 +259,10 @@ const FilterCatalogWidget = () => {
           panelId={`filter-panel-screen${idSuffix}`}
         />
         {sectionsOpen.screen ? (
-          <ul id={`filter-panel-screen${idSuffix}`} className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1">
+          <ul
+            id={`filter-panel-screen${idSuffix}`}
+            className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1"
+          >
             {screenOptions.map((opt) => (
               <li key={opt.id}>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
@@ -324,7 +329,10 @@ const FilterCatalogWidget = () => {
           panelId={`filter-panel-ram${idSuffix}`}
         />
         {sectionsOpen.ram ? (
-          <ul id={`filter-panel-ram${idSuffix}`} className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1">
+          <ul
+            id={`filter-panel-ram${idSuffix}`}
+            className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1"
+          >
             {ramOptions.map((opt) => (
               <li key={opt.id}>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
@@ -589,7 +597,10 @@ const FilterCatalogWidget = () => {
                             ? "border border-navy bg-navy text-white shadow-sm"
                             : "border border-border-blue text-navy hover:bg-hover-blue"
                         }`}
-                        aria-label={t("filterPage.pagination.goToPage").replace("{{n}}", String(item))}
+                        aria-label={t("filterPage.pagination.goToPage").replace(
+                          "{{n}}",
+                          String(item),
+                        )}
                         aria-current={page === item ? "page" : undefined}
                       >
                         {item}
@@ -632,7 +643,12 @@ const FilterCatalogWidget = () => {
       </div>
 
       {mobileFilterOpen ? (
-        <div className="fixed inset-0 z-[80] lg:hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-filter-title">
+        <div
+          className="fixed inset-0 z-[80] lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-filter-title"
+        >
           <button
             type="button"
             className="absolute inset-0 bg-black/45"
@@ -662,7 +678,9 @@ const FilterCatalogWidget = () => {
                 className="h-11 w-full rounded-xl border border-border-blue px-4 text-sm text-navy"
               />
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">{renderFilterForm("-drawer")}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+              {renderFilterForm("-drawer")}
+            </div>
             <div className="border-t border-border-blue/60 p-3">
               <button
                 type="button"

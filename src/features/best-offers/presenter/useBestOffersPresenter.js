@@ -16,11 +16,9 @@ export const SORT_OPTIONS = [
   { id: "priceDesc", labelKey: "productOffers.bestOffers.sortOptions.priceDesc" },
 ];
 
-const formatAmd = (amount) =>
-  typeof amount === "number" ? amount.toLocaleString("en-US") : "";
+const formatAmd = (amount) => (typeof amount === "number" ? amount.toLocaleString("en-US") : "");
 
-const comparePrice = (asc) => (a, b) =>
-  asc ? a.priceAmd - b.priceAmd : b.priceAmd - a.priceAmd;
+const comparePrice = (asc) => (a, b) => (asc ? a.priceAmd - b.priceAmd : b.priceAmd - a.priceAmd);
 
 const buildInitialSelections = (offers) =>
   offers.reduce((acc, offer) => {
@@ -66,9 +64,7 @@ export const useBestOffersPresenter = () => {
   const [sortId, setSortId] = useState(SORT_OPTIONS[0].id);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
-  const [selections, setSelections] = useState(() =>
-    buildInitialSelections(mockProductOffers),
-  );
+  const [selections, setSelections] = useState(() => buildInitialSelections(mockProductOffers));
 
   useEffect(() => {
     if (globalVariantKey == null) return;
@@ -88,10 +84,7 @@ export const useBestOffersPresenter = () => {
   }, [filteredOffers, sortId]);
 
   const visibleOffers = useMemo(
-    () =>
-      sortedOffers
-        .slice(0, visibleCount)
-        .map((offer) => enrichOffer(offer, selections)),
+    () => sortedOffers.slice(0, visibleCount).map((offer) => enrichOffer(offer, selections)),
     [sortedOffers, visibleCount, selections],
   );
 
@@ -100,9 +93,7 @@ export const useBestOffersPresenter = () => {
   const canShowLess = visibleCount > INITIAL_VISIBLE_COUNT;
 
   const loadMore = useCallback(() => {
-    setVisibleCount((current) =>
-      Math.min(current + LOAD_MORE_STEP, sortedOffers.length),
-    );
+    setVisibleCount((current) => Math.min(current + LOAD_MORE_STEP, sortedOffers.length));
   }, [sortedOffers.length]);
 
   const showLess = useCallback(() => {

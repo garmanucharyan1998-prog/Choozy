@@ -1,8 +1,4 @@
-export {
-  APP_LOCALE,
-  getHtmlLangForAppLanguage,
-  getOgLocaleForAppLanguage,
-} from "./appLocale";
+export { APP_LOCALE, getHtmlLangForAppLanguage, getOgLocaleForAppLanguage } from "./appLocale";
 export {
   getLanguageFromPath,
   hasUnknownLanguagePrefix,
