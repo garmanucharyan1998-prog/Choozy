@@ -15,11 +15,11 @@ const PAYMENT_HISTORY_ROWS = [
 
 const PaymentStatusBadge = ({ status, t }) =>
   status === "approved" ? (
-    <span className="inline-flex shrink-0 rounded-full bg-[#DCFCE7] px-3 py-1 text-xs font-semibold text-[#166534]">
+    <span className="inline-flex shrink-0 rounded-full bg-[#dcfce7] px-3 py-1 text-xs font-semibold text-[#166534]">
       {t("shopAccount.finance.payments.statusApproved")}
     </span>
   ) : (
-    <span className="inline-flex shrink-0 rounded-full bg-[#FFE4E6] px-3 py-1 text-xs font-semibold text-[#9F1239]">
+    <span className="inline-flex shrink-0 rounded-full bg-[#ffe4e6] px-3 py-1 text-xs font-semibold text-[#9f1239]">
       {t("shopAccount.finance.payments.statusRejected")}
     </span>
   );
@@ -108,7 +108,7 @@ const ShopFinanceWidget = () => {
             {PAYMENT_HISTORY_ROWS.map((row) => (
               <li
                 key={row.id}
-                className="flex flex-col gap-3 rounded-[12px] border border-[#E2E8F0] bg-white px-4 py-4 font-sans shadow-sm"
+                className="flex flex-col gap-3 rounded-[12px] border border-[#e2e8f0] bg-white px-4 py-4 font-sans shadow-sm"
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="m-0 min-w-0 flex-1 text-sm font-medium leading-snug text-navy">
@@ -119,7 +119,7 @@ const ShopFinanceWidget = () => {
                   </p>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs leading-none text-[#64748B]">
+                  <span className="text-xs leading-none text-[#64748b]">
                     {t("shopAccount.finance.payments.sampleDate")}
                   </span>
                   <PaymentStatusBadge status={row.status} t={t} />
@@ -134,28 +134,28 @@ const ShopFinanceWidget = () => {
               aria-label={t("shopAccount.finance.payments.tableAria")}
             >
               <thead>
-                <tr className="bg-[#F8FAFC] text-navy">
+                <tr className="bg-[#f8fafc] text-navy">
                   <th
                     scope="col"
-                    className="rounded-tl-xl border-b border-[#E2E8F0] px-4 py-4 text-left text-sm font-medium sm:px-5 sm:py-5"
+                    className="rounded-tl-xl border-b border-[#e2e8f0] px-4 py-4 text-left text-sm font-medium sm:px-5 sm:py-5"
                   >
                     {t("shopAccount.finance.payments.colDate")}
                   </th>
                   <th
                     scope="col"
-                    className="border-b border-[#E2E8F0] px-4 py-4 text-left text-sm font-medium sm:px-5 sm:py-5"
+                    className="border-b border-[#e2e8f0] px-4 py-4 text-left text-sm font-medium sm:px-5 sm:py-5"
                   >
                     {t("shopAccount.finance.payments.colMethod")}
                   </th>
                   <th
                     scope="col"
-                    className="border-b border-[#E2E8F0] px-4 py-4 text-center text-sm font-medium sm:px-5 sm:py-5"
+                    className="border-b border-[#e2e8f0] px-4 py-4 text-center text-sm font-medium sm:px-5 sm:py-5"
                   >
                     {t("shopAccount.finance.payments.colStatus")}
                   </th>
                   <th
                     scope="col"
-                    className="rounded-tr-xl border-b border-[#E2E8F0] px-4 py-4 text-right text-sm font-medium sm:px-5 sm:py-5"
+                    className="rounded-tr-xl border-b border-[#e2e8f0] px-4 py-4 text-right text-sm font-medium sm:px-5 sm:py-5"
                   >
                     {t("shopAccount.finance.payments.colAmount")}
                   </th>
@@ -165,9 +165,9 @@ const ShopFinanceWidget = () => {
                 {PAYMENT_HISTORY_ROWS.map((row) => (
                   <tr
                     key={row.id}
-                    className="border-b border-[#E2E8F0] transition-colors last:border-b-0 hover:bg-[#F8FAFC]/60"
+                    className="border-b border-[#e2e8f0] transition-colors last:border-b-0 hover:bg-[#f8fafc]/60"
                   >
-                    <td className="px-4 py-4 text-[#64748B] sm:px-5 sm:py-5">
+                    <td className="px-4 py-4 text-[#64748b] sm:px-5 sm:py-5">
                       {t("shopAccount.finance.payments.sampleDate")}
                     </td>
                     <td className="px-4 py-4 font-bold text-navy sm:px-5 sm:py-5">

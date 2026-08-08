@@ -72,19 +72,19 @@ const buildColorOptions = () => {
 
   const extraDetailColors = [
     { id: "gray", hex: "#aeaeb2", labelKey: "productDetail.colors.gray" },
-    { id: "yellow", hex: "#E8B923", label: "Yellow" },
-    { id: "violet", hex: "#5B4B8A", label: "Violet" },
-    { id: "pink", hex: "#E8A0A8", label: "Pink" },
-    { id: "hazel", hex: "#9A8B7A", label: "Hazel" },
-    { id: "starlight", hex: "#F5F0E8", label: "Starlight" },
-    { id: "silver", hex: "#E3E4E6", label: "Silver" },
-    { id: "midnight", hex: "#2E3642", label: "Midnight" },
+    { id: "yellow", hex: "#e8b923", label: "Yellow" },
+    { id: "violet", hex: "#5b4b8a", label: "Violet" },
+    { id: "pink", hex: "#e8a0a8", label: "Pink" },
+    { id: "hazel", hex: "#9a8b7a", label: "Hazel" },
+    { id: "starlight", hex: "#f5f0e8", label: "Starlight" },
+    { id: "silver", hex: "#e3e4e6", label: "Silver" },
+    { id: "midnight", hex: "#2e3642", label: "Midnight" },
     { id: "space-black", hex: "#1c1c1e", label: "Space Black" },
-    { id: "mint", hex: "#7EC8B8", label: "Mint" },
-    { id: "platinum", hex: "#E8E8E8", label: "Platinum" },
-    { id: "graphite", hex: "#3A3A3C", label: "Graphite" },
-    { id: "neon-red", hex: "#E63946", label: "Neon Red" },
-    { id: "neon-blue", hex: "#3A86FF", label: "Neon Blue" },
+    { id: "mint", hex: "#7ec8b8", label: "Mint" },
+    { id: "platinum", hex: "#e8e8e8", label: "Platinum" },
+    { id: "graphite", hex: "#3a3a3c", label: "Graphite" },
+    { id: "neon-red", hex: "#e63946", label: "Neon Red" },
+    { id: "neon-blue", hex: "#3a86ff", label: "Neon Blue" },
   ];
 
   extraDetailColors.forEach((color) => {

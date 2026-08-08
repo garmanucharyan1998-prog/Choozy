@@ -396,7 +396,7 @@ const Header = ({
 
   /** Renders mobile bottom panel icon according to item type and active state. */
   const renderMobileBottomIcon = useCallback((iconType, isActive) => {
-    const commonIconClassName = isActive ? "text-[#fbfbfb]" : "text-[#6B738C]";
+    const commonIconClassName = isActive ? "text-[#fbfbfb]" : "text-[#6b738c]";
     const commonIconSize = 18;
 
     switch (iconType) {
@@ -678,7 +678,7 @@ const Header = ({
                     <span className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-transparent transition-all duration-200">
                       {renderMobileBottomIcon(item.iconType, false)}
                     </span>
-                    <span className="text-[10px] sm:text-[11px] font-medium text-[#6B738C]">
+                    <span className="text-[10px] sm:text-[11px] font-medium text-[#6b738c]">
                       {item.label}
                     </span>
                   </button>
@@ -692,13 +692,13 @@ const Header = ({
                   >
                     <span
                       className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full transition-all duration-200 ${
-                        isActive ? "bg-[#152147]" : "bg-transparent"
+                        isActive ? "bg-navy" : "bg-transparent"
                       }`}
                     >
                       {renderMobileBottomIcon(item.iconType, isActive)}
                     </span>
                     <span
-                      className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-[#152147]" : "text-[#6B738C]"}`}
+                      className={`text-[10px] sm:text-[11px] font-medium ${isActive ? "text-navy" : "text-[#6b738c]"}`}
                     >
                       {item.label}
                     </span>

@@ -30,7 +30,7 @@ export const defaultShopNotificationPrefs = {
 };
 
 /** Default color dots when none stored (yellow, black, white, muted blue). */
-export const DEFAULT_PRODUCT_SWATCH_COLORS = ["#E8B923", "#111111", "#FFFFFF", "#6B8EAE"];
+export const DEFAULT_PRODUCT_SWATCH_COLORS = ["#e8b923", "#111111", "#ffffff", "#6b8eae"];
 
 const DEFAULT_SWATCH_OBJECTS = () =>
   DEFAULT_PRODUCT_SWATCH_COLORS.map((hex, idx) => ({ id: `color-${idx}`, hex }));
@@ -89,10 +89,10 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     productUrl: "",
     variants: ["256 / 12gb", "256 / 12gb", "1TB / 12gb"],
     colors: [
-      { id: "yellow", hex: "#E8B923" },
+      { id: "yellow", hex: "#e8b923" },
       { id: "black", hex: "#1c1c1e" },
-      { id: "white", hex: "#FFFFFF" },
-      { id: "blue", hex: "#4A90D9" },
+      { id: "white", hex: "#ffffff" },
+      { id: "blue", hex: "#4a90d9" },
     ],
   },
   {
@@ -112,10 +112,10 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     productUrl: "",
     variants: ["256 / 12gb", "512 / 12gb"],
     colors: [
-      { id: "gray", hex: "#8E8E93" },
+      { id: "gray", hex: "#8e8e93" },
       { id: "black", hex: "#1c1c1e" },
-      { id: "violet", hex: "#5B4B8A" },
-      { id: "yellow", hex: "#E8B923" },
+      { id: "violet", hex: "#5b4b8a" },
+      { id: "yellow", hex: "#e8b923" },
     ],
   },
   {
@@ -136,9 +136,9 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     variants: ["128 / 16gb", "256 / 16gb"],
     colors: [
       { id: "black", hex: "#1c1c1e" },
-      { id: "white", hex: "#F5F5F7" },
-      { id: "pink", hex: "#E8A0A8" },
-      { id: "hazel", hex: "#9A8B7A" },
+      { id: "white", hex: "#f5f5f7" },
+      { id: "pink", hex: "#e8a0a8" },
+      { id: "hazel", hex: "#9a8b7a" },
     ],
   },
   {
@@ -158,9 +158,9 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     productUrl: "",
     variants: ["256 / 16gb", "512 / 24gb"],
     colors: [
-      { id: "starlight", hex: "#F5F0E8" },
-      { id: "silver", hex: "#E3E4E6" },
-      { id: "midnight", hex: "#2E3642" },
+      { id: "starlight", hex: "#f5f0e8" },
+      { id: "silver", hex: "#e3e4e6" },
+      { id: "midnight", hex: "#2e3642" },
     ],
   },
   {
@@ -180,7 +180,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     productUrl: "",
     variants: ["USB-C Case", "MagSafe"],
     colors: [
-      { id: "white", hex: "#F5F5F7" },
+      { id: "white", hex: "#f5f5f7" },
       { id: "black", hex: "#1c1c1e" },
     ],
   },
@@ -202,7 +202,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     variants: ["256 / 8gb", "512 / 8gb"],
     colors: [
       { id: "space-black", hex: "#1c1c1e" },
-      { id: "silver", hex: "#E3E4E6" },
+      { id: "silver", hex: "#e3e4e6" },
     ],
   },
   {
@@ -223,8 +223,8 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     variants: ["Black", "Silver"],
     colors: [
       { id: "black", hex: "#1c1c1e" },
-      { id: "silver", hex: "#C4C4C4" },
-      { id: "blue", hex: "#3D5A80" },
+      { id: "silver", hex: "#c4c4c4" },
+      { id: "blue", hex: "#3d5a80" },
     ],
   },
   {
@@ -244,8 +244,8 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     productUrl: "",
     variants: ["32 / 1TB", "64 / 2TB"],
     colors: [
-      { id: "platinum", hex: "#E8E8E8" },
-      { id: "graphite", hex: "#3A3A3C" },
+      { id: "platinum", hex: "#e8e8e8" },
+      { id: "graphite", hex: "#3a3a3c" },
     ],
   },
   {
@@ -266,8 +266,8 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     variants: ["128 / 8gb", "256 / 8gb"],
     colors: [
       { id: "black", hex: "#1c1c1e" },
-      { id: "white", hex: "#F5F5F7" },
-      { id: "mint", hex: "#7EC8B8" },
+      { id: "white", hex: "#f5f5f7" },
+      { id: "mint", hex: "#7ec8b8" },
     ],
   },
   {
@@ -287,9 +287,9 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     productUrl: "",
     variants: ["OLED White", "OLED Neon"],
     colors: [
-      { id: "white", hex: "#FFFFFF" },
-      { id: "neon-red", hex: "#E60012" },
-      { id: "neon-blue", hex: "#00AEDF" },
+      { id: "white", hex: "#ffffff" },
+      { id: "neon-red", hex: "#e60012" },
+      { id: "neon-blue", hex: "#00aedf" },
     ],
   },
   {
@@ -310,7 +310,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     variants: ["18-45mm Kit", "Body only"],
     colors: [
       { id: "black", hex: "#1c1c1e" },
-      { id: "white", hex: "#F5F5F7" },
+      { id: "white", hex: "#f5f5f7" },
     ],
   },
   {
@@ -331,7 +331,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     variants: ['55"', '65"', '77"'],
     colors: [
       { id: "black", hex: "#1c1c1e" },
-      { id: "silver", hex: "#C7C7CC" },
+      { id: "silver", hex: "#c7c7cc" },
     ],
   },
   {
@@ -351,8 +351,8 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     productUrl: "",
     variants: ["Graphite", "Pale Gray"],
     colors: [
-      { id: "graphite", hex: "#3C3C43" },
-      { id: "pale-gray", hex: "#D1D1D6" },
+      { id: "graphite", hex: "#3c3c43" },
+      { id: "pale-gray", hex: "#d1d1d6" },
     ],
   },
   {
@@ -372,8 +372,8 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     productUrl: "",
     variants: ["32 / 1TB", "16 / 512gb"],
     colors: [
-      { id: "eclipse", hex: "#2B2B2D" },
-      { id: "white", hex: "#F5F5F7" },
+      { id: "eclipse", hex: "#2b2b2d" },
+      { id: "white", hex: "#f5f5f7" },
     ],
   },
   {
@@ -394,7 +394,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     variants: ["Standard", "Creator Edition"],
     colors: [
       { id: "black", hex: "#1c1c1e" },
-      { id: "blue", hex: "#0077B6" },
+      { id: "blue", hex: "#0077b6" },
     ],
   },
 ];
