@@ -7,12 +7,17 @@ import { localizedPath } from "shared/lib/locale";
  * catalog regardless of URL, which would misdescribe what a crawler visiting
  * `/filter?category=laptops&page=2` actually sees.
  *
- * @param {{ items: { id: string, title: string, href: string }[], language: string, page: number }} params
+ * `pageSize` should be the catalog's actual page size (e.g. the `perPage` the visitor
+ * picked), not inferred from `items.length` — the last page of a result set is usually
+ * partial, and inferring from it understates every position after page 1. Defaults to
+ * `items.length` only so an existing caller that doesn't pass it yet still gets a value.
+ *
+ * @param {{ items: { id: string, title: string, href: string }[], language: string, page: number, pageSize?: number }} params
  */
-export const buildCatalogItemListJsonLd = ({ items, language, page = 1 }) => {
+export const buildCatalogItemListJsonLd = ({ items, language, page = 1, pageSize }) => {
   const base = getSiteBaseUrl() || DEFAULT_SITE_BASE_URL;
-  const pageSize = items.length || 1;
-  const startPosition = (Math.max(page, 1) - 1) * pageSize;
+  const effectivePageSize = pageSize || items.length || 1;
+  const startPosition = (Math.max(page, 1) - 1) * effectivePageSize;
 
   return {
     "@context": "https://schema.org",

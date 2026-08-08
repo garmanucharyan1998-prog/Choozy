@@ -15,10 +15,16 @@ const seededFraction = (seed, index) => {
   return x - Math.floor(x);
 };
 
+/**
+ * Positional (not a plain character-code sum): a sum is order-insensitive, so ids that are
+ * digit permutations of each other — e.g. "fp-12" and "fp-21" — hashed to the exact same
+ * seed and produced identical relative price curves. Multiplying by a prime per character
+ * folds position into the result.
+ */
 const hashProductId = (id) =>
   String(id)
     .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    .reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) | 0, 0);
 
 /**
  * @param {{ id: string, priceValue: number }} product

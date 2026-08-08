@@ -113,8 +113,8 @@ const FilterCatalogWidget = () => {
 
   const { language } = useLanguage();
   const catalogItemListJsonLd = useMemo(
-    () => buildCatalogItemListJsonLd({ items: pageItems, language, page }),
-    [pageItems, language, page],
+    () => buildCatalogItemListJsonLd({ items: pageItems, language, page, pageSize }),
+    [pageItems, language, page, pageSize],
   );
 
   /**
