@@ -1,6 +1,11 @@
 import { sha256Hex } from "./passwordHash";
 import { getDefaultProductDetailPath, getProductDetailHref } from "entities/product-detail";
+import { readSessionFromDocument } from "entities/session";
 
+/**
+ * Guest shelf — also the storage key for anyone not signed in. Kept as the plain,
+ * unscoped key (rather than e.g. `::guest`) so existing data isn't orphaned by this change.
+ */
 export const ACCOUNT_STORAGE_KEY = "choozy.account.v2";
 
 /** Fired on same-tab updates after `writeAccountState` (storage event only fires across tabs). */
@@ -193,6 +198,61 @@ export const defaultAccountState = {
 const isBrowser = () => typeof window !== "undefined" && Boolean(window.localStorage);
 
 /**
+ * A signed-in visitor (see entities/session) gets their own shelf, keyed by the email they
+ * typed at login — so two people sharing a browser (or a buyer who logs out and back in)
+ * don't see each other's wishlist. Anyone not signed in keeps using the plain, shared
+ * `ACCOUNT_STORAGE_KEY` — this is a demo app with no server, so "signed in" only ever
+ * narrows storage to this one browser; it does not make favorites available elsewhere.
+ */
+const accountStorageKeyFor = (session) =>
+  session?.isAuthenticated && session.email
+    ? `${ACCOUNT_STORAGE_KEY}::${session.email}`
+    : ACCOUNT_STORAGE_KEY;
+
+const readRawAccountState = (key) => {
+  if (!isBrowser()) return null;
+  try {
+    const stored = window.localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeRawAccountState = (key, value) => {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /** Quota exceeded or storage disabled — see writeAccountState's own comment. */
+  }
+};
+
+/**
+ * Folds the guest shelf's wishlist into a newly-identified account shelf (by product id,
+ * so items already saved on both sides aren't duplicated), then empties the guest shelf.
+ * Runs at most once per login: after the first merge the guest shelf has nothing left to
+ * contribute, so later calls are a cheap no-op — no separate "already merged" flag needed.
+ */
+const mergeGuestWishlistInto = (accountKey) => {
+  if (accountKey === ACCOUNT_STORAGE_KEY) return;
+  const guestRaw = readRawAccountState(ACCOUNT_STORAGE_KEY);
+  const guestWishlist = Array.isArray(guestRaw?.wishlistItems) ? guestRaw.wishlistItems : [];
+  if (guestWishlist.length === 0) return;
+
+  const accountRaw = readRawAccountState(accountKey) || {};
+  const accountWishlist = Array.isArray(accountRaw.wishlistItems) ? accountRaw.wishlistItems : [];
+  const accountIds = new Set(accountWishlist.map((item) => item?.id));
+  const merged = [
+    ...accountWishlist,
+    ...guestWishlist.filter((item) => item?.id && !accountIds.has(item.id)),
+  ];
+
+  writeRawAccountState(accountKey, { ...accountRaw, wishlistItems: merged });
+  writeRawAccountState(ACCOUNT_STORAGE_KEY, { ...guestRaw, wishlistItems: [] });
+};
+
+/**
  * @param {unknown} item
  * @returns {{ id: string, title: string, description: string, price: string, image: string, href: string, category: string }}
  */
@@ -267,8 +327,11 @@ export const readAccountState = () => {
     return normalizeAccountState(null);
   }
 
+  const key = accountStorageKeyFor(readSessionFromDocument());
+  mergeGuestWishlistInto(key);
+
   try {
-    const stored = window.localStorage.getItem(ACCOUNT_STORAGE_KEY);
+    const stored = window.localStorage.getItem(key);
     return stored ? normalizeAccountState(JSON.parse(stored)) : normalizeAccountState(null);
   } catch {
     return normalizeAccountState(null);
@@ -284,8 +347,9 @@ export const writeAccountState = (partialOrFn) => {
   });
 
   if (isBrowser()) {
+    const key = accountStorageKeyFor(readSessionFromDocument());
     try {
-      window.localStorage.setItem(ACCOUNT_STORAGE_KEY, JSON.stringify(next));
+      window.localStorage.setItem(key, JSON.stringify(next));
     } catch {
       /**
        * Quota exceeded (a large avatar data URL) or storage disabled in private mode.

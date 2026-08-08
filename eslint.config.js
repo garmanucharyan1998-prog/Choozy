@@ -40,9 +40,10 @@ const elementTypes = [
    * eslint-plugin-boundaries only supports "folder mode" for `boundaries/elements`
    * (confirmed via its own debug output: a bare top-level file never resolves to a
    * known element, no matter how the pattern is written), so they're invisible to
-   * `boundaries/dependencies` regardless. Verified by hand instead: `root.tsx` only
-   * imports `contexts` and `shared/*` (plus `react-router` itself) — consistent with
-   * the `app` layer's allowances below. `routes.ts` imports only `@react-router/dev/routes`;
+   * `boundaries/dependencies` regardless. Verified by hand instead: `root.tsx` imports
+   * `contexts`, `entities/session` and `shared/*` (plus `react-router` itself) —
+   * consistent with the `app` layer's allowances below (`app -> entities` is permitted).
+   * `routes.ts` imports only `@react-router/dev/routes`;
    * its `pages/*`/`widgets/*` references are string path literals for the framework's
    * route config, not ES imports, so there's nothing for a linter to check there at all.
    * Re-check `root.tsx` by hand if its imports change.

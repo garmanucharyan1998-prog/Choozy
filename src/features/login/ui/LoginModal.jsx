@@ -1,5 +1,6 @@
 import { FaTimes } from "react-icons/fa";
 import { useLanguage } from "contexts";
+import { ROLES } from "entities/session";
 import { useAuthModalPresenter } from "../presenter/useAuthModalPresenter";
 
 const INPUT_CLASS =
@@ -8,10 +9,65 @@ const INPUT_CLASS =
 const SWITCH_BUTTON_CLASS =
   "border-0 bg-transparent p-0 text-sm font-bold text-link-blue underline transition hover:opacity-80";
 
-const LoginModal = ({ isOpen, onClose, onSuccess }) => {
+const SEGMENT_BASE =
+  "flex-1 rounded-[10px] border px-3 py-2 text-sm font-semibold transition text-center";
+const SEGMENT_ACTIVE = `${SEGMENT_BASE} border-navy bg-navy text-white`;
+const SEGMENT_IDLE = `${SEGMENT_BASE} border-[#b8c8e8] bg-white text-navy hover:bg-[#f4f6fb]`;
+
+/**
+ * Two `type="button"` toggles, deliberately NOT native radio inputs: the dialog's focus
+ * trap (see useAuthModalPresenter) collects every element its selector matches, but a
+ * browser only makes the *checked* radio in a group tab-reachable — so picking Seller
+ * would put the unreachable Buyer radio at `focusables[0]`, and Shift+Tab from the first
+ * real field would never land back where the trap expects, letting focus escape the modal.
+ * Plain buttons are always tabbable, so the trap holds regardless of which one is active.
+ */
+const RolePicker = ({ role, onSelect, t }) => (
+  <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
+    <legend className="p-0 text-sm font-semibold text-navy">{t("auth.roleLabel")}</legend>
+    <div className="flex gap-2" role="group">
+      <button
+        type="button"
+        aria-pressed={role === ROLES.BUYER}
+        className={role === ROLES.BUYER ? SEGMENT_ACTIVE : SEGMENT_IDLE}
+        onClick={() => onSelect(ROLES.BUYER)}
+      >
+        {t("auth.roleBuyer")}
+      </button>
+      <button
+        type="button"
+        aria-pressed={role === ROLES.SELLER}
+        className={role === ROLES.SELLER ? SEGMENT_ACTIVE : SEGMENT_IDLE}
+        onClick={() => onSelect(ROLES.SELLER)}
+      >
+        {t("auth.roleSeller")}
+      </button>
+    </div>
+  </fieldset>
+);
+
+/**
+ * `useAuthModalPresenter` calls `useSubmit()`, which needs a data router — fine in the
+ * real app (framework mode), but `SiteShell.test.jsx` renders the header under a plain
+ * declarative `MemoryRouter` and never opens this modal. Gating on `isOpen` *before* the
+ * hook runs (rather than after, as the old class-free version did) means the presenter —
+ * and `useSubmit` with it — is never invoked while closed, in tests or otherwise; it
+ * mounts fresh each time the modal opens, which resets the form as a side effect of the
+ * mount instead of needing its own explicit "closed" branch.
+ */
+const LoginModal = ({ isOpen, onClose }) => {
+  if (!isOpen) {
+    return null;
+  }
+  return <LoginModalDialog onClose={onClose} />;
+};
+
+const LoginModalDialog = ({ onClose }) => {
   const { t } = useLanguage();
   const {
     isRegisterMode,
+    role,
+    selectRole,
     email,
     password,
     confirmPassword,
@@ -23,11 +79,7 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
     handleRegisterSubmit,
     switchToLogin,
     switchToRegister,
-  } = useAuthModalPresenter({ isOpen, onClose, onSuccess });
-
-  if (!isOpen) {
-    return null;
-  }
+  } = useAuthModalPresenter({ isOpen: true, onClose });
 
   const titleId = isRegisterMode ? "register-modal-title" : "login-modal-title";
 
@@ -65,6 +117,8 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             <form className="flex flex-col gap-4" onSubmit={handleRegisterSubmit} noValidate>
+              <RolePicker role={role} onSelect={selectRole} t={t} />
+
               <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
                 <span>{t("register.emailLabel")}</span>
                 <input
@@ -137,6 +191,8 @@ const LoginModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
 
             <form className="flex flex-col gap-4" onSubmit={handleLoginSubmit} noValidate>
+              <RolePicker role={role} onSelect={selectRole} t={t} />
+
               <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
                 <span>{t("login.emailLabel")}</span>
                 <input

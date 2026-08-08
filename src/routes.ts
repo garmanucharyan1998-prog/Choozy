@@ -37,6 +37,8 @@ const contentRoutes = (lang: string): RouteConfigEntry[] => [
   route("filter", "pages/filterproduct/ui/FilterProduct.jsx", { id: `filter-${lang}` }),
   route("login", "app/routes/loginRedirect.js", { id: `login-${lang}` }),
   route("favorites", "app/routes/favoritesRedirect.js", { id: `favorites-${lang}` }),
+  route("session/login", "app/routes/sessionLoginAction.js", { id: `session-login-${lang}` }),
+  route("session/logout", "app/routes/sessionLogoutAction.js", { id: `session-logout-${lang}` }),
   route("about", "pages/about/ui/AboutPage.jsx", { id: `about-${lang}` }),
   route("catalog", "pages/catalog/ui/CatalogPage.jsx", { id: `catalog-${lang}` }),
   route("compare", "pages/compare/ui/ComparePage.jsx", { id: `compare-${lang}` }),

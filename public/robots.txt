@@ -7,4 +7,9 @@ Disallow: /account
 Disallow: /ru/account
 Disallow: /en/account
 
+# Session login/logout — POST-only resource routes, nothing to render or index.
+Disallow: /session
+Disallow: /ru/session
+Disallow: /en/session
+
 Sitemap: https://choosy.com/sitemap.xml

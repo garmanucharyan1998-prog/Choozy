@@ -5,6 +5,7 @@ import {
   FaPen,
   FaPlus,
   FaRegTrashAlt,
+  FaSignOutAlt,
   FaSyncAlt,
   FaTimes,
   FaUpload,
@@ -19,6 +20,7 @@ import {
   SHOP_SIDEBAR_IDS,
 } from "entities/shop";
 import { useShopAccountPresenter } from "features/shop-account";
+import { useLogout } from "features/session";
 import { formatAmd } from "shared/lib/formatAmd";
 import {
   formatAmdPriceConversionParts,
@@ -298,6 +300,7 @@ const ShopAccountDashboardWidget = () => {
     toggleProductMemory,
     toggleProductColor,
   } = useShopAccountPresenter();
+  const handleLogout = useLogout();
 
   const [editingPriceId, setEditingPriceId] = useState(null);
   const [editingPriceValue, setEditingPriceValue] = useState("");
@@ -1223,6 +1226,18 @@ const ShopAccountDashboardWidget = () => {
                 })}
               </ul>
             </nav>
+
+            {/* Outside the nav (not a sidebarItems entry): logout is a form submission via
+                useLogout, not a selectSidebar(id) tab switch, and keeping it out of the
+                <ul> keeps the tabs' aria-current="page" semantics honest. */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#e1e6ef] bg-white px-4 py-3 text-sm font-bold text-navy transition hover:bg-[#f4f6fb]"
+            >
+              <FaSignOutAlt size={14} aria-hidden="true" />
+              {t("auth.logout")}
+            </button>
           </aside>
 
           <div className="relative min-w-0 flex-1">

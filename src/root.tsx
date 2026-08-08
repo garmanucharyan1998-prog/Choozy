@@ -9,7 +9,8 @@ import {
   useRouteError,
   redirect,
 } from "react-router";
-import { LanguageProvider, useLanguage } from "contexts";
+import { LanguageProvider, SessionProvider, useLanguage } from "contexts";
+import { readSessionFromRequest } from "entities/session";
 import { getHtmlLangForAppLanguage, getLanguageFromPath } from "shared/lib/locale";
 import { ScrollToTopButton, ScrollToTopOnNavigate } from "shared/ui/scroll-to-top";
 import { getTranslator } from "shared/i18n";
@@ -28,7 +29,7 @@ export function loader({ request }: Route.LoaderArgs) {
     const canonical = `${url.pathname.replace(/\/+$/, "")}${url.search}${url.hash}`;
     throw redirect(canonical, 301);
   }
-  return null;
+  return { session: readSessionFromRequest(request) };
 }
 
 /**
@@ -84,14 +85,16 @@ const SkipToContentLink = () => {
   );
 };
 
-export default function App() {
+export default function App({ loaderData }: Route.ComponentProps) {
   return (
-    <LanguageProvider>
-      <SkipToContentLink />
-      <ScrollToTopOnNavigate />
-      <Outlet />
-      <ScrollToTopButton />
-    </LanguageProvider>
+    <SessionProvider session={loaderData?.session}>
+      <LanguageProvider>
+        <SkipToContentLink />
+        <ScrollToTopOnNavigate />
+        <Outlet />
+        <ScrollToTopButton />
+      </LanguageProvider>
+    </SessionProvider>
   );
 }
 

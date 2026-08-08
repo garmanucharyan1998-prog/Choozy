@@ -9,11 +9,16 @@ import {
   FaBars,
   FaChevronDown,
   FaRegHeart,
+  FaSignOutAlt,
+  FaStore,
+  FaBoxOpen,
 } from "react-icons/fa";
 import { useHeaderPresenter } from "features/header";
 import { LoginModal } from "features/login";
+import { useLogout } from "features/session";
 import { ACCOUNT_STORAGE_EVENT, readAccountState } from "entities/user";
-import { useLanguage } from "contexts";
+import { dashboardPathForRole, ROLES } from "entities/session";
+import { useLanguage, useSession } from "contexts";
 import { LocalizedLink } from "shared/ui/link";
 import { stripLanguageFromPath } from "shared/lib/locale";
 import choozyMainLogo from "shared/assets/logos/choozyMainLogo.svg";
@@ -39,6 +44,26 @@ function FavoritesCountBadge({ text }) {
   );
 }
 
+/**
+ * `useLogout` calls `useSubmit()`, which needs a data router — fine in the real app, but
+ * `SiteShell.test.jsx` renders the header under a plain declarative `MemoryRouter` with
+ * no signed-in session. Calling `useLogout()` here, in a component only ever mounted
+ * inside an `isAuthenticated` branch, keeps it out of Header's own unconditional render
+ * path — same fix as LoginModal/LoginModalDialog for the same underlying constraint.
+ */
+function LogoutButton({ className, children, onBeforeLogout, ...rest }) {
+  const handleLogout = useLogout();
+  const handleClick = () => {
+    onBeforeLogout?.();
+    handleLogout();
+  };
+  return (
+    <button type="button" className={className} onClick={handleClick} {...rest}>
+      {children}
+    </button>
+  );
+}
+
 const Header = ({
   isCompact = false,
   isMobileMenuOpen = false,
@@ -47,6 +72,8 @@ const Header = ({
 }) => {
   const location = useLocation();
   const { t } = useLanguage();
+  const { isAuthenticated, role } = useSession();
+  const dashboardPath = dashboardPathForRole(role);
   const [wishlistCount, setWishlistCount] = useState(() => readAccountState().wishlistItems.length);
   const headerRef = useRef(null);
   const mobileBottomNavRef = useRef(null);
@@ -72,7 +99,6 @@ const Header = ({
     isLoginModalOpen,
     openLoginModal,
     closeLoginModal,
-    handleLoginSuccess,
   } = useHeaderPresenter();
 
   const handleMobileMenuToggle = useCallback(() => {
@@ -363,36 +389,98 @@ const Header = ({
     ],
   );
 
-  const mobileBottomNavItems = useMemo(
-    () => [
-      {
-        href: "/",
-        label: t("header.mobileBottomNav.home.label"),
-        ariaLabel: t("header.mobileBottomNav.home.ariaLabel"),
-        iconType: "home",
-      },
-      {
-        href: "/compare",
-        label: t("header.mobileBottomNav.compare.label"),
-        ariaLabel: t("header.mobileBottomNav.compare.ariaLabel"),
-        iconType: "compare",
-      },
-      {
-        href: "/account/favorite",
-        label: t("header.mobileBottomNav.favorites.label"),
-        ariaLabel: t("header.mobileBottomNav.favorites.ariaLabel"),
-        iconType: "favorites",
-      },
-      {
-        href: "/account",
-        label: t("header.mobileBottomNav.profile.label"),
-        ariaLabel: t("header.mobileBottomNav.profile.ariaLabel"),
-        iconType: "profile",
-        opensLogin: true,
-      },
-    ],
-    [t],
-  );
+  /**
+   * Always 4 slots regardless of role, so the fixed bar's height (which feeds the
+   * `--mobile-bottom-nav-height` CSS var) never shifts between states. A seller sees
+   * their shop dashboard/products instead of favorites/account — favorites is buyer/
+   * anonymous-only (see the desktop favorites link's own comment for why).
+   */
+  const mobileBottomNavItems = useMemo(() => {
+    const homeItem = {
+      href: "/",
+      label: t("header.mobileBottomNav.home.label"),
+      ariaLabel: t("header.mobileBottomNav.home.ariaLabel"),
+      iconType: "home",
+    };
+    const compareItem = {
+      href: "/compare",
+      label: t("header.mobileBottomNav.compare.label"),
+      ariaLabel: t("header.mobileBottomNav.compare.ariaLabel"),
+      iconType: "compare",
+    };
+
+    if (role === ROLES.SELLER) {
+      return [
+        homeItem,
+        compareItem,
+        {
+          href: "/account/shop-account/products",
+          label: t("header.mobileBottomNav.shopProducts.label"),
+          ariaLabel: t("header.mobileBottomNav.shopProducts.ariaLabel"),
+          iconType: "shopProducts",
+        },
+        {
+          href: "/account/shop-account",
+          label: t("header.mobileBottomNav.shop.label"),
+          ariaLabel: t("header.mobileBottomNav.shop.ariaLabel"),
+          iconType: "shop",
+        },
+      ];
+    }
+
+    const favoritesItem = {
+      href: "/account/favorite",
+      label: t("header.mobileBottomNav.favorites.label"),
+      ariaLabel: t("header.mobileBottomNav.favorites.ariaLabel"),
+      iconType: "favorites",
+    };
+
+    return [
+      homeItem,
+      compareItem,
+      favoritesItem,
+      isAuthenticated
+        ? {
+            href: "/account",
+            label: t("header.mobileBottomNav.account.label"),
+            ariaLabel: t("header.mobileBottomNav.account.ariaLabel"),
+            iconType: "profile",
+          }
+        : {
+            href: "/account",
+            label: t("header.mobileBottomNav.profile.label"),
+            ariaLabel: t("header.mobileBottomNav.profile.ariaLabel"),
+            iconType: "profile",
+            opensLogin: true,
+          },
+    ];
+  }, [t, role, isAuthenticated]);
+
+  /**
+   * Exact-or-slash per item, with two explicit exclusions: `/account` must not also light
+   * up on `/account/favorite` (a real bug in the old chained-ternary version once a
+   * seller's `/account/shop-account` href existed — `startsWith("/account")` matched
+   * both), and `/account/shop-account` must not also light up on its own `/products`
+   * sub-tab.
+   */
+  const isPathActiveForItem = useCallback((item, path) => {
+    switch (item.href) {
+      case "/":
+        return path === "/";
+      case "/account":
+        return (
+          path === "/account" || (path.startsWith("/account/") && !path.startsWith("/account/favorite"))
+        );
+      case "/account/shop-account":
+        return (
+          path === "/account/shop-account" ||
+          (path.startsWith("/account/shop-account/") &&
+            !path.startsWith("/account/shop-account/products"))
+        );
+      default:
+        return path === item.href || path.startsWith(`${item.href}/`);
+    }
+  }, []);
 
   /** Renders mobile bottom panel icon according to item type and active state. */
   const renderMobileBottomIcon = useCallback((iconType, isActive) => {
@@ -423,6 +511,10 @@ const Header = ({
         );
       case "profile":
         return <FaUser size={commonIconSize} className={commonIconClassName} aria-hidden="true" />;
+      case "shop":
+        return <FaStore size={commonIconSize} className={commonIconClassName} aria-hidden="true" />;
+      case "shopProducts":
+        return <FaBoxOpen size={commonIconSize} className={commonIconClassName} aria-hidden="true" />;
       default:
         return null;
     }
@@ -442,6 +534,17 @@ const Header = ({
     ? "relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-2.5 py-1.5 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-2.5 md:py-2 2xl:px-4 2xl:py-2"
     : "relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-3 py-2 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-3 md:py-2.5 2xl:px-5 2xl:py-2.5";
 
+  const logoutButtonClassName = isCompact
+    ? "relative inline-flex items-center justify-center rounded-full border border-solid border-black bg-transparent p-2 text-black transition-colors duration-200 hover:bg-neutral-100 md:p-2"
+    : "relative inline-flex items-center justify-center rounded-full border border-solid border-black bg-transparent p-2.5 text-black transition-colors duration-200 hover:bg-neutral-100 md:p-2.5";
+
+  const isSeller = role === ROLES.SELLER;
+  const accountLinkLabel = isSeller ? t("header.sellerAccountLabel") : t("header.buyerAccountLabel");
+  const accountLinkTitle = isSeller ? t("header.sellerAccountTitle") : t("header.buyerAccountTitle");
+  const accountLinkAriaLabel = isSeller
+    ? t("header.sellerAccountAriaLabel")
+    : t("header.buyerAccountAriaLabel");
+
   const UserNavigationSection = useMemo(
     () => (
       <nav
@@ -460,34 +563,61 @@ const Header = ({
           <span className="hidden 2xl:ml-[5px] 2xl:inline">{t("header.compareLabel")}</span>
         </LocalizedLink>
 
-        <LocalizedLink
-          to="/account/favorite"
-          className={`relative mx-[5px] hidden min-w-0 items-center justify-center rounded-pill text-black no-underline transition-colors duration-200 hover:bg-accent-blue/40 hover:opacity-80 md:inline-flex 2xl:mx-0 2xl:gap-2 2xl:px-2 ${
-            isCompact ? "p-2 2xl:py-1.5" : "p-2.5 2xl:py-2"
-          }`}
-          title={t("header.favoritesTitle")}
-          aria-label={favoritesLinkAriaLabel}
-        >
-          <span className="relative inline-flex shrink-0">
-            <FaRegHeart size={20} className="text-black" aria-hidden="true" />
-            <FavoritesCountBadge text={favoritesCountBadge} />
-          </span>
-          <span className="hidden text-sm font-semibold tracking-tight text-black 2xl:inline">
-            <span className="whitespace-nowrap">{t("header.favoritesLabel")}</span>
-          </span>
-        </LocalizedLink>
-
-        <div className="hidden md:block">
-          <button
-            type="button"
-            className={loginLinkClassName}
-            title={t("header.loginTitle")}
-            aria-label={t("header.loginAriaLabel")}
-            onClick={openLoginModal}
+        {/* Favorites lives on /account/favorite, which stays open to anonymous visitors
+            (their picks are saved for this browser) and buyers (saved to their account) —
+            but a seller has no wishlist of their own, and the account guard would bounce
+            them straight to their shop dashboard anyway. */}
+        {!isSeller && (
+          <LocalizedLink
+            to="/account/favorite"
+            className={`relative mx-[5px] hidden min-w-0 items-center justify-center rounded-pill text-black no-underline transition-colors duration-200 hover:bg-accent-blue/40 hover:opacity-80 md:inline-flex 2xl:mx-0 2xl:gap-2 2xl:px-2 ${
+              isCompact ? "p-2 2xl:py-1.5" : "p-2.5 2xl:py-2"
+            }`}
+            title={t("header.favoritesTitle")}
+            aria-label={favoritesLinkAriaLabel}
           >
-            <FaUser className="text-black" size={18} aria-hidden="true" />
-            <span className="hidden whitespace-nowrap 2xl:inline">{t("header.loginLabel")}</span>
-          </button>
+            <span className="relative inline-flex shrink-0">
+              <FaRegHeart size={20} className="text-black" aria-hidden="true" />
+              <FavoritesCountBadge text={favoritesCountBadge} />
+            </span>
+            <span className="hidden text-sm font-semibold tracking-tight text-black 2xl:inline">
+              <span className="whitespace-nowrap">{t("header.favoritesLabel")}</span>
+            </span>
+          </LocalizedLink>
+        )}
+
+        <div className="hidden md:flex md:items-center md:gap-1">
+          {isAuthenticated ? (
+            <>
+              <LocalizedLink
+                to={dashboardPath}
+                className={loginLinkClassName}
+                title={accountLinkTitle}
+                aria-label={accountLinkAriaLabel}
+              >
+                <FaUser className="text-black" size={18} aria-hidden="true" />
+                <span className="hidden whitespace-nowrap 2xl:inline">{accountLinkLabel}</span>
+              </LocalizedLink>
+              <LogoutButton
+                className={logoutButtonClassName}
+                title={t("auth.logoutAria")}
+                aria-label={t("auth.logoutAria")}
+              >
+                <FaSignOutAlt size={16} aria-hidden="true" />
+              </LogoutButton>
+            </>
+          ) : (
+            <button
+              type="button"
+              className={loginLinkClassName}
+              title={t("header.loginTitle")}
+              aria-label={t("header.loginAriaLabel")}
+              onClick={openLoginModal}
+            >
+              <FaUser className="text-black" size={18} aria-hidden="true" />
+              <span className="hidden whitespace-nowrap 2xl:inline">{t("header.loginLabel")}</span>
+            </button>
+          )}
         </div>
 
         <button
@@ -595,7 +725,14 @@ const Header = ({
       favoritesCountBadge,
       favoritesLinkAriaLabel,
       loginLinkClassName,
+      logoutButtonClassName,
       openLoginModal,
+      isAuthenticated,
+      isSeller,
+      dashboardPath,
+      accountLinkLabel,
+      accountLinkTitle,
+      accountLinkAriaLabel,
       t,
     ],
   );
@@ -642,6 +779,14 @@ const Header = ({
               {item.label}
             </LocalizedLink>
           ))}
+          {isAuthenticated ? (
+            <LogoutButton
+              className="block w-full border-0 bg-transparent p-0 text-left text-sm font-medium text-[#171717]"
+              onBeforeLogout={handleMobileMenuClose}
+            >
+              {t("auth.logout")}
+            </LogoutButton>
+          ) : null}
         </nav>
       </aside>
 
@@ -653,15 +798,7 @@ const Header = ({
       >
         <ul className="m-0 flex list-none items-end justify-around px-2 sm:px-4 pt-2 pb-2 sm:pb-2.5">
           {mobileBottomNavItems.map((item) => {
-            const isActive =
-              item.href === "/"
-                ? currentPath === "/"
-                : item.href === "/account/favorite"
-                  ? currentPath.startsWith("/account/favorite")
-                  : item.href === "/account"
-                    ? currentPath.startsWith("/account") &&
-                      !currentPath.startsWith("/account/favorite")
-                    : currentPath.startsWith(item.href);
+            const isActive = isPathActiveForItem(item, currentPath);
 
             return (
               <li key={item.href} className="flex-1">
@@ -710,11 +847,7 @@ const Header = ({
         </ul>
       </nav>
 
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={closeLoginModal}
-        onSuccess={handleLoginSuccess}
-      />
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </header>
   );
 };

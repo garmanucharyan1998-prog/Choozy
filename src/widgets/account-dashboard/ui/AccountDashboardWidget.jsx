@@ -5,12 +5,14 @@ import {
   FaHeart,
   FaPen,
   FaRegHeart,
+  FaSignOutAlt,
   FaTimes,
   FaUpload,
 } from "react-icons/fa";
 import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
 import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
+import { useLogout } from "features/session";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 import { MainCard, NotificationFeedCard, ToggleRow } from "shared/ui/dashboard-cards";
 import { ProductCardImage } from "shared/ui/product-card-image";
@@ -152,6 +154,7 @@ const AccountDashboardWidget = () => {
     setAvatarFromFile,
     clearAvatar,
   } = useAccountPresenter();
+  const handleLogout = useLogout();
 
   useEffect(() => {
     if (activeSidebarId === sidebarIds.NOTIFICATIONS) {
@@ -819,6 +822,18 @@ const AccountDashboardWidget = () => {
                 })}
               </ul>
             </nav>
+
+            {/* Outside the nav (not a sidebarItems entry): logout is a form submission via
+                useLogout, not a selectSidebar(id) tab switch, and keeping it out of the
+                <ul> keeps the tabs' aria-current="page" semantics honest. */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#e1e6ef] bg-white px-4 py-3 text-sm font-bold text-navy transition hover:bg-[#f4f6fb]"
+            >
+              <FaSignOutAlt size={14} aria-hidden="true" />
+              {t("auth.logout")}
+            </button>
           </aside>
 
           <div className="relative min-w-0 flex-1">

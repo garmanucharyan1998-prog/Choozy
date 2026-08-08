@@ -61,10 +61,6 @@ export const useHeaderPresenter = () => {
     setIsLoginModalOpen(false);
   }, []);
 
-  const handleLoginSuccess = useCallback(() => {
-    navigate("/account");
-  }, [navigate]);
-
   const handleSearchInputChange = useCallback(async (e) => {
     const value = e.target.value;
     setSearchQuery(value);
@@ -189,7 +185,6 @@ export const useHeaderPresenter = () => {
     isLoginModalOpen,
     openLoginModal,
     closeLoginModal,
-    handleLoginSuccess,
   };
 };
 

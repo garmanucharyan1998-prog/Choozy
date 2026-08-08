@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import { useSubmit } from "react-router";
 import { useLanguage } from "contexts";
+import { ROLES } from "entities/session";
+import { localizedPath } from "shared/lib/locale";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 
 const AUTH_MODES = {
@@ -7,9 +10,18 @@ const AUTH_MODES = {
   LOGIN: "login",
 };
 
-export const useAuthModalPresenter = ({ isOpen, onClose, onSuccess }) => {
-  const { t } = useLanguage();
+/**
+ * There is still no real backend (see the two submit handlers below — presence checks
+ * only, nothing verified against a server). What changed: a chosen role now gets posted
+ * to `/session/login`, a resource-route `action` that sets the session cookie and issues
+ * a real server redirect — see entities/session and app/routes/sessionLoginAction.js for
+ * why that's a server action and not a client-side cookie write.
+ */
+export const useAuthModalPresenter = ({ isOpen, onClose }) => {
+  const { t, language } = useLanguage();
+  const submit = useSubmit();
   const [mode, setMode] = useState(AUTH_MODES.REGISTER);
+  const [role, setRole] = useState(ROLES.BUYER);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -17,6 +29,7 @@ export const useAuthModalPresenter = ({ isOpen, onClose, onSuccess }) => {
 
   const resetForm = useCallback(() => {
     setMode(AUTH_MODES.REGISTER);
+    setRole(ROLES.BUYER);
     setEmail("");
     setPassword("");
     setConfirmPassword("");
@@ -84,6 +97,16 @@ export const useAuthModalPresenter = ({ isOpen, onClose, onSuccess }) => {
 
   const clearError = useCallback(() => setError(""), []);
 
+  /** Survives `switchToLogin`/`switchToRegister` on purpose — toggling register/login
+   *  mid-flow shouldn't discard which dashboard the visitor was heading for. */
+  const selectRole = useCallback(
+    (nextRole) => {
+      setRole(nextRole);
+      clearError();
+    },
+    [clearError],
+  );
+
   const handleEmailChange = useCallback(
     (event) => {
       setEmail(event.target.value);
@@ -120,6 +143,14 @@ export const useAuthModalPresenter = ({ isOpen, onClose, onSuccess }) => {
     setError("");
   }, []);
 
+  const submitSession = useCallback(() => {
+    submit(
+      { role, email: email.trim() },
+      { method: "post", action: localizedPath("/session/login", language) },
+    );
+    onClose();
+  }, [submit, role, email, language, onClose]);
+
   const handleLoginSubmit = useCallback(
     (event) => {
       event.preventDefault();
@@ -129,10 +160,9 @@ export const useAuthModalPresenter = ({ isOpen, onClose, onSuccess }) => {
         return;
       }
 
-      onSuccess?.();
-      onClose();
+      submitSession();
     },
-    [email, password, onClose, onSuccess, t],
+    [email, password, t, submitSession],
   );
 
   const handleRegisterSubmit = useCallback(
@@ -149,16 +179,17 @@ export const useAuthModalPresenter = ({ isOpen, onClose, onSuccess }) => {
         return;
       }
 
-      onSuccess?.();
-      onClose();
+      submitSession();
     },
-    [confirmPassword, email, onClose, onSuccess, password, t],
+    [confirmPassword, email, password, t, submitSession],
   );
 
   const isRegisterMode = mode === AUTH_MODES.REGISTER;
 
   return {
     isRegisterMode,
+    role,
+    selectRole,
     email,
     password,
     confirmPassword,

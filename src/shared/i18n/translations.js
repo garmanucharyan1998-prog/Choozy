@@ -41,6 +41,12 @@ const am = {
     loginLabel: "Մուտք",
     loginTitle: "Մուտք գործել հաշիվ",
     loginAriaLabel: "Մուտք գործել անձնական հաշիվ",
+    buyerAccountLabel: "Հաշիվ",
+    buyerAccountTitle: "Անցնել անձնական հաշվին",
+    buyerAccountAriaLabel: "Անցնել անձնական հաշվին",
+    sellerAccountLabel: "Խանութ",
+    sellerAccountTitle: "Անցնել խանութի հաշվին",
+    sellerAccountAriaLabel: "Անցնել խանութի հաշվին",
     openMenuAriaLabel: "Բացել մենյուն",
     closeMenuAriaLabel: "Փակել մենյուն",
     languageSelectionAriaLabel: "Լեզվի ընտրություն",
@@ -66,6 +72,18 @@ const am = {
       profile: {
         label: "Մուտք",
         ariaLabel: "Բացել անձնական հաշիվը",
+      },
+      account: {
+        label: "Հաշիվ",
+        ariaLabel: "Անցնել անձնական հաշվին",
+      },
+      shop: {
+        label: "Խանութ",
+        ariaLabel: "Անցնել խանութի հաշվին",
+      },
+      shopProducts: {
+        label: "Ապրանքներ",
+        ariaLabel: "Անցնել ապրանքների կառավարմանը",
       },
     },
     mobileMenuItems: {
@@ -723,6 +741,11 @@ const am = {
   auth: {
     closeAria: "Փակել պատուհանը",
     backdropAria: "Փակել պատուհանը",
+    roleLabel: "Կարգավիճակ՝",
+    roleBuyer: "Գնորդ",
+    roleSeller: "Վաճառող",
+    logout: "Ելք",
+    logoutAria: "Ելք հաշվից",
   },
   register: {
     title: "Գրանցում",
