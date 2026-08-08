@@ -104,4 +104,23 @@ describe("account storage — guest vs. signed-in shelves", () => {
     const accountRaw = JSON.parse(window.localStorage.getItem(accountKeyFor("shop@test.com")));
     expect(accountRaw.subscriptionOptIn).toBe(true);
   });
+
+  test("logging in with the same email typed in a different case reuses the same shelf", () => {
+    setSessionCookie("buyer", "Frank@Test.com");
+    addWishlistProduct(PRODUCT_A);
+
+    setSessionCookie("buyer", "frank@test.com");
+    expect(readAccountState().wishlistItems.map((i) => i.id)).toEqual(["fp-1"]);
+  });
+
+  test("a seller's guest wishlist is not merged into their shelf and stays on the guest shelf", () => {
+    addWishlistProduct(PRODUCT_A); // guest
+
+    setSessionCookie("seller", "seller@test.com");
+    expect(readAccountState().wishlistItems).toEqual([]);
+    expect(window.localStorage.getItem(accountKeyFor("seller@test.com"))).toBeNull();
+
+    const guestRaw = JSON.parse(window.localStorage.getItem(ACCOUNT_STORAGE_KEY));
+    expect(guestRaw.wishlistItems.map((i) => i.id)).toEqual(["fp-1"]);
+  });
 });

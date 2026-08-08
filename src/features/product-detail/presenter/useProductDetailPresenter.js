@@ -42,7 +42,13 @@ export const useProductDetailPresenter = () => {
   /** Index 0 — the product's own default configuration/color, not an arbitrary alternate. */
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
-  const [wishlist, setWishlist] = useState(() => isWishlistProductId(product.id));
+  /**
+   * Starts `false` (matching the server, which has no `localStorage`) rather than reading
+   * real wishlist state in the initializer — that would diverge from the SSR HTML on the
+   * very first client render (React #418). The effect below, whose deps include
+   * `product.id`, already re-runs right after mount and sets the real value then.
+   */
+  const [wishlist, setWishlist] = useState(false);
 
   useEffect(() => {
     setActiveImageIndex(0);

@@ -35,7 +35,13 @@ const parseSessionValue = (raw) => {
   }
   const role = normalizeRole(parsed?.r);
   if (!role) return SIGNED_OUT;
-  const email = typeof parsed?.e === "string" && parsed.e.trim() ? parsed.e.trim() : null;
+  /**
+   * Lowercased so every consumer agrees on identity — entities/user's per-account
+   * localStorage key is a case-sensitive string built from this value, and without this
+   * normalization "Anna@x.com" and "anna@x.com" would silently land on different shelves.
+   */
+  const email =
+    typeof parsed?.e === "string" && parsed.e.trim() ? parsed.e.trim().toLowerCase() : null;
   return { isAuthenticated: true, role, email };
 };
 

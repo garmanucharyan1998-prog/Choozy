@@ -1,6 +1,6 @@
 import { sha256Hex } from "./passwordHash";
 import { getDefaultProductDetailPath, getProductDetailHref } from "entities/product-detail";
-import { readSessionFromDocument } from "entities/session";
+import { readSessionFromDocument, ROLES } from "entities/session";
 
 /**
  * Guest shelf — also the storage key for anyone not signed in. Kept as the plain,
@@ -327,8 +327,18 @@ export const readAccountState = () => {
     return normalizeAccountState(null);
   }
 
-  const key = accountStorageKeyFor(readSessionFromDocument());
-  mergeGuestWishlistInto(key);
+  const session = readSessionFromDocument();
+  const key = accountStorageKeyFor(session);
+  /**
+   * Sellers have no wishlist UI (see Header.jsx, which hides the favorites link for
+   * them) — merging a guest's picks into a seller shelf would strand them somewhere
+   * nothing ever reads, which reads as data loss to the visitor. Skipping the merge
+   * leaves the guest shelf untouched, so it's still there if they later sign in as a
+   * buyer instead.
+   */
+  if (session.role !== ROLES.SELLER) {
+    mergeGuestWishlistInto(key);
+  }
 
   try {
     const stored = window.localStorage.getItem(key);

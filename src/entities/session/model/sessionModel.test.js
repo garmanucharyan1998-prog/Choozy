@@ -82,6 +82,12 @@ describe("readSessionFromRequest — cookie parsing", () => {
     expect(() => readSessionFromRequest(requestWithCookie(header))).not.toThrow();
     expect(readSessionFromRequest(requestWithCookie(header)).isAuthenticated).toBe(false);
   });
+
+  test("email is lowercased so identity is consistent regardless of how it was typed", () => {
+    const value = encodeURIComponent(JSON.stringify({ r: ROLES.BUYER, e: "Anna@Example.com" }));
+    const header = `${SESSION_COOKIE_NAME}=${value}`;
+    expect(readSessionFromRequest(requestWithCookie(header)).email).toBe("anna@example.com");
+  });
 });
 
 describe("serializeSessionCookie / serializeClearedSessionCookie", () => {

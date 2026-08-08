@@ -117,13 +117,20 @@ const FilterCatalogWidget = () => {
     [pageItems, language, page],
   );
 
-  const [wishlist, setWishlist] = useState(wishlistMapFromStorage);
+  /**
+   * Starts empty (matching the server, which has no `localStorage`) instead of reading
+   * real wishlist state in the initializer — that would diverge from the SSR HTML on the
+   * very first client render (React #418). `sync()` inside the mount effect below fills
+   * in the real data right after hydration.
+   */
+  const [wishlist, setWishlist] = useState(() => ({}));
   const [compare, setCompare] = useState(() => ({}));
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [overlayOptionQuery, setOverlayOptionQuery] = useState("");
 
   useEffect(() => {
     const sync = () => setWishlist(wishlistMapFromStorage());
+    sync();
     window.addEventListener(ACCOUNT_STORAGE_EVENT, sync);
     return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
   }, []);
