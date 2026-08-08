@@ -20,7 +20,6 @@ export const useHeaderPresenter = () => {
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showNoResults, setShowNoResults] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   /** Last query sent for suggestions — lets us drop out-of-order responses. */
   const lastSuggestionQueryRef = useRef("");
@@ -53,18 +52,8 @@ export const useHeaderPresenter = () => {
     setIsLanguageDropdownOpen((prev) => !prev);
   }, []);
 
-  const toggleMobileMenu = useCallback(() => {
-    setIsLanguageDropdownOpen(false);
-    setIsMobileMenuOpen((prev) => !prev);
-  }, []);
-
-  const closeMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(false);
-  }, []);
-
   const openLoginModal = useCallback(() => {
     setIsLanguageDropdownOpen(false);
-    setIsMobileMenuOpen(false);
     setIsLoginModalOpen(true);
   }, []);
 
@@ -179,28 +168,14 @@ export const useHeaderPresenter = () => {
     return () => document.removeEventListener("mousedown", handlePointerDown);
   }, [isLanguageDropdownOpen]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   return {
     languages: LANGUAGES,
     mobileMenuItems,
     language,
     currentLanguage,
     isLanguageDropdownOpen,
-    isMobileMenuOpen,
     handleLanguageChange,
     toggleLanguageDropdown,
-    toggleMobileMenu,
-    closeMobileMenu,
     searchQuery,
     searchSuggestions,
     showSuggestions,
