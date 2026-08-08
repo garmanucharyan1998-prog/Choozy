@@ -1,1 +1,1 @@
-export { searchModel, fetchSuggestions, submitSearch } from "./model/searchModel";
+export { searchModel, fetchSuggestions } from "./model/searchModel";

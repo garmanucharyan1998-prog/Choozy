@@ -55,7 +55,7 @@ const ProductDetailWidget = () => {
     selectedVariantIndex,
     selectedColorIndex,
     wishlist,
-    variantIds,
+    variants,
     colorEntries,
     priceMinFormatted,
     priceMaxFormatted,
@@ -94,7 +94,7 @@ const ProductDetailWidget = () => {
     rows.map((row) => (
       <div key={row.labelKey} className="min-w-0 text-sm leading-relaxed lg:text-[15px]">
         <dt className="inline font-normal text-text-muted">{t(row.labelKey)}</dt>
-        <dd className="m-0 inline font-semibold text-text-dark"> {t(row.valueKey)}</dd>
+        <dd className="m-0 inline font-semibold text-text-dark"> {row.value}</dd>
       </div>
     ));
 
@@ -204,9 +204,9 @@ const ProductDetailWidget = () => {
               role="group"
               aria-label={t("productDetail.variantsAriaLabel")}
             >
-              {variantIds.map((variantId, index) => (
+              {variants.map((variant, index) => (
                 <button
-                  key={variantId}
+                  key={variant.id}
                   type="button"
                   onClick={() => selectVariant(index)}
                   className={`min-h-[44px] rounded-xl border-2 px-4 py-2 text-sm font-medium transition-colors md:text-base ${
@@ -215,7 +215,7 @@ const ProductDetailWidget = () => {
                       : "border-border-blue bg-white text-text-dark hover:border-link-blue"
                   }`}
                 >
-                  {t(`productDetail.variants.${variantId}`)}
+                  {variant.label}
                 </button>
               ))}
             </div>
@@ -237,8 +237,8 @@ const ProductDetailWidget = () => {
                         : "border-black/10"
                     }`}
                     style={{ backgroundColor: color.hex }}
-                    title={t(`productDetail.colors.${color.id}`)}
-                    aria-label={t(`productDetail.colors.${color.id}`)}
+                    title={t(`filterPage.filters.colorNames.${color.id}`, color.id)}
+                    aria-label={t(`filterPage.filters.colorNames.${color.id}`, color.id)}
                     aria-pressed={selectedColorIndex === index}
                   />
                 ))}

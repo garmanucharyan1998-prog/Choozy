@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaChevronDown, FaList, FaSlidersH, FaTh, FaTimes } from "react-icons/fa";
 import { BRAND_OPTIONS } from "entities/filter-catalog";
-import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProducts";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
+import { PRODUCT_CATALOG, buildCatalogItemListJsonLd } from "entities/product";
 import { useFilterCatalogPresenter } from "features/filter-catalog";
+import { useLanguage } from "contexts";
 import FilterProductCard from "shared/ui/filter-product-card/FilterProductCard";
 import { LocalizedLink } from "shared/ui/link";
 
@@ -85,6 +86,12 @@ const FilterCatalogWidget = () => {
     activeFilterChips,
   } = useFilterCatalogPresenter();
 
+  const { language } = useLanguage();
+  const catalogItemListJsonLd = useMemo(
+    () => buildCatalogItemListJsonLd({ items: pageItems, language, page }),
+    [pageItems, language, page],
+  );
+
   const [wishlist, setWishlist] = useState(wishlistMapFromStorage);
   const [compare, setCompare] = useState(() => ({}));
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
@@ -131,7 +138,7 @@ const FilterCatalogWidget = () => {
 
   const toggleWishlist = useCallback((product) => {
     const full =
-      mockFilterProducts.find((p) => p.id === product.id) ||
+      PRODUCT_CATALOG.find((p) => p.id === product.id) ||
       (product.id && product.title
         ? {
             id: product.id,
@@ -386,6 +393,12 @@ const FilterCatalogWidget = () => {
 
   return (
     <div className="cont-width-default mx-auto w-full max-w-[1600px] py-6 text-start md:py-8">
+      {pageItems.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogItemListJsonLd) }}
+        />
+      )}
       <h1 className="sr-only">{t("filterPage.pageTitle")}</h1>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
         <aside

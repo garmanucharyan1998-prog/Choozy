@@ -2,31 +2,35 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 
 const ProductOffersVariantFilterContext = createContext(null);
 
-/** Maps product-detail variant id (e.g. v1tb) to i18n key used by best-offers filter. */
-export const productDetailVariantIdToFilterKey = (variantId) =>
-  variantId ? `productDetail.variants.${variantId}` : null;
-
 /**
- * Shared memory/storage filter for Best Offers, driven from product detail variant pills.
+ * Shared variant selection for Best Offers, driven from the product detail variant
+ * pills — a plain index into the current product's own `variants` array.
+ *
+ * Previously this synced by i18n key (`productDetail.variants.v256a`, shared globally
+ * across every product) and Best Offers had to fuzzy-match a "storage family" out of
+ * it, because offers weren't otherwise tied to which product's variants they meant.
+ * Now that `getOffersForProduct` builds every offer's `variantIds` from that same
+ * product's own `variants`, the two lists are already index-aligned — no key or family
+ * resolution needed, just the index itself.
  */
 export const ProductOffersVariantFilterProvider = ({ children }) => {
-  const [globalVariantKey, setGlobalVariantKeyState] = useState(null);
+  const [selectedVariantIndex, setSelectedVariantIndexState] = useState(null);
 
-  const setGlobalVariantKey = useCallback((variantKey) => {
-    setGlobalVariantKeyState(variantKey);
+  const setSelectedVariantIndex = useCallback((index) => {
+    setSelectedVariantIndexState(index);
   }, []);
 
-  const clearGlobalVariantKey = useCallback(() => {
-    setGlobalVariantKeyState(null);
+  const clearSelectedVariantIndex = useCallback(() => {
+    setSelectedVariantIndexState(null);
   }, []);
 
   const value = useMemo(
     () => ({
-      globalVariantKey,
-      setGlobalVariantKey,
-      clearGlobalVariantKey,
+      selectedVariantIndex,
+      setSelectedVariantIndex,
+      clearSelectedVariantIndex,
     }),
-    [globalVariantKey, setGlobalVariantKey, clearGlobalVariantKey],
+    [selectedVariantIndex, setSelectedVariantIndex, clearSelectedVariantIndex],
   );
 
   return (

@@ -1,10 +1,4 @@
 export {
-  mockProductDetail,
-  defaultProductDetailRouteId,
-  getProductDetailForRoute,
-} from "./model/mockProductDetail";
-
-export {
   getProductDetailHref,
   getDefaultProductDetailPath,
   getCanonicalProductDetailPath,

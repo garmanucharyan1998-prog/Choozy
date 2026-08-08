@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useLanguage } from "contexts";
 import {
-  mockFilterProducts,
   SCREEN_SIZE_OPTIONS,
   BRAND_OPTIONS,
   RAM_OPTIONS,
@@ -10,11 +9,12 @@ import {
   isValidFilterCategoryId,
   productMatchesSearch,
 } from "entities/filter-catalog";
+import { PRODUCT_CATALOG } from "entities/product";
 
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
 const boundsFromProducts = () => {
-  const vals = mockFilterProducts.map((p) => p.priceValue);
+  const vals = PRODUCT_CATALOG.map((p) => p.priceValue);
   return { globalMin: Math.min(...vals), globalMax: Math.max(...vals) };
 };
 
@@ -228,7 +228,7 @@ export const useFilterCatalogPresenter = () => {
 
   const filteredProducts = useMemo(() => {
     const q = urlQuery.trim();
-    let list = mockFilterProducts.filter((p) => {
+    let list = PRODUCT_CATALOG.filter((p) => {
       if (p.priceValue < priceMin || p.priceValue > priceMax) return false;
       if (selectedScreens.size > 0 && !selectedScreens.has(String(p.screenInch))) return false;
       if (selectedBrands.size > 0 && !selectedBrands.has(p.brandId)) return false;
@@ -278,7 +278,7 @@ export const useFilterCatalogPresenter = () => {
    */
   const countsFor = useCallback(
     (facetKey, valueOf) => {
-      const base = mockFilterProducts.filter((p) => {
+      const base = PRODUCT_CATALOG.filter((p) => {
         if (p.priceValue < priceMin || p.priceValue > priceMax) return false;
         if (
           facetKey !== "screen" &&

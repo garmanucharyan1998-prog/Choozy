@@ -4,8 +4,8 @@
  */
 
 import { FILTER_CATEGORY_IDS } from "entities/filter-catalog/model/filterCatalogCategories";
-import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProducts";
 import { COLOR_OPTIONS } from "entities/filter-catalog/model/filterOptions";
+import { PRODUCT_CATALOG } from "entities/product";
 import { DEMO_SHOP_PRODUCTS_SEED } from "./shopAccountModel";
 
 export const SHOP_PRODUCT_CATEGORY_IDS = [...FILTER_CATEGORY_IDS];
@@ -108,7 +108,7 @@ const buildColorOptions = () => {
 const buildCatalogProducts = () => {
   const byTitle = new Map();
 
-  mockFilterProducts.forEach((product) => {
+  PRODUCT_CATALOG.forEach((product) => {
     byTitle.set(product.title, {
       id: `catalog-${product.id}`,
       categoryId: product.categoryId,

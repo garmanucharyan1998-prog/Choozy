@@ -163,9 +163,9 @@ const BestOffersWidget = () => {
       aria-label={t("productOffers.bestOffers.variantsAriaLabel")}
       className="flex flex-wrap items-center justify-center gap-1.5"
     >
-      {offer.variantKeys.map((variantKey, variantIndex) => (
+      {offer.variants.map((variant, variantIndex) => (
         <button
-          key={`${offer.id}-${variantKey}-${variantIndex}`}
+          key={`${offer.id}-${variant.id}`}
           type="button"
           onClick={() => selectVariantForOffer(offer.id, variantIndex)}
           aria-pressed={activeVariantIndex === variantIndex}
@@ -173,7 +173,7 @@ const BestOffersWidget = () => {
             activeVariantIndex === variantIndex ? VARIANT_PILL_ACTIVE : VARIANT_PILL_IDLE
           }`}
         >
-          {t(variantKey)}
+          {variant.label}
         </button>
       ))}
     </div>
@@ -237,9 +237,9 @@ const BestOffersWidget = () => {
       <div className={DESKTOP_OPTIONS_CELL_CLASS}>
         <div className={ALIGNED_MEMORY_WRAP_CLASS}>
           <div className={ALIGNED_VARIANTS_CLASS}>
-            {offer.variantKeys.map((variantKey, variantIndex) => (
+            {offer.variants.map((variant, variantIndex) => (
               <button
-                key={`${offer.id}-aligned-${variantKey}-${variantIndex}`}
+                key={`${offer.id}-aligned-${variant.id}`}
                 type="button"
                 onClick={() => selectVariantForOffer(offer.id, variantIndex)}
                 aria-pressed={activeVariantIndex === variantIndex}
@@ -247,7 +247,7 @@ const BestOffersWidget = () => {
                   activeVariantIndex === variantIndex ? VARIANT_PILL_ACTIVE : VARIANT_PILL_IDLE
                 }`}
               >
-                {t(variantKey)}
+                {variant.label}
               </button>
             ))}
           </div>

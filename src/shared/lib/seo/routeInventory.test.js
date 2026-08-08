@@ -4,7 +4,7 @@ import {
   getNonIndexableRoutes,
   getPrerenderRouteInventory,
 } from "./routeInventory";
-import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProducts";
+import { PRODUCT_CATALOG } from "entities/product";
 import { SUPPORTED_LANGUAGE_CODES } from "shared/i18n/languageConfig";
 
 describe("getIndexableRoutes", () => {
@@ -13,12 +13,12 @@ describe("getIndexableRoutes", () => {
     expect(paths).toContain("/");
     expect(paths).toContain("/filter");
     // home + filter + one per category + one per catalog product
-    expect(getIndexableRoutes().length).toBeGreaterThanOrEqual(2 + mockFilterProducts.length);
+    expect(getIndexableRoutes().length).toBeGreaterThanOrEqual(2 + PRODUCT_CATALOG.length);
   });
 
   test("every catalog product has its own indexable URL (sitemap must not drop products)", () => {
     const routes = getIndexableRoutes();
-    mockFilterProducts.forEach((product) => {
+    PRODUCT_CATALOG.forEach((product) => {
       const hasRoute = routes.some(
         (r) => r.path.includes(encodeURIComponent(product.id)) || r.path.includes(product.id),
       );

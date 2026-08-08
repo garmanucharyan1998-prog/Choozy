@@ -2,20 +2,43 @@ import { DEFAULT_SITE_BASE_URL, getSiteBaseUrl } from "shared/config/siteMeta";
 import { localizedPath } from "shared/lib/locale";
 import { getCanonicalProductDetailPath } from "entities/product-detail";
 
+const BRAND_LABEL = {
+  apple: "Apple",
+  samsung: "Samsung",
+  sony: "Sony",
+  dell: "Dell",
+  lenovo: "Lenovo",
+  hp: "HP",
+};
+
 /**
  * Product + AggregateOffer + BreadcrumbList for the detail page.
- * Prices come straight from the resolved product, so the markup can never drift
- * from what the page renders.
+ * Prices come straight from the resolved product, and `AggregateOffer` is built from
+ * the *same* offers the Best Offers table renders below it — previously the offers
+ * table read a completely unrelated global list (K1), so this markup could describe a
+ * price range the page didn't actually show anywhere.
  *
  * @param {{
  *   product: object,
+ *   offers: { priceAmd: number, shopNameKey: string, url: string }[],
  *   language: string,
  *   description: string,
  *   catalogLabel: string,
  *   homeLabel: string,
+ *   categoryLabel: string,
+ *   t: (key: string) => string,
  * }} params
  */
-export const buildProductJsonLd = ({ product, language, description, catalogLabel, homeLabel }) => {
+export const buildProductJsonLd = ({
+  product,
+  offers,
+  language,
+  description,
+  catalogLabel,
+  homeLabel,
+  categoryLabel,
+  t,
+}) => {
   const base = getSiteBaseUrl() || DEFAULT_SITE_BASE_URL;
   const productPath = getCanonicalProductDetailPath(product);
   const productUrl = `${base}${localizedPath(productPath, language)}`;
@@ -25,6 +48,11 @@ export const buildProductJsonLd = ({ product, language, description, catalogLabe
     ? [...new Set(product.galleryImageUrls)].slice(0, 6)
     : [];
 
+  const offerList = Array.isArray(offers) ? offers : [];
+  const offerPrices = offerList.map((o) => o.priceAmd).filter((n) => Number.isFinite(n));
+  const lowPrice = offerPrices.length ? Math.min(...offerPrices) : product.priceMinAmd;
+  const highPrice = offerPrices.length ? Math.max(...offerPrices) : product.priceMaxAmd;
+
   return [
     {
       "@context": "https://schema.org",
@@ -33,13 +61,24 @@ export const buildProductJsonLd = ({ product, language, description, catalogLabe
       description,
       image: images,
       sku: product.id,
+      brand: { "@type": "Brand", name: BRAND_LABEL[product.brandId] || product.brandId },
+      category: categoryLabel,
       offers: {
         "@type": "AggregateOffer",
         priceCurrency: "AMD",
-        lowPrice: product.priceMinAmd,
-        highPrice: product.priceMaxAmd,
+        lowPrice,
+        highPrice,
+        offerCount: offerList.length,
         availability: "https://schema.org/InStock",
         url: productUrl,
+        offers: offerList.map((offer) => ({
+          "@type": "Offer",
+          price: offer.priceAmd,
+          priceCurrency: "AMD",
+          availability: "https://schema.org/InStock",
+          url: offer.url,
+          seller: { "@type": "Organization", name: t(offer.shopNameKey) },
+        })),
       },
     },
     {

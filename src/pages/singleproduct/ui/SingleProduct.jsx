@@ -10,7 +10,8 @@ import { buildPageMeta } from "shared/lib/seo";
 import { getLanguageFromPath } from "shared/lib/locale";
 import { Breadcrumbs } from "shared/ui/breadcrumbs";
 import { NotFoundContent } from "shared/ui/not-found-content";
-import { getCanonicalProductDetailPath, getProductDetailForRoute } from "entities/product-detail";
+import { getCanonicalProductDetailPath } from "entities/product-detail";
+import { getOffersForProduct, getProductDetailForRoute } from "entities/product";
 import { buildProductJsonLd } from "pages/singleproduct/model/productJsonLd";
 
 const formatAmd = (amount) => (typeof amount === "number" ? amount.toLocaleString("en-US") : "");
@@ -71,10 +72,13 @@ const SingleProduct = () => {
 
   const jsonLd = buildProductJsonLd({
     product,
+    offers: getOffersForProduct(product),
     language,
     description,
     catalogLabel: t("navPanel.catalogLabel"),
     homeLabel: t("footer.columns.primary.home"),
+    categoryLabel: t(`filterPage.categories.${product.categoryId}`, product.categoryId),
+    t,
   });
 
   return (

@@ -1,4 +1,3 @@
-export { mockFilterProducts } from "./model/mockFilterProducts";
 export {
   FILTER_CATEGORY_IDS,
   GRID_ITEM_TO_CATEGORY,

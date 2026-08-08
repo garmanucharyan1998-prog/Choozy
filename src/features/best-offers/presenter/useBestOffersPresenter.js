@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router";
 import { useProductOffersVariantFilter } from "contexts";
-import {
-  mockProductOffers,
-  offerMatchesVariantFilter,
-  resolveOfferVariantIndex,
-} from "entities/product-offers";
+import { getOffersForProduct, getProductDetailForRoute } from "entities/product";
 
 const INITIAL_VISIBLE_COUNT = 3;
 const LOAD_MORE_STEP = 2;
@@ -29,19 +26,6 @@ const buildInitialSelections = (offers) =>
     return acc;
   }, {});
 
-const applyVariantKeyToSelections = (variantKey, current) =>
-  mockProductOffers.reduce((acc, offer) => {
-    const prev = current[offer.id] ?? {
-      variantIndex: offer.defaultVariantIndex ?? 0,
-      colorIndex: offer.defaultColorIndex ?? 0,
-    };
-    acc[offer.id] = {
-      variantIndex: resolveOfferVariantIndex(offer, variantKey, prev.variantIndex),
-      colorIndex: prev.colorIndex,
-    };
-    return acc;
-  }, {});
-
 const enrichOffer = (offer, selections) => {
   const selection = selections[offer.id] ?? {
     variantIndex: offer.defaultVariantIndex ?? 0,
@@ -58,30 +42,44 @@ const enrichOffer = (offer, selections) => {
 /**
  * Presenter for the "Best offers" table.
  * Manages global variant filter, per-row color selection, sorting, and paginated see more/less.
+ *
+ * Offers now come from `getOffersForProduct(product)` — previously this read
+ * `mockProductOffers`, one fixed global list shared by every product page (K1: an
+ * AirPods page and a MacBook page showed the identical 3 shops at the identical prices).
  */
 export const useBestOffersPresenter = () => {
-  const { globalVariantKey } = useProductOffersVariantFilter();
+  const { productId } = useParams();
+  const product = useMemo(() => getProductDetailForRoute(productId), [productId]);
+  const offers = useMemo(() => getOffersForProduct(product), [product]);
+
+  const { selectedVariantIndex } = useProductOffersVariantFilter();
   const [sortId, setSortId] = useState(SORT_OPTIONS[0].id);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
-  const [selections, setSelections] = useState(() => buildInitialSelections(mockProductOffers));
+  const [selections, setSelections] = useState(() => buildInitialSelections(offers));
 
   useEffect(() => {
-    if (globalVariantKey == null) return;
     setVisibleCount(INITIAL_VISIBLE_COUNT);
-    setSelections((current) => applyVariantKeyToSelections(globalVariantKey, current));
-  }, [globalVariantKey]);
+    setSelections(buildInitialSelections(offers));
+  }, [offers]);
 
-  const filteredOffers = useMemo(
-    () => mockProductOffers.filter((offer) => offerMatchesVariantFilter(offer, globalVariantKey)),
-    [globalVariantKey],
-  );
+  useEffect(() => {
+    if (selectedVariantIndex == null) return;
+    setSelections((current) =>
+      Object.fromEntries(
+        Object.entries(current).map(([offerId, selection]) => [
+          offerId,
+          { ...selection, variantIndex: selectedVariantIndex },
+        ]),
+      ),
+    );
+  }, [selectedVariantIndex]);
 
   const sortedOffers = useMemo(() => {
-    if (sortId === "priceAsc") return [...filteredOffers].sort(comparePrice(true));
-    if (sortId === "priceDesc") return [...filteredOffers].sort(comparePrice(false));
-    return filteredOffers;
-  }, [filteredOffers, sortId]);
+    if (sortId === "priceAsc") return [...offers].sort(comparePrice(true));
+    if (sortId === "priceDesc") return [...offers].sort(comparePrice(false));
+    return offers;
+  }, [offers, sortId]);
 
   const visibleOffers = useMemo(
     () => sortedOffers.slice(0, visibleCount).map((offer) => enrichOffer(offer, selections)),
@@ -114,20 +112,10 @@ export const useBestOffersPresenter = () => {
   }, []);
 
   const selectVariantForOffer = useCallback((offerId, variantIndex) => {
-    setSelections((current) => {
-      const offer = mockProductOffers.find((item) => item.id === offerId);
-      const prev = current[offerId] ?? {
-        variantIndex: offer?.defaultVariantIndex ?? 0,
-        colorIndex: offer?.defaultColorIndex ?? 0,
-      };
-      return {
-        ...current,
-        [offerId]: {
-          ...prev,
-          variantIndex,
-        },
-      };
-    });
+    setSelections((current) => ({
+      ...current,
+      [offerId]: { ...current[offerId], variantIndex },
+    }));
   }, []);
 
   const selectColorForOffer = useCallback((offerId, colorIndex) => {
@@ -151,7 +139,6 @@ export const useBestOffersPresenter = () => {
     sortOptions: SORT_OPTIONS,
     activeSortOption,
     isSortOpen,
-    globalVariantKey,
     canLoadMore,
     canShowLess,
     toggleSortOpen,

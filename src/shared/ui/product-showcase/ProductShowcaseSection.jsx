@@ -5,18 +5,12 @@ import { LocalizedLink } from "shared/ui/link";
 /**
  * Reusable section layout for product showcase blocks.
  * Keeps repeated section markup in a single place.
+ *
+ * `items` now comes synchronously from the page's own `loader()` (see HomePage.jsx),
+ * so there's no more loading/error/retry state to render — the previous client-fetch
+ * pattern this replaced never actually populated the initial server response anyway.
  */
-const ProductShowcaseSection = ({
-  sectionId,
-  title,
-  moreHref,
-  items,
-  loading,
-  error,
-  onRetry,
-  sectionClassName,
-  carouselAriaLabel,
-}) => {
+const ProductShowcaseSection = ({ sectionId, title, moreHref, items, sectionClassName, carouselAriaLabel }) => {
   const { t } = useLanguage();
 
   return (
@@ -38,22 +32,7 @@ const ProductShowcaseSection = ({
           </LocalizedLink>
         </div>
 
-        {error && (
-          <div className="text-red-500 text-center py-4" role="alert">
-            {error}
-            <button type="button" onClick={onRetry} className="ml-2 underline">
-              {t("productShowcase.retryLabel")}
-            </button>
-          </div>
-        )}
-
-        {loading && !items.length ? (
-          <div className="text-center py-8 text-text-muted" role="status">
-            {t("productShowcase.loadingLabel")}
-          </div>
-        ) : (
-          <Carousel items={items} ariaLabel={carouselAriaLabel} />
-        )}
+        <Carousel items={items} ariaLabel={carouselAriaLabel} />
       </div>
     </section>
   );

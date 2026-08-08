@@ -1,13 +1,13 @@
-import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProducts";
 import { FILTER_CATEGORY_IDS } from "entities/filter-catalog/model/filterCatalogCategories";
 import { getProductDetailHref } from "entities/product-detail";
+import { PRODUCT_CATALOG } from "entities/product";
 import { SUPPORTED_LANGUAGE_CODES } from "shared/i18n/languageConfig";
 import { localizedPath } from "shared/lib/locale";
 
 /**
  * Single source of truth for "which URLs exist and should be indexed".
- * Consumed by the build-time prerender + sitemap generator, so the sitemap can never
- * drift from what the app actually renders.
+ * Consumed by the sitemap.xml resource route (app/routes/sitemap.ts), so the sitemap
+ * can never drift from what the app actually renders.
  *
  * Deliberately excluded:
  *  - account / shop-account (noindex, localStorage-driven)
@@ -30,7 +30,7 @@ export const getIndexableRoutes = () => {
     });
   });
 
-  mockFilterProducts.forEach((product) => {
+  PRODUCT_CATALOG.forEach((product) => {
     routes.push({
       path: getProductDetailHref(product.id, product.title),
       changefreq: "weekly",

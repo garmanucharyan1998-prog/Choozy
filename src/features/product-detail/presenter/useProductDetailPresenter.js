@@ -1,17 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
-import {
-  getCanonicalProductDetailPath,
-  getProductDetailForRoute,
-  getProductDetailHref,
-} from "entities/product-detail";
+import { getCanonicalProductDetailPath, getProductDetailHref } from "entities/product-detail";
+import { getProductDetailForRoute } from "entities/product";
 import {
   ACCOUNT_STORAGE_EVENT,
   isWishlistProductId,
   pushRecentlyViewedProduct,
   toggleWishlistProduct,
 } from "entities/user";
-import { productDetailVariantIdToFilterKey, useProductOffersVariantFilter } from "contexts";
+import { useProductOffersVariantFilter } from "contexts";
 import { getLanguageFromPath, localizedPath } from "shared/lib/locale";
 
 const formatAmd = (amount) => (typeof amount === "number" ? amount.toLocaleString("en-US") : "");
@@ -25,7 +22,8 @@ export const useProductDetailPresenter = () => {
   const location = useLocation();
 
   const product = useMemo(() => getProductDetailForRoute(productId), [productId]);
-  const { setGlobalVariantKey, clearGlobalVariantKey } = useProductOffersVariantFilter();
+  const { setSelectedVariantIndex: setGlobalVariantIndex, clearSelectedVariantIndex } =
+    useProductOffersVariantFilter();
 
   const canonicalPath = useMemo(() => getCanonicalProductDetailPath(product), [product]);
 
@@ -42,17 +40,18 @@ export const useProductDetailPresenter = () => {
   }, [canonicalPath, location.pathname, navigate]);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [selectedVariantIndex, setSelectedVariantIndex] = useState(1);
-  const [selectedColorIndex, setSelectedColorIndex] = useState(1);
+  /** Index 0 — the product's own default configuration/color, not an arbitrary alternate. */
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [wishlist, setWishlist] = useState(() => isWishlistProductId(product.id));
 
   useEffect(() => {
     setActiveImageIndex(0);
-    setSelectedVariantIndex(1);
-    setSelectedColorIndex(1);
+    setSelectedVariantIndex(0);
+    setSelectedColorIndex(0);
     setWishlist(isWishlistProductId(product.id));
-    clearGlobalVariantKey();
-  }, [product.id, clearGlobalVariantKey]);
+    clearSelectedVariantIndex();
+  }, [product.id, clearSelectedVariantIndex]);
 
   useEffect(() => {
     const sync = () => setWishlist(isWishlistProductId(product.id));
@@ -73,7 +72,7 @@ export const useProductDetailPresenter = () => {
 
   const mainImageSrc = product.galleryImageUrls[activeImageIndex] ?? product.galleryImageUrls[0];
 
-  const variantIds = product.variantIds;
+  const variants = product.variants;
   const colorEntries = product.colors;
 
   const priceMinFormatted = useMemo(() => formatAmd(product.priceMinAmd), [product.priceMinAmd]);
@@ -98,13 +97,10 @@ export const useProductDetailPresenter = () => {
   const selectVariant = useCallback(
     (index) => {
       setSelectedVariantIndex(index);
-      const variantId = product.variantIds[index];
-      const filterKey = productDetailVariantIdToFilterKey(variantId);
-      if (filterKey) {
-        setGlobalVariantKey(filterKey);
-      }
+      /** Best Offers reads the same index — its offers share this product's own variant list. */
+      setGlobalVariantIndex(index);
     },
-    [product.variantIds, setGlobalVariantKey],
+    [setGlobalVariantIndex],
   );
 
   const selectColor = useCallback((index) => {
@@ -120,7 +116,7 @@ export const useProductDetailPresenter = () => {
     selectedVariantIndex,
     selectedColorIndex,
     wishlist,
-    variantIds,
+    variants,
     colorEntries,
     priceMinFormatted,
     priceMaxFormatted,

@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { LanguageProvider } from "contexts";
-import { mockFilterProducts } from "entities/filter-catalog/model/mockFilterProducts";
+import { PRODUCT_CATALOG } from "entities/product";
 import { useFilterCatalogPresenter } from "./useFilterCatalogPresenter";
 
 const renderPresenter = (initialPath = "/filter") =>
@@ -16,15 +16,15 @@ const renderPresenter = (initialPath = "/filter") =>
 describe("useFilterCatalogPresenter", () => {
   test("with no filters, shows every catalog product", () => {
     const { result } = renderPresenter();
-    expect(result.current.totalResults).toBe(mockFilterProducts.length);
+    expect(result.current.totalResults).toBe(PRODUCT_CATALOG.length);
   });
 
   test("a category in the URL narrows the results to that category (G14 regression)", () => {
-    const laptop = mockFilterProducts.find((p) => p.categoryId === "laptops");
+    const laptop = PRODUCT_CATALOG.find((p) => p.categoryId === "laptops");
     const { result } = renderPresenter(`/filter?category=${laptop.categoryId}`);
 
     expect(result.current.totalResults).toBeGreaterThan(0);
-    expect(result.current.totalResults).toBeLessThan(mockFilterProducts.length);
+    expect(result.current.totalResults).toBeLessThan(PRODUCT_CATALOG.length);
     result.current.filteredProducts.forEach((p) => {
       expect(p.categoryId).toBe(laptop.categoryId);
     });
@@ -33,7 +33,7 @@ describe("useFilterCatalogPresenter", () => {
   test("toggling a brand facet narrows results and the count for that brand matches the actual catalog", () => {
     const { result } = renderPresenter();
     const brandId = "apple";
-    const expectedCount = mockFilterProducts.filter((p) => p.brandId === brandId).length;
+    const expectedCount = PRODUCT_CATALOG.filter((p) => p.brandId === brandId).length;
 
     act(() => result.current.toggleBrand(brandId));
 
@@ -45,7 +45,7 @@ describe("useFilterCatalogPresenter", () => {
     const { result } = renderPresenter();
     const brandId = "apple";
     const appleScreenSizes = new Set(
-      mockFilterProducts.filter((p) => p.brandId === brandId).map((p) => String(p.screenInch)),
+      PRODUCT_CATALOG.filter((p) => p.brandId === brandId).map((p) => String(p.screenInch)),
     );
 
     act(() => result.current.toggleBrand(brandId));
@@ -65,7 +65,7 @@ describe("useFilterCatalogPresenter", () => {
   });
 
   test("search actually filters the product list by title", () => {
-    const target = mockFilterProducts[0];
+    const target = PRODUCT_CATALOG[0];
     const uniqueWord = target.title.split(" ")[0];
     const { result } = renderPresenter(`/filter?q=${encodeURIComponent(uniqueWord)}`);
 

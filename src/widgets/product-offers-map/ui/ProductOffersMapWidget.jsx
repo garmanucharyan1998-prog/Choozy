@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useParams } from "react-router";
 import { useLanguage } from "contexts";
 import { useProductOffersPresenter } from "features/product-offers";
-import { getProductDetailForRoute } from "entities/product-detail";
+import { getProductDetailForRoute } from "entities/product";
 import { YerevanMap } from "shared/ui/yerevan-map";
 
 const ProductOffersMapWidget = () => {
@@ -53,7 +53,7 @@ const ProductOffersMapWidget = () => {
                   {t(row.labelKey)}
                 </dt>
                 <dd className="m-0 text-sm font-semibold leading-snug text-text-dark md:text-base">
-                  {t(row.valueKey)}
+                  {row.value}
                 </dd>
               </div>
             ))}
