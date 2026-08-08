@@ -10,14 +10,22 @@ import { DEMO_SHOP_PRODUCTS_SEED } from "./shopAccountModel";
 
 export const SHOP_PRODUCT_CATEGORY_IDS = [...FILTER_CATEGORY_IDS];
 
+/**
+ * The filter catalog only has 8 categories (see FILTER_CATEGORY_IDS) and none of them are
+ * "gaming consoles" or "accessories" — so Gaming/Accessories demo products need a
+ * best-effort home rather than a perfect match. Picked explicitly here instead of falling
+ * through to buildCatalogProducts' default, which used to silently put them somewhere
+ * unrelated (Gaming → wearables, Accessories → smartphones by the default itself).
+ */
 const DEMO_CATEGORY_TO_ID = {
   Smartphones: "smartphones",
   Laptops: "laptops",
   Audio: "headphones",
   Tablets: "tablets",
-  Gaming: "wearables",
+  Gaming: "tv",
   TV: "tv",
   Cameras: "cameras",
+  Accessories: "laptops",
 };
 
 const STANDARD_MEMORY_OPTIONS = [

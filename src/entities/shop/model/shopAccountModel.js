@@ -87,7 +87,7 @@ export const DEMO_SHOP_PRODUCTS_SEED = [
     badgeKey: "",
     shopUrlLabel: "",
     productUrl: "",
-    variants: ["256 / 12gb", "256 / 12gb", "1TB / 12gb"],
+    variants: ["256 / 12gb", "1TB / 12gb"],
     colors: [
       { id: "yellow", hex: "#e8b923" },
       { id: "black", hex: "#1c1c1e" },

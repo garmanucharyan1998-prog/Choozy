@@ -401,7 +401,14 @@ export const useShopAccountPresenter = () => {
         setStatusKey("shopAccount.products.messages.productRequired");
         return;
       }
-      if (!price) {
+      /**
+       * Validate the *formatted* price (digits only), not the raw typed string — a
+       * non-numeric price like "abc" is truthy before formatting but strips down to "",
+       * which used to sail past this check and get saved as a blank price. Mirrors the
+       * check already done correctly in updateShopProductPrice below.
+       */
+      const { price: formattedPrice, priceAmd } = formatShopPrice(price);
+      if (!formattedPrice) {
         setStatusKey("shopAccount.products.messages.priceRequired");
         return;
       }
@@ -428,7 +435,6 @@ export const useShopAccountPresenter = () => {
       }
       const availability =
         productDraft.availability === "out_of_stock" ? "out_of_stock" : "in_stock";
-      const { price: formattedPrice, priceAmd } = formatShopPrice(price);
       const now = Date.now();
       const productPayload = {
         title: catalogProduct.title,
