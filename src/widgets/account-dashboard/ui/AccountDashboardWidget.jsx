@@ -12,6 +12,7 @@ import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
 import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
+import { MainCard, NotificationFeedCard, ToggleRow } from "shared/ui/dashboard-cards";
 import { ProductCardImage } from "shared/ui/product-card-image";
 import { LocalizedLink } from "shared/ui/link";
 
@@ -101,49 +102,6 @@ const AccountGridProductCard = ({
       <p className="m-0 pt-0.5 text-sm font-semibold text-link-blue sm:text-base">{item.price}</p>
     </LocalizedLink>
   </article>
-);
-
-const MainCard = ({ children, className = "" }) => (
-  <div className={`rounded-[12px] border border-[#e1e6ef] bg-white shadow-sm ${className}`}>
-    {children}
-  </div>
-);
-
-const NotificationFeedCard = ({ title, timeLabel, body }) => (
-  <article className="flex flex-col gap-3 rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
-    <div className="flex items-start justify-between gap-3 border-b border-[#d9dfea] pb-3">
-      <h3 className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">
-        {title}
-      </h3>
-      <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">
-        {timeLabel}
-      </span>
-    </div>
-    <p className="m-0 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
-  </article>
-);
-
-const ToggleRow = ({ title, description, enabled, onToggle }) => (
-  <button
-    type="button"
-    className="flex min-h-[52px] w-full touch-manipulation items-center justify-between gap-3 rounded-[12px] border border-[#e1e6ef] bg-[#fbfcff] p-3.5 text-start transition hover:bg-[#f4f6fb] sm:min-h-0 sm:gap-4 sm:p-4"
-    onClick={onToggle}
-    aria-pressed={enabled}
-  >
-    <span className="flex flex-col gap-1">
-      <span className="block text-sm font-bold text-navy">{title}</span>
-      {description ? (
-        <span className="block text-xs leading-relaxed text-text-muted">{description}</span>
-      ) : null}
-    </span>
-    <span
-      className={`flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition ${
-        enabled ? "justify-end bg-navy" : "justify-start bg-[#dfe4f1]"
-      }`}
-    >
-      <span className="h-5 w-5 rounded-full bg-white shadow-sm" />
-    </span>
-  </button>
 );
 
 const AccountDashboardWidget = () => {

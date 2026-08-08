@@ -20,6 +20,7 @@ import {
   writeShopAccountState,
 } from "entities/shop";
 import { useLanguage } from "contexts";
+import { formatAmd } from "shared/lib/formatAmd";
 import { stripLanguageFromPath, useLocalizedNavigate } from "shared/lib/locale";
 
 const SHOP_ACCOUNT_PATH_BY_SIDEBAR = {
@@ -60,7 +61,7 @@ const formatShopPrice = (raw) => {
   if (!digits) return { price: "", priceAmd: undefined };
   const priceAmd = parseInt(digits, 10);
   return {
-    price: Number.isFinite(priceAmd) ? priceAmd.toLocaleString("en-US") : "",
+    price: Number.isFinite(priceAmd) ? formatAmd(priceAmd) : "",
     priceAmd: Number.isFinite(priceAmd) ? priceAmd : undefined,
   };
 };

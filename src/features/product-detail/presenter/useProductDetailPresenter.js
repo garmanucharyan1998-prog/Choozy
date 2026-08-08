@@ -9,9 +9,8 @@ import {
   toggleWishlistProduct,
 } from "entities/user";
 import { useProductOffersVariantFilter } from "contexts";
+import { formatAmd } from "shared/lib/formatAmd";
 import { getLanguageFromPath, localizedPath } from "shared/lib/locale";
-
-const formatAmd = (amount) => (typeof amount === "number" ? amount.toLocaleString("en-US") : "");
 
 /**
  * Presenter for the product detail page (demo data + local UI state).

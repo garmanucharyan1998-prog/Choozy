@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import { useProductOffersVariantFilter } from "contexts";
 import { getOffersForProduct, getProductDetailForRoute } from "entities/product";
+import { formatAmd } from "shared/lib/formatAmd";
 
 const INITIAL_VISIBLE_COUNT = 3;
 const LOAD_MORE_STEP = 2;
@@ -12,8 +13,6 @@ export const SORT_OPTIONS = [
   { id: "priceAsc", labelKey: "productOffers.bestOffers.sortOptions.priceAsc" },
   { id: "priceDesc", labelKey: "productOffers.bestOffers.sortOptions.priceDesc" },
 ];
-
-const formatAmd = (amount) => (typeof amount === "number" ? amount.toLocaleString("en-US") : "");
 
 const comparePrice = (asc) => (a, b) => (asc ? a.priceAmd - b.priceAmd : b.priceAmd - a.priceAmd);
 

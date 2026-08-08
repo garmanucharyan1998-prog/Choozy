@@ -10,6 +10,7 @@
  * productOffers.js).
  */
 import { getProductDetailHref } from "entities/product-detail/model/productRouteRegistry";
+import { formatAmd } from "shared/lib/formatAmd";
 import { PRODUCT_IMAGES } from "./productImages";
 
 /**
@@ -374,7 +375,7 @@ const buildDescription = (product) =>
 /** @type {CatalogProduct[]} */
 export const PRODUCT_CATALOG = CATALOG_BASE.map((p) => ({
   ...p,
-  price: `${p.priceValue.toLocaleString("en-US")} AMD`,
+  price: `${formatAmd(p.priceValue)} AMD`,
   description: buildDescription(p),
   href: getProductDetailHref(p.id, p.title),
 }));

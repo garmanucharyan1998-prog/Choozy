@@ -19,10 +19,12 @@ import {
   SHOP_SIDEBAR_IDS,
 } from "entities/shop";
 import { useShopAccountPresenter } from "features/shop-account";
+import { formatAmd } from "shared/lib/formatAmd";
 import {
   formatAmdPriceConversionParts,
   parseProductAmdAmount,
 } from "shared/lib/formatAmdPriceConversions";
+import { MainCard, NotificationFeedCard, ToggleRow } from "shared/ui/dashboard-cards";
 import ShopFinanceWidget from "widgets/shop-finance";
 import ShopStatisticsWidget from "widgets/shop-statistics";
 
@@ -36,12 +38,6 @@ const sidebarItems = [
 const notificationKeys = ["priceDrops", "wishlistUpdates", "accountNews"];
 
 const NOTIFICATIONS_FEED_ITEM_KEYS = ["recent", "hour", "dated"];
-
-const MainCard = ({ children, className = "" }) => (
-  <div className={`rounded-[12px] border border-[#e1e6ef] bg-white shadow-sm ${className}`}>
-    {children}
-  </div>
-);
 
 const SHOP_NAV_SCROLL_CLASS =
   "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory";
@@ -201,24 +197,6 @@ const ProductTableRowActions = ({
   </div>
 );
 
-const NotificationFeedCard = ({ title, timeLabel, body, headingLevel = 3 }) => {
-  const HeadingTag = headingLevel === 4 ? "h4" : "h3";
-
-  return (
-    <article className="flex flex-col gap-3 rounded-lg border border-[#e2e8f3] bg-[#eef1f6] p-3.5 text-start shadow-[0_1px_0_rgba(0,0,0,0.03)] sm:rounded-[10px] sm:border-0 sm:p-4 md:p-5 sm:shadow-none">
-      <div className="flex items-start justify-between gap-3 border-b border-[#d9dfea] pb-3">
-        <HeadingTag className="min-w-0 flex-1 text-sm font-bold leading-snug text-navy sm:text-base">
-          {title}
-        </HeadingTag>
-        <span className="shrink-0 whitespace-nowrap text-xs font-normal tabular-nums text-navy sm:text-sm">
-          {timeLabel}
-        </span>
-      </div>
-      <p className="m-0 text-[13px] leading-relaxed text-navy sm:text-sm md:text-[15px]">{body}</p>
-    </article>
-  );
-};
-
 const ShopProductPriceButton = ({
   product,
   priceText,
@@ -269,29 +247,6 @@ const ShopProductPriceButton = ({
     </div>
   );
 };
-
-const ToggleRow = ({ title, description, enabled, onToggle }) => (
-  <button
-    type="button"
-    className="flex min-h-[52px] w-full touch-manipulation items-center justify-between gap-3 rounded-[12px] border border-[#e1e6ef] bg-[#fbfcff] p-3.5 text-start transition hover:bg-[#f4f6fb] sm:min-h-0 sm:gap-4 sm:p-4"
-    onClick={onToggle}
-    aria-pressed={enabled}
-  >
-    <span className="flex flex-col gap-1">
-      <span className="block text-sm font-bold text-navy">{title}</span>
-      {description ? (
-        <span className="block text-xs leading-relaxed text-text-muted">{description}</span>
-      ) : null}
-    </span>
-    <span
-      className={`flex h-7 w-12 shrink-0 items-center rounded-full p-1 transition ${
-        enabled ? "justify-end bg-navy" : "justify-start bg-[#dfe4f1]"
-      }`}
-    >
-      <span className="h-5 w-5 rounded-full bg-white shadow-sm" />
-    </span>
-  </button>
-);
 
 const ShopAccountDashboardWidget = () => {
   const fileInputRef = useRef(null);
@@ -719,7 +674,7 @@ const ShopAccountDashboardWidget = () => {
       const raw = typeof product.price === "string" ? product.price.trim() : "";
       if (raw) return `${raw} ${amd}`;
       if (typeof product.priceAmd === "number" && Number.isFinite(product.priceAmd)) {
-        return `${product.priceAmd.toLocaleString("en-US")} ${amd}`;
+        return `${formatAmd(product.priceAmd)} ${amd}`;
       }
       return "—";
     };

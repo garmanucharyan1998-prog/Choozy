@@ -6,6 +6,7 @@ import { RelatedProductsWidget } from "widgets/related-products";
 import { ProductDetailWidget } from "widgets/product-detail";
 import { ProductOffersMapWidget } from "widgets/product-offers-map";
 import { getTranslator } from "shared/i18n";
+import { formatAmd } from "shared/lib/formatAmd";
 import { buildPageMeta } from "shared/lib/seo";
 import { getLanguageFromPath } from "shared/lib/locale";
 import { Breadcrumbs } from "shared/ui/breadcrumbs";
@@ -13,8 +14,6 @@ import { NotFoundContent } from "shared/ui/not-found-content";
 import { getCanonicalProductDetailPath } from "entities/product-detail";
 import { getOffersForProduct, getProductDetailForRoute } from "entities/product";
 import { buildProductJsonLd } from "pages/singleproduct/model/productJsonLd";
-
-const formatAmd = (amount) => (typeof amount === "number" ? amount.toLocaleString("en-US") : "");
 
 /**
  * Unknown product ids must 404 (a real HTTP status now that there's a real server, not

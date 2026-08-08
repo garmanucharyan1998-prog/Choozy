@@ -1,10 +1,9 @@
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { formatAmd } from "shared/lib/formatAmd";
 
 const BAR_NAVY = "#152147";
 const BAR_MUTED = "#dadfe8";
 const GRID_STROKE = "#dde3f8";
-
-const formatTick = (value) => (typeof value === "number" ? value.toLocaleString("en-US") : "");
 
 /**
  * Mini price history column chart — dashed horizontal grid, rounded bar tops,
@@ -51,7 +50,7 @@ const PriceHistoryChart = ({ data, ariaLabel }) => {
             ticks={yTicks}
             tickLine={false}
             axisLine={false}
-            tickFormatter={formatTick}
+            tickFormatter={formatAmd}
             tick={{ fill: "#1f2937", fontSize: 11, fontWeight: 600 }}
             width={56}
           />
