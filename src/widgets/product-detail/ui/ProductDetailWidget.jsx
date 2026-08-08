@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 import { useProductDetailPresenter } from "features/product-detail";
 import { useLanguage } from "contexts";
+import { BREAKPOINTS } from "shared/config/breakpoints";
 import { PriceHistoryChart } from "shared/ui/price-history-chart";
 import { ProgressiveImage } from "shared/ui/progressive-image";
 import { FaBalanceScale, FaHeart, FaRegHeart } from "react-icons/fa";
@@ -30,9 +31,9 @@ const CHART_MONTH_KEYS = [
 ];
 const SWIPER_MODULES = [Navigation];
 const SWIPER_THUMB_BREAKPOINTS = {
-  480: { slidesPerView: 4 },
-  768: { slidesPerView: 5 },
-  1024: { slidesPerView: 4 },
+  [BREAKPOINTS.sm]: { slidesPerView: 4 },
+  [BREAKPOINTS.md]: { slidesPerView: 5 },
+  [BREAKPOINTS.lg]: { slidesPerView: 4 },
 };
 
 const getTrailingMonthKeys = (count = 5, date = new Date()) => {

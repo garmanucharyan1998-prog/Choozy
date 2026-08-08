@@ -7,6 +7,10 @@ module.exports = {
         sans: ['MontserratArm', 'Montserrat', 'sans-serif'],
         system: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
       },
+      /*
+       * Keep in sync with src/shared/config/breakpoints.js — this file is loaded by
+       * Node outside the Vite/ESM graph, so it can't import that module directly.
+       */
       screens: {
         sm: '480px',
         md: '768px',

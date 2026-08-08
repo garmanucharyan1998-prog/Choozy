@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useLanguage } from "contexts";
+import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 
 const AUTH_MODES = {
   REGISTER: "register",
@@ -27,6 +28,8 @@ export const useAuthModalPresenter = ({ isOpen, onClose, onSuccess }) => {
       resetForm();
     }
   }, [isOpen, resetForm]);
+
+  useLockBodyScroll(isOpen);
 
   /**
    * Escape to close, Tab kept inside the dialog, focus moved in on open and returned to

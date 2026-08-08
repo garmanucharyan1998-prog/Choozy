@@ -5,6 +5,7 @@ import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "
 import { PRODUCT_CATALOG, buildCatalogItemListJsonLd } from "entities/product";
 import { useFilterCatalogPresenter } from "features/filter-catalog";
 import { useLanguage } from "contexts";
+import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 import FilterProductCard from "shared/ui/filter-product-card/FilterProductCard";
 import { LocalizedLink } from "shared/ui/link";
 
@@ -37,6 +38,30 @@ const wishlistMapFromStorage = () => {
   const ids = new Set(readAccountState().wishlistItems.map((x) => x.id));
   return Object.fromEntries([...ids].map((id) => [id, true]));
 };
+
+/** Grid/list toggle — identical between the mobile and desktop toolbars, so it lives once. */
+const ViewModeToggle = ({ viewMode, onChange, gridAria, listAria, className = "" }) => (
+  <div className={`flex shrink-0 gap-0.5 rounded-xl border border-border-blue bg-white p-1 ${className}`}>
+    <button
+      type="button"
+      onClick={() => onChange("grid")}
+      aria-pressed={viewMode === "grid"}
+      aria-label={gridAria}
+      className={`rounded-lg p-2.5 ${viewMode === "grid" ? "bg-navy text-white" : "text-navy hover:bg-gray-100"}`}
+    >
+      <FaTh className="h-4 w-4" aria-hidden />
+    </button>
+    <button
+      type="button"
+      onClick={() => onChange("list")}
+      aria-pressed={viewMode === "list"}
+      aria-label={listAria}
+      className={`rounded-lg p-2.5 ${viewMode === "list" ? "bg-navy text-white" : "text-navy hover:bg-gray-100"}`}
+    >
+      <FaList className="h-4 w-4" aria-hidden />
+    </button>
+  </div>
+);
 
 const FilterCatalogWidget = () => {
   const {
@@ -103,14 +128,7 @@ const FilterCatalogWidget = () => {
     return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
   }, []);
 
-  useEffect(() => {
-    if (!mobileFilterOpen) return undefined;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [mobileFilterOpen]);
+  useLockBodyScroll(mobileFilterOpen);
 
   /** Escape closes the drawer and focus returns to the button that opened it. */
   useEffect(() => {
@@ -440,26 +458,13 @@ const FilterCatalogWidget = () => {
                   ))}
                 </select>
               </label>
-              <div className="flex shrink-0 gap-0.5 rounded-xl border border-border-blue bg-white p-1 shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => setViewMode("grid")}
-                  aria-pressed={viewMode === "grid"}
-                  aria-label={t("filterPage.viewGridAria")}
-                  className={`rounded-lg p-2.5 ${viewMode === "grid" ? "bg-navy text-white" : "text-navy hover:bg-gray-100"}`}
-                >
-                  <FaTh className="h-4 w-4" aria-hidden />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("list")}
-                  aria-pressed={viewMode === "list"}
-                  aria-label={t("filterPage.viewListAria")}
-                  className={`rounded-lg p-2.5 ${viewMode === "list" ? "bg-navy text-white" : "text-navy hover:bg-gray-100"}`}
-                >
-                  <FaList className="h-4 w-4" aria-hidden />
-                </button>
-              </div>
+              <ViewModeToggle
+                viewMode={viewMode}
+                onChange={setViewMode}
+                gridAria={t("filterPage.viewGridAria")}
+                listAria={t("filterPage.viewListAria")}
+                className="shadow-sm"
+              />
             </div>
             <input
               type="search"
@@ -500,26 +505,12 @@ const FilterCatalogWidget = () => {
                     ))}
                   </select>
                 </label>
-                <div className="flex gap-0.5 rounded-xl border border-border-blue p-1">
-                  <button
-                    type="button"
-                    onClick={() => setViewMode("grid")}
-                    aria-pressed={viewMode === "grid"}
-                    aria-label={t("filterPage.viewGridAria")}
-                    className={`rounded-lg p-2.5 ${viewMode === "grid" ? "bg-navy text-white" : "text-navy hover:bg-gray-100"}`}
-                  >
-                    <FaTh className="h-4 w-4" aria-hidden />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setViewMode("list")}
-                    aria-pressed={viewMode === "list"}
-                    aria-label={t("filterPage.viewListAria")}
-                    className={`rounded-lg p-2.5 ${viewMode === "list" ? "bg-navy text-white" : "text-navy hover:bg-gray-100"}`}
-                  >
-                    <FaList className="h-4 w-4" aria-hidden />
-                  </button>
-                </div>
+                <ViewModeToggle
+                  viewMode={viewMode}
+                  onChange={setViewMode}
+                  gridAria={t("filterPage.viewGridAria")}
+                  listAria={t("filterPage.viewListAria")}
+                />
               </div>
             </div>
           </div>

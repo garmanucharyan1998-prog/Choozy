@@ -4,9 +4,22 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { useLanguage } from "contexts";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useRelatedProductsPresenter } from "features/related-products";
+import { BREAKPOINTS } from "shared/config/breakpoints";
 import { ProductCardImage } from "shared/ui/product-card-image";
 import { LocalizedLink } from "shared/ui/link";
 import "swiper/css";
+
+/**
+ * Only Tailwind's own screens (shared/config/breakpoints.js). The old 640 step didn't
+ * correspond to any breakpoint used anywhere else in the app and skipped `md` entirely
+ * (jumping straight from 640 to 1024) — moved to `md` (768) instead of dropped, since
+ * this carousel otherwise has no tablet-width step at all.
+ */
+const RELATED_PRODUCTS_BREAKPOINTS = {
+  [BREAKPOINTS.sm]: { slidesPerView: 1.35, spaceBetween: 14 },
+  [BREAKPOINTS.md]: { slidesPerView: 2, spaceBetween: 16 },
+  [BREAKPOINTS.lg]: { slidesPerView: 4, spaceBetween: 18 },
+};
 
 /** Responsive type scale — fixed inline px would not shrink on narrow screens. */
 const TITLE_TEXT_CLASS = "m-0 line-clamp-2 text-sm font-bold leading-snug text-navy sm:text-base";
@@ -101,11 +114,7 @@ const RelatedProductsWidget = () => {
             watchOverflow
             slidesPerView={1.15}
             spaceBetween={14}
-            breakpoints={{
-              480: { slidesPerView: 1.35, spaceBetween: 14 },
-              640: { slidesPerView: 2, spaceBetween: 16 },
-              1024: { slidesPerView: 4, spaceBetween: 18 },
-            }}
+            breakpoints={RELATED_PRODUCTS_BREAKPOINTS}
           >
             {items.map((product) => {
               const inWishlist = Boolean(wishlist[product.id]);

@@ -3,10 +3,22 @@ import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } fr
 import { getProductDetailHref } from "entities/product-detail";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useLanguage } from "contexts";
+import { BREAKPOINTS } from "shared/config/breakpoints";
 import { ProductCardImage } from "shared/ui/product-card-image";
 import { LocalizedLink } from "shared/ui/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
+
+/**
+ * Only Tailwind's own screens (shared/config/breakpoints.js) — no orphan steps like the
+ * old 375/640, which didn't correspond to any breakpoint used anywhere else in the app.
+ */
+const CAROUSEL_BREAKPOINTS = {
+  [BREAKPOINTS.sm]: { slidesPerView: 1.45, spaceBetween: 14 },
+  [BREAKPOINTS.md]: { slidesPerView: 3, spaceBetween: 16 },
+  [BREAKPOINTS.lg]: { slidesPerView: 4, spaceBetween: 18 },
+  [BREAKPOINTS.xl]: { slidesPerView: 5, spaceBetween: 20 },
+};
 
 const ACTION_BTN =
   "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/[0.06] bg-white text-[rgba(21,33,71,1)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-colors hover:bg-[#f8f9fc] active:scale-[0.98] sm:h-10 sm:w-10";
@@ -76,14 +88,7 @@ const Carousel = ({ items, ariaLabel }) => {
             slidesPerView={1.1}
             spaceBetween={12}
             loop={loopEnabled}
-            breakpoints={{
-              375: { slidesPerView: 1.25, spaceBetween: 12 },
-              480: { slidesPerView: 1.45, spaceBetween: 14 },
-              640: { slidesPerView: 2, spaceBetween: 16 },
-              768: { slidesPerView: 3, spaceBetween: 16 },
-              1024: { slidesPerView: 4, spaceBetween: 18 },
-              1280: { slidesPerView: 5, spaceBetween: 20 },
-            }}
+            breakpoints={CAROUSEL_BREAKPOINTS}
           >
             {safeItems.map((product, index) => {
               const detailPath =

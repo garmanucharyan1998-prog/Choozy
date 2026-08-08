@@ -98,16 +98,3 @@
     gap: 6px;
   }
 }
-
-@media (max-width: 379.98px) {
-  .grid-catalog {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-    grid-auto-rows: auto;
-    gap: 8px;
-  }
-
-  .grid-catalog .grid-item {
-    grid-area: auto !important;
-  }
-}

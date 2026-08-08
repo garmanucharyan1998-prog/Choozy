@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 
 /**
  * Site shell presenter — sticky header/nav chrome shared by every page.
@@ -46,6 +47,9 @@ export const useSiteShellPresenter = () => {
     setIsMobileMenuOpen(false);
     setIsMobileCatalogOpen(false);
   };
+
+  const isAnyMobilePanelOpen = isMobileMenuOpen || isMobileCatalogOpen;
+  useLockBodyScroll(isAnyMobilePanelOpen);
 
   useLayoutEffect(() => {
     isCompactHeaderRef.current = isCompactHeader;
@@ -207,7 +211,7 @@ export const useSiteShellPresenter = () => {
     isCompactHeader,
     isMobileMenuOpen,
     isMobileCatalogOpen,
-    isAnyMobilePanelOpen: isMobileMenuOpen || isMobileCatalogOpen,
+    isAnyMobilePanelOpen,
     toggleMobileMenu,
     closeMobileMenu,
     toggleMobileCatalog,

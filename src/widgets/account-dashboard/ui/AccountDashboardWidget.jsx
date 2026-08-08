@@ -11,6 +11,7 @@ import {
 import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
 import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
+import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 import { ProductCardImage } from "shared/ui/product-card-image";
 import { LocalizedLink } from "shared/ui/link";
 
@@ -203,6 +204,8 @@ const AccountDashboardWidget = () => {
   useEffect(() => {
     setRecentVisibleCount(RECENT_INITIAL_VISIBLE_COUNT);
   }, [activeSidebarId, accountState.recentlyViewed.length]);
+
+  useLockBodyScroll(Boolean(pendingWishlistRemoveId));
 
   useEffect(() => {
     if (!pendingWishlistRemoveId) return undefined;
