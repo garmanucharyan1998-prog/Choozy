@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSubmit } from "react-router";
 import { useLanguage } from "contexts";
-import { ROLES } from "entities/session";
+import { readRoleForEmail, rememberRoleForEmail, ROLES } from "entities/session";
 import { localizedPath } from "shared/lib/locale";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 
@@ -12,10 +12,16 @@ const AUTH_MODES = {
 
 /**
  * There is still no real backend (see the two submit handlers below — presence checks
- * only, nothing verified against a server). What changed: a chosen role now gets posted
- * to `/session/login`, a resource-route `action` that sets the session cookie and issues
- * a real server redirect — see entities/session and app/routes/sessionLoginAction.js for
+ * only, nothing verified against a server). What changed: a role now gets posted to
+ * `/session/login`, a resource-route `action` that sets the session cookie and issues a
+ * real server redirect — see entities/session and app/routes/sessionLoginAction.js for
  * why that's a server action and not a client-side cookie write.
+ *
+ * The role picker (`role`/`selectRole` below) only ever applies to registration — a real
+ * account's role is decided once, when it's created, not re-chosen on every login. Login
+ * instead looks the email up in entities/session's local role registry (populated by a
+ * prior registration, or pre-seeded for the two demo accounts) and falls back to buyer for
+ * an email that's never been seen — see readRoleForEmail's own doc comment.
  */
 export const useAuthModalPresenter = ({ isOpen, onClose }) => {
   const { t, language } = useLanguage();
@@ -143,13 +149,16 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
     setError("");
   }, []);
 
-  const submitSession = useCallback(() => {
-    submit(
-      { role, email: email.trim() },
-      { method: "post", action: localizedPath("/session/login", language) },
-    );
-    onClose();
-  }, [submit, role, email, language, onClose]);
+  const submitSession = useCallback(
+    (resolvedRole) => {
+      submit(
+        { role: resolvedRole, email: email.trim() },
+        { method: "post", action: localizedPath("/session/login", language) },
+      );
+      onClose();
+    },
+    [submit, email, language, onClose],
+  );
 
   const handleLoginSubmit = useCallback(
     (event) => {
@@ -160,7 +169,9 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
         return;
       }
 
-      submitSession();
+      /** Unknown email (never registered here) — buyer is the least-surprising default. */
+      const resolvedRole = readRoleForEmail(email.trim()) ?? ROLES.BUYER;
+      submitSession(resolvedRole);
     },
     [email, password, t, submitSession],
   );
@@ -179,9 +190,10 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
         return;
       }
 
-      submitSession();
+      rememberRoleForEmail(email.trim(), role);
+      submitSession(role);
     },
-    [confirmPassword, email, password, t, submitSession],
+    [confirmPassword, email, password, role, t, submitSession],
   );
 
   const isRegisterMode = mode === AUTH_MODES.REGISTER;

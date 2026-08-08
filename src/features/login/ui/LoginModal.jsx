@@ -191,8 +191,6 @@ const LoginModalDialog = ({ onClose }) => {
             </div>
 
             <form className="flex flex-col gap-4" onSubmit={handleLoginSubmit} noValidate>
-              <RolePicker role={role} onSelect={selectRole} t={t} />
-
               <label className="flex flex-col gap-1.5 text-start text-sm font-semibold text-navy">
                 <span>{t("login.emailLabel")}</span>
                 <input
