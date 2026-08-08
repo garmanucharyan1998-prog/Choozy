@@ -74,7 +74,14 @@ const Header = ({
   const { t } = useLanguage();
   const { isAuthenticated, role } = useSession();
   const dashboardPath = dashboardPathForRole(role);
-  const [wishlistCount, setWishlistCount] = useState(() => readAccountState().wishlistItems.length);
+  /**
+   * `readAccountState()` differs between server (always empty, no `localStorage` there)
+   * and client (the visitor's real wishlist) — reading it directly in this initializer
+   * mismatched the server's HTML on every single page (Header renders everywhere), a real
+   * React #418. Starting at 0 (matching the server) and letting the mount effect below
+   * populate the real count keeps first paint identical.
+   */
+  const [wishlistCount, setWishlistCount] = useState(0);
   const headerRef = useRef(null);
   const mobileBottomNavRef = useRef(null);
 

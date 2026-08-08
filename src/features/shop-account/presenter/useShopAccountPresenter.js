@@ -3,6 +3,7 @@ import { useLocation } from "react-router";
 import {
   getCatalogProductById,
   getCatalogProductsByCategory,
+  getServerDefaultShopAccountState,
   getShopCategoryLabelKey,
   getShopColorOptionById,
   normalizeShopProduct,
@@ -110,7 +111,15 @@ export const useShopAccountPresenter = () => {
   const location = useLocation();
   const navigate = useLocalizedNavigate();
 
-  const [shopState, setShopState] = useState(() => readShopAccountState());
+  /**
+   * `readShopAccountState()` returns different data server vs client once a shop has real
+   * stored data (profile edits, added products) — reading it directly here meant the first
+   * client render (during hydration) already differed from the server's HTML, a React #418
+   * mismatch. `getServerDefaultShopAccountState()` is the exact same expression the server
+   * uses (not a hand-copied duplicate that could drift), so the first paint matches; the
+   * effect below swaps in the visitor's real data once hydration has settled.
+   */
+  const [shopState, setShopState] = useState(getServerDefaultShopAccountState);
   const [activeSidebarId, setActiveSidebarId] = useState(() =>
     sidebarIdFromPathname(location.pathname),
   );
@@ -141,6 +150,7 @@ export const useShopAccountPresenter = () => {
 
   useEffect(() => {
     const sync = () => setShopState(readShopAccountState());
+    sync(); // populate the visitor's real data now that hydration has settled
     window.addEventListener(SHOP_ACCOUNT_STORAGE_EVENT, sync);
     return () => window.removeEventListener(SHOP_ACCOUNT_STORAGE_EVENT, sync);
   }, []);

@@ -4,6 +4,7 @@ export {
   defaultShopProfile,
   DEFAULT_PRODUCT_SWATCH_COLORS,
   DEMO_SHOP_PRODUCTS_SEED,
+  getServerDefaultShopAccountState,
   isShopProductStale,
   normalizeShopProduct,
   pruneStaleShopProducts,

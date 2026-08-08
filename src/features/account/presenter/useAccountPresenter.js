@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
 import {
   ACCOUNT_STORAGE_EVENT,
+  defaultAccountState,
   hashPassword,
   PERSONAL_INNER_TABS,
   readAccountState,
@@ -39,7 +40,16 @@ export const useAccountPresenter = () => {
   const location = useLocation();
   const navigate = useLocalizedNavigate();
 
-  const [accountState, setAccountState] = useState(() => readAccountState());
+  /**
+   * `readAccountState()` returns SSR-safe defaults on the server (no `localStorage` there)
+   * but the visitor's real data on the client — reading it directly in this initializer
+   * meant the very first client render (during hydration) already differed from what the
+   * server sent, a real React #418 mismatch confirmed by reproducing it with a guest
+   * wishlist item and a hard load of /account/favorite. Starting from the same constant
+   * the server effectively uses, then swapping in real data via the effect below (which
+   * only runs after hydration completes), keeps the first paint byte-identical.
+   */
+  const [accountState, setAccountState] = useState(defaultAccountState);
   const [activeSidebarId, setActiveSidebarId] = useState(() =>
     sidebarIdFromPathname(location.pathname),
   );
@@ -65,6 +75,7 @@ export const useAccountPresenter = () => {
 
   useEffect(() => {
     const sync = () => setAccountState(readAccountState());
+    sync(); // populate the visitor's real data now that hydration has settled
     window.addEventListener(ACCOUNT_STORAGE_EVENT, sync);
     return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
   }, []);

@@ -558,9 +558,18 @@ const readAndMaybePersistPrunedState = (rawState) => {
   return normalized;
 };
 
+/**
+ * What `readShopAccountState()` returns during SSR (no `localStorage` there). Exported so
+ * a presenter's initial client-render state can call this exact same function instead of
+ * hand-duplicating the expression — a copy that drifted out of sync would reintroduce the
+ * same class of hydration mismatch this is meant to fix (see useShopAccountPresenter.js).
+ */
+export const getServerDefaultShopAccountState = () =>
+  normalizeShopAccountState({ shopProducts: DEMO_SHOP_PRODUCTS_SEED });
+
 export const readShopAccountState = () => {
   if (!isBrowser()) {
-    return normalizeShopAccountState({ shopProducts: DEMO_SHOP_PRODUCTS_SEED });
+    return getServerDefaultShopAccountState();
   }
 
   try {
