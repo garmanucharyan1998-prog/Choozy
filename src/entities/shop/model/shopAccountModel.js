@@ -55,12 +55,12 @@ const normalizeSwatch = (raw, idx) => {
 };
 
 export const defaultShopProfile = {
-  shopName: "Shop Shop Electronics",
+  shopName: "TechZone Electronics",
   description:
     "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
-  email: "test2025@gmail.com",
-  phoneLocal: "93001002",
-  website: "testwebsite.com",
+  email: "seller.demo@choosy.am",
+  phoneLocal: "99887766",
+  website: "techzone.am",
 };
 
 export const defaultShopAccountState = {

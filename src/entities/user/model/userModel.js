@@ -26,10 +26,10 @@ export const defaultNotificationPrefs = {
 };
 
 export const defaultProfile = {
-  firstName: "Հովհաննիսյան",
-  lastName: "Մարգարիտա",
-  email: "test2025@gmail.com",
-  phoneLocal: "93001002",
+  firstName: "Անի",
+  lastName: "Պետրոսյան",
+  email: "buyer.demo@choosy.am",
+  phoneLocal: "91234567",
 };
 
 export const defaultWishlistItems = [
