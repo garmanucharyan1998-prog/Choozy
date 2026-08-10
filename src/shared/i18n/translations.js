@@ -759,6 +759,8 @@ const am = {
     errors: {
       required: "Լրացրեք բոլոր դաշտերը։",
       passwordMismatch: "Գաղտնաբառերը չեն համընկնում։",
+      invalidEmail: "Մուտքագրեք վավեր էլ. հասցե։",
+      passwordTooShort: "Գաղտնաբառը պետք է լինի առնվազն 6 նիշ։",
     },
   },
   login: {

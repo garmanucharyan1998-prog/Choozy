@@ -116,15 +116,42 @@ export const resolveAccountRouteRedirect = (barePathname, session) => {
   return null;
 };
 
-/** Loader-facing guard: call from a page's own `loader`, throws a redirect when access is denied. */
+/**
+ * Every path the two dashboards actually have a tab for. `/account/*` and
+ * `/account/shop-account/*` are splat routes, so without this list anything else beneath
+ * them (`/account/garbage`) matched, fell through to the default tab and answered 200 —
+ * a soft 404.
+ */
+const KNOWN_ACCOUNT_PATHS = new Set([
+  ACCOUNT_ROOT,
+  FAVORITES_PATH,
+  "/account/recent",
+  "/account/subscription",
+  "/account/notifications",
+  SHOP_ACCOUNT_ROOT,
+  "/account/shop-account/products",
+  "/account/shop-account/statistics",
+  "/account/shop-account/finance",
+]);
+
+/** @param {string} barePathname — language-stripped pathname (see stripLanguageFromPath). */
+export const isKnownAccountPath = (barePathname) =>
+  KNOWN_ACCOUNT_PATHS.has((barePathname || "/").replace(/\/+$/, "").toLowerCase() || "/");
+
+/**
+ * Loader-facing guard: call from a page's own `loader`. Throws a redirect when access is
+ * denied, or a 404 for a path neither dashboard has a tab for.
+ */
 export const requireAccountAccess = (request) => {
   const url = new URL(request.url);
   const language = getLanguageFromPath(url.pathname);
-  const target = resolveAccountRouteRedirect(
-    stripLanguageFromPath(url.pathname),
-    readSessionFromRequest(request),
-  );
+  const barePathname = stripLanguageFromPath(url.pathname);
+  const target = resolveAccountRouteRedirect(barePathname, readSessionFromRequest(request));
   if (target) {
     throw redirect(localizedPath(target, language));
+  }
+  /** After the access check, so an unknown path never reveals whether the area exists. */
+  if (!isKnownAccountPath(barePathname)) {
+    throw new Response("Not Found", { status: 404 });
   }
 };

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router";
 import {
   ACCOUNT_STORAGE_EVENT,
+  adoptGuestShelfForSession,
   defaultAccountState,
   hashPassword,
   PERSONAL_INNER_TABS,
@@ -9,7 +10,7 @@ import {
   SIDEBAR_IDS,
   writeAccountState,
 } from "entities/user";
-import { useLanguage } from "contexts";
+import { useLanguage, useSession } from "contexts";
 import { stripLanguageFromPath, useLocalizedNavigate } from "shared/lib/locale";
 
 const emptyPasswordDraft = () => ({
@@ -39,6 +40,7 @@ export const useAccountPresenter = () => {
   const { t } = useLanguage();
   const location = useLocation();
   const navigate = useLocalizedNavigate();
+  const session = useSession();
 
   /**
    * `readAccountState()` returns SSR-safe defaults on the server (no `localStorage` there)
@@ -55,7 +57,12 @@ export const useAccountPresenter = () => {
   );
   const [personalInnerTab, setPersonalInnerTab] = useState(PERSONAL_INNER_TABS.DATA);
   const [isPersonalEditMode, setIsPersonalEditMode] = useState(false);
-  const [profileDraft, setProfileDraft] = useState(() => readAccountState().profile);
+  /**
+   * Same SSR-safe default as `accountState` above, for the same reason — and because
+   * reading storage in an initializer runs during render. Never rendered as-is: the edit
+   * form is closed by default and re-seeds the draft from storage when it opens.
+   */
+  const [profileDraft, setProfileDraft] = useState(defaultAccountState.profile);
   const [passwordDraft, setPasswordDraft] = useState(emptyPasswordDraft);
   const [statusKey, setStatusKey] = useState("");
   const [passwordErrorKey, setPasswordErrorKey] = useState("");
@@ -73,12 +80,20 @@ export const useAccountPresenter = () => {
     setActiveSidebarId(sidebarIdFromPathname(location.pathname));
   }, [location.pathname]);
 
+  /**
+   * Keyed on the session rather than `[]`: logging in from this page navigates from
+   * /account/favorite to /account, which is the same route id inside the same layout, so
+   * this hook never unmounts. A mount-only effect therefore kept rendering the *guest*
+   * shelf while every write went to the account shelf (the key is derived from the
+   * session — see entities/user's accountStorageKeyFor), and the two silently diverged.
+   */
   useEffect(() => {
     const sync = () => setAccountState(readAccountState());
+    adoptGuestShelfForSession();
     sync(); // populate the visitor's real data now that hydration has settled
     window.addEventListener(ACCOUNT_STORAGE_EVENT, sync);
     return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
-  }, []);
+  }, [session.isAuthenticated, session.email]);
 
   const selectSidebar = useCallback(
     (id) => {

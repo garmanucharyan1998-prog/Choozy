@@ -2,6 +2,7 @@ import {
   ACCOUNT_ROOT,
   dashboardPathForRole,
   FAVORITES_PATH,
+  isKnownAccountPath,
   readSessionFromRequest,
   requireAccountAccess,
   resolveAccountRouteRedirect,
@@ -177,6 +178,29 @@ describe("resolveAccountRouteRedirect — the access matrix", () => {
    * guarded route. Comparing it as typed used to fall through to `null` — an anonymous
    * visitor got the dashboard at /Account, and the seller dashboard at /Account/Shop-Account.
    */
+  test("a path neither dashboard has a tab for is not an account path", () => {
+    expect(isKnownAccountPath("/account/garbage")).toBe(false);
+    expect(isKnownAccountPath("/account/shop-account/garbage")).toBe(false);
+    expect(isKnownAccountPath("/account/shop-accountant")).toBe(false);
+    expect(isKnownAccountPath("/filter")).toBe(false);
+  });
+
+  test.each([
+    "/account",
+    "/account/favorite",
+    "/account/recent",
+    "/account/subscription",
+    "/account/notifications",
+    "/account/shop-account",
+    "/account/shop-account/products",
+    "/account/shop-account/statistics",
+    "/account/shop-account/finance",
+    "/Account/Favorite",
+    "/account/recent/",
+  ])("%s is a known account path", (path) => {
+    expect(isKnownAccountPath(path)).toBe(true);
+  });
+
   test("casing cannot slip past the guard", () => {
     expect(resolveAccountRouteRedirect("/Account", SIGNED_OUT)).toBe("/");
     expect(resolveAccountRouteRedirect("/ACCOUNT/", SIGNED_OUT)).toBe("/");

@@ -2,6 +2,7 @@ export {
   ACCOUNT_STORAGE_KEY,
   ACCOUNT_STORAGE_EVENT,
   addWishlistProduct,
+  adoptGuestShelfForSession,
   defaultAccountState,
   defaultProfile,
   hashPassword,

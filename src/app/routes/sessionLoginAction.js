@@ -17,8 +17,16 @@ export async function action({ request }) {
   const role = normalizeRole(formData.get("role"));
   const email = formData.get("email");
 
+  /**
+   * Unreachable from the UI — the form only ever posts a validated role (see
+   * entities/session's roleRegistry, which now validates on read as well as on write). This
+   * used to redirect home with no cookie, so a corrupted registry entry looked exactly like
+   * a successful login that silently didn't happen: the modal had already closed
+   * optimistically and the visitor landed on the home page still signed out. A hand-crafted
+   * request gets an honest error instead.
+   */
   if (!role) {
-    throw redirect(localizedPath("/", language));
+    throw new Response("Invalid role", { status: 400 });
   }
 
   throw redirect(localizedPath(dashboardPathForRole(role), language), {

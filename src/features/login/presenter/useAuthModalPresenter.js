@@ -10,6 +10,15 @@ const AUTH_MODES = {
   LOGIN: "login",
 };
 
+/** Matches account.password.tooShort's rule so the two places can't disagree. */
+const MIN_PASSWORD_LENGTH = 6;
+
+/**
+ * Deliberately loose — one `@`, a dot in the domain, no whitespace. Enough to catch a real
+ * typo without rejecting the valid-but-unusual addresses a stricter pattern always does.
+ */
+const isLikelyEmail = (value) => /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(String(value).trim());
+
 /**
  * There is still no real backend (see the two submit handlers below — presence checks
  * only, nothing verified against a server). What changed: a role now gets posted to
@@ -182,6 +191,23 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
 
       if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
         setError(t("register.errors.required"));
+        return;
+      }
+
+      /**
+       * The form sets `noValidate` (it renders its own error line rather than the browser's
+       * bubble), so `type="email"` alone checks nothing. This address becomes the session
+       * cookie's identity and the suffix of the visitor's localStorage shelf, so a typo is
+       * not recoverable from the UI — worth one check even in a demo with no backend.
+       */
+      if (!isLikelyEmail(email)) {
+        setError(t("register.errors.invalidEmail"));
+        return;
+      }
+
+      /** Same 6-character floor the in-account password change already enforces. */
+      if (password.length < MIN_PASSWORD_LENGTH) {
+        setError(t("register.errors.passwordTooShort"));
         return;
       }
 

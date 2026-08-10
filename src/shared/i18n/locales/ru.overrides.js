@@ -662,6 +662,8 @@ export const ruOverrides = {
     errors: {
       required: "Заполните все поля.",
       passwordMismatch: "Пароли не совпадают.",
+      invalidEmail: "Введите корректный адрес эл. почты.",
+      passwordTooShort: "Пароль должен быть не короче 6 символов.",
     },
   },
   login: {

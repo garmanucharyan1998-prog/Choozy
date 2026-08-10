@@ -228,28 +228,72 @@ const writeRawAccountState = (key, value) => {
   }
 };
 
+/** Appends the guest rows missing from `accountList`, matching on product id. */
+const mergeShelfLists = (accountList, guestList) => {
+  const accountRows = Array.isArray(accountList) ? accountList : [];
+  const guestRows = Array.isArray(guestList) ? guestList : [];
+  const seenIds = new Set(accountRows.map((item) => item?.id));
+  return [...accountRows, ...guestRows.filter((item) => item?.id && !seenIds.has(item.id))];
+};
+
 /**
- * Folds the guest shelf's wishlist into a newly-identified account shelf (by product id,
- * so items already saved on both sides aren't duplicated), then empties the guest shelf.
- * Runs at most once per login: after the first merge the guest shelf has nothing left to
+ * Folds a guest's saved picks into a newly-identified account shelf, then empties the guest
+ * shelf. Runs at most once per login: afterwards the guest shelf has nothing left to
  * contribute, so later calls are a cheap no-op — no separate "already merged" flag needed.
+ *
+ * Called from the session-keyed effects in Header and useAccountPresenter rather than from
+ * `readAccountState`: this writes to localStorage, and `readAccountState` is called from
+ * render paths (state initializers, presenters), where a write is a side effect during
+ * render — double-invoked under StrictMode and invisible to anything listening for
+ * ACCOUNT_STORAGE_EVENT.
+ *
+ * @returns {boolean} whether anything actually moved.
  */
-const mergeGuestWishlistInto = (accountKey) => {
-  if (accountKey === ACCOUNT_STORAGE_KEY) return;
+const mergeGuestShelfInto = (accountKey) => {
+  if (accountKey === ACCOUNT_STORAGE_KEY) return false;
   const guestRaw = readRawAccountState(ACCOUNT_STORAGE_KEY);
   const guestWishlist = Array.isArray(guestRaw?.wishlistItems) ? guestRaw.wishlistItems : [];
-  if (guestWishlist.length === 0) return;
+  const guestRecent = Array.isArray(guestRaw?.recentlyViewed) ? guestRaw.recentlyViewed : [];
+  if (guestWishlist.length === 0 && guestRecent.length === 0) return false;
 
   const accountRaw = readRawAccountState(accountKey) || {};
-  const accountWishlist = Array.isArray(accountRaw.wishlistItems) ? accountRaw.wishlistItems : [];
-  const accountIds = new Set(accountWishlist.map((item) => item?.id));
-  const merged = [
-    ...accountWishlist,
-    ...guestWishlist.filter((item) => item?.id && !accountIds.has(item.id)),
-  ];
 
-  writeRawAccountState(accountKey, { ...accountRaw, wishlistItems: merged });
-  writeRawAccountState(ACCOUNT_STORAGE_KEY, { ...guestRaw, wishlistItems: [] });
+  writeRawAccountState(accountKey, {
+    ...accountRaw,
+    wishlistItems: mergeShelfLists(accountRaw.wishlistItems, guestWishlist),
+    /** Capped the same way writeRecentlyViewed caps it, so the merge can't grow the list past the limit. */
+    recentlyViewed: mergeShelfLists(accountRaw.recentlyViewed, guestRecent).slice(
+      0,
+      MAX_RECENTLY_VIEWED,
+    ),
+  });
+  writeRawAccountState(ACCOUNT_STORAGE_KEY, {
+    ...guestRaw,
+    wishlistItems: [],
+    recentlyViewed: [],
+  });
+  return true;
+};
+
+/**
+ * Hands a freshly signed-in visitor the picks they made while anonymous. Call from an
+ * effect keyed on the session — never during render.
+ *
+ * Sellers are skipped: they have no wishlist UI at all (see Header.jsx, which hides the
+ * favorites link for them), so merging into a seller shelf would strand the items
+ * somewhere nothing ever reads, which reads as data loss. Leaving the guest shelf intact
+ * means the picks are still there if the visitor later signs in as a buyer instead.
+ */
+export const adoptGuestShelfForSession = () => {
+  if (!isBrowser()) return false;
+  const session = readSessionFromDocument();
+  if (session.role === ROLES.SELLER) return false;
+
+  const moved = mergeGuestShelfInto(accountStorageKeyFor(session));
+  if (moved) {
+    window.dispatchEvent(new CustomEvent(ACCOUNT_STORAGE_EVENT));
+  }
+  return moved;
 };
 
 /**
@@ -322,24 +366,13 @@ const normalizeAccountState = (raw) => {
   };
 };
 
+/** Pure read — safe to call from render. The guest-shelf merge lives in `adoptGuestShelfForSession`. */
 export const readAccountState = () => {
   if (!isBrowser()) {
     return normalizeAccountState(null);
   }
 
-  const session = readSessionFromDocument();
-  const key = accountStorageKeyFor(session);
-  /**
-   * Sellers have no wishlist UI (see Header.jsx, which hides the favorites link for
-   * them) — merging a guest's picks into a seller shelf would strand them somewhere
-   * nothing ever reads, which reads as data loss to the visitor. Skipping the merge
-   * leaves the guest shelf untouched, so it's still there if they later sign in as a
-   * buyer instead.
-   */
-  if (session.role !== ROLES.SELLER) {
-    mergeGuestWishlistInto(key);
-  }
-
+  const key = accountStorageKeyFor(readSessionFromDocument());
   try {
     const stored = window.localStorage.getItem(key);
     return stored ? normalizeAccountState(JSON.parse(stored)) : normalizeAccountState(null);
@@ -436,6 +469,7 @@ export const userModel = {
   hashPassword,
   readAccountState,
   writeAccountState,
+  adoptGuestShelfForSession,
   addWishlistProduct,
   removeWishlistProduct,
   toggleWishlistProduct,

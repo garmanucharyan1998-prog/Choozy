@@ -1,7 +1,11 @@
+import { vi } from "vitest";
 import { serializeSessionCookie } from "entities/session";
 import {
+  ACCOUNT_STORAGE_EVENT,
   ACCOUNT_STORAGE_KEY,
   addWishlistProduct,
+  adoptGuestShelfForSession,
+  pushRecentlyViewedProduct,
   readAccountState,
   writeAccountState,
 } from "./userModel";
@@ -41,11 +45,59 @@ describe("account storage — guest vs. signed-in shelves", () => {
     addWishlistProduct(PRODUCT_A); // as guest
 
     setSessionCookie("buyer", "buyer@test.com");
+    adoptGuestShelfForSession(); // what the session-keyed effect in Header does on login
     addWishlistProduct(PRODUCT_B); // as buyer@test.com
 
     const accountRaw = JSON.parse(window.localStorage.getItem(accountKeyFor("buyer@test.com")));
-    // fp-1 was merged in from the guest shelf on the first read under this identity.
     expect(accountRaw.wishlistItems.map((i) => i.id).sort()).toEqual(["fp-1", "fp-2"]);
+  });
+
+  /**
+   * The merge is a localStorage write, so it must not ride along on a read: `readAccountState`
+   * is called from render paths (state initializers, presenters), where a write is a side
+   * effect during render — double-invoked under StrictMode and invisible to every
+   * ACCOUNT_STORAGE_EVENT listener.
+   */
+  test("reading does not move anything between shelves", () => {
+    addWishlistProduct(PRODUCT_A); // guest
+
+    setSessionCookie("buyer", "read-only@test.com");
+    expect(readAccountState().wishlistItems).toEqual([]);
+
+    const guestRaw = JSON.parse(window.localStorage.getItem(ACCOUNT_STORAGE_KEY));
+    expect(guestRaw.wishlistItems.map((i) => i.id)).toEqual(["fp-1"]);
+    expect(window.localStorage.getItem(accountKeyFor("read-only@test.com"))).toBeNull();
+  });
+
+  test("adopting the guest shelf announces the change so mounted listeners refresh", () => {
+    addWishlistProduct(PRODUCT_A); // guest
+    setSessionCookie("buyer", "notify@test.com");
+
+    const listener = vi.fn();
+    window.addEventListener(ACCOUNT_STORAGE_EVENT, listener);
+    try {
+      expect(adoptGuestShelfForSession()).toBe(true);
+      expect(listener).toHaveBeenCalledTimes(1);
+
+      /** Nothing left to move — a second call is a no-op and stays quiet. */
+      expect(adoptGuestShelfForSession()).toBe(false);
+      expect(listener).toHaveBeenCalledTimes(1);
+    } finally {
+      window.removeEventListener(ACCOUNT_STORAGE_EVENT, listener);
+    }
+  });
+
+  /** Recently-viewed used to be stranded on the guest shelf, invisible after signing in. */
+  test("the merge carries recently-viewed rows over, not just the wishlist", () => {
+    pushRecentlyViewedProduct(PRODUCT_A); // guest
+    pushRecentlyViewedProduct(PRODUCT_B); // guest
+
+    setSessionCookie("buyer", "recent@test.com");
+    adoptGuestShelfForSession();
+
+    expect(readAccountState().recentlyViewed.map((i) => i.id).sort()).toEqual(["fp-1", "fp-2"]);
+    const guestRaw = JSON.parse(window.localStorage.getItem(ACCOUNT_STORAGE_KEY));
+    expect(guestRaw.recentlyViewed).toEqual([]);
   });
 
   test("two different accounts on the same browser do not share a wishlist", () => {
@@ -67,7 +119,7 @@ describe("account storage — guest vs. signed-in shelves", () => {
     addWishlistProduct(PRODUCT_B); // guest
 
     setSessionCookie("buyer", "carol@test.com");
-    // First read under the new identity triggers the merge.
+    adoptGuestShelfForSession();
     const merged = readAccountState().wishlistItems.map((i) => i.id).sort();
     expect(merged).toEqual(["fp-1", "fp-2"]);
 
@@ -83,6 +135,7 @@ describe("account storage — guest vs. signed-in shelves", () => {
     addWishlistProduct(PRODUCT_A); // same product, saved again as guest
 
     setSessionCookie("buyer", "dave@test.com");
+    adoptGuestShelfForSession();
     const ids = readAccountState().wishlistItems.map((i) => i.id);
     expect(ids).toEqual(["fp-1"]);
   });
@@ -90,7 +143,7 @@ describe("account storage — guest vs. signed-in shelves", () => {
   test("logging out returns to the (now-empty, post-merge) guest shelf", () => {
     addWishlistProduct(PRODUCT_A); // guest
     setSessionCookie("buyer", "erin@test.com");
-    readAccountState(); // merges + empties the guest shelf
+    adoptGuestShelfForSession(); // merges + empties the guest shelf
 
     clearSessionCookie();
     expect(readAccountState().wishlistItems).toEqual([]);
@@ -117,6 +170,7 @@ describe("account storage — guest vs. signed-in shelves", () => {
     addWishlistProduct(PRODUCT_A); // guest
 
     setSessionCookie("seller", "seller@test.com");
+    expect(adoptGuestShelfForSession()).toBe(false);
     expect(readAccountState().wishlistItems).toEqual([]);
     expect(window.localStorage.getItem(accountKeyFor("seller@test.com"))).toBeNull();
 

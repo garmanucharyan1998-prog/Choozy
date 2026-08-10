@@ -2,6 +2,7 @@ export {
   ACCOUNT_ROOT,
   dashboardPathForRole,
   FAVORITES_PATH,
+  isKnownAccountPath,
   normalizeRole,
   readSessionFromDocument,
   readSessionFromRequest,

@@ -666,6 +666,8 @@ export const enOverrides = {
     errors: {
       required: "Please fill in all fields.",
       passwordMismatch: "Passwords do not match.",
+      invalidEmail: "Enter a valid email address.",
+      passwordTooShort: "Password must be at least 6 characters.",
     },
   },
   login: {

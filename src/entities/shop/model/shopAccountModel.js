@@ -492,11 +492,22 @@ export const normalizeShopProduct = (raw) => {
   };
 };
 
+const DEMO_SEED_PRODUCT_IDS = new Set(DEMO_SHOP_PRODUCTS_SEED.map((product) => product.id));
+
 /**
- * @param {{ lastRefreshedAt?: number; createdAt?: number }} product
+ * @param {{ id?: string, lastRefreshedAt?: number; createdAt?: number }} product
  * @param {number} [now]
  */
 export const isShopProductStale = (product, now = Date.now()) => {
+  /**
+   * The demo catalog is fixture data, not a listing a seller is expected to refresh, so it
+   * never expires. Without this the whole shop emptied itself permanently: the seed carries
+   * no `lastRefreshedAt`, so `normalizeShopProduct` stamps it with "now" on every read —
+   * harmless until the first write froze that stamp into storage. Five days later the
+   * pruner deleted all 15 demo products, and because storage now existed the seed was
+   * never consulted again, leaving the products tab blank forever.
+   */
+  if (product?.id && DEMO_SEED_PRODUCT_IDS.has(product.id)) return false;
   const refreshedAt = product?.lastRefreshedAt ?? product?.createdAt ?? now;
   return now - refreshedAt > SHOP_PRODUCT_STALE_MS;
 };
@@ -592,7 +603,17 @@ export const writeShopAccountState = (partialOrFn) => {
   });
 
   if (isBrowser()) {
-    window.localStorage.setItem(SHOP_ACCOUNT_STORAGE_KEY, JSON.stringify(next));
+    try {
+      window.localStorage.setItem(SHOP_ACCOUNT_STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /**
+       * Quota exceeded (a shop avatar is allowed up to 200 KB as a base64 data URL — see
+       * useShopAccountPresenter) or storage disabled in private mode. The write is lost,
+       * but the returned state still drives the UI; throwing from here took the whole page
+       * down, including from inside a FileReader callback where nothing catches it.
+       * Matches entities/user's writeAccountState and the pruning write above.
+       */
+    }
     window.dispatchEvent(new CustomEvent(SHOP_ACCOUNT_STORAGE_EVENT));
   }
 

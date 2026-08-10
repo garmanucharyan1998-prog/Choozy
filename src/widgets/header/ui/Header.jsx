@@ -16,7 +16,7 @@ import {
 import { useHeaderPresenter } from "features/header";
 import { LoginModal } from "features/login";
 import { useLogout } from "features/session";
-import { ACCOUNT_STORAGE_EVENT, readAccountState } from "entities/user";
+import { ACCOUNT_STORAGE_EVENT, adoptGuestShelfForSession, readAccountState } from "entities/user";
 import { dashboardPathForRole, ROLES } from "entities/session";
 import { useLanguage, useSession } from "contexts";
 import { LocalizedLink } from "shared/ui/link";
@@ -72,7 +72,7 @@ const Header = ({
 }) => {
   const location = useLocation();
   const { t } = useLanguage();
-  const { isAuthenticated, role } = useSession();
+  const { isAuthenticated, role, email } = useSession();
   const dashboardPath = dashboardPathForRole(role);
   /**
    * `readAccountState()` differs between server (always empty, no `localStorage` there)
@@ -123,14 +123,24 @@ const Header = ({
     }
   }, [onCloseMobileMenu]);
 
+  /**
+   * Keyed on the session, not `[]`: signing in navigates within the same route tree, so
+   * nothing here remounts, and a mount-only effect would keep showing the count from the
+   * shelf the visitor was on *before* they signed in (the shelf key is derived from the
+   * session — see entities/user's accountStorageKeyFor).
+   *
+   * This is also where a guest's picks are handed to the account they just signed into.
+   * The header is mounted on every page, so it happens no matter where the login started.
+   */
   useEffect(() => {
     const syncWishlistCount = () => {
       setWishlistCount(readAccountState().wishlistItems.length);
     };
+    adoptGuestShelfForSession();
     syncWishlistCount();
     window.addEventListener(ACCOUNT_STORAGE_EVENT, syncWishlistCount);
     return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, syncWishlistCount);
-  }, []);
+  }, [isAuthenticated, email]);
 
   useEffect(() => {
     const isTouchLikeDevice = () =>

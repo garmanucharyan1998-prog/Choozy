@@ -1,4 +1,4 @@
-import { ROLES } from "./sessionModel";
+import { normalizeRole, ROLES } from "./sessionModel";
 
 /**
  * A real account's role is decided once, at registration — not re-chosen on every login.
@@ -31,11 +31,17 @@ const readRegistry = () => {
   }
 };
 
-/** Called on successful registration — remembers which role this email chose. */
+/**
+ * Called on successful registration — remembers which role this email chose.
+ * An email already in the registry keeps the role it registered with: a role is a property
+ * of the account, and re-registering an existing address must not silently flip it (that
+ * would also let anyone re-point the two seeded demo accounts).
+ */
 export const rememberRoleForEmail = (email, role) => {
   const key = normalizeEmailKey(email);
-  if (!isBrowser() || !key || (role !== ROLES.BUYER && role !== ROLES.SELLER)) return;
+  if (!isBrowser() || !key || !normalizeRole(role)) return;
   const registry = readRegistry();
+  if (normalizeRole(registry[key])) return;
   registry[key] = role;
   try {
     window.localStorage.setItem(ROLE_REGISTRY_KEY, JSON.stringify(registry));
@@ -44,9 +50,16 @@ export const rememberRoleForEmail = (email, role) => {
   }
 };
 
-/** Called on login — `null` means this email was never registered here. */
+/**
+ * Called on login — `null` means this email was never registered here (or the stored value
+ * isn't a role we recognize). Validated on read as well as on write, because the registry
+ * lives in localStorage: a hand-edited or half-written entry used to flow straight through
+ * `?? ROLES.BUYER` into the login form, and the login action then dropped the request
+ * without setting a cookie — the visitor landed on the home page still signed out, with no
+ * error shown.
+ */
 export const readRoleForEmail = (email) => {
   const key = normalizeEmailKey(email);
   if (!key) return null;
-  return readRegistry()[key] ?? null;
+  return normalizeRole(readRegistry()[key]);
 };
