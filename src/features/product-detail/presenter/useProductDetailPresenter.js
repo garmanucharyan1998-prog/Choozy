@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router";
-import { getCanonicalProductDetailPath, getProductDetailHref } from "entities/product-detail";
+import { useParams } from "react-router";
+import { getProductDetailHref } from "entities/product-detail";
 import { getProductDetailForRoute } from "entities/product";
 import {
   ACCOUNT_STORAGE_EVENT,
@@ -10,33 +10,22 @@ import {
 } from "entities/user";
 import { useProductOffersVariantFilter } from "contexts";
 import { formatAmd } from "shared/lib/formatAmd";
-import { getLanguageFromPath, localizedPath } from "shared/lib/locale";
 
 /**
  * Presenter for the product detail page (demo data + local UI state).
  */
 export const useProductDetailPresenter = () => {
   const { productId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const product = useMemo(() => getProductDetailForRoute(productId), [productId]);
   const { setSelectedVariantIndex: setGlobalVariantIndex, clearSelectedVariantIndex } =
     useProductOffersVariantFilter();
 
-  const canonicalPath = useMemo(() => getCanonicalProductDetailPath(product), [product]);
-
   /**
-   * Normalises legacy/mistyped slugs onto the canonical URL — while preserving the
-   * language prefix, which a bare `navigate(canonicalPath)` would strip.
+   * No slug normalization here any more: the page's own `loader` issues a real 301 to the
+   * canonical URL before anything renders. Doing it from an effect meant a crawler got a 200
+   * at the non-canonical address, and the `navigate` call dropped the query string and hash.
    */
-  useEffect(() => {
-    const language = getLanguageFromPath(location.pathname);
-    const target = localizedPath(canonicalPath, language);
-    if (location.pathname !== target) {
-      navigate(target, { replace: true });
-    }
-  }, [canonicalPath, location.pathname, navigate]);
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   /** Index 0 — the product's own default configuration/color, not an arbitrary alternate. */

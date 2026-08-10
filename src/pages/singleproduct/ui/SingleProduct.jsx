@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { data, useParams } from "react-router";
+import { data, redirect, useParams } from "react-router";
 import { ProductOffersVariantFilterProvider, useLanguage } from "contexts";
 import { BestOffersWidget } from "widgets/best-offers";
 import { RelatedProductsWidget } from "widgets/related-products";
@@ -8,7 +8,7 @@ import { ProductOffersMapWidget } from "widgets/product-offers-map";
 import { getTranslator } from "shared/i18n";
 import { formatAmd } from "shared/lib/formatAmd";
 import { buildPageMeta } from "shared/lib/seo";
-import { getLanguageFromPath } from "shared/lib/locale";
+import { getLanguageFromPath, localizedPath } from "shared/lib/locale";
 import { Breadcrumbs } from "shared/ui/breadcrumbs";
 import { NotFoundContent } from "shared/ui/not-found-content";
 import { getCanonicalProductDetailPath } from "entities/product-detail";
@@ -18,12 +18,26 @@ import { buildProductJsonLd } from "pages/singleproduct/model/productJsonLd";
 /**
  * Unknown product ids must 404 (a real HTTP status now that there's a real server, not
  * just a client-rendered not-found page) rather than serve duplicate placeholder content.
+ *
+ * A bare id or a stale slug (`/singleproduct/fp-1`, `/singleproduct/old-title~fp-1`) is
+ * redirected here, server-side and permanently, so each product answers on exactly one URL.
+ * A client effect used to do this with `navigate(replace)` after the page had already
+ * rendered — the crawler got a 200 at the non-canonical URL and every product stayed
+ * reachable at two addresses, and that effect dropped the query string and hash on the way.
  */
-export async function loader({ params }) {
+export async function loader({ params, request }) {
   const product = getProductDetailForRoute(params.productId);
   if (!product) {
     return data(null, { status: 404 });
   }
+
+  const url = new URL(request.url);
+  const language = getLanguageFromPath(url.pathname);
+  const canonical = localizedPath(getCanonicalProductDetailPath(product), language);
+  if (canonical !== url.pathname) {
+    throw redirect(`${canonical}${url.search}${url.hash}`, 301);
+  }
+
   return data({ product });
 }
 

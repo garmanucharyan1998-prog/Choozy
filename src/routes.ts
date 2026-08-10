@@ -81,8 +81,9 @@ const shellBranch = (lang: string): RouteConfigEntry[] => [
 const routes: RouteConfigEntry[] = [
   ...shellBranch(DEFAULT_LANGUAGE_CODE),
   ...PREFIXED_LANGUAGES.flatMap((language) => prefix(language, shellBranch(language))),
-  /** Resource route — XML response, no page component, so no shell wrapper. */
+  /** Resource routes — XML/text responses, no page component, so no shell wrapper. */
   route("sitemap.xml", "app/routes/sitemap.ts", { id: "sitemap" }),
+  route("robots.txt", "app/routes/robots.ts", { id: "robots" }),
   layout("widgets/site-shell/ui/SiteShellWhite.jsx", { id: "shell-white-not-found" }, [
     route("*", "pages/not-found/ui/NotFoundPage.jsx", { id: "not-found" }),
   ]),

@@ -727,6 +727,65 @@ export const enOverrides = {
       title: "Catalog and price comparison — Choosy",
       description:
         "Filter products by brand, price, screen and memory. Compare offers from stores across Armenia on Choosy.",
+      pageSuffix: "page {{page}}",
+    },
+    filterCategories: {
+      smartphones: {
+        title: "Smartphone prices in Armenia — compare and choose | Choosy",
+        description:
+          "Prices for iPhone, Samsung Galaxy and other smartphones from stores across Armenia. Compare price, storage and colour on one page.",
+        intro:
+          "Choosy collects smartphone offers from stores across Armenia so you can see where the price is lowest. Filter by brand, storage size, screen size and colour, then open a product to see every shop's price side by side.",
+      },
+      laptops: {
+        title: "Laptop prices in Armenia — compare and choose | Choosy",
+        description:
+          "Prices for MacBook, Dell, Lenovo, HP and Samsung laptops from stores across Armenia. Compare screen, storage and price.",
+        intro:
+          "When you are choosing a laptop for work, study or gaming, the price can differ significantly between shops. Choosy puts the offers next to each other, filtered by brand, screen size and storage.",
+      },
+      speakers: {
+        title: "Portable speaker prices in Armenia | Choosy",
+        description:
+          "Prices for Bluetooth and portable speakers from stores across Armenia. Compare the offers on Choosy.",
+        intro:
+          "Portable speakers for home, travel and outdoor gatherings. Compare prices from stores across Armenia and pick the model that suits you.",
+      },
+      headphones: {
+        title: "Headphone prices in Armenia — AirPods, Sony | Choosy",
+        description:
+          "Prices for AirPods, Sony WH-1000XM5 and other headphones from stores across Armenia. Compare and pick the best offer.",
+        intro:
+          "Active noise-cancelling headphones and wireless earbuds at prices from shops across Armenia. Compare the models and find the best offer.",
+      },
+      tablets: {
+        title: "Tablet prices in Armenia — iPad, Galaxy Tab | Choosy",
+        description:
+          "Prices for iPad and Samsung Galaxy Tab tablets from stores across Armenia. Compare screen, storage and price.",
+        intro:
+          "Tablets for media, notes and creative work. Choosy shows which shop has the better price.",
+      },
+      tv: {
+        title: "TV prices in Armenia — 4K Smart TV | Choosy",
+        description:
+          "Prices for 4K and Smart TVs from stores across Armenia. Compare sizes and prices on Choosy.",
+        intro:
+          "Smart TVs and 4K sets at prices from shops across Armenia. Compare screen sizes and pick the one that fits your room.",
+      },
+      wearables: {
+        title: "Smartwatch prices in Armenia | Choosy",
+        description:
+          "Prices for Apple Watch and other smartwatches from stores across Armenia. Compare the offers on Choosy.",
+        intro:
+          "Smartwatches for training, health tracking and notifications. Compare prices from stores across Armenia.",
+      },
+      cameras: {
+        title: "Camera and lens prices in Armenia | Choosy",
+        description:
+          "Prices for cameras and lenses from stores across Armenia. Compare the offers on Choosy.",
+        intro:
+          "Lenses and cameras for portraits, low light and street photography. Compare prices from stores across Armenia.",
+      },
     },
     product: {
       title: "{{title}} — prices and offers | Choosy",

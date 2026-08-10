@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
   useLocation,
   useRouteError,
   redirect,
@@ -17,6 +18,7 @@ import {
   getLanguageFromPath,
 } from "shared/lib/locale";
 import { ScrollToTopButton } from "shared/ui/scroll-to-top";
+import { NotFoundContent } from "shared/ui/not-found-content";
 import { getTranslator } from "shared/i18n";
 import type { Route } from "./+types/root";
 import "./index.css";
@@ -39,6 +41,16 @@ export function loader({ request }: Route.LoaderArgs) {
     throw redirect(`${canonicalPathname}${url.search}${url.hash}`, 301);
   }
   return { session: readSessionFromRequest(request) };
+}
+
+/**
+ * HTML is revalidated on every request. Prices and offers are the point of this site, so a
+ * cached document would be worse than useless — but a validator still lets an unchanged page
+ * come back as a 304. Applies to every route: React Router uses the root `headers` export
+ * unless a leaf route exports its own (the resource routes for sitemap/robots do).
+ */
+export function headers() {
+  return { "Cache-Control": "public, max-age=0, must-revalidate" };
 }
 
 /**
@@ -113,20 +125,51 @@ export default function App({ loaderData }: Route.ComponentProps) {
  * renders (a `loader` can throw before the tree below it ever does), so the heading/message
  * are looked up directly from the dictionary instead of via `useLanguage()`, which would
  * throw a second error if called outside its provider.
+ *
+ * Three things this had to learn:
+ *  - A thrown `Response` (a guard's 404, say) used to render the generic "something went
+ *    wrong" block with `String(error)` — literally "[object Response]" — instead of a real
+ *    not-found page.
+ *  - No route-level `meta` matches an errored route, and neither this file nor either shell
+ *    layout exports one, so error pages went out with an empty `<title>`. React 19 hoists a
+ *    `<title>` rendered anywhere in the tree into `<head>`.
+ *  - `error.message` was printed into the page, handing visitors raw server error text. It
+ *    is now development-only.
  */
 export function ErrorBoundary() {
   const error = useRouteError();
   const { pathname } = useLocation();
-  const t = getTranslator(getLanguageFromPath(pathname));
-  const message = error instanceof Error ? error.message : String(error);
+  const language = getLanguageFromPath(pathname);
+  const t = getTranslator(language);
+
+  if (isRouteErrorResponse(error) && error.status === 404) {
+    return (
+      <>
+        <title>{t("notFoundPage.seoTitle")}</title>
+        <meta name="robots" content="noindex, follow" />
+        <LanguageProvider>
+          <NotFoundContent />
+        </LanguageProvider>
+      </>
+    );
+  }
+
+  const status = isRouteErrorResponse(error) ? error.status : 500;
+  const detail = error instanceof Error ? error.message : String(error);
 
   return (
-    <div className="min-h-[50vh] bg-white px-5 py-10 text-start font-sans">
-      <p className="text-lg font-semibold text-red-700">{t("errorBoundary.heading")}</p>
-      <p className="pt-1 text-sm text-text-muted">{t("errorBoundary.message")}</p>
-      <pre className="max-w-[90vw] whitespace-pre-wrap break-words pt-3 text-sm text-[#333]">
-        {message}
-      </pre>
-    </div>
+    <>
+      <title>{`${status} — ${t("errorBoundary.heading")}`}</title>
+      <meta name="robots" content="noindex, follow" />
+      <div className="min-h-[50vh] bg-white px-5 py-10 text-start font-sans">
+        <p className="text-lg font-semibold text-red-700">{t("errorBoundary.heading")}</p>
+        <p className="pt-1 text-sm text-text-muted">{t("errorBoundary.message")}</p>
+        {import.meta.env.DEV ? (
+          <pre className="max-w-[90vw] whitespace-pre-wrap break-words pt-3 text-sm text-[#333]">
+            {detail}
+          </pre>
+        ) : null}
+      </div>
+    </>
   );
 }

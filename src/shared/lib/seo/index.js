@@ -1,4 +1,5 @@
 export { buildPageMeta } from "./buildPageMeta";
+export { resolveCatalogCanonical } from "./resolveCatalogCanonical";
 export {
   getIndexableRoutes,
   getLocalizedRouteInventory,
