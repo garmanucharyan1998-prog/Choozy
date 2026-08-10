@@ -8,6 +8,7 @@ export { normalizeQuery, expandSearchTokens, productMatchesSearch } from "./mode
 export {
   SCREEN_SIZE_OPTIONS,
   BRAND_OPTIONS,
-  RAM_OPTIONS,
+  STORAGE_OPTIONS,
   COLOR_OPTIONS,
+  screenBucketIdFor,
 } from "./model/filterOptions";

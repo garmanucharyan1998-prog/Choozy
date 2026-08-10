@@ -11,18 +11,26 @@
  */
 import { getProductDetailHref } from "entities/product-detail/model/productRouteRegistry";
 import { formatAmd } from "shared/lib/formatAmd";
+import { formatStorageGb } from "shared/lib/formatStorageGb";
 import { PRODUCT_IMAGES } from "./productImages";
 
 /**
+ * `screenInch` and `storageGb` are both optional and both mean exactly what they say —
+ * the real diagonal and the real storage size, absent on products that have neither (a
+ * lens, headphones, a speaker). They used to be neither: every product carried a
+ * `screenInch` so that headphones turned up under an "11 inch" screen filter, and
+ * `ramGb` was rendered as RAM on the catalog card and as SSD capacity in the spec table
+ * on the page that card linked to.
+ *
  * @typedef {{
  *   id: string,
  *   title: string,
  *   priceValue: number,
  *   image: string,
  *   categoryId: string,
- *   screenInch: number,
+ *   screenInch?: number,
  *   brandId: string,
- *   ramGb: number,
+ *   storageGb?: number,
  *   colorId: string,
  *   homeSection?: "top" | "variety",
  * }} CatalogProduct
@@ -36,9 +44,9 @@ const CATALOG_BASE = [
     priceValue: 739000,
     image: PRODUCT_IMAGES.iphoneOrange,
     categoryId: "smartphones",
-    screenInch: 13,
+    screenInch: 6.9,
     brandId: "apple",
-    ramGb: 8,
+    storageGb: 256,
     colorId: "orange",
     homeSection: "top",
   },
@@ -48,9 +56,9 @@ const CATALOG_BASE = [
     priceValue: 1290000,
     image: PRODUCT_IMAGES.macbook,
     categoryId: "laptops",
-    screenInch: 14,
+    screenInch: 14.2,
     brandId: "apple",
-    ramGb: 16,
+    storageGb: 512,
     colorId: "black",
     homeSection: "top",
   },
@@ -61,9 +69,7 @@ const CATALOG_BASE = [
     image: PRODUCT_IMAGES.headphones,
     /** Was "speakers" — these are over-ear headphones, not a speaker; the category had no real speaker in it. */
     categoryId: "headphones",
-    screenInch: 11,
     brandId: "sony",
-    ramGb: 4,
     colorId: "white",
     homeSection: "top",
   },
@@ -73,9 +79,9 @@ const CATALOG_BASE = [
     priceValue: 615000,
     image: PRODUCT_IMAGES.samsungPhone,
     categoryId: "smartphones",
-    screenInch: 12,
+    screenInch: 6.9,
     brandId: "samsung",
-    ramGb: 12,
+    storageGb: 512,
     colorId: "black",
     homeSection: "top",
   },
@@ -85,9 +91,7 @@ const CATALOG_BASE = [
     priceValue: 185000,
     image: PRODUCT_IMAGES.lens,
     categoryId: "cameras",
-    screenInch: 12,
     brandId: "sony",
-    ramGb: 8,
     colorId: "black",
     homeSection: "top",
   },
@@ -97,9 +101,8 @@ const CATALOG_BASE = [
     priceValue: 525000,
     image: PRODUCT_IMAGES.tv,
     categoryId: "tv",
-    screenInch: 15,
+    screenInch: 55,
     brandId: "samsung",
-    ramGb: 16,
     colorId: "black",
     homeSection: "top",
   },
@@ -109,9 +112,9 @@ const CATALOG_BASE = [
     priceValue: 1080000,
     image: PRODUCT_IMAGES.laptop,
     categoryId: "laptops",
-    screenInch: 15,
+    screenInch: 15.6,
     brandId: "dell",
-    ramGb: 32,
+    storageGb: 1000,
     colorId: "grey",
   },
   {
@@ -122,7 +125,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 14,
     brandId: "hp",
-    ramGb: 16,
+    storageGb: 512,
     colorId: "navy",
   },
   {
@@ -133,7 +136,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 14,
     brandId: "lenovo",
-    ramGb: 16,
+    storageGb: 512,
     colorId: "black",
   },
   {
@@ -142,9 +145,9 @@ const CATALOG_BASE = [
     priceValue: 585000,
     image: PRODUCT_IMAGES.tablet,
     categoryId: "tablets",
-    screenInch: 14,
+    screenInch: 14.6,
     brandId: "samsung",
-    ramGb: 128,
+    storageGb: 256,
     colorId: "grey",
     homeSection: "variety",
   },
@@ -156,7 +159,7 @@ const CATALOG_BASE = [
     categoryId: "tablets",
     screenInch: 13,
     brandId: "apple",
-    ramGb: 16,
+    storageGb: 256,
     colorId: "white",
   },
   {
@@ -165,9 +168,7 @@ const CATALOG_BASE = [
     priceValue: 129000,
     image: PRODUCT_IMAGES.earbuds,
     categoryId: "headphones",
-    screenInch: 11,
     brandId: "apple",
-    ramGb: 4,
     colorId: "white",
     homeSection: "variety",
   },
@@ -177,9 +178,9 @@ const CATALOG_BASE = [
     priceValue: 419000,
     image: PRODUCT_IMAGES.watch,
     categoryId: "wearables",
-    screenInch: 12,
+    screenInch: 1.9,
     brandId: "apple",
-    ramGb: 4,
+    storageGb: 64,
     colorId: "navy",
     homeSection: "variety",
   },
@@ -189,9 +190,9 @@ const CATALOG_BASE = [
     priceValue: 690000,
     image: PRODUCT_IMAGES.macbook,
     categoryId: "laptops",
-    screenInch: 13,
+    screenInch: 13.6,
     brandId: "apple",
-    ramGb: 8,
+    storageGb: 256,
     colorId: "black",
     homeSection: "variety",
   },
@@ -203,7 +204,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 16,
     brandId: "samsung",
-    ramGb: 16,
+    storageGb: 512,
     colorId: "black",
   },
   {
@@ -212,9 +213,9 @@ const CATALOG_BASE = [
     priceValue: 445000,
     image: PRODUCT_IMAGES.iphoneBlack,
     categoryId: "smartphones",
-    screenInch: 13,
+    screenInch: 6.1,
     brandId: "apple",
-    ramGb: 8,
+    storageGb: 128,
     colorId: "blue",
   },
   {
@@ -225,7 +226,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 14,
     brandId: "dell",
-    ramGb: 16,
+    storageGb: 512,
     colorId: "black",
   },
   {
@@ -236,7 +237,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 16,
     brandId: "hp",
-    ramGb: 32,
+    storageGb: 1000,
     colorId: "black",
   },
   {
@@ -247,7 +248,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 14,
     brandId: "lenovo",
-    ramGb: 16,
+    storageGb: 512,
     colorId: "grey",
   },
   {
@@ -256,9 +257,9 @@ const CATALOG_BASE = [
     priceValue: 335000,
     image: PRODUCT_IMAGES.samsungPhone,
     categoryId: "smartphones",
-    screenInch: 15,
+    screenInch: 6.7,
     brandId: "samsung",
-    ramGb: 8,
+    storageGb: 256,
     colorId: "black",
   },
   {
@@ -267,9 +268,7 @@ const CATALOG_BASE = [
     priceValue: 118000,
     image: PRODUCT_IMAGES.earbuds,
     categoryId: "headphones",
-    screenInch: 11,
     brandId: "sony",
-    ramGb: 4,
     colorId: "black",
   },
   {
@@ -280,7 +279,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 16,
     brandId: "dell",
-    ramGb: 32,
+    storageGb: 1000,
     colorId: "black",
   },
   {
@@ -291,7 +290,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 14,
     brandId: "hp",
-    ramGb: 8,
+    storageGb: 128,
     colorId: "grey",
   },
   {
@@ -300,9 +299,9 @@ const CATALOG_BASE = [
     priceValue: 890000,
     image: PRODUCT_IMAGES.gamingLaptop,
     categoryId: "laptops",
-    screenInch: 15,
+    screenInch: 15.6,
     brandId: "lenovo",
-    ramGb: 16,
+    storageGb: 512,
     colorId: "black",
   },
   {
@@ -312,9 +311,9 @@ const CATALOG_BASE = [
     priceValue: 629000,
     image: PRODUCT_IMAGES.iphoneOrange,
     categoryId: "smartphones",
-    screenInch: 12,
+    screenInch: 6.3,
     brandId: "apple",
-    ramGb: 8,
+    storageGb: 128,
     colorId: "white",
     homeSection: "variety",
   },
@@ -327,7 +326,7 @@ const CATALOG_BASE = [
     categoryId: "laptops",
     screenInch: 16,
     brandId: "lenovo",
-    ramGb: 16,
+    storageGb: 1000,
     colorId: "black",
     homeSection: "variety",
   },
@@ -344,19 +343,21 @@ const CATALOG_BASE = [
     priceValue: 249000,
     image: PRODUCT_IMAGES.speaker,
     categoryId: "speakers",
-    screenInch: 11,
     brandId: "sony",
-    ramGb: 4,
     colorId: "black",
   },
 ];
 
 const DESCRIPTION_TEMPLATES = {
-  smartphones: (p) => `${p.brandId === "apple" ? "iOS" : "Android"} smartphone with a ${p.screenInch}.6″ display and ${p.ramGb} GB RAM.`,
-  laptops: (p) => `${p.screenInch}″ laptop with ${p.ramGb} GB RAM, built for everyday work and travel.`,
-  headphones: (p) => `Wireless audio with active noise cancellation and a ${p.ramGb > 4 ? "long" : "compact"} battery life.`,
-  tablets: (p) => `${p.screenInch}″ tablet with ${p.ramGb} GB storage, suited for media, notes and light creative work.`,
-  tv: (p) => `${p.screenInch * 4}″-class 4K smart TV with a ${p.ramGb} GB smart platform.`,
+  smartphones: (p) =>
+    `${p.brandId === "apple" ? "iOS" : "Android"} smartphone with a ${p.screenInch}″ display and ${formatStorageGb(p.storageGb)} of storage.`,
+  laptops: (p) =>
+    `${p.screenInch}″ laptop with ${formatStorageGb(p.storageGb)} of storage, built for everyday work and travel.`,
+  headphones: () =>
+    `Wireless audio with active noise cancellation and all-day battery life.`,
+  tablets: (p) =>
+    `${p.screenInch}″ tablet with ${formatStorageGb(p.storageGb)} of storage, suited for media, notes and light creative work.`,
+  tv: (p) => `${p.screenInch}″ 4K smart TV with HDR and a built-in streaming platform.`,
   wearables: () => `Titanium-built smartwatch with extended battery life and GPS tracking.`,
   cameras: () => `Prime lens with a wide aperture for portraits, low light and street photography.`,
   speakers: () => `Portable Bluetooth speaker with rich bass and a water-resistant build.`,

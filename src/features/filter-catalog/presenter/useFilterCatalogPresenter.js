@@ -4,12 +4,14 @@ import { useLanguage } from "contexts";
 import {
   SCREEN_SIZE_OPTIONS,
   BRAND_OPTIONS,
-  RAM_OPTIONS,
+  STORAGE_OPTIONS,
   COLOR_OPTIONS,
   isValidFilterCategoryId,
   productMatchesSearch,
+  screenBucketIdFor,
 } from "entities/filter-catalog";
 import { PRODUCT_CATALOG } from "entities/product";
+import { formatStorageGb } from "shared/lib/formatStorageGb";
 
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
@@ -69,12 +71,12 @@ export const useFilterCatalogPresenter = () => {
       ),
     [searchParams],
   );
-  const selectedRam = useMemo(
+  const selectedStorage = useMemo(
     () =>
       readSet(
         searchParams,
-        "ram",
-        RAM_OPTIONS.map((o) => o.id),
+        "storage",
+        STORAGE_OPTIONS.map((o) => o.id),
       ),
     [searchParams],
   );
@@ -123,7 +125,7 @@ export const useFilterCatalogPresenter = () => {
     price: true,
     screen: true,
     brand: true,
-    ram: true,
+    storage: true,
     color: true,
   }));
   const [brandExpanded, setBrandExpanded] = useState(false);
@@ -180,9 +182,9 @@ export const useFilterCatalogPresenter = () => {
     (id) => toggleInSet("brand", selectedBrands, id),
     [toggleInSet, selectedBrands],
   );
-  const toggleRam = useCallback(
-    (id) => toggleInSet("ram", selectedRam, id),
-    [toggleInSet, selectedRam],
+  const toggleStorage = useCallback(
+    (id) => toggleInSet("storage", selectedStorage, id),
+    [toggleInSet, selectedStorage],
   );
 
   const setColor = useCallback(
@@ -206,13 +208,13 @@ export const useFilterCatalogPresenter = () => {
     },
     [updateParams, selectedBrands],
   );
-  const removeRam = useCallback(
+  const removeStorage = useCallback(
     (id) => {
-      const next = new Set(selectedRam);
+      const next = new Set(selectedStorage);
       next.delete(id);
-      updateParams({ ram: next });
+      updateParams({ storage: next });
     },
-    [updateParams, selectedRam],
+    [updateParams, selectedStorage],
   );
 
   const clearSelectedColor = useCallback(() => updateParams({ color: null }), [updateParams]);
@@ -230,9 +232,10 @@ export const useFilterCatalogPresenter = () => {
     const q = urlQuery.trim();
     let list = PRODUCT_CATALOG.filter((p) => {
       if (p.priceValue < priceMin || p.priceValue > priceMax) return false;
-      if (selectedScreens.size > 0 && !selectedScreens.has(String(p.screenInch))) return false;
+      if (selectedScreens.size > 0 && !selectedScreens.has(screenBucketIdFor(p.screenInch)))
+        return false;
       if (selectedBrands.size > 0 && !selectedBrands.has(p.brandId)) return false;
-      if (selectedRam.size > 0 && !selectedRam.has(String(p.ramGb))) return false;
+      if (selectedStorage.size > 0 && !selectedStorage.has(String(p.storageGb))) return false;
       if (selectedColor && p.colorId !== selectedColor) return false;
       if (selectedCategory && p.categoryId !== selectedCategory) return false;
       if (q && !productMatchesSearch(p, q)) return false;
@@ -248,7 +251,7 @@ export const useFilterCatalogPresenter = () => {
     priceMax,
     selectedScreens,
     selectedBrands,
-    selectedRam,
+    selectedStorage,
     selectedColor,
     selectedCategory,
     urlQuery,
@@ -283,12 +286,12 @@ export const useFilterCatalogPresenter = () => {
         if (
           facetKey !== "screen" &&
           selectedScreens.size > 0 &&
-          !selectedScreens.has(String(p.screenInch))
+          !selectedScreens.has(screenBucketIdFor(p.screenInch))
         )
           return false;
         if (facetKey !== "brand" && selectedBrands.size > 0 && !selectedBrands.has(p.brandId))
           return false;
-        if (facetKey !== "ram" && selectedRam.size > 0 && !selectedRam.has(String(p.ramGb)))
+        if (facetKey !== "storage" && selectedStorage.size > 0 && !selectedStorage.has(String(p.storageGb)))
           return false;
         if (selectedColor && p.colorId !== selectedColor) return false;
         if (selectedCategory && p.categoryId !== selectedCategory) return false;
@@ -300,6 +303,8 @@ export const useFilterCatalogPresenter = () => {
       const map = {};
       base.forEach((p) => {
         const key = valueOf(p);
+        /** `null` for a product the facet doesn't apply to (headphones have no screen). */
+        if (key == null) return;
         map[key] = (map[key] || 0) + 1;
       });
       return map;
@@ -309,16 +314,22 @@ export const useFilterCatalogPresenter = () => {
       priceMax,
       selectedScreens,
       selectedBrands,
-      selectedRam,
+      selectedStorage,
       selectedColor,
       selectedCategory,
       urlQuery,
     ],
   );
 
-  const screenCounts = useMemo(() => countsFor("screen", (p) => String(p.screenInch)), [countsFor]);
+  const screenCounts = useMemo(
+    () => countsFor("screen", (p) => screenBucketIdFor(p.screenInch)),
+    [countsFor],
+  );
   const brandCounts = useMemo(() => countsFor("brand", (p) => p.brandId), [countsFor]);
-  const ramCounts = useMemo(() => countsFor("ram", (p) => String(p.ramGb)), [countsFor]);
+  const storageCounts = useMemo(
+    () => countsFor("storage", (p) => (typeof p.storageGb === "number" ? String(p.storageGb) : null)),
+    [countsFor],
+  );
 
   const setPriceMinSafe = useCallback(
     (v) => {
@@ -373,9 +384,34 @@ export const useFilterCatalogPresenter = () => {
 
   const pageSizeOptions = useMemo(() => PAGE_SIZES, []);
 
+  /**
+   * Facet options reach the widget display-ready as `{ id, label }`, so the markup never
+   * has to know which facets carry a translation key and which build their label from data.
+   * Screen buckets read as a range ("13–15 inch"); a storage size is the same text in every
+   * locale, so it needs no dictionary entry at all.
+   */
+  const screenOptions = useMemo(() => {
+    const unit = t("filterPage.filters.screenSizes.unit");
+    return SCREEN_SIZE_OPTIONS.map((option) => {
+      if (option.maxInch === Infinity) return { id: option.id, label: `${option.minInch}+ ${unit}` };
+      if (option.minInch === 0) return { id: option.id, label: `< ${option.maxInch} ${unit}` };
+      return { id: option.id, label: `${option.minInch}–${option.maxInch} ${unit}` };
+    });
+  }, [t]);
+
+  const storageOptions = useMemo(
+    () => STORAGE_OPTIONS.map((option) => ({ id: option.id, label: formatStorageGb(option.gb) })),
+    [],
+  );
+
+  const brandOptions = useMemo(
+    () => BRAND_OPTIONS.map((option) => ({ id: option.id, label: t(option.labelKey) })),
+    [t],
+  );
+
   const visibleBrandOptions = useMemo(
-    () => (brandExpanded ? BRAND_OPTIONS : BRAND_OPTIONS.slice(0, 4)),
-    [brandExpanded],
+    () => (brandExpanded ? brandOptions : brandOptions.slice(0, 4)),
+    [brandExpanded, brandOptions],
   );
 
   const priceRangeActive = priceMin > globalMin || priceMax < globalMax;
@@ -395,38 +431,38 @@ export const useFilterCatalogPresenter = () => {
   const activeFilterChips = useMemo(() => {
     const chips = [];
     selectedScreens.forEach((id) => {
-      const opt = SCREEN_SIZE_OPTIONS.find((o) => o.id === id);
+      const opt = screenOptions.find((o) => o.id === id);
       if (opt) {
         chips.push({
           key: `screen-${id}`,
           kind: "screen",
           id,
-          label: t(opt.labelKey),
+          label: opt.label,
           remove: () => removeScreen(id),
         });
       }
     });
     selectedBrands.forEach((id) => {
-      const opt = BRAND_OPTIONS.find((o) => o.id === id);
+      const opt = brandOptions.find((o) => o.id === id);
       if (opt) {
         chips.push({
           key: `brand-${id}`,
           kind: "brand",
           id,
-          label: t(opt.labelKey),
+          label: opt.label,
           remove: () => removeBrand(id),
         });
       }
     });
-    selectedRam.forEach((id) => {
-      const opt = RAM_OPTIONS.find((o) => o.id === id);
+    selectedStorage.forEach((id) => {
+      const opt = storageOptions.find((o) => o.id === id);
       if (opt) {
         chips.push({
-          key: `ram-${id}`,
-          kind: "ram",
+          key: `storage-${id}`,
+          kind: "storage",
           id,
-          label: t(opt.labelKey),
-          remove: () => removeRam(id),
+          label: opt.label,
+          remove: () => removeStorage(id),
         });
       }
     });
@@ -464,15 +500,18 @@ export const useFilterCatalogPresenter = () => {
     t,
     selectedScreens,
     selectedBrands,
-    selectedRam,
+    selectedStorage,
     selectedColor,
     selectedCategory,
     priceMin,
     priceMax,
     priceRangeActive,
+    screenOptions,
+    brandOptions,
+    storageOptions,
     removeScreen,
     removeBrand,
-    removeRam,
+    removeStorage,
     clearSelectedColor,
     resetPriceBounds,
     clearCategory,
@@ -490,13 +529,13 @@ export const useFilterCatalogPresenter = () => {
     onMaxRangeChange: setPriceMaxSafe,
     selectedScreens,
     selectedBrands,
-    selectedRam,
+    selectedStorage,
     selectedColor,
     selectedCategory,
     clearCategory,
     toggleScreen,
     toggleBrand,
-    toggleRam,
+    toggleStorage,
     setColor,
     search: searchDraft,
     onSearchChange,
@@ -513,13 +552,13 @@ export const useFilterCatalogPresenter = () => {
     toggleSection,
     brandExpanded,
     setBrandExpanded,
-    screenOptions: SCREEN_SIZE_OPTIONS,
+    screenOptions,
     screenCounts,
-    brandOptions: BRAND_OPTIONS,
+    brandOptions,
     brandCounts,
     visibleBrandOptions,
-    ramOptions: RAM_OPTIONS,
-    ramCounts,
+    storageOptions,
+    storageCounts,
     colorOptions: COLOR_OPTIONS,
     sortOptions,
     pageSizeOptions,

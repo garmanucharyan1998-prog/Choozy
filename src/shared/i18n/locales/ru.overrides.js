@@ -125,22 +125,20 @@ export const ruOverrides = {
       priceMax: "Максимум",
       screen: "Размер экрана",
       brandTitle: "Бренд",
+      storage: "Объём памяти",
       color: "Цвет",
       seeMore: "Показать ещё",
       seeLess: "Показать меньше",
       screenSizes: {
-        inch11: "11 дюймов",
-        inch12: "12 дюймов",
-        inch13: "13 дюймов",
-        inch14: "14 дюймов",
-        inch15: "15 дюймов",
-        inch16: "16 дюймов",
+        unit: "дюйм.",
       },
       colorNames: {
         black: "Чёрный",
         grey: "Серый",
         white: "Белый",
-        navy: "Синий",
+        navy: "Тёмно-синий",
+        blue: "Голубой",
+        orange: "Оранжевый",
       },
     },
     pagination: {
@@ -291,17 +289,18 @@ export const ruOverrides = {
       ram: "ОЗУ:",
       battery: "Батарея:",
       year: "Год:",
-      microphoneValue: "Да",
-      manufacturer: "Производитель:",
     },
     specsExtended: {
       screenType: "Тип экрана:",
       microphone: "Встроенный микрофон:",
       technology: "Технология:",
-      matrixValue: "Камера 1080p FaceTime HD",
       matrix: "Плотность пикселей:",
       ssd: "Объём SSD:",
       bluetooth: "Версия Bluetooth:",
+      /** Lives here because `productSpecs` reads `specsExtended.manufacturer`. It used to
+       *  sit under `specsBrief`, where nothing read it, so every English and Russian
+       *  product page fell back to the Armenian label. */
+      manufacturer: "Производитель:",
     },
   },
   productOffers: {

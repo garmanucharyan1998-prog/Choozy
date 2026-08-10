@@ -125,16 +125,12 @@ export const enOverrides = {
       priceMax: "Maximum",
       screen: "Screen size",
       brandTitle: "Brand",
+      storage: "Storage",
       color: "Color",
       seeMore: "See more",
       seeLess: "Show less",
       screenSizes: {
-        inch11: "11 inch",
-        inch12: "12 inch",
-        inch13: "13 inch",
-        inch14: "14 inch",
-        inch15: "15 inch",
-        inch16: "16 inch",
+        unit: "inch",
       },
       colorNames: {
         black: "Black",
@@ -294,17 +290,18 @@ export const enOverrides = {
       ram: "Memory (RAM):",
       battery: "Battery:",
       year: "Year:",
-      microphoneValue: "Yes",
-      manufacturer: "Manufacturer:",
     },
     specsExtended: {
       screenType: "Screen type:",
       microphone: "Built-in microphone:",
       technology: "Technology:",
       matrix: "Pixel density:",
-      matrixValue: "1080p FaceTime HD camera",
       ssd: "SSD capacity:",
       bluetooth: "Bluetooth version:",
+      /** Lives here because `productSpecs` reads `specsExtended.manufacturer`. It used to
+       *  sit under `specsBrief`, where nothing read it, so every English and Russian
+       *  product page fell back to the Armenian label. */
+      manufacturer: "Manufacturer:",
     },
   },
   productOffers: {

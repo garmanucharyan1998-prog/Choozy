@@ -20,12 +20,15 @@ const niceCeiling = (value) => {
 };
 
 const PriceHistoryChart = ({ data, ariaLabel }) => {
+  /** Guarded once, up front — the render below used to trust `data` while this line didn't. */
+  const rows = Array.isArray(data) ? data : [];
+
   /**
    * Derived from the data instead of a fixed 400 000 ceiling: prices scale per product,
    * so expensive items had bars running past the top of the axis while cheap ones were
    * squashed into invisible slivers.
    */
-  const amounts = (data || []).map((d) => d.amount).filter((n) => Number.isFinite(n));
+  const amounts = rows.map((d) => d.amount).filter((n) => Number.isFinite(n));
   const maxY = niceCeiling(Math.max(...amounts, 0) * 1.1);
   const yTicks = [1, 2, 3, 4].map((i) => Math.round((maxY / 4) * i));
 
@@ -33,7 +36,7 @@ const PriceHistoryChart = ({ data, ariaLabel }) => {
     <div className="h-[280px] w-full min-w-0" role="img" aria-label={ariaLabel}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={data}
+          data={rows}
           margin={{ top: 12, right: 8, left: 4, bottom: 8 }}
           barCategoryGap="22%"
         >
@@ -55,7 +58,7 @@ const PriceHistoryChart = ({ data, ariaLabel }) => {
             width={56}
           />
           <Bar dataKey="amount" radius={[14, 14, 0, 0]} maxBarSize={56}>
-            {data.map((entry, index) => (
+            {rows.map((entry, index) => (
               <Cell
                 key={`cell-${entry.name}-${index}`}
                 fill={entry.highlight ? BAR_NAVY : BAR_MUTED}

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaChevronDown, FaList, FaSlidersH, FaTh, FaTimes } from "react-icons/fa";
-import { BRAND_OPTIONS } from "entities/filter-catalog";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { PRODUCT_CATALOG, buildCatalogItemListJsonLd } from "entities/product";
 import { useFilterCatalogPresenter } from "features/filter-catalog";
@@ -76,11 +75,11 @@ const FilterCatalogWidget = () => {
     onMaxRangeChange,
     selectedScreens,
     selectedBrands,
-    selectedRam,
+    selectedStorage,
     selectedColor,
     toggleScreen,
     toggleBrand,
-    toggleRam,
+    toggleStorage,
     setColor,
     search,
     onSearchChange,
@@ -98,10 +97,11 @@ const FilterCatalogWidget = () => {
     setBrandExpanded,
     screenOptions,
     screenCounts,
+    brandOptions,
     brandCounts,
     visibleBrandOptions,
-    ramOptions,
-    ramCounts,
+    storageOptions,
+    storageCounts,
     colorOptions,
     sortOptions,
     pageSizeOptions,
@@ -211,9 +211,9 @@ const FilterCatalogWidget = () => {
   const brandOptionsForOverlay = useMemo(() => {
     if (!overlayQueryLower) return visibleBrandOptions;
     return visibleBrandOptions.filter((opt) =>
-      t(opt.labelKey).toLowerCase().includes(overlayQueryLower),
+      opt.label.toLowerCase().includes(overlayQueryLower),
     );
-  }, [visibleBrandOptions, overlayQueryLower, t]);
+  }, [visibleBrandOptions, overlayQueryLower]);
 
   const renderFilterForm = (idSuffix) => (
     <>
@@ -305,7 +305,7 @@ const FilterCatalogWidget = () => {
                     onChange={() => toggleScreen(opt.id)}
                   />
                   <span>
-                    {t(opt.labelKey)} ({screenCounts[opt.id] ?? 0})
+                    {opt.label} ({screenCounts[opt.id] ?? 0})
                   </span>
                 </label>
               </li>
@@ -334,13 +334,13 @@ const FilterCatalogWidget = () => {
                       onChange={() => toggleBrand(opt.id)}
                     />
                     <span>
-                      {t(opt.labelKey)} ({brandCounts[opt.id] ?? 0})
+                      {opt.label} ({brandCounts[opt.id] ?? 0})
                     </span>
                   </label>
                 </li>
               ))}
             </ul>
-            {BRAND_OPTIONS.length > 4 ? (
+            {brandOptions.length > 4 ? (
               <button
                 type="button"
                 className="pt-2 text-sm font-medium text-link-blue hover:text-navy"
@@ -355,27 +355,27 @@ const FilterCatalogWidget = () => {
 
       <div className="border-b border-border-blue/50 py-2">
         <SectionHead
-          open={sectionsOpen.ram}
-          title={t("filterPage.filters.ram")}
-          onToggle={() => toggleSection("ram")}
-          panelId={`filter-panel-ram${idSuffix}`}
+          open={sectionsOpen.storage}
+          title={t("filterPage.filters.storage")}
+          onToggle={() => toggleSection("storage")}
+          panelId={`filter-panel-storage${idSuffix}`}
         />
-        {sectionsOpen.ram ? (
+        {sectionsOpen.storage ? (
           <ul
-            id={`filter-panel-ram${idSuffix}`}
+            id={`filter-panel-storage${idSuffix}`}
             className="m-0 flex list-none flex-col gap-2 p-0 pb-3 pt-1"
           >
-            {ramOptions.map((opt) => (
+            {storageOptions.map((opt) => (
               <li key={opt.id}>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
                   <input
                     type="checkbox"
                     className="h-4 w-4 rounded border-border-blue accent-navy"
-                    checked={selectedRam.has(opt.id)}
-                    onChange={() => toggleRam(opt.id)}
+                    checked={selectedStorage.has(opt.id)}
+                    onChange={() => toggleStorage(opt.id)}
                   />
                   <span>
-                    {t(opt.labelKey)} ({ramCounts[opt.id] ?? 0})
+                    {opt.label} ({storageCounts[opt.id] ?? 0})
                   </span>
                 </label>
               </li>

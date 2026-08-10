@@ -36,8 +36,14 @@ const SWIPER_THUMB_BREAKPOINTS = {
   [BREAKPOINTS.lg]: { slidesPerView: 4 },
 };
 
+/**
+ * UTC, not local time: this runs during render on both the server and the client, and
+ * `getMonth()` reads the host's own timezone. A server in UTC and a visitor in Yerevan
+ * (UTC+4) disagree about which month it is for four hours out of every month boundary,
+ * which put different month labels in the SSR HTML than in the hydrating client render.
+ */
 const getTrailingMonthKeys = (count = 5, date = new Date()) => {
-  const currentMonthIndex = date.getMonth();
+  const currentMonthIndex = date.getUTCMonth();
   return Array.from({ length: count }, (_, index) => {
     const offset = count - 1 - index;
     const monthIndex =

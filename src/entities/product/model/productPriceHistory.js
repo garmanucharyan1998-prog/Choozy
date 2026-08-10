@@ -33,10 +33,18 @@ const hashProductId = (id) =>
 export const buildPriceHistoryForProduct = (product) => {
   const seed = hashProductId(product.id);
   return Array.from({ length: MONTH_COUNT }, (_, index) => {
-    /** +/-12% around the current price, trending toward it in the most recent month. */
+    /**
+     * The last month IS the current price, not merely close to it: the chart's final bar is
+     * the highlighted one and sits directly under the price printed on the page, so any gap
+     * reads as the page contradicting itself. It used to keep 40% of its swing there —
+     * up to 4.8% off — despite the comment claiming it converged.
+     */
+    if (index === MONTH_COUNT - 1) return product.priceValue;
+
+    /** +/-12% around the current price, converging on it as the months approach today. */
     const swing = (seededFraction(seed, index) - 0.5) * 0.24;
-    const trendToward = index / (MONTH_COUNT - 1);
-    const factor = 1 + swing * (1 - trendToward * 0.6);
+    const distanceFromNow = (MONTH_COUNT - 1 - index) / (MONTH_COUNT - 1);
+    const factor = 1 + swing * distanceFromNow;
     return Math.round((product.priceValue * factor) / 1000) * 1000;
   });
 };

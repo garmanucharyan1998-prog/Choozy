@@ -41,4 +41,23 @@ describe("buildPriceHistoryForProduct", () => {
       expect(value).toBeLessThan(priceValue * 1.15);
     });
   });
+
+  /**
+   * The chart's last bar is the highlighted one and sits directly beneath the price printed
+   * on the page. It used to keep 40% of its swing — up to 4.8% off — so the graph quietly
+   * disagreed with the number above it.
+   */
+  test("the most recent month is exactly the current price", () => {
+    ["fp-1", "fp-9", "fp-27"].forEach((id) => {
+      const priceValue = 739000;
+      const history = buildPriceHistoryForProduct({ id, priceValue });
+      expect(history[history.length - 1]).toBe(priceValue);
+    });
+  });
+
+  test("earlier months stay off the current price, so the chart still has a shape", () => {
+    const priceValue = 739000;
+    const history = buildPriceHistoryForProduct({ id: "fp-1", priceValue });
+    expect(history.slice(0, -1).some((value) => value !== priceValue)).toBe(true);
+  });
 });

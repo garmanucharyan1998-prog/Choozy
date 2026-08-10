@@ -159,17 +159,17 @@ const am = {
       priceMax: "Առավելագույն",
       screen: "Էկրանի չափս",
       brandTitle: "Ապրանքանիշ",
-      ram: "RAM",
+      storage: "Հիշողության ծավալ",
       color: "Գույն",
       seeMore: "Տեսնել Ավելին",
       seeLess: "Պակաս ցուցադրել",
+      /**
+       * Screen options are data-derived ranges built in the presenter, so the only copy the
+       * dictionary owes them is the unit word. The old per-value keys (`inch11`…`inch16`)
+       * hardcoded a list that no longer matches the catalog's real diagonals.
+       */
       screenSizes: {
-        inch11: "11 դյույմ",
-        inch12: "12 դյույմ",
-        inch13: "13 դյույմ",
-        inch14: "14 դյույմ",
-        inch15: "15 դյույմ",
-        inch16: "16 դյույմ",
+        unit: "դյույմ",
       },
       brandNames: {
         apple: "Apple",
@@ -179,13 +179,10 @@ const am = {
         lenovo: "Lenovo",
         dell: "Dell",
       },
-      ramSizes: {
-        gb4: "4 GB",
-        gb8: "8 GB",
-        gb16: "16 GB",
-        gb32: "32 GB",
-        gb128: "128 GB",
-      },
+      /**
+       * Storage options carry no keys at all: "256 GB" / "1 TB" is the same text in every
+       * locale, so the presenter builds them from the catalog with `formatStorageGb`.
+       */
       colorNames: {
         black: "Սև",
         grey: "Մոխրագույն",

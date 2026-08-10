@@ -25,12 +25,27 @@ describe("getOffersForProduct", () => {
   });
 
   test("offers carry the product's own variants and colors, not an unrelated fixed set", () => {
+    const phone = PRODUCT_CATALOG.find((p) => p.categoryId === "smartphones");
+    const offers = getOffersForProduct(phone);
+
+    offers.forEach((offer) => {
+      expect(offer.colors[0].id).toBe(phone.colorId);
+      expect(offer.variants.map((v) => v.label)).toContain("256 GB");
+    });
+  });
+
+  /**
+   * A pair of earbuds has no storage tiers to choose between. They used to be offered one
+   * chip labelled from the old `ramGb` "memory tier" field — "4 GB" on headphones.
+   */
+  test("a product with no storage axis offers no variants", () => {
     const headphones = PRODUCT_CATALOG.find((p) => p.categoryId === "headphones");
     const offers = getOffersForProduct(headphones);
 
+    expect(offers.length).toBeGreaterThan(0);
     offers.forEach((offer) => {
       expect(offer.colors[0].id).toBe(headphones.colorId);
-      expect(offer.variants.length).toBeGreaterThan(0);
+      expect(offer.variants).toEqual([]);
     });
   });
 

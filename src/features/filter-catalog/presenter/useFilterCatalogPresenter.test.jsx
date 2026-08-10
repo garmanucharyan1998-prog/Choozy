@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { LanguageProvider } from "contexts";
 import { PRODUCT_CATALOG } from "entities/product";
+import { screenBucketIdFor } from "entities/filter-catalog";
 import { useFilterCatalogPresenter } from "./useFilterCatalogPresenter";
 
 const renderPresenter = (initialPath = "/filter") =>
@@ -44,14 +45,60 @@ describe("useFilterCatalogPresenter", () => {
   test("facet counts reflect the current selection, not the whole catalog (G14 regression)", () => {
     const { result } = renderPresenter();
     const brandId = "apple";
-    const appleScreenSizes = new Set(
-      PRODUCT_CATALOG.filter((p) => p.brandId === brandId).map((p) => String(p.screenInch)),
+    const appleScreenBuckets = new Set(
+      PRODUCT_CATALOG.filter((p) => p.brandId === brandId)
+        .map((p) => screenBucketIdFor(p.screenInch))
+        .filter(Boolean),
     );
 
     act(() => result.current.toggleBrand(brandId));
 
     const screenCountKeys = Object.keys(result.current.screenCounts);
-    expect(new Set(screenCountKeys)).toEqual(appleScreenSizes);
+    expect(new Set(screenCountKeys)).toEqual(appleScreenBuckets);
+  });
+
+  /**
+   * Every option a visitor can tick has to return something, and every product has to be
+   * reachable. The hardcoded facet lists broke both: RAM offered 4/8/16/32/128 GB while the
+   * Galaxy S25 Ultra carried 12, so that product was silently unfilterable.
+   */
+  test("every facet option returns at least one product", () => {
+    const { result } = renderPresenter();
+
+    result.current.screenOptions.forEach((opt) => {
+      expect(result.current.screenCounts[opt.id] ?? 0).toBeGreaterThan(0);
+    });
+    result.current.storageOptions.forEach((opt) => {
+      expect(result.current.storageCounts[opt.id] ?? 0).toBeGreaterThan(0);
+    });
+  });
+
+  test("every product with a screen or storage is reachable through some option", () => {
+    const { result } = renderPresenter();
+    const screenIds = new Set(result.current.screenOptions.map((o) => o.id));
+    const storageIds = new Set(result.current.storageOptions.map((o) => o.id));
+
+    PRODUCT_CATALOG.forEach((product) => {
+      if (typeof product.screenInch === "number") {
+        expect(screenIds.has(screenBucketIdFor(product.screenInch))).toBe(true);
+      }
+      if (typeof product.storageGb === "number") {
+        expect(storageIds.has(String(product.storageGb))).toBe(true);
+      }
+    });
+  });
+
+  test("a storage facet selection narrows results to products with that exact size", () => {
+    const { result } = renderPresenter();
+    const sizeId = result.current.storageOptions[0].id;
+    const expected = PRODUCT_CATALOG.filter((p) => String(p.storageGb) === sizeId).length;
+
+    act(() => result.current.toggleStorage(sizeId));
+
+    expect(result.current.totalResults).toBe(expected);
+    result.current.filteredProducts.forEach((p) => {
+      expect(String(p.storageGb)).toBe(sizeId);
+    });
   });
 
   test("typing into search keeps a trailing space instead of losing it on the URL round-trip (G1 regression)", () => {
