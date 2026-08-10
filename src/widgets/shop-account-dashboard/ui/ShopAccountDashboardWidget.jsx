@@ -22,6 +22,7 @@ import {
 import { useShopAccountPresenter } from "features/shop-account";
 import { useLogout } from "features/session";
 import { formatAmd } from "shared/lib/formatAmd";
+import { parseAmdInput } from "shared/lib/parseAmdInput";
 import {
   formatAmdPriceConversionParts,
   parseProductAmdAmount,
@@ -306,11 +307,8 @@ const ShopAccountDashboardWidget = () => {
   const [editingPriceValue, setEditingPriceValue] = useState("");
 
   const startInlinePriceEdit = (product) => {
-    const raw =
-      (typeof product.price === "string" ? product.price.replace(/[^\d]/g, "") : "") ||
-      (typeof product.priceAmd === "number" && Number.isFinite(product.priceAmd)
-        ? String(product.priceAmd)
-        : "");
+    const parsed = parseAmdInput(product.price) ?? product.priceAmd;
+    const raw = typeof parsed === "number" && Number.isFinite(parsed) ? String(parsed) : "";
     setEditingPriceId(product.id);
     setEditingPriceValue(raw);
   };

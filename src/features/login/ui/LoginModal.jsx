@@ -65,6 +65,7 @@ const LoginModal = ({ isOpen, onClose }) => {
 const LoginModalDialog = ({ onClose }) => {
   const { t } = useLanguage();
   const {
+    dialogRef,
     isRegisterMode,
     role,
     selectRole,
@@ -85,6 +86,7 @@ const LoginModalDialog = ({ onClose }) => {
 
   return (
     <div
+      ref={dialogRef}
       className="fixed inset-0 z-[95] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"

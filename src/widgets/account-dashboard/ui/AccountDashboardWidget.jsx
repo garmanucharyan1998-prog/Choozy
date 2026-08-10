@@ -13,6 +13,7 @@ import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
 import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
 import { useLogout } from "features/session";
+import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 import { MainCard, NotificationFeedCard, ToggleRow } from "shared/ui/dashboard-cards";
 import { ProductCardImage } from "shared/ui/product-card-image";
@@ -57,6 +58,7 @@ const WISHLIST_ACTION_ICON = "h-3.5 w-3.5 xl:h-4 xl:w-4";
  */
 const AccountGridProductCard = ({
   item,
+  priceLabel,
   detailTo,
   inCompare,
   onToggleCompare,
@@ -101,7 +103,9 @@ const AccountGridProductCard = ({
       <p className="m-0 line-clamp-2 text-xs text-text-muted sm:text-sm" title={item.description}>
         {item.description}
       </p>
-      <p className="m-0 pt-0.5 text-sm font-semibold text-link-blue sm:text-base">{item.price}</p>
+      <p className="m-0 pt-0.5 text-sm font-semibold text-link-blue sm:text-base">
+        {priceLabel || item.price}
+      </p>
     </LocalizedLink>
   </article>
 );
@@ -181,6 +185,13 @@ const AccountDashboardWidget = () => {
     () => new Set(accountState.wishlistItems.map((w) => w.id)),
     [accountState.wishlistItems],
   );
+
+  /**
+   * Saved rows carry the amount, not a formatted label, so a wishlist saved in Armenian
+   * reads in Russian after switching language. Rows written before `priceValue` existed
+   * fall back to the label they were stored with.
+   */
+  const currencySuffix = t("productDetail.currencySuffix");
 
   const visibleRecentlyViewed = useMemo(
     () => accountState.recentlyViewed.slice(0, recentVisibleCount),
@@ -590,6 +601,7 @@ const AccountDashboardWidget = () => {
               <AccountGridProductCard
                 key={item.id}
                 item={item}
+                priceLabel={formatPriceAmd(item.priceValue, currencySuffix)}
                 detailTo={detailTo}
                 inCompare={Boolean(wishlistCompare[item.id])}
                 onToggleCompare={() => toggleWishlistCompare(item.id)}
@@ -634,6 +646,7 @@ const AccountDashboardWidget = () => {
                 <AccountGridProductCard
                   key={item.id}
                   item={item}
+                  priceLabel={formatPriceAmd(item.priceValue, currencySuffix)}
                   detailTo={detailTo}
                   inCompare={Boolean(recentCompare[item.id])}
                   onToggleCompare={() => toggleRecentCompare(item.id)}
@@ -642,7 +655,7 @@ const AccountDashboardWidget = () => {
                       id: item.id,
                       title: item.title,
                       description: item.description,
-                      price: item.price,
+                      priceValue: item.priceValue,
                       image: item.image,
                       href: detailTo,
                     });

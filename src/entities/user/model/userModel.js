@@ -297,8 +297,25 @@ export const adoptGuestShelfForSession = () => {
 };
 
 /**
+ * Recovers an amount from a formatted price string, for rows saved before `priceValue` was
+ * part of this shape. Digits only, so it reads "739,000 AMD", "739 000 դր." and a bare
+ * number alike.
+ */
+const priceValueFromLabel = (label) => {
+  /** First number only: a legacy recently-viewed row stored a range ("717,000 – 798,000 AMD"). */
+  const firstNumber = typeof label === "string" ? label.match(/\d[\d\s.,]*/) : null;
+  const digits = firstNumber ? firstNumber[0].replace(/\D/g, "") : "";
+  return digits ? Number(digits) : null;
+};
+
+/**
+ * `priceValue` is the amount; `price` is the label it was saved with. Rows used to store
+ * only the label, which froze the currency word into the visitor's data — a wishlist saved
+ * in Armenian still read "դր." after switching to Russian. The label is kept as a fallback
+ * for rows written before this field existed.
+ *
  * @param {unknown} item
- * @returns {{ id: string, title: string, description: string, price: string, image: string, href: string, category: string }}
+ * @returns {{ id: string, title: string, description: string, price: string, priceValue: number | null, image: string, href: string, category: string }}
  */
 export const normalizeWishlistItem = (item) => {
   if (!item || typeof item !== "object") {
@@ -307,6 +324,7 @@ export const normalizeWishlistItem = (item) => {
       title: "",
       description: "",
       price: "",
+      priceValue: null,
       image: "",
       href: getDefaultProductDetailPath(),
       category: "",
@@ -326,13 +344,17 @@ export const normalizeWishlistItem = (item) => {
       : typeof item.priceLabel === "string"
         ? item.priceLabel
         : "";
+  const priceValue =
+    typeof item.priceValue === "number" && Number.isFinite(item.priceValue)
+      ? item.priceValue
+      : priceValueFromLabel(price);
   const image = typeof item.image === "string" ? item.image : "";
   const href =
     typeof item.href === "string" && item.href.startsWith("/")
       ? item.href
       : getProductDetailHref(id || "apple-macbook-pro-demo", title);
   const category = typeof item.category === "string" ? item.category : "";
-  return { id, title, description, price, image, href, category };
+  return { id, title, description, price, priceValue, image, href, category };
 };
 
 /** Same shape as wishlist rows; used for `recentlyViewed` normalization. */

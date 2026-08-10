@@ -3,6 +3,7 @@ import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } fr
 import { getProductDetailHref } from "entities/product-detail";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useLanguage } from "contexts";
+import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { BREAKPOINTS } from "shared/config/breakpoints";
 import { ProductCardImage } from "shared/ui/product-card-image";
 import { LocalizedLink } from "shared/ui/link";
@@ -37,6 +38,7 @@ const wishlistMapFromStorage = () => {
 
 const Carousel = ({ items, ariaLabel }) => {
   const { t } = useLanguage();
+  const currencySuffix = t("productDetail.currencySuffix");
   const safeItems = Array.isArray(items) ? items : [];
   const slideCount = safeItems.length;
   /** Swiper needs more slides than the widest `slidesPerView` (5) to loop without gaps. */
@@ -63,9 +65,10 @@ const Carousel = ({ items, ariaLabel }) => {
       id: product.id,
       title: product.title,
       description: product.description,
-      price: product.price,
+      priceValue: product.priceValue,
       image: product.image,
       href,
+      category: product.categoryId,
     });
     setWishlist(wishlistMapFromStorage());
   }, []);
@@ -158,7 +161,7 @@ const Carousel = ({ items, ariaLabel }) => {
                         {product.description}
                       </p>
                       <p className="m-0 mt-auto text-sm font-semibold text-navy 2xl:text-base">
-                        {product.price}
+                        {formatPriceAmd(product.priceValue, currencySuffix) || product.price}
                       </p>
                     </LocalizedLink>
                   </article>

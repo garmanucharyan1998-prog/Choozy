@@ -140,9 +140,6 @@ const am = {
     applyFilters: "Կիրառել",
     removeChipAria: "Հանել ֆիլտրը",
     activeChipsAria: "Ակտիվ ֆիլտրեր",
-    activeChips: {
-      priceLabel: "{{min}}–{{max}} AMD",
-    },
     categories: {
       smartphones: "Սմարթֆոն",
       laptops: "Նոթբուքեր",
@@ -840,7 +837,7 @@ const am = {
       /** {{title}} — ապրանքի անվանումը, {{priceMin}}/{{priceMax}} — գնային միջակայքը։ */
       title: "{{title}} — գներ և առաջարկներ | Choosy",
       description:
-        "{{title}}՝ {{priceMin}}–{{priceMax}} AMD։ Համեմատեք գները Հայաստանի խանութներից և ընտրեք լավագույն առաջարկը Choosy-ում։",
+        "{{title}}՝ {{priceMin}}–{{priceMax}} դր.։ Համեմատեք գները Հայաստանի խանութներից և ընտրեք լավագույն առաջարկը Choosy-ում։",
     },
     account: {
       title: "Անձնական հաշիվ — Choosy",

@@ -64,12 +64,18 @@ export const useProductDetailPresenter = () => {
     return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
   }, [product.id]);
 
+  /**
+   * Stores the product's own price as a number, like the wishlist does. Both shelves used to
+   * hold a formatted string, and two different shapes of one — a range here
+   * ("717,000 – 798,000 AMD") against a single price there — with the currency word frozen
+   * into the visitor's saved data in whichever language they happened to be using.
+   */
   useEffect(() => {
     pushRecentlyViewedProduct({
       id: product.id,
       title: product.listingTitle || "Product",
       description: product.listingDescription || "",
-      price: `${formatAmd(product.priceMinAmd)} – ${formatAmd(product.priceMaxAmd)} AMD`,
+      priceValue: product.priceValue,
       image: product.galleryImageUrls?.[0] || "",
       href: getProductDetailHref(product.id, product.listingTitle || "Product"),
     });
@@ -88,12 +94,13 @@ export const useProductDetailPresenter = () => {
       id: product.id,
       title: product.listingTitle || "Product",
       description: product.listingDescription || "",
-      price: `${priceMinFormatted} – ${priceMaxFormatted} AMD`,
+      priceValue: product.priceValue,
       image: mainImageSrc,
       href: getProductDetailHref(product.id, product.listingTitle || "Product"),
+      category: product.categoryId,
     });
     setWishlist(isWishlistProductId(product.id));
-  }, [product, priceMinFormatted, priceMaxFormatted, mainImageSrc]);
+  }, [product, mainImageSrc]);
 
   const selectThumbnail = useCallback((index) => {
     setActiveImageIndex(index);

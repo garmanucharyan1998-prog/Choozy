@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { useLanguage } from "contexts";
+/** One grouping style app-wide: this axis used `hy-AM` while every other amount used `formatAmd`. */
+import { formatAmd } from "shared/lib/formatAmd";
 import { demoShopStatisticsMetrics } from "../model/demoShopStatistics";
 
 const LINE_STROKE = "#3a4fe0";
@@ -133,7 +135,7 @@ const ShopStatisticsWidget = () => {
                   axisLine={false}
                   tick={{ fill: "#696969", fontSize: 11 }}
                   width={40}
-                  tickFormatter={(v) => (typeof v === "number" ? v.toLocaleString("hy-AM") : v)}
+                  tickFormatter={(v) => (typeof v === "number" ? formatAmd(v) : v)}
                 />
                 <Line
                   type="monotone"

@@ -1,3 +1,5 @@
+import { parseAmdInput } from "shared/lib/parseAmdInput";
+
 /** Fired on same-tab updates after `writeShopAccountState`. */
 export const SHOP_ACCOUNT_STORAGE_EVENT = "choozy-shop-account-storage";
 
@@ -462,8 +464,7 @@ export const normalizeShopProduct = (raw) => {
   if (typeof base.priceAmd === "number" && Number.isFinite(base.priceAmd)) {
     priceAmd = base.priceAmd;
   } else {
-    const priceStr = typeof base.price === "string" ? base.price.replace(/[^\d]/g, "") : "";
-    priceAmd = priceStr ? parseInt(priceStr, 10) : undefined;
+    priceAmd = parseAmdInput(base.price) ?? undefined;
   }
 
   const createdAt = typeof base.createdAt === "number" ? base.createdAt : Date.now();

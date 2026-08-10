@@ -143,30 +143,36 @@ export const useSiteShellPresenter = () => {
         return;
       }
 
-      setIsCompactHeader((prev) => {
-        let next = prev;
+      /**
+       * The transition is decided out here, against the ref that mirrors the state, rather
+       * than inside a `setIsCompactHeader` updater. React may call an updater more than once
+       * (StrictMode, a replayed render), and this one armed the lock ref and scheduled a
+       * timeout — the very state machine that gates the whole compact-header behaviour, so a
+       * double invocation double-scheduled and could leave the lock stuck on.
+       */
+      const prev = isCompactHeaderRef.current;
+      let next = prev;
+      if (!prev && currentScroll > COMPACT_ENTER_SCROLL) {
+        next = true;
+      }
+      if (prev && currentScroll <= compactExitScrollRef.current) {
+        next = false;
+      }
 
-        if (!prev && currentScroll > COMPACT_ENTER_SCROLL) {
-          next = true;
-        }
-        if (prev && currentScroll <= compactExitScrollRef.current) {
-          next = false;
-        }
+      if (next !== prev) {
+        isCompactHeaderRef.current = next;
+        setIsCompactHeader(next);
 
-        if (next !== prev) {
-          compactLockRef.current = true;
-          if (compactLockTimeoutRef.current) {
-            window.clearTimeout(compactLockTimeoutRef.current);
-          }
-          compactLockTimeoutRef.current = window.setTimeout(() => {
-            compactLockRef.current = false;
-            // Re-check: the scroll position may have settled while locked.
-            updateCompactStateRef.current?.();
-          }, 420);
+        compactLockRef.current = true;
+        if (compactLockTimeoutRef.current) {
+          window.clearTimeout(compactLockTimeoutRef.current);
         }
-
-        return next;
-      });
+        compactLockTimeoutRef.current = window.setTimeout(() => {
+          compactLockRef.current = false;
+          // Re-check: the scroll position may have settled while locked.
+          updateCompactStateRef.current?.();
+        }, 420);
+      }
 
       ticking = false;
     };

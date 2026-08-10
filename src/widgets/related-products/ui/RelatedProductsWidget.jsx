@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useLanguage } from "contexts";
+import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useRelatedProductsPresenter } from "features/related-products";
 import { BREAKPOINTS } from "shared/config/breakpoints";
@@ -44,6 +45,7 @@ const wishlistMapFromStorage = () => {
 
 const RelatedProductsWidget = () => {
   const { t } = useLanguage();
+  const currencySuffix = t("productDetail.currencySuffix");
   const { items } = useRelatedProductsPresenter();
   const swiperRef = useRef(null);
   /**
@@ -67,9 +69,10 @@ const RelatedProductsWidget = () => {
       id: product.id,
       title: product.title,
       description: product.description,
-      price: product.price,
+      priceValue: product.priceValue,
       image: product.image,
       href: product.href,
+      category: product.categoryId,
     });
     setWishlist(wishlistMapFromStorage());
   }, []);
@@ -174,7 +177,9 @@ const RelatedProductsWidget = () => {
                       <p className={DESC_TEXT_CLASS} title={product.description}>
                         {product.description}
                       </p>
-                      <p className={PRICE_TEXT_CLASS}>{product.price}</p>
+                      <p className={PRICE_TEXT_CLASS}>
+                        {formatPriceAmd(product.priceValue, currencySuffix) || product.price}
+                      </p>
                     </LocalizedLink>
                   </article>
                 </SwiperSlide>

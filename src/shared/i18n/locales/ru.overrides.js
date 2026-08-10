@@ -730,7 +730,7 @@ export const ruOverrides = {
     product: {
       title: "{{title}} — цены и предложения | Choosy",
       description:
-        "{{title}}: {{priceMin}}–{{priceMax}} AMD. Сравните цены магазинов Армении и выберите лучшее предложение на Choosy.",
+        "{{title}}: {{priceMin}}–{{priceMax}} драм. Сравните цены магазинов Армении и выберите лучшее предложение на Choosy.",
     },
     account: {
       title: "Личный кабинет — Choosy",

@@ -16,7 +16,7 @@ import {
   getHtmlLangForAppLanguage,
   getLanguageFromPath,
 } from "shared/lib/locale";
-import { ScrollToTopButton, ScrollToTopOnNavigate } from "shared/ui/scroll-to-top";
+import { ScrollToTopButton } from "shared/ui/scroll-to-top";
 import { getTranslator } from "shared/i18n";
 import type { Route } from "./+types/root";
 import "./index.css";
@@ -99,7 +99,6 @@ export default function App({ loaderData }: Route.ComponentProps) {
     <SessionProvider session={loaderData?.session}>
       <LanguageProvider>
         <SkipToContentLink />
-        <ScrollToTopOnNavigate />
         <Outlet />
         <ScrollToTopButton />
       </LanguageProvider>

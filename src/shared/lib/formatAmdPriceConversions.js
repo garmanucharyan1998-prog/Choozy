@@ -1,3 +1,6 @@
+import { parseAmdInput } from "./parseAmdInput";
+
+
 /** Demo AMD cross-rates for shop manager price tooltips (replace with live rates when API exists). */
 const AMD_PER_USD = 390;
 const AMD_PER_RUB = 4.35;
@@ -11,10 +14,7 @@ export const parseProductAmdAmount = (product) => {
   if (typeof product.priceAmd === "number" && Number.isFinite(product.priceAmd)) {
     return product.priceAmd;
   }
-  const digits = typeof product.price === "string" ? product.price.replace(/[^\d]/g, "") : "";
-  if (!digits) return null;
-  const parsed = parseInt(digits, 10);
-  return Number.isFinite(parsed) ? parsed : null;
+  return parseAmdInput(product.price);
 };
 
 /**

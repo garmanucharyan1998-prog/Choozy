@@ -22,6 +22,7 @@ import {
 } from "entities/shop";
 import { useLanguage } from "contexts";
 import { formatAmd } from "shared/lib/formatAmd";
+import { parseAmdInput } from "shared/lib/parseAmdInput";
 import { stripLanguageFromPath, useLocalizedNavigate } from "shared/lib/locale";
 
 const SHOP_ACCOUNT_PATH_BY_SIDEBAR = {
@@ -58,13 +59,9 @@ const newShopProductId = () =>
     : `shop-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
 const formatShopPrice = (raw) => {
-  const digits = String(raw ?? "").replace(/[^\d]/g, "");
-  if (!digits) return { price: "", priceAmd: undefined };
-  const priceAmd = parseInt(digits, 10);
-  return {
-    price: Number.isFinite(priceAmd) ? formatAmd(priceAmd) : "",
-    priceAmd: Number.isFinite(priceAmd) ? priceAmd : undefined,
-  };
+  const priceAmd = parseAmdInput(raw);
+  if (priceAmd == null) return { price: "", priceAmd: undefined };
+  return { price: formatAmd(priceAmd), priceAmd };
 };
 
 /**
@@ -89,12 +86,9 @@ const productToDraft = (product, t) => {
     .map((color) => color.id)
     .filter((id) => SHOP_COLOR_OPTIONS.some((option) => option.id === id));
 
+  const parsedPrice = parseAmdInput(product.price) ?? product.priceAmd;
   const price =
-    typeof product.price === "string" && product.price.trim()
-      ? product.price.replace(/[^\d]/g, "")
-      : typeof product.priceAmd === "number" && Number.isFinite(product.priceAmd)
-        ? String(product.priceAmd)
-        : "";
+    typeof parsedPrice === "number" && Number.isFinite(parsedPrice) ? String(parsedPrice) : "";
 
   return {
     categoryId,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSubmit } from "react-router";
 import { useLanguage } from "contexts";
 import { readRoleForEmail, rememberRoleForEmail, ROLES } from "entities/session";
@@ -42,21 +42,20 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const resetForm = useCallback(() => {
-    setMode(AUTH_MODES.REGISTER);
-    setRole(ROLES.BUYER);
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setError("");
-  }, []);
+  /**
+   * The dialog element itself, handed over by LoginModal. Was
+   * `document.querySelector('[role="dialog"][aria-modal="true"]')`, which returns the first
+   * such element in the document — the wishlist-remove confirm and the mobile filter drawer
+   * carry the same selector, so this only ever picked the right node because the header
+   * happens to precede `<main>` in DOM order.
+   */
+  const dialogRef = useRef(null);
 
-  useEffect(() => {
-    if (!isOpen) {
-      resetForm();
-    }
-  }, [isOpen, resetForm]);
-
+  /**
+   * No "reset the form when closed" effect: `LoginModal` gates on `isOpen` before calling
+   * this hook, so the presenter is never mounted while closed and every open starts from
+   * these initial values. The old effect could not run — its own condition was unreachable.
+   */
   useLockBodyScroll(isOpen);
 
   /**
@@ -225,6 +224,7 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
   const isRegisterMode = mode === AUTH_MODES.REGISTER;
 
   return {
+    dialogRef,
     isRegisterMode,
     role,
     selectRole,

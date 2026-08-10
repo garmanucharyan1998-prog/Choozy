@@ -11,6 +11,7 @@ import {
   screenBucketIdFor,
 } from "entities/filter-catalog";
 import { PRODUCT_CATALOG } from "entities/product";
+import { formatPriceRangeAmd } from "shared/lib/formatPriceAmd";
 import { formatStorageGb } from "shared/lib/formatStorageGb";
 
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
@@ -349,6 +350,57 @@ export const useFilterCatalogPresenter = () => {
     [globalMin, globalMax, priceMin, updateParams],
   );
 
+  /**
+   * The two typed bounds keep their own draft, like the search box above. They used to be
+   * fully controlled from the clamped URL value and committed on every keystroke, so the
+   * field was impossible to type into: selecting all and pressing "2" clamped 2 up to the
+   * catalog minimum (118,000) and rewrote the input mid-keystroke, and clearing the field
+   * snapped it back to the minimum as well. Committing on blur or Enter lets a whole number
+   * be typed before it means anything.
+   */
+  const [priceMinDraft, setPriceMinDraft] = useState(String(priceMin));
+  const [priceMaxDraft, setPriceMaxDraft] = useState(String(priceMax));
+  const lastSyncedBoundsRef = useRef({ min: priceMin, max: priceMax });
+
+  /** Re-sync when the URL moves the bounds from elsewhere — a slider, a chip, or Reset. */
+  useEffect(() => {
+    if (lastSyncedBoundsRef.current.min !== priceMin) {
+      lastSyncedBoundsRef.current.min = priceMin;
+      setPriceMinDraft(String(priceMin));
+    }
+    if (lastSyncedBoundsRef.current.max !== priceMax) {
+      lastSyncedBoundsRef.current.max = priceMax;
+      setPriceMaxDraft(String(priceMax));
+    }
+  }, [priceMin, priceMax]);
+
+  const commitPriceMinDraft = useCallback(() => {
+    /** An emptied field means "no lower bound", not "zero". */
+    if (priceMinDraft.trim() === "") {
+      lastSyncedBoundsRef.current.min = globalMin;
+      setPriceMinDraft(String(globalMin));
+      updateParams({ priceMin: null });
+      return;
+    }
+    const next = Math.min(clamp(Number(priceMinDraft) || globalMin, globalMin, globalMax), priceMax);
+    lastSyncedBoundsRef.current.min = next;
+    setPriceMinDraft(String(next));
+    updateParams({ priceMin: next === globalMin ? null : next });
+  }, [priceMinDraft, globalMin, globalMax, priceMax, updateParams]);
+
+  const commitPriceMaxDraft = useCallback(() => {
+    if (priceMaxDraft.trim() === "") {
+      lastSyncedBoundsRef.current.max = globalMax;
+      setPriceMaxDraft(String(globalMax));
+      updateParams({ priceMax: null });
+      return;
+    }
+    const next = Math.max(clamp(Number(priceMaxDraft) || globalMax, globalMin, globalMax), priceMin);
+    lastSyncedBoundsRef.current.max = next;
+    setPriceMaxDraft(String(next));
+    updateParams({ priceMax: next === globalMax ? null : next });
+  }, [priceMaxDraft, globalMin, globalMax, priceMin, updateParams]);
+
   const onSearchChange = useCallback(
     (e) => {
       const value = e.target.value;
@@ -480,9 +532,12 @@ export const useFilterCatalogPresenter = () => {
         key: "price",
         kind: "price",
         id: "price",
-        label: t("filterPage.activeChips.priceLabel")
-          .replace("{{min}}", String(Math.round(priceMin)))
-          .replace("{{max}}", String(Math.round(priceMax))),
+        /** Grouped and with the language's own currency word, like every other price shown. */
+        label: formatPriceRangeAmd(
+          Math.round(priceMin),
+          Math.round(priceMax),
+          t("productDetail.currencySuffix"),
+        ),
         remove: resetPriceBounds,
       });
     }
@@ -523,8 +578,12 @@ export const useFilterCatalogPresenter = () => {
     globalMax,
     priceMin,
     priceMax,
-    setPriceMin: setPriceMinSafe,
-    setPriceMax: setPriceMaxSafe,
+    priceMinDraft,
+    priceMaxDraft,
+    setPriceMinDraft,
+    setPriceMaxDraft,
+    commitPriceMinDraft,
+    commitPriceMaxDraft,
     onMinRangeChange: setPriceMinSafe,
     onMaxRangeChange: setPriceMaxSafe,
     selectedScreens,

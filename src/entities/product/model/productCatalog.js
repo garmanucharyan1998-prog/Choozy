@@ -10,7 +10,6 @@
  * productOffers.js).
  */
 import { getProductDetailHref } from "entities/product-detail/model/productRouteRegistry";
-import { formatAmd } from "shared/lib/formatAmd";
 import { formatStorageGb } from "shared/lib/formatStorageGb";
 import { PRODUCT_IMAGES } from "./productImages";
 
@@ -373,10 +372,16 @@ const DESCRIPTION_TEMPLATES = {
 const buildDescription = (product) =>
   (DESCRIPTION_TEMPLATES[product.categoryId] || DESCRIPTION_TEMPLATES.smartphones)(product);
 
-/** @type {CatalogProduct[]} */
+/**
+ * No pre-formatted `price` string: it hardcoded "AMD" at module scope, so every card
+ * contradicted the product page it linked to in Armenian and Russian, and the whole catalog
+ * shipped those strings in the SSR payload for nothing. Views format `priceValue` with
+ * `formatPriceAmd` and the visitor's own currency word.
+ *
+ * @type {CatalogProduct[]}
+ */
 export const PRODUCT_CATALOG = CATALOG_BASE.map((p) => ({
   ...p,
-  price: `${formatAmd(p.priceValue)} AMD`,
   description: buildDescription(p),
   href: getProductDetailHref(p.id, p.title),
 }));

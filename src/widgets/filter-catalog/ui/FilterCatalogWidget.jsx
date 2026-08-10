@@ -4,6 +4,7 @@ import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "
 import { PRODUCT_CATALOG, buildCatalogItemListJsonLd } from "entities/product";
 import { useFilterCatalogPresenter } from "features/filter-catalog";
 import { useLanguage } from "contexts";
+import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 import FilterProductCard from "shared/ui/filter-product-card/FilterProductCard";
 import { LocalizedLink } from "shared/ui/link";
@@ -69,8 +70,12 @@ const FilterCatalogWidget = () => {
     globalMax,
     priceMin,
     priceMax,
-    setPriceMin,
-    setPriceMax,
+    priceMinDraft,
+    priceMaxDraft,
+    setPriceMinDraft,
+    setPriceMaxDraft,
+    commitPriceMinDraft,
+    commitPriceMaxDraft,
     onMinRangeChange,
     onMaxRangeChange,
     selectedScreens,
@@ -112,6 +117,8 @@ const FilterCatalogWidget = () => {
   } = useFilterCatalogPresenter();
 
   const { language } = useLanguage();
+  /** One currency word for the whole page — cards used to bake a hardcoded "AMD" into the data. */
+  const currencySuffix = t("productDetail.currencySuffix");
   const catalogItemListJsonLd = useMemo(
     () => buildCatalogItemListJsonLd({ items: pageItems, language, page, pageSize }),
     [pageItems, language, page, pageSize],
@@ -169,9 +176,10 @@ const FilterCatalogWidget = () => {
             id: product.id,
             title: product.title,
             description: product.description,
-            price: product.price,
+            priceValue: product.priceValue,
             image: product.image,
             href: product.href,
+            categoryId: product.categoryId,
           }
         : null);
     if (!full) return;
@@ -179,9 +187,10 @@ const FilterCatalogWidget = () => {
       id: full.id,
       title: full.title,
       description: full.description,
-      price: full.price,
+      priceValue: full.priceValue,
       image: full.image,
       href: full.href,
+      category: full.categoryId,
     });
     setWishlist(wishlistMapFromStorage());
   }, []);
@@ -234,10 +243,17 @@ const FilterCatalogWidget = () => {
                 id={`filter-price-min${idSuffix}`}
                 type="number"
                 className="w-full min-w-0 rounded-lg border border-border-blue px-2 py-2 text-sm text-navy"
-                value={priceMin}
+                value={priceMinDraft}
                 min={globalMin}
                 max={globalMax}
-                onChange={(e) => setPriceMin(e.target.value)}
+                onChange={(e) => setPriceMinDraft(e.target.value)}
+                onBlur={commitPriceMinDraft}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitPriceMinDraft();
+                  }
+                }}
               />
               <span className="text-text-muted">—</span>
               <label className="sr-only" htmlFor={`filter-price-max${idSuffix}`}>
@@ -247,10 +263,17 @@ const FilterCatalogWidget = () => {
                 id={`filter-price-max${idSuffix}`}
                 type="number"
                 className="w-full min-w-0 rounded-lg border border-border-blue px-2 py-2 text-sm text-navy"
-                value={priceMax}
+                value={priceMaxDraft}
                 min={globalMin}
                 max={globalMax}
-                onChange={(e) => setPriceMax(e.target.value)}
+                onChange={(e) => setPriceMaxDraft(e.target.value)}
+                onBlur={commitPriceMaxDraft}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitPriceMaxDraft();
+                  }
+                }}
               />
             </div>
             <div className="flex flex-col gap-3">
@@ -262,7 +285,7 @@ const FilterCatalogWidget = () => {
                   min={globalMin}
                   max={priceMax}
                   value={priceMin}
-                  aria-valuetext={`${priceMin} AMD`}
+                  aria-valuetext={formatPriceAmd(priceMin, currencySuffix)}
                   onChange={(e) => onMinRangeChange(e.target.value)}
                 />
               </label>
@@ -274,7 +297,7 @@ const FilterCatalogWidget = () => {
                   min={priceMin}
                   max={globalMax}
                   value={priceMax}
-                  aria-valuetext={`${priceMax} AMD`}
+                  aria-valuetext={formatPriceAmd(priceMax, currencySuffix)}
                   onChange={(e) => onMaxRangeChange(e.target.value)}
                 />
               </label>
@@ -564,6 +587,7 @@ const FilterCatalogWidget = () => {
                   <FilterProductCard
                     key={product.id}
                     product={product}
+                    priceLabel={formatPriceAmd(product.priceValue, currencySuffix)}
                     listMode={listMode}
                     inCompare={Boolean(compare[product.id])}
                     inWishlist={Boolean(wishlist[product.id])}
