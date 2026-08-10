@@ -6,7 +6,23 @@ import { DEFAULT_LANGUAGE_CODE, SUPPORTED_LANGUAGE_CODES } from "shared/i18n/lan
  * The prefix is the source of truth for the active language — see LanguageContext.
  */
 
-const LANGUAGE_PREFIX_PATTERN = /^\/([a-z]{2})(?=\/|$)/;
+/**
+ * Case-insensitive because React Router's own matching is: `/RU/filter` reaches the `ru`
+ * route branch, so the language reader has to agree with the router or the page renders
+ * Armenian copy under a `/RU/` URL. The canonical-case 301 in the root loader
+ * (see canonicalizePathname) means visitors never stay on such a URL for long.
+ */
+const LANGUAGE_PREFIX_PATTERN = /^\/([a-zA-Z]{2})(?=\/|$)/;
+
+/**
+ * @param {string} cleanPath — a pathname with no query/hash
+ * @returns {{ code: string, length: number } | null} the lowercased two-letter prefix and
+ *   how many characters it occupies, or `null` when there is no such prefix.
+ */
+const readPathPrefix = (cleanPath) => {
+  const match = cleanPath.match(LANGUAGE_PREFIX_PATTERN);
+  return match ? { code: match[1].toLowerCase(), length: match[0].length } : null;
+};
 
 /** Splits `/ru/filter?q=x#top` into path and the `?q=x#top` remainder. */
 const splitPath = (fullPath) => {
@@ -26,9 +42,9 @@ const splitPath = (fullPath) => {
  */
 export const getLanguageFromPath = (pathname) => {
   const { pathname: cleanPath } = splitPath(pathname);
-  const match = cleanPath.match(LANGUAGE_PREFIX_PATTERN);
-  if (match && SUPPORTED_LANGUAGE_CODES.includes(match[1])) {
-    return match[1];
+  const prefix = readPathPrefix(cleanPath);
+  if (prefix && SUPPORTED_LANGUAGE_CODES.includes(prefix.code)) {
+    return prefix.code;
   }
   return DEFAULT_LANGUAGE_CODE;
 };
@@ -40,8 +56,8 @@ export const getLanguageFromPath = (pathname) => {
  */
 export const hasUnknownLanguagePrefix = (pathname) => {
   const { pathname: cleanPath } = splitPath(pathname);
-  const match = cleanPath.match(LANGUAGE_PREFIX_PATTERN);
-  return Boolean(match) && !SUPPORTED_LANGUAGE_CODES.includes(match[1]);
+  const prefix = readPathPrefix(cleanPath);
+  return Boolean(prefix) && !SUPPORTED_LANGUAGE_CODES.includes(prefix.code);
 };
 
 /**
@@ -51,9 +67,9 @@ export const hasUnknownLanguagePrefix = (pathname) => {
  */
 export const stripLanguageFromPath = (pathname) => {
   const { pathname: cleanPath, suffix } = splitPath(pathname);
-  const match = cleanPath.match(LANGUAGE_PREFIX_PATTERN);
-  if (match && SUPPORTED_LANGUAGE_CODES.includes(match[1])) {
-    const rest = cleanPath.slice(match[0].length);
+  const prefix = readPathPrefix(cleanPath);
+  if (prefix && SUPPORTED_LANGUAGE_CODES.includes(prefix.code)) {
+    const rest = cleanPath.slice(prefix.length);
     return `${rest || "/"}${suffix}`;
   }
   return `${cleanPath}${suffix}`;

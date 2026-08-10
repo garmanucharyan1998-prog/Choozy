@@ -1,4 +1,4 @@
-import { DEFAULT_SITE_BASE_URL, getSiteBaseUrl } from "shared/config/siteMeta";
+import { getSiteBaseUrl } from "shared/config/siteMeta";
 import { localizedPath } from "shared/lib/locale";
 
 /**
@@ -8,7 +8,7 @@ import { localizedPath } from "shared/lib/locale";
  * @param {{ language: string, siteName: string, description: string }} params
  */
 export const buildHomeJsonLd = ({ language, siteName, description }) => {
-  const base = getSiteBaseUrl() || DEFAULT_SITE_BASE_URL;
+  const base = getSiteBaseUrl();
   const homeUrl = `${base}${localizedPath("/", language)}`;
   const searchTarget = `${base}${localizedPath("/filter", language)}?q={search_term_string}`;
 

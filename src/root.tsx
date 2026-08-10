@@ -11,23 +11,32 @@ import {
 } from "react-router";
 import { LanguageProvider, SessionProvider, useLanguage } from "contexts";
 import { readSessionFromRequest } from "entities/session";
-import { getHtmlLangForAppLanguage, getLanguageFromPath } from "shared/lib/locale";
+import {
+  canonicalizePathname,
+  getHtmlLangForAppLanguage,
+  getLanguageFromPath,
+} from "shared/lib/locale";
 import { ScrollToTopButton, ScrollToTopOnNavigate } from "shared/ui/scroll-to-top";
 import { getTranslator } from "shared/i18n";
 import type { Route } from "./+types/root";
 import "./index.css";
 
 /**
- * Collapses a trailing slash (`/ru/filter/`) onto the canonical form so a page is never
- * reachable at two URLs. A real server-side redirect now that there's a real server —
- * previously a client component swapped in a `<Navigate>` after the wrong page had
- * already rendered once.
+ * Folds a trailing slash (`/ru/filter/`), a doubled slash (`//`) and a capitalized path
+ * (`/Account`) onto the one canonical form, so a page is never reachable at two URLs and
+ * no guard can be slipped past by casing. A real server-side redirect now that there's a
+ * real server — previously a client component swapped in a `<Navigate>` after the wrong
+ * page had already rendered once.
+ *
+ * Compares against the full canonical form rather than testing for a trailing slash: the
+ * old shape turned `//` into an empty `Location`, which browsers resolve back to the same
+ * URL — a redirect loop.
  */
 export function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
-    const canonical = `${url.pathname.replace(/\/+$/, "")}${url.search}${url.hash}`;
-    throw redirect(canonical, 301);
+  const canonicalPathname = canonicalizePathname(url.pathname);
+  if (canonicalPathname !== url.pathname) {
+    throw redirect(`${canonicalPathname}${url.search}${url.hash}`, 301);
   }
   return { session: readSessionFromRequest(request) };
 }

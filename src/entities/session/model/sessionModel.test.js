@@ -171,6 +171,21 @@ describe("resolveAccountRouteRedirect — the access matrix", () => {
     expect(resolveAccountRouteRedirect("/account/shop-account/", SIGNED_OUT)).toBe("/");
     expect(resolveAccountRouteRedirect("/account/shop-account/", SELLER)).toBeNull();
   });
+
+  /**
+   * React Router matches routes case-insensitively, so a capitalized path reaches the
+   * guarded route. Comparing it as typed used to fall through to `null` — an anonymous
+   * visitor got the dashboard at /Account, and the seller dashboard at /Account/Shop-Account.
+   */
+  test("casing cannot slip past the guard", () => {
+    expect(resolveAccountRouteRedirect("/Account", SIGNED_OUT)).toBe("/");
+    expect(resolveAccountRouteRedirect("/ACCOUNT/", SIGNED_OUT)).toBe("/");
+    expect(resolveAccountRouteRedirect("/Account/Shop-Account", SIGNED_OUT)).toBe("/");
+    expect(resolveAccountRouteRedirect("/Account/Shop-Account", BUYER)).toBe(ACCOUNT_ROOT);
+    expect(resolveAccountRouteRedirect("/Account", SELLER)).toBe(SHOP_ACCOUNT_ROOT);
+    expect(resolveAccountRouteRedirect("/Account/Favorite", SELLER)).toBe(SHOP_ACCOUNT_ROOT);
+    expect(resolveAccountRouteRedirect("/Account/Favorite", SIGNED_OUT)).toBeNull();
+  });
 });
 
 describe("requireAccountAccess — loader guard", () => {

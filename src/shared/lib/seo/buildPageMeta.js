@@ -1,4 +1,4 @@
-import { DEFAULT_SITE_BASE_URL, getSiteBaseUrl } from "shared/config/siteMeta";
+import { getSiteBaseUrl } from "shared/config/siteMeta";
 import {
   APP_LOCALE,
   getOgLocaleForAppLanguage,
@@ -32,7 +32,7 @@ export const buildPageMeta = ({
   imagePath = "/logo512.png",
   noIndex = false,
 }) => {
-  const base = getSiteBaseUrl() || DEFAULT_SITE_BASE_URL;
+  const base = getSiteBaseUrl();
   const pathWithoutLanguage = stripLanguageFromPath(path);
   const canonicalUrl = `${base}${localizedPath(pathWithoutLanguage, language)}`;
 

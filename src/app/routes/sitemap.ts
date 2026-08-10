@@ -1,7 +1,7 @@
 import { getLocalizedRouteInventory } from "shared/lib/seo";
 import { SUPPORTED_LANGUAGE_CODES } from "shared/i18n/languageConfig";
 import { getHtmlLangForAppLanguage } from "shared/lib/locale";
-import { DEFAULT_SITE_BASE_URL, getSiteBaseUrl } from "shared/config/siteMeta";
+import { getSiteBaseUrl } from "shared/config/siteMeta";
 
 /**
  * `sitemap.xml` as a resource route (a loader with no page component) instead of a
@@ -10,7 +10,7 @@ import { DEFAULT_SITE_BASE_URL, getSiteBaseUrl } from "shared/config/siteMeta";
  * from a stale build artifact the way a once-generated static file could.
  */
 export async function loader() {
-  const base = getSiteBaseUrl() || DEFAULT_SITE_BASE_URL;
+  const base = getSiteBaseUrl();
   const languages = SUPPORTED_LANGUAGE_CODES.map((code) => ({
     code,
     hreflang: getHtmlLangForAppLanguage(code),

@@ -1,4 +1,4 @@
-import { DEFAULT_SITE_BASE_URL, getSiteBaseUrl } from "shared/config/siteMeta";
+import { getSiteBaseUrl } from "shared/config/siteMeta";
 import { localizedPath } from "shared/lib/locale";
 import { getCanonicalProductDetailPath } from "entities/product-detail";
 
@@ -39,7 +39,7 @@ export const buildProductJsonLd = ({
   categoryLabel,
   t,
 }) => {
-  const base = getSiteBaseUrl() || DEFAULT_SITE_BASE_URL;
+  const base = getSiteBaseUrl();
   const productPath = getCanonicalProductDetailPath(product);
   const productUrl = `${base}${localizedPath(productPath, language)}`;
   const title = product.listingTitle || "Product";

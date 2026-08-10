@@ -51,6 +51,15 @@ describe("getLanguageFromPath", () => {
   test("an unsupported two-letter prefix does not get treated as a language", () => {
     expect(getLanguageFromPath("/de/filter")).toBe("am");
   });
+
+  /** The router matches `/RU/filter` to the ru branch, so this has to agree with it. */
+  test.each([
+    ["/RU/filter", "ru"],
+    ["/Ru", "ru"],
+    ["/EN/singleproduct/x~fp-1", "en"],
+  ])("reads the language from the capitalized prefix %s -> %s", (path, expected) => {
+    expect(getLanguageFromPath(path)).toBe(expected);
+  });
 });
 
 describe("hasUnknownLanguagePrefix", () => {
@@ -69,6 +78,8 @@ describe("stripLanguageFromPath", () => {
     ["/en/filter?category=laptops", "/filter?category=laptops"],
     ["/filter", "/filter"],
     ["/ru", "/"],
+    ["/RU/account", "/account"],
+    ["/EN", "/"],
   ])("%s -> %s", (path, expected) => {
     expect(stripLanguageFromPath(path)).toBe(expected);
   });

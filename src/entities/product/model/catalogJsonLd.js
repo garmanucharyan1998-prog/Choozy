@@ -1,4 +1,4 @@
-import { DEFAULT_SITE_BASE_URL, getSiteBaseUrl } from "shared/config/siteMeta";
+import { getSiteBaseUrl } from "shared/config/siteMeta";
 import { localizedPath } from "shared/lib/locale";
 
 /**
@@ -15,7 +15,7 @@ import { localizedPath } from "shared/lib/locale";
  * @param {{ items: { id: string, title: string, href: string }[], language: string, page: number, pageSize?: number }} params
  */
 export const buildCatalogItemListJsonLd = ({ items, language, page = 1, pageSize }) => {
-  const base = getSiteBaseUrl() || DEFAULT_SITE_BASE_URL;
+  const base = getSiteBaseUrl();
   const effectivePageSize = pageSize || items.length || 1;
   const startPosition = (Math.max(page, 1) - 1) * effectivePageSize;
 

@@ -87,7 +87,13 @@ const isAccountArea = (path) => path === ACCOUNT_ROOT || path.startsWith(`${ACCO
  * @returns {string | null} a redirect target, or `null` to let the request through.
  */
 export const resolveAccountRouteRedirect = (barePathname, session) => {
-  const path = (barePathname || "/").replace(/\/+$/, "") || "/";
+  /**
+   * Lowercased because React Router matches routes case-insensitively: `/Account` reaches
+   * the guarded route, and comparing it against the lowercase literals below would fall
+   * through to `null` and hand an anonymous visitor the dashboard. The root loader also
+   * 301s such URLs (see canonicalizePathname) — this is the second lock on the same door.
+   */
+  const path = (barePathname || "/").replace(/\/+$/, "").toLowerCase() || "/";
 
   /** Decision: favorites stays open to anonymous visitors — only sellers get redirected off it. */
   if (isFavoritesPath(path)) {
