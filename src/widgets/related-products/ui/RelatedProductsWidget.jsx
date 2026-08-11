@@ -5,6 +5,7 @@ import { useLanguage } from "contexts";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { buildProductDescription } from "entities/product";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
+import { useProductCompare } from "features/product-compare";
 import { useRelatedProductsPresenter } from "features/related-products";
 import { BREAKPOINTS } from "shared/config/breakpoints";
 import { ProductCardImage } from "shared/ui/product-card-image";
@@ -56,7 +57,8 @@ const RelatedProductsWidget = () => {
    * in the real data right after hydration.
    */
   const [wishlist, setWishlist] = useState(() => ({}));
-  const [compare, setCompare] = useState(() => ({}));
+  /** Shared with the header badge and every other list — see `features/product-compare`. */
+  const { compareIds, toggleCompare } = useProductCompare();
 
   useEffect(() => {
     const sync = () => setWishlist(wishlistMapFromStorage());
@@ -77,10 +79,6 @@ const RelatedProductsWidget = () => {
     });
     setWishlist(wishlistMapFromStorage());
   }, [t]);
-
-  const toggleCompare = useCallback((id) => {
-    setCompare((prev) => ({ ...prev, [id]: !prev[id] }));
-  }, []);
 
   return (
     <section aria-labelledby="related-products-title">
@@ -129,7 +127,7 @@ const RelatedProductsWidget = () => {
           >
             {items.map((product) => {
               const inWishlist = Boolean(wishlist[product.id]);
-              const inCompare = Boolean(compare[product.id]);
+              const inCompare = compareIds.has(product.id);
 
               return (
                 <SwiperSlide key={product.id} className="!h-auto">

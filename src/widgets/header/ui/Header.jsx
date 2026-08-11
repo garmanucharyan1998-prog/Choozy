@@ -16,6 +16,7 @@ import {
 import { useHeaderPresenter } from "features/header";
 import { LoginModal } from "features/login";
 import { useLogout } from "features/session";
+import { useProductCompare } from "features/product-compare";
 import { ACCOUNT_STORAGE_EVENT, adoptGuestShelfForSession, readAccountState } from "entities/user";
 import { dashboardPathForRole, ROLES } from "entities/session";
 import { useLanguage, useSession } from "contexts";
@@ -24,7 +25,12 @@ import { stripLanguageFromPath } from "shared/lib/locale";
 import choozyMainLogo from "shared/assets/logos/choozyMainLogo.svg";
 import "./Header.css";
 
-function FavoritesCountBadge({ text }) {
+/**
+ * The little number on a header icon. Was `FavoritesCountBadge` when favourites was the only
+ * thing that counted anything; compare now carries one too. The CSS class keeps its historical
+ * name so `Header.css` needs no churn.
+ */
+function HeaderCountBadge({ text }) {
   if (text == null || text === "") {
     return null;
   }
@@ -82,6 +88,8 @@ const Header = ({
    * populate the real count keeps first paint identical.
    */
   const [wishlistCount, setWishlistCount] = useState(0);
+  /** Same hydration story, handled inside the hook: starts at 0, fills in after mount. */
+  const { compareCount } = useProductCompare();
   const headerRef = useRef(null);
   const mobileBottomNavRef = useRef(null);
 
@@ -547,6 +555,11 @@ const Header = ({
     ? `${t("header.favoritesAriaLabel")}. ${t("header.favoritesCountForAria")}: ${favoritesCountBadge}.`
     : t("header.favoritesAriaLabel");
 
+  const compareCountBadge = compareCount > 0 ? String(compareCount) : null;
+  const compareLinkAriaLabel = compareCountBadge
+    ? `${t("header.compareAriaLabel")}. ${t("comparePage.countForAria")}: ${compareCountBadge}.`
+    : t("header.compareAriaLabel");
+
   const loginLinkClassName = isCompact
     ? "relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-2.5 py-1.5 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-2.5 md:py-2 2xl:px-4 2xl:py-2"
     : "relative mx-[5px] inline-flex items-center justify-center gap-2 rounded-[40px] border border-solid border-black bg-transparent px-3 py-2 text-sm font-semibold text-black no-underline transition-colors duration-200 hover:bg-neutral-100 md:px-3 md:py-2.5 2xl:px-5 2xl:py-2.5";
@@ -574,9 +587,12 @@ const Header = ({
             isCompact ? "p-2 2xl:px-4 2xl:py-2.5" : "p-2.5 2xl:px-5 2xl:py-3.5"
           }`}
           title={t("header.compareTitle")}
-          aria-label={t("header.compareAriaLabel")}
+          aria-label={compareLinkAriaLabel}
         >
-          <FaBalanceScale size={20} aria-hidden="true" />
+          <span className="relative inline-flex shrink-0">
+            <FaBalanceScale size={20} aria-hidden="true" />
+            <HeaderCountBadge text={compareCountBadge} />
+          </span>
           <span className="hidden 2xl:ml-[5px] 2xl:inline">{t("header.compareLabel")}</span>
         </LocalizedLink>
 
@@ -595,7 +611,7 @@ const Header = ({
           >
             <span className="relative inline-flex shrink-0">
               <FaRegHeart size={20} className="text-black" aria-hidden="true" />
-              <FavoritesCountBadge text={favoritesCountBadge} />
+              <HeaderCountBadge text={favoritesCountBadge} />
             </span>
             <span className="hidden text-sm font-semibold tracking-tight text-black 2xl:inline">
               <span className="whitespace-nowrap">{t("header.favoritesLabel")}</span>
@@ -741,6 +757,8 @@ const Header = ({
       handleMobileMenuToggle,
       favoritesCountBadge,
       favoritesLinkAriaLabel,
+      compareCountBadge,
+      compareLinkAriaLabel,
       loginLinkClassName,
       logoutButtonClassName,
       openLoginModal,

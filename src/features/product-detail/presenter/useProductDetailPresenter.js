@@ -8,6 +8,7 @@ import {
   pushRecentlyViewedProduct,
   toggleWishlistProduct,
 } from "entities/user";
+import { useProductCompare } from "features/product-compare";
 import { useLanguage, useProductOffersVariantFilter } from "contexts";
 import { formatAmd } from "shared/lib/formatAmd";
 
@@ -109,9 +110,19 @@ export const useProductDetailPresenter = () => {
     setSelectedColorIndex(index);
   }, []);
 
-  const onCompareClick = useCallback(() => {}, []);
+  /**
+   * Was `useCallback(() => {}, [])` — a real, labelled button wired to nothing, on the page
+   * where the intent to compare is strongest.
+   */
+  const { compareIds, compareCount, toggleCompare } = useProductCompare();
+  const inCompare = product ? compareIds.has(product.id) : false;
+  const onCompareClick = useCallback(() => {
+    if (product) toggleCompare(product.id);
+  }, [product, toggleCompare]);
 
   return {
+    inCompare,
+    compareCount,
     product,
     mainImageSrc,
     activeImageIndex,

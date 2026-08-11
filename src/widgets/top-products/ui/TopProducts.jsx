@@ -1,4 +1,5 @@
 import { useLanguage } from "contexts";
+import { useProductCompare } from "features/product-compare";
 import { useProductWishlist } from "features/product-wishlist";
 import { ProductShowcaseSection } from "shared/ui/product-showcase";
 
@@ -6,6 +7,7 @@ const TopProducts = ({ items }) => {
   const { t } = useLanguage();
   /** Domain state lives here, not in the shared carousel this renders. */
   const { wishlistIds, toggleWishlist } = useProductWishlist();
+  const { compareIds, toggleCompare } = useProductCompare();
 
   return (
     <ProductShowcaseSection
@@ -16,6 +18,8 @@ const TopProducts = ({ items }) => {
       items={items}
       wishlistIds={wishlistIds}
       onToggleWishlist={toggleWishlist}
+      compareIds={compareIds}
+      onToggleCompare={toggleCompare}
       sectionClassName="mb-5 flex justify-center bg-white pb-5 pt-10 lg:mb-20 lg:pb-10 lg:pt-[7.5rem]"
     />
   );

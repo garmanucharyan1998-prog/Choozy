@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useRef } from "react";
 import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } from "react-icons/fa";
 import { useLanguage } from "contexts";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
@@ -34,19 +34,25 @@ const NAV_BTN = `${ACTION_BTN} z-10 hidden shrink-0 self-center text-navy md:fle
 
 /**
  * Presentational: every item arrives ready to render (`href`, `description`, `priceValue`)
- * and wishlist state arrives as props. It used to read and write `entities/user` and build
- * product URLs from `entities/product-detail` itself, which put a `shared/ui` component in
- * charge of domain state — the layer violation this project lints for. See
- * `features/product-wishlist`.
+ * and both wishlist and compare state arrive as props. It used to read and write
+ * `entities/user` and build product URLs from `entities/product-detail` itself, which put a
+ * `shared/ui` component in charge of domain state — the layer violation this project lints
+ * for. See `features/product-wishlist` and `features/product-compare`.
+ *
+ * Compare was the last piece still held locally here, as a `useState` map that flipped
+ * `aria-pressed` and was read by nothing; it now comes from the same store the header's badge
+ * and the compare page count.
  *
  * @param {{
  *   items: object[],
  *   ariaLabel: string,
  *   wishlistIds?: Set<string>,
  *   onToggleWishlist?: (product: object) => void,
+ *   compareIds?: Set<string>,
+ *   onToggleCompare?: (product: object) => void,
  * }} props
  */
-const Carousel = ({ items, ariaLabel, wishlistIds, onToggleWishlist }) => {
+const Carousel = ({ items, ariaLabel, wishlistIds, onToggleWishlist, compareIds, onToggleCompare }) => {
   const { t } = useLanguage();
   const currencySuffix = t("productDetail.currencySuffix");
   const safeItems = Array.isArray(items) ? items : [];
@@ -55,11 +61,7 @@ const Carousel = ({ items, ariaLabel, wishlistIds, onToggleWishlist }) => {
   const loopEnabled = slideCount > 10;
   const swiperRef = useRef(null);
   const savedIds = wishlistIds ?? new Set();
-  const [compare, setCompare] = useState(() => ({}));
-
-  const toggleCompare = useCallback((id) => {
-    setCompare((prev) => ({ ...prev, [id]: !prev[id] }));
-  }, []);
+  const comparedIds = compareIds ?? new Set();
 
   return (
     <section className="my-5 flex items-center justify-center sm:my-10" aria-label={ariaLabel}>
@@ -87,7 +89,7 @@ const Carousel = ({ items, ariaLabel, wishlistIds, onToggleWishlist }) => {
             {safeItems.map((product, index) => {
               const detailPath = product.href ?? null;
               const inWishlist = savedIds.has(product.id);
-              const inCompare = Boolean(compare[product.id]);
+              const inCompare = comparedIds.has(product.id);
 
               return (
                 <SwiperSlide key={product.id || index} className="!h-auto">
@@ -106,7 +108,7 @@ const Carousel = ({ items, ariaLabel, wishlistIds, onToggleWishlist }) => {
                       <div className="pointer-events-auto absolute right-2.5 top-2.5 z-20 flex flex-col gap-2 sm:right-3 sm:top-3">
                         <button
                           type="button"
-                          onClick={() => toggleCompare(product.id)}
+                          onClick={() => onToggleCompare?.(product)}
                           aria-pressed={inCompare}
                           aria-label={t("carousel.compareAriaLabel")}
                           className={ACTION_BTN}

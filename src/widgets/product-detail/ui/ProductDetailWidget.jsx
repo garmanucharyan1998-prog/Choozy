@@ -5,6 +5,7 @@ import { resolveSpecValue } from "entities/product";
 import { BREAKPOINTS } from "shared/config/breakpoints";
 import { PriceHistoryChart } from "shared/ui/price-history-chart";
 import { ProgressiveImage } from "shared/ui/progressive-image";
+import { LocalizedLink } from "shared/ui/link";
 import { FaBalanceScale, FaHeart, FaRegHeart } from "react-icons/fa";
 import { Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -72,6 +73,8 @@ const ProductDetailWidget = () => {
     selectVariant,
     selectColor,
     onCompareClick,
+    inCompare,
+    compareCount,
   } = useProductDetailPresenter();
 
   /** Real product name — without it every product page would share one H1. */
@@ -251,14 +254,33 @@ const ProductDetailWidget = () => {
                   />
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={onCompareClick}
-                className="inline-flex items-center justify-center gap-2 self-start rounded-xl border-2 border-border-blue bg-white px-5 py-2.5 text-sm font-semibold text-navy transition-colors hover:bg-hover-blue sm:self-center"
-              >
-                <FaBalanceScale className="h-4 w-4" aria-hidden />
-                {t("header.compareLabel")}
-              </button>
+              <div className="flex flex-wrap items-center gap-3 self-start sm:self-center">
+                <button
+                  type="button"
+                  onClick={onCompareClick}
+                  aria-pressed={inCompare}
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl border-2 px-5 py-2.5 text-sm font-semibold transition-colors ${
+                    inCompare
+                      ? "border-navy bg-navy text-white"
+                      : "border-border-blue bg-white text-navy hover:bg-hover-blue"
+                  }`}
+                >
+                  <FaBalanceScale className="h-4 w-4" aria-hidden />
+                  {inCompare ? t("comparePage.remove") : t("header.compareLabel")}
+                </button>
+                {/**
+                 * A comparison of one is not a comparison, so the way through only appears once
+                 * there is something to compare against.
+                 */}
+                {compareCount > 1 ? (
+                  <LocalizedLink
+                    to="/compare"
+                    className="text-sm font-semibold text-link-blue underline-offset-4 hover:underline"
+                  >
+                    {t("comparePage.openWithCount").replace("{{count}}", String(compareCount))}
+                  </LocalizedLink>
+                ) : null}
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-8 border-y border-border-blue py-4">

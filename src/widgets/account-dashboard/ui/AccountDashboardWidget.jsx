@@ -12,6 +12,7 @@ import {
 import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
 import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
+import { useProductCompare } from "features/product-compare";
 import { useLogout } from "features/session";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
@@ -120,16 +121,14 @@ const DEMO_PLAN_MONTHLY_AMD = 30000;
 
 const AccountDashboardWidget = () => {
   const fileInputRef = useRef(null);
-  const [wishlistCompare, setWishlistCompare] = useState(() => ({}));
-  const [recentCompare, setRecentCompare] = useState(() => ({}));
+  /**
+   * One selection for both tabs. They used to keep a `wishlistCompare` and a `recentCompare`
+   * map apiece, so the same product marked on the favourites tab showed unmarked on the
+   * recently-viewed tab right next to it — and neither map was read by anything else.
+   */
+  const { compareIds, toggleCompare } = useProductCompare();
   const [recentVisibleCount, setRecentVisibleCount] = useState(RECENT_INITIAL_VISIBLE_COUNT);
   const [notificationsPageTab, setNotificationsPageTab] = useState(NOTIFICATIONS_PAGE_TABS.FEED);
-  const toggleWishlistCompare = useCallback((id) => {
-    setWishlistCompare((prev) => ({ ...prev, [id]: !prev[id] }));
-  }, []);
-  const toggleRecentCompare = useCallback((id) => {
-    setRecentCompare((prev) => ({ ...prev, [id]: !prev[id] }));
-  }, []);
   const {
     t,
     accountState,
@@ -609,8 +608,8 @@ const AccountDashboardWidget = () => {
                 item={item}
                 priceLabel={formatPriceAmd(item.priceValue, currencySuffix)}
                 detailTo={detailTo}
-                inCompare={Boolean(wishlistCompare[item.id])}
-                onToggleCompare={() => toggleWishlistCompare(item.id)}
+                inCompare={compareIds.has(item.id)}
+                onToggleCompare={() => toggleCompare(item.id)}
                 onHeartClick={() => requestRemoveWishlistItem(item.id)}
                 heartFilled
                 compareAria={t("relatedProducts.compareAriaLabel")}
@@ -654,8 +653,8 @@ const AccountDashboardWidget = () => {
                   item={item}
                   priceLabel={formatPriceAmd(item.priceValue, currencySuffix)}
                   detailTo={detailTo}
-                  inCompare={Boolean(recentCompare[item.id])}
-                  onToggleCompare={() => toggleRecentCompare(item.id)}
+                  inCompare={compareIds.has(item.id)}
+                  onToggleCompare={() => toggleCompare(item.id)}
                   onHeartClick={() => {
                     toggleWishlistProduct({
                       id: item.id,

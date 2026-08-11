@@ -8,6 +8,7 @@ import {
   buildProductDescription,
 } from "entities/product";
 import { useFilterCatalogPresenter } from "features/filter-catalog";
+import { useProductCompare } from "features/product-compare";
 import { useLanguage } from "contexts";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
@@ -175,7 +176,8 @@ const FilterCatalogWidget = () => {
    * in the real data right after hydration.
    */
   const [wishlist, setWishlist] = useState(() => ({}));
-  const [compare, setCompare] = useState(() => ({}));
+  /** Shared with the header badge and every other list — see `features/product-compare`. */
+  const { compareIds, toggleCompare } = useProductCompare();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [overlayOptionQuery, setOverlayOptionQuery] = useState("");
 
@@ -238,10 +240,6 @@ const FilterCatalogWidget = () => {
     });
     setWishlist(wishlistMapFromStorage());
   }, [t]);
-
-  const toggleCompare = useCallback((id) => {
-    setCompare((prev) => ({ ...prev, [id]: !prev[id] }));
-  }, []);
 
   const pageNumbers = useMemo(() => {
     if (totalPages <= 7) {
@@ -652,7 +650,7 @@ const FilterCatalogWidget = () => {
                     priceLabel={formatPriceAmd(product.priceValue, currencySuffix)}
                     descriptionText={buildProductDescription(product, t)}
                     listMode={listMode}
-                    inCompare={Boolean(compare[product.id])}
+                    inCompare={compareIds.has(product.id)}
                     inWishlist={Boolean(wishlist[product.id])}
                     onToggleCompare={toggleCompare}
                     onToggleWishlist={toggleWishlist}

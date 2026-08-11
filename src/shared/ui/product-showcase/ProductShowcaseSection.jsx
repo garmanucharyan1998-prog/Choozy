@@ -19,6 +19,8 @@ const ProductShowcaseSection = ({
   carouselAriaLabel,
   wishlistIds,
   onToggleWishlist,
+  compareIds,
+  onToggleCompare,
 }) => {
   const { t } = useLanguage();
 
@@ -46,6 +48,8 @@ const ProductShowcaseSection = ({
           ariaLabel={carouselAriaLabel}
           wishlistIds={wishlistIds}
           onToggleWishlist={onToggleWishlist}
+          compareIds={compareIds}
+          onToggleCompare={onToggleCompare}
         />
       </div>
     </section>

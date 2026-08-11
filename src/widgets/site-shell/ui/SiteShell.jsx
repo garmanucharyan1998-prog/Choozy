@@ -1,4 +1,5 @@
 import { Outlet } from "react-router";
+import { CompareNotice } from "features/product-compare";
 import { FooterWidget } from "widgets/footer";
 import { HeaderWidget } from "widgets/header";
 import { NavPanelWidget } from "widgets/nav-panel";
@@ -81,6 +82,13 @@ const SiteShell = ({ mainBackground = "white" }) => {
       <div className="mt-auto shrink-0">
         <FooterWidget />
       </div>
+
+      {/**
+       * One live region for the whole app. A refused compare click changes nothing on screen,
+       * so without this the button simply looks broken; mounting it per card would stack one
+       * copy per list on a page that renders four of them.
+       */}
+      <CompareNotice />
     </div>
   );
 };
