@@ -91,6 +91,9 @@ export const ruOverrides = {
     },
   },
   filterPage: {
+    openFiltersAria: "Открыть панель фильтров",
+    viewListAria: "Вид списком",
+    viewGridAria: "Вид сеткой",
     pageTitle: "Каталог товаров",
     resultsHeading: "Результаты",
     mainAriaLabel: "Каталог товаров и фильтры",
@@ -150,6 +153,7 @@ export const ruOverrides = {
     },
     empty: "Результаты не найдены",
   },
+  noscript: "Для работы сайта необходимо включить JavaScript.",
   homeIntro: {
     heading: "Сравнение цен в Армении",
     body: "Choosy собирает предложения на смартфоны, ноутбуки, планшеты, телевизоры, наушники и часы из магазинов Армении на одной странице. Сравните цены, характеристики и наличие — и переходите в выбранный магазин.",
@@ -368,6 +372,9 @@ export const ruOverrides = {
     imageCaption: "Choosy — платформа персонализированных покупок",
   },
   productDetail: {
+    colorsAriaLabel: "Выбор цвета",
+    variantsAriaLabel: "Выбор конфигурации",
+    wishlistAriaLabel: "Добавить в избранное или убрать",
     mainImageAlt: "Apple MacBook Pro — фото товара",
     galleryAriaLabel: "Галерея изображений товара",
     galleryThumbAria: "Выбрать изображение",
@@ -408,6 +415,11 @@ export const ruOverrides = {
       year: "Год:",
     },
     specsExtended: {
+      values: {
+        yes: "Да",
+        batteryHours: "{{hours}} ч",
+        mainCamera: "Основная камера {{mp}} Мп",
+      },
       screenType: "Тип экрана:",
       microphone: "Встроенный микрофон:",
       technology: "Технология:",
@@ -536,6 +548,7 @@ export const ruOverrides = {
       seeLess: "Показать меньше",
     },
     subscription: {
+      planName: "Стандартный",
       title: "Подписка",
       planCardTitle: "План подписки",
       planNameLabel: "Название:",
@@ -676,6 +689,7 @@ export const ruOverrides = {
       viewInStore: "Смотреть в магазине",
       deleteAria: "Удалить товар",
       messages: {
+        productRefreshed: "Дата обновления товара обновлена.",
         required: "Заполните название и цену.",
         categoryRequired: "Выберите категорию.",
         productRequired: "Выберите товар.",
@@ -704,6 +718,7 @@ export const ruOverrides = {
       },
     },
     finance: {
+      planName: "Стандартный",
       tabsAria: "Вкладки раздела финансов",
       tabs: { plan: "План подписки", payments: "История платежей" },
       addLabel: "Добавить",

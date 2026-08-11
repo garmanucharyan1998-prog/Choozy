@@ -19,16 +19,28 @@
  *
  * @param {URLSearchParams | string} search — `location.search`
  * @param {(categoryId: string) => boolean} isKnownCategory
+ * @param {(categoryId: string | null) => number} countPages — how many pages that landing page really has
  * @returns {{ path: string, categoryId: string | null, page: number, noIndex: boolean }}
  */
-export const resolveCatalogCanonical = (search, isKnownCategory) => {
+export const resolveCatalogCanonical = (search, isKnownCategory, countPages = () => Infinity) => {
   const params = typeof search === "string" ? new URLSearchParams(search) : search;
 
   const rawCategory = params.get("category");
   const categoryId = rawCategory && isKnownCategory(rawCategory) ? rawCategory : null;
 
+  /**
+   * Clamped against the real page count, the same way the presenter clamps it for rendering.
+   * Without an upper bound the head advertised a page the body never rendered: every category
+   * fits on one page, so `?page=50` served page 1's products under a self-referencing
+   * canonical claiming to be page 50 — an unbounded family of indexable URLs all serving
+   * identical HTML, each telling a search engine it is *not* a duplicate of the others.
+   */
   const rawPage = Number(params.get("page"));
-  const page = Number.isInteger(rawPage) && rawPage > 1 ? rawPage : 1;
+  const requestedPage = Number.isInteger(rawPage) && rawPage > 1 ? rawPage : 1;
+  const totalPages = Math.max(1, countPages(categoryId));
+  const page = Math.min(requestedPage, totalPages);
+  /** Past the end is a made-up URL: canonicalize onto the real last page and keep it out. */
+  const isPageOutOfRange = requestedPage > totalPages;
 
   /**
    * Everything that narrows results without being a landing page of its own. `perPage` is
@@ -60,7 +72,7 @@ export const resolveCatalogCanonical = (search, isKnownCategory) => {
     path: canonicalPath,
     categoryId,
     page,
-    noIndex: isNarrowed || hasBogusCategory,
+    noIndex: isNarrowed || hasBogusCategory || isPageOutOfRange,
   };
 };
 

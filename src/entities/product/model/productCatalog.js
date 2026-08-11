@@ -89,7 +89,7 @@ const CATALOG_BASE = [
     priceValue: 185000,
     image: PRODUCT_IMAGES.lens,
     categoryId: "cameras",
-    brandId: "sony",
+    brandId: "sigma",
     colorId: "black",
     homeSection: "top",
   },

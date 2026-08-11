@@ -62,7 +62,10 @@ export function headers() {
  */
 export function Layout({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
-  const htmlLang = getHtmlLangForAppLanguage(getLanguageFromPath(pathname));
+  const language = getLanguageFromPath(pathname);
+  const htmlLang = getHtmlLangForAppLanguage(language);
+  /** The only string in the shell — it was hardcoded Armenian on every page in every language. */
+  const t = getTranslator(language);
 
   return (
     <html lang={htmlLang}>
@@ -79,7 +82,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Links />
       </head>
       <body>
-        <noscript>Այս կայքի աշխատանքի համար անհրաժեշտ է միացնել JavaScript-ը։</noscript>
+        <noscript>{t("noscript")}</noscript>
         {children}
         <ScrollRestoration />
         <Scripts />

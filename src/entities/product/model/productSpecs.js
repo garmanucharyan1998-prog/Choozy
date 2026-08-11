@@ -10,27 +10,20 @@
  * over a field that was fiction to begin with, so a 55-inch TV advertised itself as
  * "60″-class" and an Apple Watch as "4″".
  *
- * `labelKey` stays translated (the field names — "Screen size:", "RAM:" — are UI copy).
- * `value` is plain text, not a translation key: like the product title, a spec value
- * ("14″", "16 GB", "Apple") doesn't carry different meaning per locale the way a color
- * name does, and giving every product its own `valueKey` would mean one new dictionary
- * entry per product per language.
+ * `labelKey` is always translated (the field names — "Screen size:", "RAM:" — are UI copy).
+ * A `value` stays plain text when it is language-neutral: "14.2″", "512 GB", "Apple" and
+ * "OLED" read the same everywhere, and giving each one its own key would mean a dictionary
+ * entry per product per language. A value that is an actual English *word* carries a
+ * `valueKey` instead — "Yes", "30 hours" and "48 MP main camera" were rendering
+ * untranslated on every Armenian and Russian product page. The view resolves `valueKey`
+ * when present and falls back to `value`.
  */
 import { formatStorageGb } from "shared/lib/formatStorageGb";
+import { getBrandLabel } from "./productBrands";
 
-const BRAND_LABEL = {
-  apple: "Apple",
-  samsung: "Samsung",
-  sony: "Sony",
-  dell: "Dell",
-  lenovo: "Lenovo",
-  hp: "HP",
-};
-
-const brandLabel = (brandId) => BRAND_LABEL[brandId] || brandId;
 
 /** Drops rows whose value came out empty because the product has no such field. */
-const withoutEmptyValues = (rows) => rows.filter((row) => row && row.value);
+const withoutEmptyValues = (rows) => rows.filter((row) => row && (row.value || row.valueKey));
 
 const screenSizeRow = (p, labelKey) => ({
   labelKey,
@@ -72,14 +65,22 @@ const buildBrief = (p) => {
       ]);
     case "headphones":
       return [
-        { labelKey: "productDetail.specsBrief.battery", value: "30 hours" },
+        {
+          labelKey: "productDetail.specsBrief.battery",
+          valueKey: "productDetail.specsExtended.values.batteryHours",
+          valueParams: { hours: "30" },
+        },
         { labelKey: "productDetail.specsBrief.year", value: "2024" },
       ];
     case "wearables":
       return withoutEmptyValues([
         screenSizeRow(p, "productDetail.specsBrief.screenSize"),
         storageRow(p, "productDetail.specsBrief.storage"),
-        { labelKey: "productDetail.specsBrief.battery", value: "80 hours" },
+        {
+          labelKey: "productDetail.specsBrief.battery",
+          valueKey: "productDetail.specsExtended.values.batteryHours",
+          valueParams: { hours: "80" },
+        },
         { labelKey: "productDetail.specsBrief.year", value: "2024" },
       ]);
     case "tv":
@@ -90,7 +91,13 @@ const buildBrief = (p) => {
     case "cameras":
       return [{ labelKey: "productDetail.specsBrief.year", value: "2024" }];
     case "speakers":
-      return [{ labelKey: "productDetail.specsBrief.battery", value: "24 hours" }];
+      return [
+        {
+          labelKey: "productDetail.specsBrief.battery",
+          valueKey: "productDetail.specsExtended.values.batteryHours",
+          valueParams: { hours: "24" },
+        },
+      ];
     default:
       return [];
   }
@@ -100,7 +107,7 @@ const buildBrief = (p) => {
 const buildExtended = (p) => {
   const manufacturer = {
     labelKey: "productDetail.specsExtended.manufacturer",
-    value: brandLabel(p.brandId),
+    value: getBrandLabel(p.brandId),
   };
   const bluetooth = { labelKey: "productDetail.specsExtended.bluetooth", value: "5.3" };
 
@@ -119,7 +126,11 @@ const buildExtended = (p) => {
     case "smartphones":
       return withoutEmptyValues([
         { labelKey: "productDetail.specsExtended.screenType", value: "OLED" },
-        { labelKey: "productDetail.specsExtended.matrix", value: "48 MP main camera" },
+        {
+          labelKey: "productDetail.specsExtended.matrix",
+          valueKey: "productDetail.specsExtended.values.mainCamera",
+          valueParams: { mp: "48" },
+        },
         storageRow(p, "productDetail.specsExtended.ssd"),
         bluetooth,
         manufacturer,
@@ -133,7 +144,10 @@ const buildExtended = (p) => {
       ]);
     case "headphones":
       return [
-        { labelKey: "productDetail.specsExtended.microphone", value: "Yes" },
+        {
+          labelKey: "productDetail.specsExtended.microphone",
+          valueKey: "productDetail.specsExtended.values.yes",
+        },
         bluetooth,
         manufacturer,
       ];

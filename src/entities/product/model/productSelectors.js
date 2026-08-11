@@ -1,5 +1,8 @@
 import { PRODUCT_CATALOG } from "./productCatalog";
 
+/** Must match the presenter's DEFAULT_PAGE_SIZE — the size a canonical URL implies. */
+export const DEFAULT_CATALOG_PAGE_SIZE = 20;
+
 /** Home page "top products" carousel — was a separate hand-copied `top-N` list. */
 export const getTopCatalogProducts = () => PRODUCT_CATALOG.filter((p) => p.homeSection === "top");
 
@@ -49,4 +52,21 @@ export const getCatalogSearchSuggestions = (query, limit = 6) => {
       p.categoryId.toLowerCase().includes(q),
   );
   return matches.slice(0, limit).map((p) => p.title);
+};
+
+/**
+ * How many pages a catalog landing page really has, at the default page size.
+ *
+ * Exported so the SEO layer can clamp `?page=` the same way the presenter does. They used to
+ * disagree: the presenter clamped for rendering while `meta()` did not, so `?page=50` served
+ * page 1's products under a canonical claiming to be page 50.
+ *
+ * @param {string | null} categoryId — `null` for the unfiltered catalog
+ * @param {number} [pageSize]
+ */
+export const getCatalogPageCount = (categoryId, pageSize = DEFAULT_CATALOG_PAGE_SIZE) => {
+  const total = categoryId
+    ? PRODUCT_CATALOG.filter((p) => p.categoryId === categoryId).length
+    : PRODUCT_CATALOG.length;
+  return Math.max(1, Math.ceil(total / Math.max(1, pageSize)));
 };

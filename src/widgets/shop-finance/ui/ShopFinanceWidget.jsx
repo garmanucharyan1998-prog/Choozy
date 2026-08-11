@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { useLanguage } from "contexts";
+import { formatPriceAmd } from "shared/lib/formatPriceAmd";
+
+/** Demo plan pricing — see the buyer dashboard for why these are amounts, not strings. */
+const DEMO_PLAN_TOTAL_AMD = 160000;
+const DEMO_PLAN_MONTHLY_AMD = 30000;
 
 const FINANCE_TABS = {
   PLAN: "plan",
@@ -32,13 +37,12 @@ const ShopFinanceWidget = () => {
     <div className="flex flex-col gap-4 md:gap-5">
       <div
         className="flex w-fit max-w-full items-center overflow-x-auto"
-        role="tablist"
+        role="group"
         aria-label={t("shopAccount.finance.tabsAria")}
       >
         <button
           type="button"
-          role="tab"
-          aria-selected={financeTab === FINANCE_TABS.PLAN}
+          aria-pressed={financeTab === FINANCE_TABS.PLAN}
           className={`touch-manipulation shrink-0 self-center border-b-2 px-2 pb-2 align-middle text-center font-sans text-[14px] font-normal leading-[100%] tracking-normal text-[rgba(21,33,71,1)] transition-colors duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:px-3 ${
             financeTab === FINANCE_TABS.PLAN ? "border-navy" : "border-[#b8b8b8]"
           }`}
@@ -48,8 +52,7 @@ const ShopFinanceWidget = () => {
         </button>
         <button
           type="button"
-          role="tab"
-          aria-selected={financeTab === FINANCE_TABS.PAYMENTS}
+          aria-pressed={financeTab === FINANCE_TABS.PAYMENTS}
           className={`touch-manipulation shrink-0 self-center border-b-2 px-2 pb-2 align-middle text-center font-sans text-[14px] leading-[100%] tracking-normal text-[rgba(21,33,71,1)] transition-colors duration-200 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:px-3 ${
             financeTab === FINANCE_TABS.PAYMENTS
               ? "border-navy font-medium"
@@ -65,7 +68,6 @@ const ShopFinanceWidget = () => {
         <>
           <div
             className="box-border flex h-[220px] w-full max-w-[353px] flex-col gap-5 rounded-[20px] border border-[rgb(221,227,248)] bg-white p-5"
-            role="tabpanel"
           >
             <h2 className="m-0 shrink-0 font-sans text-base font-medium leading-6 text-navy">
               {t("shopAccount.finance.planCardTitle")}
@@ -85,7 +87,7 @@ const ShopFinanceWidget = () => {
                   {t("shopAccount.finance.planValueLabel")}
                 </dt>
                 <dd className="m-0 py-0 px-2 font-sans text-lg font-bold leading-normal text-navy">
-                  {t("shopAccount.finance.planTotal")}
+                  {formatPriceAmd(DEMO_PLAN_TOTAL_AMD, t("productDetail.currencySuffix"))}
                 </dd>
               </div>
               <div className="flex flex-wrap items-baseline gap-x-1">
@@ -93,14 +95,14 @@ const ShopFinanceWidget = () => {
                   {t("shopAccount.finance.planMonthlyLabel")}
                 </dt>
                 <dd className="m-0 py-0 px-2 font-sans text-lg font-bold leading-normal text-navy">
-                  {t("shopAccount.finance.planMonthly")}
+                  {formatPriceAmd(DEMO_PLAN_MONTHLY_AMD, t("productDetail.currencySuffix"))}
                 </dd>
               </div>
             </dl>
           </div>
         </>
       ) : (
-        <div className="w-full max-w-5xl" role="tabpanel">
+        <div className="w-full max-w-5xl">
           <ul
             className="m-0 flex list-none flex-col gap-3 p-0 md:hidden"
             aria-label={t("shopAccount.finance.payments.tableAria")}

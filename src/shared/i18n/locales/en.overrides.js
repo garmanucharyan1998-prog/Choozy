@@ -91,6 +91,9 @@ export const enOverrides = {
     },
   },
   filterPage: {
+    openFiltersAria: "Open the filter panel",
+    viewListAria: "List view",
+    viewGridAria: "Grid view",
     pageTitle: "Product catalog",
     resultsHeading: "Results",
     mainAriaLabel: "Product catalog and filters",
@@ -150,6 +153,7 @@ export const enOverrides = {
     },
     empty: "No results found",
   },
+  noscript: "This site needs JavaScript enabled to work.",
   homeIntro: {
     heading: "Price comparison in Armenia",
     body: "Choosy gathers offers for smartphones, laptops, tablets, TVs, headphones and watches from stores across Armenia onto one page. Compare prices, specifications and availability, then go straight to the shop you picked.",
@@ -370,6 +374,9 @@ export const enOverrides = {
     imageCaption: "Choosy — personalized shopping platform",
   },
   productDetail: {
+    colorsAriaLabel: "Color selection",
+    variantsAriaLabel: "Configuration selection",
+    wishlistAriaLabel: "Add to or remove from favorites",
     mainImageAlt: "Apple MacBook Pro — product photo",
     galleryAriaLabel: "Product image gallery",
     galleryThumbAria: "Select image",
@@ -410,6 +417,11 @@ export const enOverrides = {
       year: "Year:",
     },
     specsExtended: {
+      values: {
+        yes: "Yes",
+        batteryHours: "{{hours}} hours",
+        mainCamera: "{{mp}} MP main camera",
+      },
       screenType: "Screen type:",
       microphone: "Built-in microphone:",
       technology: "Technology:",
@@ -538,6 +550,7 @@ export const enOverrides = {
       seeLess: "Show less",
     },
     subscription: {
+      planName: "Standard",
       title: "Subscription",
       planCardTitle: "Subscription plan",
       planNameLabel: "Name:",
@@ -679,6 +692,7 @@ export const enOverrides = {
       viewInStore: "View in store",
       deleteAria: "Delete product",
       messages: {
+        productRefreshed: "The product refresh date was updated.",
         required: "Fill in title and price.",
         categoryRequired: "Select a category.",
         productRequired: "Select a product.",
@@ -707,6 +721,7 @@ export const enOverrides = {
       },
     },
     finance: {
+      planName: "Standard",
       tabsAria: "Finance section tabs",
       tabs: { plan: "Subscription plan", payments: "Payment history" },
       addLabel: "Add",

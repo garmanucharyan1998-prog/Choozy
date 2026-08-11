@@ -1,5 +1,6 @@
 import { FilterCatalogWidget } from "widgets/filter-catalog";
 import { isValidFilterCategoryId } from "entities/filter-catalog";
+import { getCatalogPageCount } from "entities/product";
 import { getTranslator } from "shared/i18n";
 import { buildPageMeta, resolveCatalogCanonical } from "shared/lib/seo";
 import { getLanguageFromPath } from "shared/lib/locale";
@@ -19,6 +20,7 @@ export function meta({ location }) {
   const { path, categoryId, page, noIndex } = resolveCatalogCanonical(
     location.search,
     isValidFilterCategoryId,
+    getCatalogPageCount,
   );
 
   const base = categoryId

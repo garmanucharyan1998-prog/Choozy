@@ -110,6 +110,14 @@ const AccountGridProductCard = ({
   </article>
 );
 
+/**
+ * Demo plan pricing. Amounts, not strings: they used to be dictionary entries reading
+ * "160,000 AMD" with no Russian or English override, so the plan card said "AMD" in every
+ * language while the rest of the site said "դր." or "драм".
+ */
+const DEMO_PLAN_TOTAL_AMD = 160000;
+const DEMO_PLAN_MONTHLY_AMD = 30000;
+
 const AccountDashboardWidget = () => {
   const fileInputRef = useRef(null);
   const [wishlistCompare, setWishlistCompare] = useState(() => ({}));
@@ -536,11 +544,10 @@ const AccountDashboardWidget = () => {
     <MainCard>
       <h2 className="sr-only">{t("account.sidebar.personal")}</h2>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e1e6ef] px-5 pt-5 md:px-8 md:pt-6">
-        <div className="flex gap-6" role="tablist" aria-label={t("account.personalTabsAria")}>
+        <div className="flex gap-6" role="group" aria-label={t("account.personalTabsAria")}>
           <button
             type="button"
-            role="tab"
-            aria-selected={personalInnerTab === innerTabs.DATA}
+            aria-pressed={personalInnerTab === innerTabs.DATA}
             className={`border-b-2 pb-3 text-sm font-bold transition ${
               personalInnerTab === innerTabs.DATA
                 ? "border-navy text-navy"
@@ -552,8 +559,7 @@ const AccountDashboardWidget = () => {
           </button>
           <button
             type="button"
-            role="tab"
-            aria-selected={personalInnerTab === innerTabs.NOTIFICATIONS}
+            aria-pressed={personalInnerTab === innerTabs.NOTIFICATIONS}
             className={`border-b-2 pb-3 text-sm font-bold transition ${
               personalInnerTab === innerTabs.NOTIFICATIONS
                 ? "border-navy text-navy"
@@ -716,7 +722,7 @@ const AccountDashboardWidget = () => {
             {t("account.subscription.planValueLabel")}
           </dt>
           <dd className="m-0 text-base font-bold text-[#171717]">
-            {t("account.subscription.planTotal")}
+            {formatPriceAmd(DEMO_PLAN_TOTAL_AMD, currencySuffix)}
           </dd>
         </div>
         <div className="flex flex-col gap-0.5 text-start sm:flex-row sm:items-baseline sm:gap-6">
@@ -724,7 +730,7 @@ const AccountDashboardWidget = () => {
             {t("account.subscription.planMonthlyLabel")}
           </dt>
           <dd className="m-0 text-base font-bold text-[#171717]">
-            {t("account.subscription.planMonthly")}
+            {formatPriceAmd(DEMO_PLAN_MONTHLY_AMD, currencySuffix)}
           </dd>
         </div>
       </dl>
@@ -746,13 +752,12 @@ const AccountDashboardWidget = () => {
             <div className="border-b border-[#e1e6ef] px-3 pt-4 sm:px-5 sm:pt-5 md:px-8 md:pt-6">
               <div
                 className="grid w-full grid-cols-2 sm:flex sm:w-auto sm:gap-8"
-                role="tablist"
+                role="group"
                 aria-label={t("account.notificationsPage.tabsAria")}
               >
                 <button
                   type="button"
-                  role="tab"
-                  aria-selected={notificationsPageTab === NOTIFICATIONS_PAGE_TABS.FEED}
+                  aria-pressed={notificationsPageTab === NOTIFICATIONS_PAGE_TABS.FEED}
                   className={`touch-manipulation border-b-2 px-1 py-3.5 text-center text-sm font-bold transition sm:px-0 sm:py-0 sm:pb-3 sm:text-start ${
                     notificationsPageTab === NOTIFICATIONS_PAGE_TABS.FEED
                       ? "border-navy text-navy"
@@ -764,8 +769,7 @@ const AccountDashboardWidget = () => {
                 </button>
                 <button
                   type="button"
-                  role="tab"
-                  aria-selected={notificationsPageTab === NOTIFICATIONS_PAGE_TABS.SETTINGS}
+                  aria-pressed={notificationsPageTab === NOTIFICATIONS_PAGE_TABS.SETTINGS}
                   className={`touch-manipulation border-b-2 px-1 py-3.5 text-center text-sm font-bold transition sm:px-0 sm:py-0 sm:pb-3 sm:text-start ${
                     notificationsPageTab === NOTIFICATIONS_PAGE_TABS.SETTINGS
                       ? "border-navy text-navy"

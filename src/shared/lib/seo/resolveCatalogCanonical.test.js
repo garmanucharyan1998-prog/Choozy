@@ -1,7 +1,10 @@
 import { isValidFilterCategoryId } from "entities/filter-catalog";
+import { getCatalogPageCount } from "entities/product";
 import { resolveCatalogCanonical } from "./resolveCatalogCanonical";
 
-const resolve = (search) => resolveCatalogCanonical(search, isValidFilterCategoryId);
+/** The real catalog, so these clamp against the same page counts the site does. */
+const resolve = (search) =>
+  resolveCatalogCanonical(search, isValidFilterCategoryId, getCatalogPageCount);
 
 describe("resolveCatalogCanonical", () => {
   test("bare /filter self-canonicalizes and is indexable", () => {
@@ -28,19 +31,34 @@ describe("resolveCatalogCanonical", () => {
     expect(result.noIndex).toBe(false);
   });
 
-  test("page 2 of a category keeps both the category and the page", () => {
-    const result = resolve("?category=laptops&page=3");
-    expect(result.path).toBe("/filter?category=laptops&page=3");
-    expect(result.page).toBe(3);
-    expect(result.noIndex).toBe(false);
-  });
-
-  test("page 2 of the whole catalog is its own indexable page", () => {
+  test("a page that really exists keeps its number and stays indexable", () => {
     const result = resolve("?page=2");
     expect(result.path).toBe("/filter?page=2");
     expect(result.page).toBe(2);
     expect(result.noIndex).toBe(false);
   });
+
+  /**
+   * Every category fits on a single page at the default size, so page 2 of one does not
+   * exist. Such a URL used to answer 200 with page 1's products under a canonical claiming
+   * to be that page — an unbounded family of self-canonical duplicates, each telling a
+   * search engine it was not a duplicate of the others.
+   */
+  test("a category page past the end canonicalizes onto the real page and is not indexed", () => {
+    const result = resolve("?category=laptops&page=3");
+    expect(result.path).toBe("/filter?category=laptops");
+    expect(result.page).toBe(1);
+    expect(result.noIndex).toBe(true);
+  });
+
+  test.each(["?page=3", "?page=4", "?page=99"])(
+    "%s is past the end of the catalog and is not indexed",
+    (search) => {
+      const result = resolve(search);
+      expect(result.path).toBe("/filter?page=2");
+      expect(result.noIndex).toBe(true);
+    },
+  );
 
   test("page=1 is dropped so it can't duplicate the bare URL", () => {
     expect(resolve("?page=1").path).toBe("/filter");
@@ -88,7 +106,9 @@ describe("resolveCatalogCanonical", () => {
   });
 
   test("accepts URLSearchParams as well as a string", () => {
-    const params = new URLSearchParams({ category: "tablets", page: "2" });
-    expect(resolve(params).path).toBe("/filter?category=tablets&page=2");
+    expect(resolve(new URLSearchParams({ category: "tablets" })).path).toBe(
+      "/filter?category=tablets",
+    );
+    expect(resolve(new URLSearchParams({ page: "2" })).path).toBe("/filter?page=2");
   });
 });

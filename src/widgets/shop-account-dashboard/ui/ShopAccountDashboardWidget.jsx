@@ -122,7 +122,7 @@ const ShopFormSelect = ({
                 <button
                   type="button"
                   role="option"
-                  aria-selected={isSelected}
+                  aria-pressed={isSelected}
                   lang={typeof document !== "undefined" ? document.documentElement.lang : undefined}
                   className={`w-full border-0 px-3 py-2.5 text-start text-sm transition ${
                     isSelected
@@ -418,13 +418,12 @@ const ShopAccountDashboardWidget = () => {
       <div className="border-b border-[#e1e6ef] px-3 pt-2 sm:px-5 md:px-8">
         <div
           className="grid w-full grid-cols-2 sm:flex sm:w-auto sm:gap-8"
-          role="tablist"
+          role="group"
           aria-label={t("shopAccount.notificationsPage.tabsAria")}
         >
           <button
             type="button"
-            role="tab"
-            aria-selected={notificationsPageTab === notificationsTabs.FEED}
+            aria-pressed={notificationsPageTab === notificationsTabs.FEED}
             className={`touch-manipulation border-b-2 px-1 py-3.5 text-center text-sm font-bold transition sm:px-0 sm:py-0 sm:pb-3 sm:text-start ${
               notificationsPageTab === notificationsTabs.FEED
                 ? "border-navy text-navy"
@@ -436,8 +435,7 @@ const ShopAccountDashboardWidget = () => {
           </button>
           <button
             type="button"
-            role="tab"
-            aria-selected={notificationsPageTab === notificationsTabs.SETTINGS}
+            aria-pressed={notificationsPageTab === notificationsTabs.SETTINGS}
             className={`touch-manipulation border-b-2 px-1 py-3.5 text-center text-sm font-bold transition sm:px-0 sm:py-0 sm:pb-3 sm:text-start ${
               notificationsPageTab === notificationsTabs.SETTINGS
                 ? "border-navy text-navy"
@@ -622,11 +620,10 @@ const ShopAccountDashboardWidget = () => {
     <MainCard className="w-full overflow-hidden p-0">
       <h2 className="sr-only">{t("shopAccount.sidebar.details")}</h2>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e1e6ef] px-5 pt-5 md:px-8 md:pt-6">
-        <div className="flex gap-6" role="tablist" aria-label={t("shopAccount.shopTabsAria")}>
+        <div className="flex gap-6" role="group" aria-label={t("shopAccount.shopTabsAria")}>
           <button
             type="button"
-            role="tab"
-            aria-selected={shopInnerTab === innerTabs.DATA}
+            aria-pressed={shopInnerTab === innerTabs.DATA}
             className={`border-b-2 pb-3 text-sm font-bold transition ${
               shopInnerTab === innerTabs.DATA
                 ? "border-navy text-navy"
@@ -638,8 +635,7 @@ const ShopAccountDashboardWidget = () => {
           </button>
           <button
             type="button"
-            role="tab"
-            aria-selected={shopInnerTab === innerTabs.NOTIFICATIONS}
+            aria-pressed={shopInnerTab === innerTabs.NOTIFICATIONS}
             className={`border-b-2 pb-3 text-sm font-bold transition ${
               shopInnerTab === innerTabs.NOTIFICATIONS
                 ? "border-navy text-navy"
@@ -670,7 +666,8 @@ const ShopAccountDashboardWidget = () => {
   );
 
   const renderShopProductsSection = () => {
-    const amd = t("shopAccount.products.amd");
+    /** The visitor’s own currency word, not a hardcoded "AMD" the dictionary never localized. */
+    const amd = t("productDetail.currencySuffix");
     const priceLabel = (product) => {
       const raw = typeof product.price === "string" ? product.price.trim() : "";
       if (raw) return `${raw} ${amd}`;

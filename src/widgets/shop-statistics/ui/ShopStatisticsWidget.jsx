@@ -53,7 +53,7 @@ const ShopStatisticsWidget = () => {
 
       <div
         className="grid grid-cols-2 gap-0 border-b border-[#e1e6ef] sm:grid-cols-4"
-        role="tablist"
+        role="group"
         aria-label={t("shopAccount.statistics.metricTabsAria")}
       >
         {demoShopStatisticsMetrics.map((metric, index) => {
@@ -62,8 +62,7 @@ const ShopStatisticsWidget = () => {
             <button
               key={metric.id}
               type="button"
-              role="tab"
-              aria-selected={selected}
+              aria-pressed={selected}
               id={`shop-stat-tab-${metric.id}`}
               aria-controls="shop-statistics-chart"
               onClick={() => setActiveIndex(index)}
@@ -101,7 +100,6 @@ const ShopStatisticsWidget = () => {
       <div
         className="px-2 pb-4 pt-2 md:px-4 md:pb-6 md:pt-4"
         id="shop-statistics-chart"
-        role="tabpanel"
         aria-labelledby={`shop-stat-tab-${active.id}`}
       >
         <div

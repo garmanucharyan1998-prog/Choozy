@@ -1,15 +1,7 @@
 import { getSiteBaseUrl } from "shared/config/siteMeta";
 import { localizedPath } from "shared/lib/locale";
 import { getCanonicalProductDetailPath } from "entities/product-detail";
-
-const BRAND_LABEL = {
-  apple: "Apple",
-  samsung: "Samsung",
-  sony: "Sony",
-  dell: "Dell",
-  lenovo: "Lenovo",
-  hp: "HP",
-};
+import { getBrandLabel } from "entities/product";
 
 /**
  * Product + AggregateOffer + BreadcrumbList for the detail page.
@@ -61,7 +53,7 @@ export const buildProductJsonLd = ({
       description,
       image: images,
       sku: product.id,
-      brand: { "@type": "Brand", name: BRAND_LABEL[product.brandId] || product.brandId },
+      brand: { "@type": "Brand", name: getBrandLabel(product.brandId) },
       category: categoryLabel,
       offers: {
         "@type": "AggregateOffer",

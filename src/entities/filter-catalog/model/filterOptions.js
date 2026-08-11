@@ -6,10 +6,10 @@
  * 4/8/16/32/128 GB while the Galaxy S25 Ultra carried 12, so that product was silently
  * unfilterable and its count was computed but never rendered.
  *
- * Brands and colors stay hand-listed: their labels are real UI copy that has to be
- * translated, and the sets are closed and stable.
+ * Colors stay hand-listed: their labels are real UI copy that has to be translated, and the
+ * set is closed and stable.
  */
-import { PRODUCT_CATALOG } from "entities/product";
+import { getBrandLabel, PRODUCT_CATALOG } from "entities/product";
 
 /**
  * Screen sizes are bucketed rather than listed one value per option: with honest diagonals
@@ -38,14 +38,16 @@ export const SCREEN_SIZE_OPTIONS = SCREEN_SIZE_BUCKETS.filter((bucket) =>
   PRODUCT_CATALOG.some((product) => screenBucketIdFor(product.screenInch) === bucket.id),
 );
 
-export const BRAND_OPTIONS = [
-  { id: "apple", labelKey: "filterPage.filters.brandNames.apple" },
-  { id: "samsung", labelKey: "filterPage.filters.brandNames.samsung" },
-  { id: "sony", labelKey: "filterPage.filters.brandNames.sony" },
-  { id: "hp", labelKey: "filterPage.filters.brandNames.hp" },
-  { id: "lenovo", labelKey: "filterPage.filters.brandNames.lenovo" },
-  { id: "dell", labelKey: "filterPage.filters.brandNames.dell" },
-];
+/**
+ * Derived from the catalog like the other facets, and labelled from the one brand map.
+ * The hand-written list could disagree with the data in both directions — a brand nobody
+ * stocks stayed clickable, and a product filed under a brand not on the list was
+ * unfilterable. Brand names are proper nouns, so they carry no translation keys.
+ */
+export const BRAND_OPTIONS = [...new Set(PRODUCT_CATALOG.map((product) => product.brandId))]
+  .filter(Boolean)
+  .sort((a, b) => getBrandLabel(a).localeCompare(getBrandLabel(b), "en"))
+  .map((id) => ({ id, label: getBrandLabel(id) }));
 
 /**
  * Every storage size present in the catalog, ascending. Labels are built by the presenter

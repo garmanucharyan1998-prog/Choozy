@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useParams } from "react-router";
 import { useLanguage } from "contexts";
+import { resolveSpecValue } from "entities/product";
 import { useProductOffersPresenter } from "features/product-offers";
 import { getProductDetailForRoute } from "entities/product";
 import { YerevanMap } from "shared/ui/yerevan-map";
@@ -57,7 +58,7 @@ const ProductOffersMapWidget = () => {
                   {t(row.labelKey)}
                 </dt>
                 <dd className="m-0 text-sm font-semibold leading-snug text-text-dark md:text-base">
-                  {row.value}
+                  {resolveSpecValue(row, t)}
                 </dd>
               </div>
             ))}

@@ -10,7 +10,7 @@ import {
   productMatchesSearch,
   screenBucketIdFor,
 } from "entities/filter-catalog";
-import { PRODUCT_CATALOG } from "entities/product";
+import { DEFAULT_CATALOG_PAGE_SIZE, PRODUCT_CATALOG } from "entities/product";
 import { formatPriceRangeAmd } from "shared/lib/formatPriceAmd";
 import { formatStorageGb } from "shared/lib/formatStorageGb";
 
@@ -23,7 +23,8 @@ const boundsFromProducts = () => {
 
 const SORT_VALUES = ["popular", "priceAsc", "priceDesc"];
 const PAGE_SIZES = [12, 20, 40];
-const DEFAULT_PAGE_SIZE = 20;
+/** Shared with the SEO layer so a canonical URL and the rendered page agree on pagination. */
+const DEFAULT_PAGE_SIZE = DEFAULT_CATALOG_PAGE_SIZE;
 
 /** Comma-separated multi-value params, filtered against the known option ids. */
 const readSet = (searchParams, key, allowedIds) => {
@@ -456,10 +457,8 @@ export const useFilterCatalogPresenter = () => {
     [],
   );
 
-  const brandOptions = useMemo(
-    () => BRAND_OPTIONS.map((option) => ({ id: option.id, label: t(option.labelKey) })),
-    [t],
-  );
+  /** Brand names are the same text in every locale, so these arrive display-ready. */
+  const brandOptions = BRAND_OPTIONS;
 
   const visibleBrandOptions = useMemo(
     () => (brandExpanded ? brandOptions : brandOptions.slice(0, 4)),

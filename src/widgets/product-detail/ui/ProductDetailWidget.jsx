@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 import { useProductDetailPresenter } from "features/product-detail";
 import { useLanguage } from "contexts";
+import { resolveSpecValue } from "entities/product";
 import { BREAKPOINTS } from "shared/config/breakpoints";
 import { PriceHistoryChart } from "shared/ui/price-history-chart";
 import { ProgressiveImage } from "shared/ui/progressive-image";
@@ -101,7 +102,7 @@ const ProductDetailWidget = () => {
     rows.map((row) => (
       <div key={row.labelKey} className="min-w-0 text-sm leading-relaxed lg:text-[15px]">
         <dt className="inline font-normal text-text-muted">{t(row.labelKey)}</dt>
-        <dd className="m-0 inline font-semibold text-text-dark"> {row.value}</dd>
+        <dd className="m-0 inline font-semibold text-text-dark"> {resolveSpecValue(row, t)}</dd>
       </div>
     ));
 

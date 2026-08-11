@@ -1,18 +1,25 @@
+import { getTranslator } from "shared/i18n";
 import { PRODUCT_CATALOG } from "./productCatalog";
+import { resolveSpecValue } from "./productSpecValue";
 import { buildSpecsForProduct } from "./productSpecs";
 import { buildVariantsForProduct } from "./productVariants";
+
+const t = getTranslator("en");
 
 const specRows = (product) => {
   const { brief, extended } = buildSpecsForProduct(product);
   return [...brief, ...extended];
 };
 
+/** Rows carry either a literal value or a translation key — compare what actually renders. */
+const specValues = (product) => specRows(product).map((row) => resolveSpecValue(row, t));
+
 describe("buildSpecsForProduct", () => {
   test("every emitted row has a non-empty value", () => {
     PRODUCT_CATALOG.forEach((product) => {
       specRows(product).forEach((row) => {
         expect(row.labelKey).toBeTruthy();
-        expect(row.value).toBeTruthy();
+        expect(resolveSpecValue(row, t), `${product.id}/${row.labelKey}`).toBeTruthy();
       });
     });
   });
@@ -20,7 +27,7 @@ describe("buildSpecsForProduct", () => {
   /** A 128 GB tablet used to advertise "0.128 TB" here while its picker said "128 GB". */
   test("a 128 GB product reports 128 GB, not a fraction of a terabyte", () => {
     const product = PRODUCT_CATALOG.find((p) => p.storageGb === 128);
-    const values = specRows(product).map((row) => row.value);
+    const values = specValues(product);
 
     expect(values).toContain("128 GB");
     values.forEach((value) => expect(value).not.toContain("0.128"));
@@ -38,13 +45,13 @@ describe("buildSpecsForProduct", () => {
    */
   test("screen rows quote the product's real diagonal", () => {
     const tv = PRODUCT_CATALOG.find((p) => p.categoryId === "tv");
-    expect(specRows(tv).map((r) => r.value)).toContain(`${tv.screenInch}″`);
+    expect(specValues(tv)).toContain(`${tv.screenInch}″`);
 
     const watch = PRODUCT_CATALOG.find((p) => p.categoryId === "wearables");
-    expect(specRows(watch).map((r) => r.value)).toContain(`${watch.screenInch}″`);
+    expect(specValues(watch)).toContain(`${watch.screenInch}″`);
 
     const phone = PRODUCT_CATALOG.find((p) => p.categoryId === "smartphones");
-    expect(specRows(phone).map((r) => r.value)).toContain(`${phone.screenInch}″`);
+    expect(specValues(phone)).toContain(`${phone.screenInch}″`);
   });
 
   test("products with no screen never quote a diagonal", () => {
@@ -54,7 +61,7 @@ describe("buildSpecsForProduct", () => {
         "productDetail.specsBrief.screenSize",
       );
       /** Catches any row that smuggles a size in, e.g. the laptops' `N″ Retina/OLED`. */
-      rows.forEach((row) => expect(row.value).not.toContain("″"));
+      rows.forEach((row) => expect(resolveSpecValue(row, t)).not.toContain("″"));
     });
   });
 
@@ -75,7 +82,7 @@ describe("buildSpecsForProduct", () => {
             row.labelKey === "productDetail.specsBrief.storage" ||
             row.labelKey === "productDetail.specsExtended.ssd",
         )
-        .map((row) => row.value.replace(" SSD", ""));
+        .map((row) => resolveSpecValue(row, t).replace(" SSD", ""));
 
       storageValues.forEach((value) => expect(variantLabels).toContain(value));
     });
