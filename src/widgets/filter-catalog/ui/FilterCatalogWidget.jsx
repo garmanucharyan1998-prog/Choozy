@@ -14,6 +14,9 @@ import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 import FilterProductCard from "shared/ui/filter-product-card/FilterProductCard";
 import { LocalizedLink } from "shared/ui/link";
 
+/** Cards in the first grid row at the widest breakpoint — above the fold, so eager. */
+const FIRST_ROW_CARD_COUNT = 4;
+
 const PAGE_LINK_IDLE =
   "inline-block rounded-lg border border-border-blue px-3 py-2 text-sm text-navy no-underline hover:bg-hover-blue";
 
@@ -131,6 +134,11 @@ const FilterCatalogWidget = () => {
   const pageHeading = selectedCategory
     ? t(`filterPage.categories.${selectedCategory}`, selectedCategory)
     : t("filterPage.pageTitle");
+
+  /** Per-category keyword copy; the unfiltered catalog has none to show. */
+  const categoryIntro = selectedCategory
+    ? t(`seo.filterCategories.${selectedCategory}.intro`, "")
+    : "";
   /** One currency word for the whole page — cards used to bake a hardcoded "AMD" into the data. */
   const currencySuffix = t("productDetail.currencySuffix");
   const catalogItemListJsonLd = useMemo(
@@ -487,7 +495,19 @@ const FilterCatalogWidget = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogBreadcrumbJsonLd) }}
       />
-      <h1 className="sr-only">{pageHeading}</h1>
+      {/**
+       * Visible, and category-specific. This was `sr-only` and always read "Product catalog",
+       * so all eight category landing pages presented the same discounted heading to a search
+       * engine. The intro paragraph gives each one its own keyword-bearing copy.
+       */}
+      <header className="pb-5 text-start md:pb-7">
+        <h1 className="m-0 text-2xl font-bold text-navy md:text-3xl">{pageHeading}</h1>
+        {categoryIntro ? (
+          <p className="m-0 max-w-[75ch] pt-3 text-sm leading-relaxed text-text-muted md:text-base">
+            {categoryIntro}
+          </p>
+        ) : null}
+      </header>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
         <aside
           className="hidden w-full shrink-0 rounded-2xl border border-border-blue/60 bg-white p-4 shadow-sm sm:p-5 lg:block lg:w-[300px] xl:w-[320px]"
@@ -623,9 +643,11 @@ const FilterCatalogWidget = () => {
                     : "grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-6"
                 }
               >
-                {pageItems.map((product) => (
+                {pageItems.map((product, index) => (
                   <FilterProductCard
                     key={product.id}
+                    eager={index < FIRST_ROW_CARD_COUNT}
+                    lcp={index === 0}
                     product={product}
                     priceLabel={formatPriceAmd(product.priceValue, currencySuffix)}
                     descriptionText={buildProductDescription(product, t)}
@@ -747,11 +769,13 @@ const FilterCatalogWidget = () => {
               </button>
             </div>
             <div className="border-b border-border-blue/40 px-4 py-3">
+              {/* A placeholder is not an accessible name — it disappears the moment you type. */}
               <input
                 type="search"
                 value={overlayOptionQuery}
                 onChange={(e) => setOverlayOptionQuery(e.target.value)}
                 placeholder={t("filterPage.overlaySearchPlaceholder")}
+                aria-label={t("filterPage.overlaySearchPlaceholder")}
                 className="h-11 w-full rounded-xl border border-border-blue px-4 text-sm text-navy"
               />
             </div>

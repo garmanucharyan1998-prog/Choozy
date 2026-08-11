@@ -73,11 +73,12 @@ function NavPanel({
           </LocalizedLink>
         </div>
 
-        <div className="nav-items-container flex min-w-0 flex-1 items-center justify-start gap-2 overflow-x-auto min-[425px]:gap-3 sm:gap-4 lg:justify-between lg:gap-0">
+        {/* A list of navigation destinations is a list — it was a row of bare divs. */}
+        <ul className="nav-items-container m-0 flex min-w-0 flex-1 list-none items-center justify-start gap-2 overflow-x-auto p-0 min-[425px]:gap-3 sm:gap-4 lg:justify-between lg:gap-0">
           {navItems.map((item) => {
             const isActive = item.id === activeCategoryId;
             return (
-              <div key={item.id} className="shrink-0">
+              <li key={item.id} className="shrink-0">
                 <LocalizedLink
                   to={item.href}
                   className={`nav-link flex items-center justify-center font-medium text-text-dark no-underline text-start w-fit h-auto hover:text-blue-600 transition-all duration-300 ${
@@ -89,10 +90,10 @@ function NavPanel({
                 >
                   {item.label}
                 </LocalizedLink>
-              </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </nav>
 
       <aside
@@ -117,18 +118,21 @@ function NavPanel({
           </button>
         </div>
 
-        <nav className="flex flex-col gap-5" aria-label={t("navPanel.catalogLinksAriaLabel")}>
-          {navItems.map((item) => (
-            <LocalizedLink
-              key={item.id}
-              to={item.href}
-              className="flex w-full items-center justify-between no-underline text-navy text-sm font-medium leading-normal"
-              onClick={handleCatalogClose}
-            >
-              <span>{item.label}</span>
-              <FaChevronRight size={14} aria-hidden="true" />
-            </LocalizedLink>
-          ))}
+        <nav aria-label={t("navPanel.catalogLinksAriaLabel")}>
+          <ul className="m-0 flex list-none flex-col gap-5 p-0">
+            {navItems.map((item) => (
+              <li key={item.id}>
+                <LocalizedLink
+                  to={item.href}
+                  className="flex w-full items-center justify-between no-underline text-navy text-sm font-medium leading-normal"
+                  onClick={handleCatalogClose}
+                >
+                  <span>{item.label}</span>
+                  <FaChevronRight size={14} aria-hidden="true" />
+                </LocalizedLink>
+              </li>
+            ))}
+          </ul>
         </nav>
       </aside>
     </div>

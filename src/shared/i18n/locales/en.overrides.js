@@ -150,6 +150,10 @@ export const enOverrides = {
     },
     empty: "No results found",
   },
+  homeIntro: {
+    heading: "Price comparison in Armenia",
+    body: "Choosy gathers offers for smartphones, laptops, tablets, TVs, headphones and watches from stores across Armenia onto one page. Compare prices, specifications and availability, then go straight to the shop you picked.",
+  },
   productDescriptions: {
     smartphonesIos: "iOS smartphone with a {{screen}} display and {{storage}} of storage.",
     smartphonesAndroid: "Android smartphone with a {{screen}} display and {{storage}} of storage.",

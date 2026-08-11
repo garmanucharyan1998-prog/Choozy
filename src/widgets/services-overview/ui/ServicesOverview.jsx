@@ -29,9 +29,17 @@ const ServicesOverview = () => {
               key={service.id}
               className="service-card flex-1 bg-white rounded-xl sm:rounded-[20px] p-3 sm:p-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] border-2 border-border-blue flex flex-col items-start text-left transition-all duration-150 motion-reduce:transition-none hover:bg-[#e8efff66] hover:duration-300 motion-reduce:hover:transform-none focus-within:outline focus-within:outline-2 focus-within:outline-blue-500 focus-within:outline-offset-2"
             >
-              {/* Decorative: the heading right below already names the service. */}
+              {/**
+               * Decorative: the heading right below already names the service — so this is a
+               * background, not an `<img>`, and never both on one element.
+               *
+               * The `bg-gradient-to-br from-… to-…` classes that used to sit here compiled to
+               * a `background-image: linear-gradient(…)` that the inline `backgroundImage`
+               * immediately overrode. Two background-image sources on one element, one of them
+               * dead — removed rather than left to read as an intentional layer.
+               */}
               <div
-                className="service-icon rounded-full flex items-center justify-center shrink-0 bg-gradient-to-br from-[#fef3c7] to-[#f59e0b] w-[56px] h-[56px] text-[1.75rem] mb-3 bg-center bg-no-repeat sm:w-[70px] sm:h-[70px] sm:text-[2.25rem] sm:mb-5 md:w-20 md:h-20 md:text-[2.5rem] md:mb-6 lg:w-[90px] lg:h-[90px] lg:text-[2.75rem] xl:w-20 xl:h-20 xl:text-[2.5rem] 2xl:w-[100px] 2xl:h-[100px] 2xl:text-[3rem] 2xl:mb-8"
+                className="service-icon rounded-full flex items-center justify-center shrink-0 w-[56px] h-[56px] text-[1.75rem] mb-3 bg-center bg-no-repeat sm:w-[70px] sm:h-[70px] sm:text-[2.25rem] sm:mb-5 md:w-20 md:h-20 md:text-[2.5rem] md:mb-6 lg:w-[90px] lg:h-[90px] lg:text-[2.75rem] xl:w-20 xl:h-20 xl:text-[2.5rem] 2xl:w-[100px] 2xl:h-[100px] 2xl:text-[3rem] 2xl:mb-8"
                 style={{
                   backgroundImage: `url("${service.icon}")`,
                   backgroundSize: "100% 100%",

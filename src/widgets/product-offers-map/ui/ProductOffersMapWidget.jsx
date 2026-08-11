@@ -39,11 +39,15 @@ const ProductOffersMapWidget = () => {
           className="flex min-w-0 flex-col gap-5 rounded-2xl border border-border-blue p-4 md:p-6"
           style={{ backgroundColor: "rgba(245, 245, 245, 1)" }}
         >
+          {/**
+           * The product name is the page's H1; repeating it as an h3 here added a second
+           * heading for the same thing and pushed the real section heading down a level.
+           */}
           <div className="flex flex-col gap-2">
-            <h3 className="m-0 text-lg font-semibold text-text-dark md:text-xl">{productTitle}</h3>
-            <h4 className="m-0 text-sm font-semibold text-navy md:text-base">
+            <p className="m-0 text-lg font-semibold text-text-dark md:text-xl">{productTitle}</p>
+            <h3 className="m-0 text-sm font-semibold text-navy md:text-base">
               {t("productOffers.tabs.specs")}
-            </h4>
+            </h3>
           </div>
 
           <dl className="m-0 flex flex-col gap-4">

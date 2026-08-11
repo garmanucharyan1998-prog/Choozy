@@ -4,6 +4,8 @@ import {
   PRODUCT_CARD_IMAGE_BG,
   PRODUCT_CARD_IMAGE_VARIANTS,
   PRODUCT_CARD_PLACEHOLDER_IMG,
+  PRODUCT_IMAGE_ASPECT_HEIGHT,
+  PRODUCT_IMAGE_ASPECT_WIDTH,
 } from "./productCardImageConstants";
 import "./ProductCardImage.css";
 
@@ -14,6 +16,16 @@ import "./ProductCardImage.css";
  * Intentionally NOT a link: cards use a single stretched link around the title, so the
  * product is not announced twice by screen readers and crawlers see one anchor per card.
  * Overlay actions are passed as `children`.
+ *
+ * Two separate signals, because they are two separate decisions:
+ *  - `eager` — this card is above the fold, so do not defer it. Loading was hardcoded to
+ *    `"lazy"` here, which deferred the six category tiles that open the home page.
+ *  - `lcp` — this is *the* image the Largest Contentful Paint is measured on. It sets
+ *    `fetchPriority="high"`, which only means anything if at most one image claims it;
+ *    marking a whole row "high" tells the browser nothing it can act on.
+ *
+ * Intrinsic dimensions ride along too: the CSS reserves the box via `aspect-ratio`, but the
+ * `<img>` itself carried no size, which Lighthouse counts against CLS.
  */
 const ProductCardImage = ({
   src,
@@ -21,6 +33,8 @@ const ProductCardImage = ({
   variant = "grid",
   backgroundColor = PRODUCT_CARD_IMAGE_BG,
   className = "",
+  eager = false,
+  lcp = false,
   children,
 }) => {
   const styles = PRODUCT_CARD_IMAGE_VARIANTS[variant] ?? PRODUCT_CARD_IMAGE_VARIANTS.grid;
@@ -40,7 +54,10 @@ const ProductCardImage = ({
         src={resolvedSrc}
         alt={alt}
         imgClassName={styles.img}
-        loading="lazy"
+        loading={eager || lcp ? "eager" : "lazy"}
+        fetchPriority={lcp ? "high" : undefined}
+        width={PRODUCT_IMAGE_ASPECT_WIDTH}
+        height={PRODUCT_IMAGE_ASPECT_HEIGHT}
         onError={() => setResolvedSrc(PRODUCT_CARD_PLACEHOLDER_IMG)}
       />
       {children}

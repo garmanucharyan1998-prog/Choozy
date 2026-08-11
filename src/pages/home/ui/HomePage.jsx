@@ -69,7 +69,20 @@ const HomePage = () => {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(entry) }}
         />
       ))}
-      <h1 className="sr-only">{t("home.pageTitle")}</h1>
+      {/**
+       * A visible H1 and a paragraph naming what the site actually does. Both used to be
+       * `sr-only`, which is valid HTML and fine for assistive tech but leaves the page's
+       * main heading as text search engines discount — on the one page most likely to rank
+       * for the site's own name and for "price comparison Armenia".
+       */}
+      <section className="cont-width-default mx-auto w-full pb-6 pt-8 text-start md:pb-8">
+        <h1 className="m-0 text-2xl font-bold text-navy md:text-3xl lg:text-[34px]">
+          {t("homeIntro.heading")}
+        </h1>
+        <p className="m-0 max-w-[70ch] pt-3 text-sm leading-relaxed text-text-muted md:text-base">
+          {t("homeIntro.body")}
+        </p>
+      </section>
       <GridCatalogWidget />
       <TopProductsWidget items={withDescriptions(topProducts)} />
       <AboutUsWidget />

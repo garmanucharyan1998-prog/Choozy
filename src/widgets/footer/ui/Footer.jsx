@@ -110,16 +110,17 @@ const Footer = () => {
 
           <nav className="flex flex-col gap-3 w-full sm:gap-5 md:flex-row md:gap-10 md:w-auto md:flex-1 md:justify-end lg:gap-20 lg:px-20">
             {footerColumns.map((column) => (
-              <div key={column[0].id} className={columnClassName}>
+              <ul key={column[0].id} className={`m-0 list-none p-0 ${columnClassName}`}>
                 {column.map((link) => (
-                  <FooterLink
-                    key={`${link.id}-${link.href}`}
-                    href={link.href}
-                    label={link.label}
-                    withEmailIcon={link.withEmailIcon}
-                  />
+                  <li key={`${link.id}-${link.href}`}>
+                    <FooterLink
+                      href={link.href}
+                      label={link.label}
+                      withEmailIcon={link.withEmailIcon}
+                    />
+                  </li>
                 ))}
-              </div>
+              </ul>
             ))}
           </nav>
         </div>

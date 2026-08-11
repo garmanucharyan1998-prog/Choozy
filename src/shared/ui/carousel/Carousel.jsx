@@ -29,6 +29,9 @@ const CAROUSEL_SHELL =
 
 const CAROUSEL_TRACK = "min-w-0 overflow-hidden py-2";
 
+/** Slides visible without scrolling at the widest breakpoint. */
+const EAGER_SLIDE_COUNT = 5;
+
 const NAV_BTN = `${ACTION_BTN} z-10 hidden shrink-0 self-center text-navy md:flex`;
 
 const wishlistMapFromStorage = () => {
@@ -109,11 +112,16 @@ const Carousel = ({ items, ariaLabel }) => {
               return (
                 <SwiperSlide key={product.id || index} className="!h-auto">
                   <article className="group relative flex h-full flex-col text-start">
+                    {/**
+                     * The first few slides are on screen at the widest breakpoint, so they
+                     * load eagerly; everything past them stays deferred.
+                     */}
                     <ProductCardImage
                       variant="carousel"
                       className="shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
                       src={product.image}
                       alt={product.title}
+                      eager={index < EAGER_SLIDE_COUNT}
                     >
                       <div className="pointer-events-auto absolute right-2.5 top-2.5 z-20 flex flex-col gap-2 sm:right-3 sm:top-3">
                         <button

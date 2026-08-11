@@ -12,12 +12,14 @@ const PRICE_CLASS = "m-0 pt-0.5 text-sm font-semibold text-navy md:text-base";
 const ACTION_BTN =
   "flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/[0.06] bg-white text-[rgba(21,33,71,1)] shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-colors hover:bg-[#f8f9fc] active:scale-[0.98]";
 
-const ImgWrap = ({ listMode, product }) => (
+const ImgWrap = ({ listMode, product, eager, lcp }) => (
   <ProductCardImage
     variant={listMode ? "list" : "grid"}
     className={listMode ? "shrink-0" : "w-full shrink-0"}
     src={product.image}
     alt={product.title}
+    eager={eager}
+    lcp={lcp}
   >
     <div className="pointer-events-auto absolute right-3 top-3 z-20 flex flex-col gap-2">
       <button
@@ -72,6 +74,8 @@ const FilterProductCard = ({
   product,
   priceLabel,
   descriptionText,
+  eager = false,
+  lcp = false,
   listMode,
   inCompare,
   inWishlist,
@@ -93,7 +97,7 @@ const FilterProductCard = ({
   if (listMode) {
     return (
       <article className="relative flex flex-row gap-4 rounded-xl border border-border-blue/40 bg-white p-3 text-start shadow-sm sm:p-4">
-        <ImgWrap listMode product={p} />
+        <ImgWrap listMode product={p} eager={eager} lcp={lcp} />
         <div className="flex min-w-0 flex-1 flex-col justify-center">
           <ProductTextLink
             product={product}
@@ -108,7 +112,7 @@ const FilterProductCard = ({
 
   return (
     <article className="relative flex h-full flex-col text-start">
-      <ImgWrap listMode={false} product={p} />
+      <ImgWrap listMode={false} product={p} eager={eager} lcp={lcp} />
       <ProductTextLink product={product} priceLabel={priceLabel} descriptionText={descriptionText} />
     </article>
   );
