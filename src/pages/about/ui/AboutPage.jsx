@@ -1,10 +1,9 @@
-import ComingSoon from "shared/ui/ComingSoon";
-import { buildComingSoonMeta } from "shared/ui/comingSoonMeta";
+import { buildContentPageMeta, ContentPage } from "shared/ui/content-page";
 
 export function meta({ location }) {
-  return buildComingSoonMeta({ titleKey: "comingSoon.titles.about", location });
+  return buildContentPageMeta({ namespace: "aboutPage", location });
 }
 
-const AboutPage = () => <ComingSoon titleKey="comingSoon.titles.about" />;
+const AboutPage = () => <ContentPage namespace="aboutPage" />;
 
 export default AboutPage;

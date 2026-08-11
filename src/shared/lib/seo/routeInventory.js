@@ -20,6 +20,14 @@ export const getIndexableRoutes = () => {
   const routes = [
     { path: "/", changefreq: "daily", priority: "1.0" },
     { path: "/filter", changefreq: "daily", priority: "0.9" },
+    /**
+     * The prose pages. They were `ComingSoon` placeholders carrying `noindex` and were
+     * excluded from here for that reason; now that they have real content, a commerce site
+     * wants them found — privacy and terms in particular are trust signals.
+     */
+    { path: "/about", changefreq: "monthly", priority: "0.5" },
+    { path: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
+    { path: "/terms-of-service", changefreq: "yearly", priority: "0.3" },
   ];
 
   FILTER_CATEGORY_IDS.forEach((categoryId) => {
@@ -49,13 +57,10 @@ export const getIndexableRoutes = () => {
  * crawlers and break hydration on the client.
  */
 export const getNonIndexableRoutes = () => [
-  { path: "/about" },
   { path: "/catalog" },
   { path: "/compare" },
   { path: "/products" },
   { path: "/variety" },
-  { path: "/privacy-policy" },
-  { path: "/terms-of-service" },
   { path: "/account" },
   { path: "/account/favorite" },
   { path: "/account/recent" },

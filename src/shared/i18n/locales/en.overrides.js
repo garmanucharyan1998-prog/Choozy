@@ -154,6 +154,108 @@ export const enOverrides = {
     heading: "Price comparison in Armenia",
     body: "Choosy gathers offers for smartphones, laptops, tablets, TVs, headphones and watches from stores across Armenia onto one page. Compare prices, specifications and availability, then go straight to the shop you picked.",
   },
+  aboutPage: {
+    seoTitle: "About Choosy — price comparison across Armenia",
+    seoDescription:
+      "What Choosy is, how prices are collected from stores across Armenia, and how the comparison works.",
+    heading: "About Choosy",
+    intro:
+      "Choosy is a price-comparison marketplace for Armenia. We gather offers for electronics — smartphones, laptops, tablets, TVs, headphones, speakers, watches and cameras — from local shops and put them on one page, so a decision that used to mean opening a dozen tabs takes a single comparison.",
+    sections: [
+      {
+        heading: "What we do",
+        body: "Every product page lists the shops carrying that model with their current prices, so you can see the spread at a glance and open the shop you chose. We do not sell anything ourselves and we do not process orders — the purchase happens on the retailer's own site, under their terms.",
+      },
+      {
+        heading: "How prices get here",
+        body: "Prices come from the shops themselves, through listings they publish and keep up to date. A listing that is not refreshed expires rather than lingering, because a stale price is worse than no price at all. We show what a shop is currently asking; the shop remains responsible for honouring it.",
+      },
+      {
+        heading: "For shops",
+        body: "Retailers manage their own catalog: adding products, setting prices, marking stock and refreshing listings. Reaching buyers who are already comparing a specific model costs a shop nothing but keeping its data accurate.",
+      },
+      {
+        heading: "Languages and coverage",
+        body: "The site is available in Armenian, Russian and English, and covers shops operating in Armenia. Every page exists at its own address in each language, so a link you share opens in the language you were reading.",
+      },
+      {
+        heading: "Contact",
+        body: "Questions, corrections to a listing, or a shop that would like to be included — write to info@choosy.am and we will get back to you.",
+      },
+    ],
+  },
+  privacyPage: {
+    seoTitle: "Privacy policy — Choosy",
+    seoDescription:
+      "What data Choosy stores, where it is kept, and the choices you have over it.",
+    heading: "Privacy policy",
+    intro:
+      "This page explains what Choosy stores when you use the site, why, and what control you have over it. It is written to be read rather than to be technically survivable, and we have kept the amount of data involved small enough that it fits on one page.",
+    sections: [
+      {
+        heading: "What is stored in your browser",
+        body: "Your saved favourites, recently viewed products and interface preferences live in your own browser's local storage. They never leave your device, and clearing your browser data removes them. Nothing here identifies you to us.",
+      },
+      {
+        heading: "Account data",
+        body: "If you create an account, we store the email address you enter and whether the account is a buyer or a shop. That pair is what lets your favourites follow the account rather than the browser. We do not ask for a name, an address or a payment method, because comparing prices does not require any of them.",
+      },
+      {
+        heading: "Cookies",
+        body: "One cookie records that you are signed in and which kind of account you have, so the right pages open for you. It expires after 30 days, and signing out removes it. We do not use advertising or cross-site tracking cookies.",
+      },
+      {
+        heading: "Leaving for a shop",
+        body: "Opening an offer takes you to the retailer's own website, which has its own privacy policy and its own cookies. We do not pass your account details to them; what you do there is between you and that shop.",
+      },
+      {
+        heading: "Your choices",
+        body: "You can clear locally stored data at any time from your browser, and you can stop using an account simply by signing out. To ask what is stored about an address or to have it removed, write to info@choosy.am.",
+      },
+      {
+        heading: "Changes",
+        body: "If this policy changes in a way that affects what we store or why, the updated version appears on this page. Continuing to use the site after that means the current version applies.",
+      },
+    ],
+  },
+  termsPage: {
+    seoTitle: "Terms of service — Choosy",
+    seoDescription:
+      "The terms for using Choosy: what the price comparison is, what it is not, and each side's responsibilities.",
+    heading: "Terms of service",
+    intro:
+      "These terms cover using Choosy. In short: we show you prices that shops publish, you buy from those shops directly, and each of us is responsible for our own part of that.",
+    sections: [
+      {
+        heading: "What the service is",
+        body: "Choosy compares prices published by retailers in Armenia. We are not a party to any sale. The contract for a purchase is between you and the shop you buy from, on that shop's terms, and questions about payment, delivery, warranty or returns go to them.",
+      },
+      {
+        heading: "Accuracy of prices",
+        body: "Prices and availability are what shops published when their listing was last refreshed, and they can change at any moment. We take reasonable care to show current information and to expire listings that go stale, but the price shown on the retailer's own page at the moment of purchase is the one that counts.",
+      },
+      {
+        heading: "Using an account",
+        body: "You are responsible for what happens under your account and for the accuracy of the email you register with. Do not use the site to scrape it at scale, to disrupt it, or to publish listings for products a shop does not actually sell.",
+      },
+      {
+        heading: "Obligations for shops",
+        body: "A shop publishing listings warrants that it is entitled to sell those products, that its prices and stock are accurate, and that it will keep listings refreshed. Listings that are misleading or left unmaintained can be removed.",
+      },
+      {
+        heading: "Content and trademarks",
+        body: "Product names, logos and images belong to their respective owners and appear here to identify the products being compared. The site's own text, design and structure belong to Choosy.",
+      },
+      {
+        heading: "Limits",
+        body: "The service is provided as it is. We do not guarantee that every price is correct at every moment or that the site is always available, and we are not liable for a purchase decision made on the basis of a price that a shop had changed. Nothing here limits rights you have under Armenian consumer law.",
+      },
+      {
+        heading: "Contact",
+        body: "Questions about these terms: info@choosy.am.",
+      },
+    ],
+  },
   productDescriptions: {
     smartphonesIos: "iOS smartphone with a {{screen}} display and {{storage}} of storage.",
     smartphonesAndroid: "Android smartphone with a {{screen}} display and {{storage}} of storage.",

@@ -11,7 +11,19 @@ export const buildLocale = (base, overrides) => {
         target[key] = value;
         return;
       }
-      if (value && typeof value === "object" && !Array.isArray(value)) {
+      /**
+       * An array is replaced wholesale, not merged element-by-element: a locale that
+       * supplies a list of prose sections supplies all of them, and index-wise merging
+       * would leave a shorter override trailing the base locale's leftovers.
+       *
+       * Arrays used to be skipped entirely — the condition below excluded them — so an
+       * override's list silently kept the Armenian base text in English and Russian.
+       */
+      if (Array.isArray(value)) {
+        target[key] = structuredClone(value);
+        return;
+      }
+      if (value && typeof value === "object") {
         if (!target[key] || typeof target[key] !== "object") {
           target[key] = {};
         }

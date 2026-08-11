@@ -1,10 +1,9 @@
-import ComingSoon from "shared/ui/ComingSoon";
-import { buildComingSoonMeta } from "shared/ui/comingSoonMeta";
+import { buildContentPageMeta, ContentPage } from "shared/ui/content-page";
 
 export function meta({ location }) {
-  return buildComingSoonMeta({ titleKey: "comingSoon.titles.privacyPolicy", location });
+  return buildContentPageMeta({ namespace: "privacyPage", location });
 }
 
-const PrivacyPolicyPage = () => <ComingSoon titleKey="comingSoon.titles.privacyPolicy" />;
+const PrivacyPolicyPage = () => <ContentPage namespace="privacyPage" />;
 
 export default PrivacyPolicyPage;
