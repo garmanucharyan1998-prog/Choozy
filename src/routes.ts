@@ -42,6 +42,14 @@ const contentRoutes = (lang: string): RouteConfigEntry[] => [
   route("about", "pages/about/ui/AboutPage.jsx", { id: `about-${lang}` }),
   route("catalog", "pages/catalog/ui/CatalogPage.jsx", { id: `catalog-${lang}` }),
   route("compare", "pages/compare/ui/ComparePage.jsx", { id: `compare-${lang}` }),
+  /**
+   * The generated "X vs Y" pages. Ranks above the catch-all `*` and below the static
+   * `compare`, so `/compare` still reaches the landing page and an unknown pair slug reaches
+   * this route's loader — which 404s it deliberately — rather than the generic not-found.
+   */
+  route("compare/:pairSlug", "pages/compare/ui/ComparePairPage.jsx", {
+    id: `compare-pair-${lang}`,
+  }),
   route("products", "pages/products/ui/ProductsPage.jsx", { id: `products-${lang}` }),
   route("variety", "pages/variety/ui/VarietyPage.jsx", { id: `variety-${lang}` }),
   route("privacy-policy", "pages/privacy-policy/ui/PrivacyPolicyPage.jsx", {

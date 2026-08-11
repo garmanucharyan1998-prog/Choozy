@@ -21,9 +21,16 @@ const CELL = "px-3 py-3 text-sm md:px-4 md:text-base";
 const LABEL_CELL = `${CELL} sticky left-0 z-10 bg-white text-start font-semibold text-navy`;
 const SECTION_CELL = "bg-subtle-bg px-3 py-2 text-start text-xs font-bold uppercase tracking-wide text-text-muted md:px-4";
 
-const ProductCompareWidget = () => {
+/**
+ * @param {{ fixedIds?: string[] }} props — supplied by `/compare/<a>-vs-<b>`, which shows one
+ *   specific pair at one indexable address and so offers no column editing; it links out to
+ *   `/compare?ids=…` for that instead.
+ */
+const ProductCompareWidget = ({ fixedIds = null }) => {
   const {
     t,
+    isFixed,
+    editHref,
     products,
     sections,
     hasRows,
@@ -34,13 +41,14 @@ const ProductCompareWidget = () => {
     clearAll,
     canAddMore,
     addMoreHref,
-  } = useComparePresenter();
+  } = useComparePresenter(fixedIds);
 
   if (products.length === 0) {
     return <CompareEmptyState t={t} />;
   }
 
-  const columnCount = products.length + (canAddMore ? 1 : 0);
+  const showAddColumn = canAddMore && !isFixed;
+  const columnCount = products.length + (showAddColumn ? 1 : 0);
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,13 +64,22 @@ const ProductCompareWidget = () => {
           />
           {t("comparePage.onlyDifferences")}
         </label>
-        <button
-          type="button"
-          onClick={clearAll}
-          className="rounded-lg px-3 py-2 text-sm font-semibold text-link-blue transition-colors hover:bg-hover-blue"
-        >
-          {t("comparePage.clearAll")}
-        </button>
+        {isFixed ? (
+          <LocalizedLink
+            to={editHref}
+            className="rounded-lg px-3 py-2 text-sm font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue"
+          >
+            {t("comparePage.editComparison")}
+          </LocalizedLink>
+        ) : (
+          <button
+            type="button"
+            onClick={clearAll}
+            className="rounded-lg px-3 py-2 text-sm font-semibold text-link-blue transition-colors hover:bg-hover-blue"
+          >
+            {t("comparePage.clearAll")}
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-border-blue bg-white">
@@ -94,18 +111,20 @@ const ProductCompareWidget = () => {
                     >
                       {product.title}
                     </LocalizedLink>
-                    <button
-                      type="button"
-                      onClick={() => removeProduct(product.id)}
-                      className="inline-flex items-center gap-1.5 text-xs font-medium text-text-muted transition-colors hover:text-navy"
-                    >
-                      <FaTimes className="h-3 w-3" aria-hidden />
-                      {t("comparePage.remove")}
-                    </button>
+                    {isFixed ? null : (
+                      <button
+                        type="button"
+                        onClick={() => removeProduct(product.id)}
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-text-muted transition-colors hover:text-navy"
+                      >
+                        <FaTimes className="h-3 w-3" aria-hidden />
+                        {t("comparePage.remove")}
+                      </button>
+                    )}
                   </div>
                 </th>
               ))}
-              {canAddMore ? (
+              {showAddColumn ? (
                 <th scope="col" className={`${CELL} min-w-[9rem] align-top md:min-w-[12rem]`}>
                   <LocalizedLink
                     to={addMoreHref}
@@ -147,7 +166,7 @@ const ProductCompareWidget = () => {
                       ) : null}
                     </td>
                   ))}
-                  {canAddMore ? <td className={CELL} /> : null}
+                  {showAddColumn ? <td className={CELL} /> : null}
                 </tr>
               ))}
             </tbody>

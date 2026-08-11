@@ -27,7 +27,13 @@ import { useProductCompare } from "../model/useProductCompare";
  * `PriceHistoryChartClientOnly`: the server and the first client render agree by construction,
  * and browser-only state is swapped in afterwards.
  */
-export const useComparePresenter = () => {
+/**
+ * @param {string[] | null} fixedIds — set by the `/compare/<a>-vs-<b>` pages, whose selection
+ *   comes from the URL path and must not be edited in place: that page is one indexable
+ *   address for one specific pair, so removing a column there would leave the URL lying.
+ *   Those pages hand the visitor over to `/compare?ids=…` instead.
+ */
+export const useComparePresenter = (fixedIds = null) => {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const { compareOrder, toggleCompare } = useProductCompare();
@@ -42,19 +48,21 @@ export const useComparePresenter = () => {
    * comparison, not their own. Declared before the mount gate so the store is already right
    * by the time the gate hands over to it.
    */
+  const isFixed = Array.isArray(fixedIds);
+
   useEffect(() => {
-    if (urlIdsKey) writeCompareIds(urlIdsKey.split(","));
-  }, [urlIdsKey]);
+    if (!isFixed && urlIdsKey) writeCompareIds(urlIdsKey.split(","));
+  }, [isFixed, urlIdsKey]);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  const ids = hasMounted ? compareOrder : urlIds;
+  const ids = isFixed ? fixedIds : hasMounted ? compareOrder : urlIds;
 
   /** Keeps the address bar shareable at all times, without stacking history entries. */
   useEffect(() => {
-    if (!hasMounted) return;
+    if (isFixed || !hasMounted) return;
     const serialized = serializeCompareIds(ids);
     if (serialized === (searchParams.get("ids") ?? "")) return;
 
@@ -62,7 +70,7 @@ export const useComparePresenter = () => {
     if (serialized) next.set("ids", serialized);
     else next.delete("ids");
     setSearchParams(next, { replace: true, preventScrollReset: true });
-  }, [hasMounted, ids, searchParams, setSearchParams]);
+  }, [isFixed, hasMounted, ids, searchParams, setSearchParams]);
 
   const products = useMemo(() => getCompareProducts(ids), [ids]);
   const categoryId = useMemo(() => compareCategoryId(ids), [ids]);
@@ -99,6 +107,9 @@ export const useComparePresenter = () => {
 
   return {
     t,
+    isFixed,
+    /** Where a fixed pair's "edit this comparison" link goes. */
+    editHref: `/compare?ids=${serializeCompareIds(ids)}`,
     products,
     categoryId,
     sections: visibleSections,

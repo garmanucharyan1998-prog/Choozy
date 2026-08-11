@@ -1,6 +1,7 @@
 import { FILTER_CATEGORY_IDS } from "entities/filter-catalog/model/filterCatalogCategories";
 import { getProductDetailHref } from "entities/product-detail";
 import { PRODUCT_CATALOG } from "entities/product";
+import { getComparePairPath, getComparePairs } from "entities/product-compare";
 import { SUPPORTED_LANGUAGE_CODES } from "shared/i18n/languageConfig";
 import { localizedPath } from "shared/lib/locale";
 
@@ -11,7 +12,10 @@ import { localizedPath } from "shared/lib/locale";
  *
  * Deliberately excluded:
  *  - account / shop-account (noindex, localStorage-driven)
- *  - ComingSoon placeholders (noindex until real content lands)
+ *  - the remaining ComingSoon placeholders (noindex until real content lands)
+ *  - `/compare?ids=…`, one visitor's working selection: thousands of thin variations on the
+ *    same table, all noindex (see `pages/compare/model/compareSeo`). The bare landing page
+ *    and the generated pairs below are the indexable half.
  *  - the 404 route
  */
 
@@ -25,6 +29,11 @@ export const getIndexableRoutes = () => {
      * excluded from here for that reason; now that they have real content, a commerce site
      * wants them found — privacy and terms in particular are trust signals.
      */
+    /**
+     * The compare landing page. Was excluded as a `ComingSoon` placeholder; it is now the
+     * page that answers "compare prices in Armenia", which is the query this site exists for.
+     */
+    { path: "/compare", changefreq: "monthly", priority: "0.6" },
     { path: "/about", changefreq: "monthly", priority: "0.5" },
     { path: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
     { path: "/terms-of-service", changefreq: "yearly", priority: "0.3" },
@@ -44,6 +53,15 @@ export const getIndexableRoutes = () => {
       changefreq: "weekly",
       priority: "0.7",
     });
+  });
+
+  /**
+   * The generated "X vs Y" pages. Listed from the same function the router resolves them
+   * with, so the sitemap cannot advertise a pair whose URL 404s — the failure mode the
+   * `?category=` mismatch produced before `resolveCatalogCanonical` existed.
+   */
+  getComparePairs().forEach((pair) => {
+    routes.push({ path: getComparePairPath(pair.slug), changefreq: "weekly", priority: "0.5" });
   });
 
   return routes;
