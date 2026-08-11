@@ -1,6 +1,19 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
+    /**
+     * The project's absolute imports (`"entities/product"`, `"shared/ui/link"`, ...) — the
+     * shape CRA gave them for free through an implicit `NODE_PATH=src`.
+     *
+     * Expressed as a `paths` mapping rather than `baseUrl: "src"`: `baseUrl` is deprecated
+     * and stops working in TypeScript 7. A `"*"` mapping is the documented replacement and
+     * resolves identically — TypeScript tries the mapping first for a bare specifier and
+     * falls back to `node_modules`, exactly as `baseUrl` did. `vite-tsconfig-paths`, which
+     * both vite.config.ts and vitest.config.ts use to mirror this resolution into the
+     * bundler, reads `paths` the same way it read `baseUrl`.
+     */
+    "paths": {
+      "*": ["./src/*"]
+    },
     "target": "es2020",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
