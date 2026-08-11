@@ -1,5 +1,5 @@
 import { getTranslator } from "shared/i18n";
-import { getIndexableRoutes } from "shared/lib/seo";
+import { getIndexableRoutes } from "app/seo";
 
 const LANGUAGES = ["am", "en", "ru"];
 const NAMESPACES = ["aboutPage", "privacyPage", "termsPage"];

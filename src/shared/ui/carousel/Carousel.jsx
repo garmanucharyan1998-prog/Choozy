@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } from "react-icons/fa";
-import { getProductDetailHref } from "entities/product-detail";
-import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useLanguage } from "contexts";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { BREAKPOINTS } from "shared/config/breakpoints";
@@ -34,12 +32,21 @@ const EAGER_SLIDE_COUNT = 5;
 
 const NAV_BTN = `${ACTION_BTN} z-10 hidden shrink-0 self-center text-navy md:flex`;
 
-const wishlistMapFromStorage = () => {
-  const ids = new Set(readAccountState().wishlistItems.map((x) => x.id));
-  return Object.fromEntries([...ids].map((id) => [id, true]));
-};
-
-const Carousel = ({ items, ariaLabel }) => {
+/**
+ * Presentational: every item arrives ready to render (`href`, `description`, `priceValue`)
+ * and wishlist state arrives as props. It used to read and write `entities/user` and build
+ * product URLs from `entities/product-detail` itself, which put a `shared/ui` component in
+ * charge of domain state — the layer violation this project lints for. See
+ * `features/product-wishlist`.
+ *
+ * @param {{
+ *   items: object[],
+ *   ariaLabel: string,
+ *   wishlistIds?: Set<string>,
+ *   onToggleWishlist?: (product: object) => void,
+ * }} props
+ */
+const Carousel = ({ items, ariaLabel, wishlistIds, onToggleWishlist }) => {
   const { t } = useLanguage();
   const currencySuffix = t("productDetail.currencySuffix");
   const safeItems = Array.isArray(items) ? items : [];
@@ -47,34 +54,8 @@ const Carousel = ({ items, ariaLabel }) => {
   /** Swiper needs more slides than the widest `slidesPerView` (5) to loop without gaps. */
   const loopEnabled = slideCount > 10;
   const swiperRef = useRef(null);
-  /**
-   * Starts empty (matching the server, which has no `localStorage`) instead of reading
-   * real wishlist state in the initializer — that would diverge from the SSR HTML on the
-   * very first client render (React #418), and this carousel renders on the homepage.
-   * `sync()` inside the mount effect below fills in the real data right after hydration.
-   */
-  const [wishlist, setWishlist] = useState(() => ({}));
+  const savedIds = wishlistIds ?? new Set();
   const [compare, setCompare] = useState(() => ({}));
-
-  useEffect(() => {
-    const sync = () => setWishlist(wishlistMapFromStorage());
-    sync();
-    window.addEventListener(ACCOUNT_STORAGE_EVENT, sync);
-    return () => window.removeEventListener(ACCOUNT_STORAGE_EVENT, sync);
-  }, []);
-
-  const toggleWishlist = useCallback((product, href) => {
-    toggleWishlistProduct({
-      id: product.id,
-      title: product.title,
-      description: product.description,
-      priceValue: product.priceValue,
-      image: product.image,
-      href,
-      category: product.categoryId,
-    });
-    setWishlist(wishlistMapFromStorage());
-  }, []);
 
   const toggleCompare = useCallback((id) => {
     setCompare((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -104,9 +85,8 @@ const Carousel = ({ items, ariaLabel }) => {
             breakpoints={CAROUSEL_BREAKPOINTS}
           >
             {safeItems.map((product, index) => {
-              const detailPath =
-                product.id != null ? getProductDetailHref(product.id, product.title) : null;
-              const inWishlist = Boolean(wishlist[product.id]);
+              const detailPath = product.href ?? null;
+              const inWishlist = savedIds.has(product.id);
               const inCompare = Boolean(compare[product.id]);
 
               return (
@@ -135,7 +115,7 @@ const Carousel = ({ items, ariaLabel }) => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => toggleWishlist(product, detailPath || "")}
+                          onClick={() => onToggleWishlist?.(product)}
                           aria-pressed={inWishlist}
                           aria-label={
                             inWishlist

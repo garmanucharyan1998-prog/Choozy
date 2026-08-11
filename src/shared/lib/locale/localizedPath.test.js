@@ -1,6 +1,5 @@
 import {
   getLanguageFromPath,
-  hasUnknownLanguagePrefix,
   localizedPath,
   stripLanguageFromPath,
 } from "./localizedPath";
@@ -59,16 +58,6 @@ describe("getLanguageFromPath", () => {
     ["/EN/singleproduct/x~fp-1", "en"],
   ])("reads the language from the capitalized prefix %s -> %s", (path, expected) => {
     expect(getLanguageFromPath(path)).toBe(expected);
-  });
-});
-
-describe("hasUnknownLanguagePrefix", () => {
-  test("flags a two-letter prefix that isn't a supported language", () => {
-    expect(hasUnknownLanguagePrefix("/de/filter")).toBe(true);
-  });
-
-  test.each(["/", "/filter", "/ru/filter", "/en"])("does not flag %s", (path) => {
-    expect(hasUnknownLanguagePrefix(path)).toBe(false);
   });
 });
 

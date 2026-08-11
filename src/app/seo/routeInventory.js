@@ -49,29 +49,6 @@ export const getIndexableRoutes = () => {
   return routes;
 };
 
-/**
- * Routes that must still be prerendered even though they carry `noindex`.
- *
- * Without their own HTML file the static host falls back to `index.html` — the
- * prerendered *home page* — so `/privacy-policy` would serve home-page markup to
- * crawlers and break hydration on the client.
- */
-export const getNonIndexableRoutes = () => [
-  { path: "/catalog" },
-  { path: "/compare" },
-  { path: "/products" },
-  { path: "/variety" },
-  { path: "/account" },
-  { path: "/account/favorite" },
-  { path: "/account/recent" },
-  { path: "/account/subscription" },
-  { path: "/account/notifications" },
-  { path: "/account/shop-account" },
-  { path: "/account/shop-account/products" },
-  { path: "/account/shop-account/statistics" },
-  { path: "/account/shop-account/finance" },
-];
-
 const withLanguages = (route) => ({
   ...route,
   /** `{ am: "/filter", ru: "/ru/filter", ... }` — used for hreflang alternates. */
@@ -82,11 +59,5 @@ const withLanguages = (route) => ({
 
 /** Indexable routes across all languages — this is what sitemap.xml is built from. */
 export const getLocalizedRouteInventory = () => getIndexableRoutes().map(withLanguages);
-
-/** Everything that needs an HTML file, indexable or not. */
-export const getPrerenderRouteInventory = () => [
-  ...getIndexableRoutes().map(withLanguages),
-  ...getNonIndexableRoutes().map(withLanguages),
-];
 
 export default getLocalizedRouteInventory;

@@ -10,7 +10,16 @@ import { LocalizedLink } from "shared/ui/link";
  * so there's no more loading/error/retry state to render — the previous client-fetch
  * pattern this replaced never actually populated the initial server response anyway.
  */
-const ProductShowcaseSection = ({ sectionId, title, moreHref, items, sectionClassName, carouselAriaLabel }) => {
+const ProductShowcaseSection = ({
+  sectionId,
+  title,
+  moreHref,
+  items,
+  sectionClassName,
+  carouselAriaLabel,
+  wishlistIds,
+  onToggleWishlist,
+}) => {
   const { t } = useLanguage();
 
   return (
@@ -32,7 +41,12 @@ const ProductShowcaseSection = ({ sectionId, title, moreHref, items, sectionClas
           </LocalizedLink>
         </div>
 
-        <Carousel items={items} ariaLabel={carouselAriaLabel} />
+        <Carousel
+          items={items}
+          ariaLabel={carouselAriaLabel}
+          wishlistIds={wishlistIds}
+          onToggleWishlist={onToggleWishlist}
+        />
       </div>
     </section>
   );

@@ -1,8 +1,6 @@
 import {
   getIndexableRoutes,
   getLocalizedRouteInventory,
-  getNonIndexableRoutes,
-  getPrerenderRouteInventory,
 } from "./routeInventory";
 import { PRODUCT_CATALOG } from "entities/product";
 import { SUPPORTED_LANGUAGE_CODES } from "shared/i18n/languageConfig";
@@ -27,15 +25,6 @@ describe("getIndexableRoutes", () => {
   });
 });
 
-describe("getNonIndexableRoutes", () => {
-  test("does not overlap with the indexable set (a URL must not be both)", () => {
-    const indexable = new Set(getIndexableRoutes().map((r) => r.path));
-    getNonIndexableRoutes().forEach((route) => {
-      expect(indexable.has(route.path)).toBe(false);
-    });
-  });
-});
-
 describe("getLocalizedRouteInventory", () => {
   test("every indexable route has a URL for every supported language", () => {
     getLocalizedRouteInventory().forEach((route) => {
@@ -53,15 +42,3 @@ describe("getLocalizedRouteInventory", () => {
   });
 });
 
-describe("getPrerenderRouteInventory", () => {
-  test("is the union of indexable and non-indexable routes — every URL gets an HTML file", () => {
-    const prerenderPaths = getPrerenderRouteInventory().map((r) => r.path);
-    const indexablePaths = getIndexableRoutes().map((r) => r.path);
-    const nonIndexablePaths = getNonIndexableRoutes().map((r) => r.path);
-
-    [...indexablePaths, ...nonIndexablePaths].forEach((path) => {
-      expect(prerenderPaths).toContain(path);
-    });
-    expect(prerenderPaths.length).toBe(indexablePaths.length + nonIndexablePaths.length);
-  });
-});

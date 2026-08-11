@@ -1,4 +1,4 @@
-import { getLocalizedRouteInventory } from "shared/lib/seo";
+import { getLocalizedRouteInventory } from "app/seo";
 import { DEFAULT_LANGUAGE_CODE, SUPPORTED_LANGUAGE_CODES } from "shared/i18n/languageConfig";
 import { getHtmlLangForAppLanguage } from "shared/lib/locale";
 import { getSiteBaseUrl } from "shared/config/siteMeta";

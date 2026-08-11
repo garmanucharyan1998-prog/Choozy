@@ -50,17 +50,6 @@ export const getLanguageFromPath = (pathname) => {
 };
 
 /**
- * True when the path starts with a two-letter segment that is not a supported language
- * (e.g. `/de/filter`) — such URLs must resolve to the 404 page, not to the default locale.
- * @param {string} pathname
- */
-export const hasUnknownLanguagePrefix = (pathname) => {
-  const { pathname: cleanPath } = splitPath(pathname);
-  const prefix = readPathPrefix(cleanPath);
-  return Boolean(prefix) && !SUPPORTED_LANGUAGE_CODES.includes(prefix.code);
-};
-
-/**
  * Removes the language prefix, returning the language-agnostic path.
  * @param {string} pathname
  * @returns {string} always starts with `/`

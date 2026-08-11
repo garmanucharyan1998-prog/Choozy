@@ -1,7 +1,7 @@
 import { DEFAULT_LANGUAGE_CODE } from "shared/i18n/languageConfig";
 import { getSiteBaseUrl } from "shared/config/siteMeta";
 import { CONTENT_LAST_MODIFIED } from "shared/config/contentRevision";
-import { getLocalizedRouteInventory } from "shared/lib/seo";
+import { getLocalizedRouteInventory } from "app/seo";
 import { loader } from "./sitemap";
 
 const readSitemap = async () => {

@@ -2,7 +2,6 @@ export { APP_LOCALE, getHtmlLangForAppLanguage, getOgLocaleForAppLanguage } from
 export { canonicalizePathname } from "./canonicalizePathname";
 export {
   getLanguageFromPath,
-  hasUnknownLanguagePrefix,
   localizedPath,
   stripLanguageFromPath,
 } from "./localizedPath";
