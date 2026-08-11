@@ -18,3 +18,4 @@ export { buildProductDescription, getProductDescriptionKey } from "./model/produ
 export { DEFAULT_CATALOG_PAGE_SIZE, getCatalogPageCount } from "./model/productSelectors";
 export { BRAND_LABEL, getBrandLabel } from "./model/productBrands";
 export { resolveSpecValue } from "./model/productSpecValue";
+export { buildSpecsForProduct } from "./model/productSpecs";
