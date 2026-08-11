@@ -963,6 +963,57 @@ const am = {
     filterCategories: {
       smartphones: {
         title: "Սմարթֆոնների գներ Հայաստանում — համեմատեք և ընտրեք | Choosy",
+  /**
+   * `comingSoon.titles.compare` is gone from here: `/compare` is a real page now, so the key
+   * would have been copy nothing renders — and unread copy is copy that drifts.
+   */
+  comparePage: {
+    seoTitle: "Ապրանքների համեմատություն կողք կողքի — Choosy",
+    seoDescription:
+      "Համեմատեք սմարթֆոնները, նոութբուքերը և այլ տեխնիկա կողք կողքի՝ բնութագրերով և Հայաստանի խանութների գներով։",
+    heading: "Ապրանքների համեմատություն",
+    intro:
+      "Ընտրեք մինչև չորս ապրանք մեկ կատեգորիայից և տեսեք դրանց բնութագրերն ու խանութների գները մեկ աղյուսակում։",
+    empty: {
+      heading: "Համեմատելու ապրանք դեռ չկա",
+      text: "Կատալոգում կամ ապրանքի էջում սեղմեք կշեռքի կոճակը՝ ապրանքն այստեղ ավելացնելու համար։",
+      cta: "Անցնել կատալոգ",
+    },
+    limitReached: "Կարող եք համեմատել առավելագույնը չորս ապրանք։ Հեռացրեք մեկը՝ նորն ավելացնելու համար։",
+    categoryMismatch:
+      "Համեմատել կարելի է միայն նույն կատեգորիայի ապրանքներ։ Մաքրեք համեմատությունը՝ ուրիշ կատեգորիայով սկսելու համար։",
+    remove: "Հեռացնել",
+    clearAll: "Մաքրել բոլորը",
+    addMore: "Ավելացնել ապրանք",
+    onlyDifferences: "Ցույց տալ միայն տարբերությունները",
+    noDifferences: "Ընտրված ապրանքները համընկնում են բոլոր բնութագրերով։",
+    tableCaption: "Ընտրված ապրանքների բնութագրերի և գների համեմատություն",
+    rowLabelHeader: "Բնութագիր",
+    sections: {
+      overview: "Ընդհանուր",
+      specs: "Բնութագրեր",
+      offers: "Գները խանութներում",
+    },
+    rows: {
+      price: "Գինը՝ սկսած",
+      brand: "Արտադրող",
+      category: "Կատեգորիա",
+    },
+    lowestPrice: "Ամենացածր գինը",
+    /** An em dash reads the same in every language, so the locales repeat it deliberately. */
+    noValue: "—",
+    countForAria: "Համեմատության մեջ",
+    openWithCount: "Անցնել համեմատությանը ({{count}})",
+    editComparison: "Փոխել համեմատությունը",
+    /** The generated `/compare/<a>-vs-<b>` pages. `{{first}}`/`{{second}}` are product titles. */
+    pair: {
+      heading: "{{first}} թե՞ {{second}}",
+      intro: "Երկու մոդելի բնութագրերը և Հայաստանի խանութների գները՝ կողք կողքի։",
+      seoTitle: "{{first}} թե՞ {{second}} — համեմատություն | Choosy",
+      seoDescription:
+        "Համեմատեք {{first}} և {{second}} մոդելները՝ բնութագրերը և Հայաստանի խանութների գները մեկ աղյուսակում։",
+    },
+  },
         description:
           "iPhone, Samsung Galaxy և այլ սմարթֆոնների գները Հայաստանի խանութներից։ Համեմատեք գները, հիշողությունը և գույները մեկ էջում։",
         intro:

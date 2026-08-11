@@ -789,6 +789,51 @@ export const enOverrides = {
     subtitle: "Create a new account",
     emailLabel: "Email",
     passwordLabel: "Password",
+  comparePage: {
+    seoTitle: "Compare products side by side — Choosy",
+    seoDescription:
+      "Compare smartphones, laptops and other electronics side by side — specifications and prices from shops in Armenia, in one table.",
+    heading: "Compare products",
+    intro:
+      "Pick up to four products from one category and see their specifications and shop prices in a single table.",
+    empty: {
+      heading: "Nothing to compare yet",
+      text: "Tap the scales button in the catalog or on a product page to add it here.",
+      cta: "Browse the catalog",
+    },
+    limitReached: "You can compare up to four products. Remove one to add another.",
+    categoryMismatch:
+      "Only products from the same category can be compared. Clear the comparison to start one in another category.",
+    remove: "Remove",
+    clearAll: "Clear all",
+    addMore: "Add a product",
+    onlyDifferences: "Show differences only",
+    noDifferences: "The selected products match on every specification.",
+    tableCaption: "Specification and price comparison for the selected products",
+    rowLabelHeader: "Specification",
+    sections: {
+      overview: "Overview",
+      specs: "Specifications",
+      offers: "Shop prices",
+    },
+    rows: {
+      price: "Price from",
+      brand: "Manufacturer",
+      category: "Category",
+    },
+    lowestPrice: "Lowest price",
+    noValue: "—",
+    countForAria: "In comparison",
+    openWithCount: "Open comparison ({{count}})",
+    editComparison: "Edit this comparison",
+    pair: {
+      heading: "{{first}} or {{second}}",
+      intro: "Both models' specifications and shop prices in Armenia, side by side.",
+      seoTitle: "{{first}} or {{second}} — comparison | Choosy",
+      seoDescription:
+        "Compare {{first}} and {{second}}: specifications and prices from shops in Armenia, in one table.",
+    },
+  },
     confirmPasswordLabel: "Confirm password",
     submit: "Register",
     switchToLoginPrompt: "Already have an account?",
