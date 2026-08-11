@@ -12,7 +12,12 @@ import { getLanguageFromPath, localizedPath } from "shared/lib/locale";
 import { Breadcrumbs } from "shared/ui/breadcrumbs";
 import { NotFoundContent } from "shared/ui/not-found-content";
 import { getCanonicalProductDetailPath } from "entities/product-detail";
-import { getOffersForProduct, getProductDetailForRoute } from "entities/product";
+import {
+  getOffersForProduct,
+  getProductDetailForRoute,
+  PRODUCT_IMAGE_HEIGHT,
+  PRODUCT_IMAGE_WIDTH,
+} from "entities/product";
 import { buildProductJsonLd } from "pages/singleproduct/model/productJsonLd";
 
 /**
@@ -66,6 +71,11 @@ export function meta({ data: loaderData, location }) {
     language,
     path: getCanonicalProductDetailPath(product),
     imagePath: product.galleryImageUrls?.[0],
+    /** Real dimensions of the Unsplash crop every product image is requested at. */
+    imageWidth: PRODUCT_IMAGE_WIDTH,
+    imageHeight: PRODUCT_IMAGE_HEIGHT,
+    imageAlt: title,
+    ogType: "product",
   });
 }
 

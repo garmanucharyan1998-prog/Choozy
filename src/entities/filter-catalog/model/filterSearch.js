@@ -87,7 +87,13 @@ export const productMatchesSearch = (product, q) => {
   const normalized = normalizeQuery(q);
   if (!normalized) return true;
 
-  const haystack = [product.title, product.description, product.categoryId, product.brandId]
+  /**
+   * Title, category and brand only. The description is now a translated template resolved at
+   * render time, so matching against it would make the same query return different results in
+   * different languages — and every word it contributed ("laptop", "smartphone") is already
+   * here as `categoryId` or reachable through the synonym expansions above.
+   */
+  const haystack = [product.title, product.categoryId, product.brandId]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();

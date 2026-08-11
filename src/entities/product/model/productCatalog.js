@@ -10,7 +10,6 @@
  * productOffers.js).
  */
 import { getProductDetailHref } from "entities/product-detail/model/productRouteRegistry";
-import { formatStorageGb } from "shared/lib/formatStorageGb";
 import { PRODUCT_IMAGES } from "./productImages";
 
 /**
@@ -35,7 +34,7 @@ import { PRODUCT_IMAGES } from "./productImages";
  * }} CatalogProduct
  */
 
-/** @type {Omit<CatalogProduct, "href" | "price" | "description">[]} */
+/** @type {Omit<CatalogProduct, "href">[]} */
 const CATALOG_BASE = [
   {
     id: "fp-1",
@@ -347,30 +346,6 @@ const CATALOG_BASE = [
   },
 ];
 
-const DESCRIPTION_TEMPLATES = {
-  smartphones: (p) =>
-    `${p.brandId === "apple" ? "iOS" : "Android"} smartphone with a ${p.screenInch}″ display and ${formatStorageGb(p.storageGb)} of storage.`,
-  laptops: (p) =>
-    `${p.screenInch}″ laptop with ${formatStorageGb(p.storageGb)} of storage, built for everyday work and travel.`,
-  headphones: () =>
-    `Wireless audio with active noise cancellation and all-day battery life.`,
-  tablets: (p) =>
-    `${p.screenInch}″ tablet with ${formatStorageGb(p.storageGb)} of storage, suited for media, notes and light creative work.`,
-  tv: (p) => `${p.screenInch}″ 4K smart TV with HDR and a built-in streaming platform.`,
-  wearables: () => `Titanium-built smartwatch with extended battery life and GPS tracking.`,
-  cameras: () => `Prime lens with a wide aperture for portraits, low light and street photography.`,
-  speakers: () => `Portable Bluetooth speaker with rich bass and a water-resistant build.`,
-};
-
-/**
- * Short catalog description, generated per product from its own category and specs
- * instead of one literal sentence shared by all 24 (`DESC`, removed). Not translated —
- * matches how product titles already work in this catalog (brand/model names and specs
- * stay as-is across locales; only UI chrome translates). Full bespoke marketing copy in
- * all three languages remains a content task, not a structural one — see plan item 7.
- */
-const buildDescription = (product) =>
-  (DESCRIPTION_TEMPLATES[product.categoryId] || DESCRIPTION_TEMPLATES.smartphones)(product);
 
 /**
  * No pre-formatted `price` string: it hardcoded "AMD" at module scope, so every card
@@ -382,7 +357,6 @@ const buildDescription = (product) =>
  */
 export const PRODUCT_CATALOG = CATALOG_BASE.map((p) => ({
   ...p,
-  description: buildDescription(p),
   href: getProductDetailHref(p.id, p.title),
 }));
 

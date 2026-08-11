@@ -77,7 +77,27 @@ export const buildProductJsonLd = ({
           priceCurrency: "AMD",
           availability: "https://schema.org/InStock",
           url: offer.url,
-          seller: { "@type": "Organization", name: t(offer.shopNameKey) },
+          /**
+           * A seller with a street presence is a `LocalBusiness`, not a bare `Organization`.
+           * Every offer already carries the shop's coordinates — the map widget below plots
+           * them — so the markup can say where the shop actually is.
+           */
+          seller: {
+            "@type": "LocalBusiness",
+            "@id": `${base}/#shop-${offer.id?.split("-").pop() ?? ""}`,
+            name: t(offer.shopNameKey),
+            url: offer.url,
+            address: { "@type": "PostalAddress", addressCountry: "AM", addressLocality: "Yerevan" },
+            ...(offer.location
+              ? {
+                  geo: {
+                    "@type": "GeoCoordinates",
+                    latitude: offer.location.lat,
+                    longitude: offer.location.lng,
+                  },
+                }
+              : {}),
+          },
         })),
       },
     },

@@ -1,3 +1,4 @@
+import { getProductDescriptionKey } from "./productDescriptions";
 import { resolveProductRouteParam } from "entities/product-detail/model/productRouteRegistry";
 import { PRODUCT_CATALOG, getCatalogProductById } from "./productCatalog";
 import { buildGalleryForProduct } from "./productImages";
@@ -33,7 +34,8 @@ export const getProductDetailForRoute = (routeProductId) => {
   return {
     ...product,
     listingTitle: product.title,
-    listingDescription: product.description,
+    /** Resolved by the view with the visitor's language — see buildProductDescription. */
+    descriptionKey: getProductDescriptionKey(product),
     galleryImageUrls: buildGalleryForProduct(product),
     variants: buildVariantsForProduct(product),
     colors: buildColorOptionsForProduct(product.colorId),

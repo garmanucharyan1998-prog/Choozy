@@ -3,7 +3,11 @@
  * serve WebP instead of the browser negotiating a heavier format — a same-URL,
  * zero-risk win since these are remote images the catalog doesn't control encoding for.
  */
-const IMG_CROP = "auto=format&fm=webp&fit=crop&w=1200&h=900&q=85";
+/** The crop every catalog image is requested at — exported so markup can declare the real size. */
+export const PRODUCT_IMAGE_WIDTH = 1200;
+export const PRODUCT_IMAGE_HEIGHT = 900;
+
+const IMG_CROP = `auto=format&fm=webp&fit=crop&w=${PRODUCT_IMAGE_WIDTH}&h=${PRODUCT_IMAGE_HEIGHT}&q=85`;
 
 export const PRODUCT_IMAGES = {
   iphoneOrange: `https://images.unsplash.com/photo-1592750475338-74b7b21085ab?${IMG_CROP}`,

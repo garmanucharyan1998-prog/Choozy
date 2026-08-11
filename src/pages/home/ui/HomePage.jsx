@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useLoaderData } from "react-router";
 import { AboutUsWidget } from "widgets/about-us";
 import { GridCatalogWidget } from "widgets/grid-catalog";
@@ -8,7 +9,11 @@ import { useLanguage } from "contexts";
 import { getTranslator } from "shared/i18n";
 import { buildPageMeta } from "shared/lib/seo";
 import { getLanguageFromPath } from "shared/lib/locale";
-import { getTopCatalogProducts, getVarietyCatalogProducts } from "entities/product";
+import {
+  buildProductDescription,
+  getTopCatalogProducts,
+  getVarietyCatalogProducts,
+} from "entities/product";
 import { buildHomeJsonLd } from "pages/home/model/homeJsonLd";
 
 export function meta({ location }) {
@@ -40,6 +45,15 @@ export function loader() {
 const HomePage = () => {
   const { topProducts, varietyProducts } = useLoaderData();
   const { t, language } = useLanguage();
+
+  /**
+   * Descriptions are resolved here, not inside the carousel: `shared/ui` may not reach into
+   * `entities`, and a page may. The carousel just renders the text it is handed.
+   */
+  const withDescriptions = useMemo(
+    () => (items) => items.map((item) => ({ ...item, description: buildProductDescription(item, t) })),
+    [t],
+  );
   const jsonLd = buildHomeJsonLd({
     language,
     siteName: t("seo.siteName"),
@@ -57,9 +71,9 @@ const HomePage = () => {
       ))}
       <h1 className="sr-only">{t("home.pageTitle")}</h1>
       <GridCatalogWidget />
-      <TopProductsWidget items={topProducts} />
+      <TopProductsWidget items={withDescriptions(topProducts)} />
       <AboutUsWidget />
-      <VarietyWidget items={varietyProducts} />
+      <VarietyWidget items={withDescriptions(varietyProducts)} />
       <ServicesOverviewWidget />
     </>
   );

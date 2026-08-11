@@ -3,6 +3,7 @@ import { FaBalanceScale, FaChevronLeft, FaChevronRight, FaHeart, FaRegHeart } fr
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useLanguage } from "contexts";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
+import { buildProductDescription } from "entities/product";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
 import { useRelatedProductsPresenter } from "features/related-products";
 import { BREAKPOINTS } from "shared/config/breakpoints";
@@ -68,14 +69,14 @@ const RelatedProductsWidget = () => {
     toggleWishlistProduct({
       id: product.id,
       title: product.title,
-      description: product.description,
+      description: buildProductDescription(product, t),
       priceValue: product.priceValue,
       image: product.image,
       href: product.href,
       category: product.categoryId,
     });
     setWishlist(wishlistMapFromStorage());
-  }, []);
+  }, [t]);
 
   const toggleCompare = useCallback((id) => {
     setCompare((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -174,8 +175,8 @@ const RelatedProductsWidget = () => {
                       className="flex flex-col gap-1 pt-3 no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
                     >
                       <h3 className={TITLE_TEXT_CLASS}>{product.title}</h3>
-                      <p className={DESC_TEXT_CLASS} title={product.description}>
-                        {product.description}
+                      <p className={DESC_TEXT_CLASS} title={buildProductDescription(product, t)}>
+                        {buildProductDescription(product, t)}
                       </p>
                       <p className={PRICE_TEXT_CLASS}>
                         {formatPriceAmd(product.priceValue, currencySuffix) || product.price}

@@ -150,6 +150,18 @@ export const ruOverrides = {
     },
     empty: "Результаты не найдены",
   },
+  productDescriptions: {
+    smartphonesIos: "Смартфон на iOS с экраном {{screen}} и памятью {{storage}}.",
+    smartphonesAndroid: "Смартфон на Android с экраном {{screen}} и памятью {{storage}}.",
+    laptops: "Ноутбук {{screen}} с памятью {{storage}} — для повседневной работы и поездок.",
+    tablets:
+      "Планшет {{screen}} с памятью {{storage}} — для медиа, заметок и несложной творческой работы.",
+    tv: "Телевизор {{screen}} 4K Smart TV с HDR и встроенной платформой стриминга.",
+    headphones: "Беспроводной звук с активным шумоподавлением и автономностью на весь день.",
+    wearables: "Умные часы в титановом корпусе с увеличенным временем работы и GPS.",
+    cameras: "Объектив с широкой диафрагмой — для портретов, съёмки при слабом свете и street-фото.",
+    speakers: "Портативная Bluetooth-колонка с насыщенным басом и защитой от воды.",
+  },
   productShowcase: {
     viewMoreLabel: "Смотреть ещё",
     retryLabel: "Повторить",

@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router";
 import { getProductDetailHref } from "entities/product-detail";
-import { getProductDetailForRoute } from "entities/product";
+import { buildProductDescription, getProductDetailForRoute } from "entities/product";
 import {
   ACCOUNT_STORAGE_EVENT,
   isWishlistProductId,
   pushRecentlyViewedProduct,
   toggleWishlistProduct,
 } from "entities/user";
-import { useProductOffersVariantFilter } from "contexts";
+import { useLanguage, useProductOffersVariantFilter } from "contexts";
 import { formatAmd } from "shared/lib/formatAmd";
 
 /**
@@ -16,6 +16,7 @@ import { formatAmd } from "shared/lib/formatAmd";
  */
 export const useProductDetailPresenter = () => {
   const { productId } = useParams();
+  const { t } = useLanguage();
 
   const product = useMemo(() => getProductDetailForRoute(productId), [productId]);
   const { setSelectedVariantIndex: setGlobalVariantIndex, clearSelectedVariantIndex } =
@@ -63,12 +64,12 @@ export const useProductDetailPresenter = () => {
     pushRecentlyViewedProduct({
       id: product.id,
       title: product.listingTitle || "Product",
-      description: product.listingDescription || "",
+      description: buildProductDescription(product, t),
       priceValue: product.priceValue,
       image: product.galleryImageUrls?.[0] || "",
       href: getProductDetailHref(product.id, product.listingTitle || "Product"),
     });
-  }, [product]);
+  }, [product, t]);
 
   const mainImageSrc = product.galleryImageUrls[activeImageIndex] ?? product.galleryImageUrls[0];
 
@@ -82,14 +83,14 @@ export const useProductDetailPresenter = () => {
     toggleWishlistProduct({
       id: product.id,
       title: product.listingTitle || "Product",
-      description: product.listingDescription || "",
+      description: buildProductDescription(product, t),
       priceValue: product.priceValue,
       image: mainImageSrc,
       href: getProductDetailHref(product.id, product.listingTitle || "Product"),
       category: product.categoryId,
     });
     setWishlist(isWishlistProductId(product.id));
-  }, [product, mainImageSrc]);
+  }, [product, mainImageSrc, t]);
 
   const selectThumbnail = useCallback((index) => {
     setActiveImageIndex(index);

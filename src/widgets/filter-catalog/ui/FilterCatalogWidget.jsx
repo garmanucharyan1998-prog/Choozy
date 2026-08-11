@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FaChevronDown, FaList, FaSlidersH, FaTh, FaTimes } from "react-icons/fa";
 import { ACCOUNT_STORAGE_EVENT, readAccountState, toggleWishlistProduct } from "entities/user";
-import { PRODUCT_CATALOG, buildCatalogItemListJsonLd } from "entities/product";
+import {
+  PRODUCT_CATALOG,
+  buildCatalogBreadcrumbJsonLd,
+  buildCatalogItemListJsonLd,
+  buildProductDescription,
+} from "entities/product";
 import { useFilterCatalogPresenter } from "features/filter-catalog";
 import { useLanguage } from "contexts";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
@@ -82,6 +87,7 @@ const FilterCatalogWidget = () => {
     selectedBrands,
     selectedStorage,
     selectedColor,
+    selectedCategory,
     toggleScreen,
     toggleBrand,
     toggleStorage,
@@ -117,11 +123,41 @@ const FilterCatalogWidget = () => {
   } = useFilterCatalogPresenter();
 
   const { language } = useLanguage();
+
+  /**
+   * The page's own name — the selected category, or the generic catalog title. Used as the
+   * visible H1 and as the ItemList's `name`, so the two can never disagree.
+   */
+  const pageHeading = selectedCategory
+    ? t(`filterPage.categories.${selectedCategory}`, selectedCategory)
+    : t("filterPage.pageTitle");
   /** One currency word for the whole page — cards used to bake a hardcoded "AMD" into the data. */
   const currencySuffix = t("productDetail.currencySuffix");
   const catalogItemListJsonLd = useMemo(
-    () => buildCatalogItemListJsonLd({ items: pageItems, language, page, pageSize }),
-    [pageItems, language, page, pageSize],
+    () =>
+      buildCatalogItemListJsonLd({
+        items: pageItems,
+        language,
+        page,
+        pageSize,
+        name: pageHeading,
+        totalItems: totalResults,
+      }),
+    [pageItems, language, page, pageSize, pageHeading, totalResults],
+  );
+
+  const catalogBreadcrumbJsonLd = useMemo(
+    () =>
+      buildCatalogBreadcrumbJsonLd({
+        language,
+        homeLabel: t("footer.columns.primary.home"),
+        catalogLabel: t("navPanel.catalogLabel"),
+        categoryLabel: selectedCategory
+          ? t(`filterPage.categories.${selectedCategory}`, selectedCategory)
+          : undefined,
+        categoryId: selectedCategory,
+      }),
+    [language, t, selectedCategory],
   );
 
   /**
@@ -175,7 +211,7 @@ const FilterCatalogWidget = () => {
         ? {
             id: product.id,
             title: product.title,
-            description: product.description,
+            description: buildProductDescription(product, t),
             priceValue: product.priceValue,
             image: product.image,
             href: product.href,
@@ -186,14 +222,14 @@ const FilterCatalogWidget = () => {
     toggleWishlistProduct({
       id: full.id,
       title: full.title,
-      description: full.description,
+      description: buildProductDescription(full, t),
       priceValue: full.priceValue,
       image: full.image,
       href: full.href,
       category: full.categoryId,
     });
     setWishlist(wishlistMapFromStorage());
-  }, []);
+  }, [t]);
 
   const toggleCompare = useCallback((id) => {
     setCompare((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -447,7 +483,11 @@ const FilterCatalogWidget = () => {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogItemListJsonLd) }}
         />
       )}
-      <h1 className="sr-only">{t("filterPage.pageTitle")}</h1>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(catalogBreadcrumbJsonLd) }}
+      />
+      <h1 className="sr-only">{pageHeading}</h1>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
         <aside
           className="hidden w-full shrink-0 rounded-2xl border border-border-blue/60 bg-white p-4 shadow-sm sm:p-5 lg:block lg:w-[300px] xl:w-[320px]"
@@ -588,6 +628,7 @@ const FilterCatalogWidget = () => {
                     key={product.id}
                     product={product}
                     priceLabel={formatPriceAmd(product.priceValue, currencySuffix)}
+                    descriptionText={buildProductDescription(product, t)}
                     listMode={listMode}
                     inCompare={Boolean(compare[product.id])}
                     inWishlist={Boolean(wishlist[product.id])}

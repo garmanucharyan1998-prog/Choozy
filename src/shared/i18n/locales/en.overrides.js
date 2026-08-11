@@ -150,6 +150,18 @@ export const enOverrides = {
     },
     empty: "No results found",
   },
+  productDescriptions: {
+    smartphonesIos: "iOS smartphone with a {{screen}} display and {{storage}} of storage.",
+    smartphonesAndroid: "Android smartphone with a {{screen}} display and {{storage}} of storage.",
+    laptops: "{{screen}} laptop with {{storage}} of storage, built for everyday work and travel.",
+    tablets:
+      "{{screen}} tablet with {{storage}} of storage, suited for media, notes and light creative work.",
+    tv: "{{screen}} 4K smart TV with HDR and a built-in streaming platform.",
+    headphones: "Wireless audio with active noise cancellation and all-day battery life.",
+    wearables: "Titanium-built smartwatch with extended battery life and GPS tracking.",
+    cameras: "Prime lens with a wide aperture for portraits, low light and street photography.",
+    speakers: "Portable Bluetooth speaker with rich bass and a water-resistant build.",
+  },
   productShowcase: {
     viewMoreLabel: "View more",
     retryLabel: "Retry",

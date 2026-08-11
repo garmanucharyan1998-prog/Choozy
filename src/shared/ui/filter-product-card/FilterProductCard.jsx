@@ -50,7 +50,7 @@ const ImgWrap = ({ listMode, product }) => (
  * Single stretched link per card: the title stays the anchor text (good for crawlers and
  * screen readers) while `after:inset-0` keeps the whole card clickable.
  */
-const ProductTextLink = ({ product, priceLabel, omitTopPadding }) => (
+const ProductTextLink = ({ product, priceLabel, descriptionText, omitTopPadding }) => (
   <LocalizedLink
     to={product.href}
     className={`flex min-w-0 flex-col gap-1 text-start no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy ${
@@ -58,8 +58,8 @@ const ProductTextLink = ({ product, priceLabel, omitTopPadding }) => (
     }`}
   >
     <h3 className={TITLE_CLASS}>{product.title}</h3>
-    <p className={DESC_CLASS} title={product.description}>
-      {product.description}
+    <p className={DESC_CLASS} title={descriptionText}>
+      {descriptionText}
     </p>
     <p className={PRICE_CLASS}>{priceLabel || product.price}</p>
   </LocalizedLink>
@@ -71,6 +71,7 @@ const ProductTextLink = ({ product, priceLabel, omitTopPadding }) => (
 const FilterProductCard = ({
   product,
   priceLabel,
+  descriptionText,
   listMode,
   inCompare,
   inWishlist,
@@ -94,7 +95,12 @@ const FilterProductCard = ({
       <article className="relative flex flex-row gap-4 rounded-xl border border-border-blue/40 bg-white p-3 text-start shadow-sm sm:p-4">
         <ImgWrap listMode product={p} />
         <div className="flex min-w-0 flex-1 flex-col justify-center">
-          <ProductTextLink product={product} priceLabel={priceLabel} omitTopPadding />
+          <ProductTextLink
+            product={product}
+            priceLabel={priceLabel}
+            descriptionText={descriptionText}
+            omitTopPadding
+          />
         </div>
       </article>
     );
@@ -103,7 +109,7 @@ const FilterProductCard = ({
   return (
     <article className="relative flex h-full flex-col text-start">
       <ImgWrap listMode={false} product={p} />
-      <ProductTextLink product={product} priceLabel={priceLabel} />
+      <ProductTextLink product={product} priceLabel={priceLabel} descriptionText={descriptionText} />
     </article>
   );
 };
