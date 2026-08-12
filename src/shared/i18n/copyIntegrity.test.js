@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { translations } from "./translations";
 import { SUPPORTED_LANGUAGE_CODES } from "./languageConfig";
 
@@ -159,6 +161,39 @@ describe("copy integrity", () => {
     expect(offenders).toEqual([]);
   });
 
+  /**
+   * A capital letter directly inside a lowercase word — camelCase or PascalCase leaking into
+   * prose, e.g. "seeMore" where "See more" was meant — reads as a typo or a debugging
+   * artifact left in shipped copy. Armenian has its own rule above (Title Case, not
+   * mid-word); this one is scoped to en/ru, and only to genuine leaks — real brand names
+   * and initialisms that happen to capitalize mid-word are not bugs.
+   */
+  test("English and Russian copy has no camelCase leaking into prose", () => {
+    const KNOWN_MIXED_CASE_WORDS = new Set([
+      "iPhone",
+      "iPad",
+      "iOS",
+      "iSpace",
+      "MacBook",
+      "AirPods",
+      "JavaScript",
+    ]);
+    const midWordCapital = /\p{L}*\p{Ll}\p{Lu}\p{L}*/gu;
+
+    const offenders = allStrings
+      .filter(({ language }) => language === "en" || language === "ru")
+      .flatMap(({ language, path, text }) => {
+        /** `{{priceMin}}`-style interpolation names are code, not prose. */
+        const prose = text.replace(/\{\{[^}]*\}\}/g, "");
+        const words = [...prose.matchAll(midWordCapital)]
+          .map((match) => match[0])
+          .filter((word) => !KNOWN_MIXED_CASE_WORDS.has(word));
+        return words.map((word) => `${language} ${path}: "${word}" in "${text.slice(0, 70)}"`);
+      });
+
+    expect(offenders).toEqual([]);
+  });
+
   test("the contact address has one spelling", () => {
     expect(offending(/choosy\.am/i)).toEqual([]);
   });
@@ -178,6 +213,99 @@ describe("copy integrity", () => {
           identityKey.test(path) && /առցանց խանութ|интернет-магазин|online store/i.test(text),
       )
       .map(({ language, path, text }) => `${language} ${path}: ${text.slice(0, 100)}`);
+
+    expect(offenders).toEqual([]);
+  });
+
+  /**
+   * User-facing Armenian outside `shared/i18n/**` bypasses every rule above: it is not a leaf
+   * in `translations`, so `localeCoverage` cannot see it, and it renders unchanged no matter
+   * which locale a visitor picked. `shopAccountModel.defaultShopProfile.description` was
+   * exactly this — a literal Armenian sentence shown to English and Russian sellers alike.
+   *
+   * The remaining files below are not that bug: each is Armenian *by design*, not by
+   * accident, and stays out of the dictionary on purpose.
+   */
+  test("no Armenian literal exists outside the dictionary", () => {
+    const SRC_ROOT = join(process.cwd(), "src");
+    const I18N_ROOT = join(SRC_ROOT, "shared", "i18n");
+    const ARMENIAN_LETTER = /[԰-֏]/;
+
+    /**
+     * @type {Record<string, string>} repo-relative path (forward slashes) -> why it's allowed
+     */
+    const ALLOWED_FILES = {
+      "entities/filter-catalog/model/filterSearch.js":
+        "Armenian search-term synonyms — must match what an Armenian speaker types, regardless of UI locale.",
+      "shared/api/mocks/mockData.js":
+        "same Armenian search-term expansion map as filterSearch.js.",
+      "shared/lib/formatAmd.js":
+        'the "դր." AMD abbreviation — a computed currency suffix, not translatable prose (see the function\'s own comment).',
+      "shared/lib/formatPriceAmd.js": "same AMD abbreviation as formatAmd.js.",
+      "entities/header/model/headerModel.js":
+        'the language switcher\'s own name for Armenian ("Հայ") — a language names itself in its own script.',
+      "entities/user/model/userModel.js":
+        "the demo buyer profile's own Armenian name — a person's name, not UI copy.",
+    };
+
+    const collectFiles = (dir) => {
+      const out = [];
+      for (const entry of readdirSync(dir)) {
+        const full = join(dir, entry);
+        if (full === I18N_ROOT) continue;
+        if (statSync(full).isDirectory()) {
+          out.push(...collectFiles(full));
+          continue;
+        }
+        if (/\.(jsx?|tsx?)$/.test(entry) && !entry.includes(".test.")) out.push(full);
+      }
+      return out;
+    };
+
+    const offenders = [];
+    collectFiles(SRC_ROOT).forEach((file) => {
+      const rel = file.slice(SRC_ROOT.length + 1).replace(/\\/g, "/");
+      if (ALLOWED_FILES[rel]) return;
+      /** Block comments document this very rule by naming Armenian letters/examples. */
+      const withoutComments = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+      if (ARMENIAN_LETTER.test(withoutComments)) offenders.push(rel);
+    });
+
+    expect(offenders).toEqual([]);
+  });
+
+  /**
+   * Tailwind's `uppercase` runs `text-transform` on the rendered string, and Armenian's `և`
+   * uppercases to the archaic ligature `ԵՒ` instead of the modern `ԵՎ` — a defect a source
+   * reader would never see, since the dictionary itself still holds the correct lowercase
+   * `և`. Finds every `eyebrow={t("…")}` call site (the one place this codebase renders
+   * translated copy through `uppercase`, via `PageIntro`) and checks the key's Armenian value.
+   */
+  test("no string rendered with `uppercase` contains և", () => {
+    const SRC_ROOT = join(process.cwd(), "src");
+    const readAtPath = (path) => path.split(".").reduce((node, key) => node?.[key], translations.am);
+
+    const collectFiles = (dir) => {
+      const out = [];
+      for (const entry of readdirSync(dir)) {
+        const full = join(dir, entry);
+        if (statSync(full).isDirectory()) {
+          out.push(...collectFiles(full));
+          continue;
+        }
+        if (/\.jsx$/.test(entry) && !entry.includes(".test.")) out.push(full);
+      }
+      return out;
+    };
+
+    const offenders = [];
+    collectFiles(SRC_ROOT).forEach((file) => {
+      const source = readFileSync(file, "utf8");
+      for (const match of source.matchAll(/eyebrow=\{t\("([^"]+)"/g)) {
+        const value = readAtPath(match[1]);
+        if (typeof value === "string" && value.includes("և")) offenders.push(match[1]);
+      }
+    });
 
     expect(offenders).toEqual([]);
   });

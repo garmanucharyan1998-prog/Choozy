@@ -56,10 +56,15 @@ const normalizeSwatch = (raw, idx) => {
   return null;
 };
 
+/**
+ * `description` starts empty, not a literal Armenian sentence: this shape is shared by every
+ * locale, and a seller who signed in as English or Russian used to see the shop's "about"
+ * text in Armenian regardless. The dashboard falls back to the translated
+ * `shopAccount.defaultShopDescription` when this is empty (see ShopAccountDashboardWidget).
+ */
 export const defaultShopProfile = {
   shopName: "TechZone Electronics",
-  description:
-    "Choosy-ն նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
+  description: "",
   email: "seller.demo@choosy.am",
   phoneLocal: "99887766",
   website: "techzone.am",

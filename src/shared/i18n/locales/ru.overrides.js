@@ -128,7 +128,7 @@ export const ruOverrides = {
       seeMore: "Показать ещё",
       seeLess: "Показать меньше",
       screenSizes: {
-        unit: "дюйм.",
+        unit: "дюйм",
       },
       colorNames: {
         black: "Чёрный",
@@ -537,6 +537,8 @@ export const ruOverrides = {
     pageTitle: "Страница магазина",
     sidebarNavAria: "Разделы страницы магазина",
     shopTabsAria: "Вкладки данных магазина",
+    defaultShopDescription:
+      "Choosy — новый онлайн-маркетплейс для взыскательных покупателей и продавцов, которые ценят качество и индивидуальный подход.",
     sidebar: {
       details: "Данные магазина",
       products: "Управление товарами",

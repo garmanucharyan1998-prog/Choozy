@@ -675,6 +675,13 @@ const am = {
     pageTitle: "Խանութի էջ",
     sidebarNavAria: "Խանութի էջի բաժիններ",
     shopTabsAria: "Խանութի տվյալների ներդիրներ",
+    /**
+     * Shown for a shop that hasn't written its own description yet — was baked into
+     * `defaultShopProfile.description` as a literal Armenian sentence, so an English or
+     * Russian seller's dashboard showed it in Armenian regardless of locale.
+     */
+    defaultShopDescription:
+      "Choosy-ն նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
     sidebar: {
       details: "Խանութի տվյալներ",
       products: "Ապրանքի կառավարում",

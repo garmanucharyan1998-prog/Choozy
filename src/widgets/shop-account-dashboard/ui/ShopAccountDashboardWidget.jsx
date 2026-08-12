@@ -483,11 +483,9 @@ const ShopAccountDashboardWidget = () => {
           {t("shopAccount.actions.edit")}
         </button>
       </div>
-      {shopState.profile.description ? (
-        <p className="pt-5 text-sm leading-relaxed text-navy md:text-[15px]">
-          {shopState.profile.description}
-        </p>
-      ) : null}
+      <p className="pt-5 text-sm leading-relaxed text-navy md:text-[15px]">
+        {shopState.profile.description || t("shopAccount.defaultShopDescription")}
+      </p>
       <div className="mb-5 border-t border-[#e1e6ef] pt-5" />
       <dl className="flex flex-col gap-[22.5px]">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -554,6 +552,7 @@ const ShopAccountDashboardWidget = () => {
         <textarea
           value={profileDraft.description}
           onChange={(e) => updateDescriptionDraft(e.target.value)}
+          placeholder={t("shopAccount.defaultShopDescription")}
           rows={4}
           className={`${inputClass} min-h-[100px] resize-y py-2.5`}
         />

@@ -538,6 +538,8 @@ export const enOverrides = {
     pageTitle: "Shop page",
     sidebarNavAria: "Shop page sections",
     shopTabsAria: "Shop details tabs",
+    defaultShopDescription:
+      "Choosy is a new online marketplace built for savvy buyers and sellers who value quality and personalization.",
     sidebar: {
       details: "Shop details",
       products: "Product management",
