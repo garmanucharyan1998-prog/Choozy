@@ -861,6 +861,13 @@ export const enOverrides = {
     countForAria: "In comparison",
     openWithCount: "Open comparison ({{count}})",
     editComparison: "Edit this comparison",
+    radar: {
+      heading: "Compared at a glance",
+      ariaLabel: "Radar chart of the selected products' specifications",
+      legendAria: "Choose which products the chart shows",
+      capNote: "The chart shows up to three products at a time. Picking a fourth replaces the first.",
+      scaleNote: "Scores are relative to this category's catalog, not an absolute rating.",
+    },
     bars: {
       heading: "Compared by the numbers",
     },

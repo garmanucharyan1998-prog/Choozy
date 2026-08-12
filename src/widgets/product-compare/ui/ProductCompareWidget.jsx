@@ -6,6 +6,7 @@ import { ProductCardImage } from "shared/ui/product-card-image";
 import { CompareAdvantages } from "./CompareAdvantages";
 import { CompareBars } from "./CompareBars";
 import { CompareEmptyState } from "./CompareEmptyState";
+import { CompareRadar } from "./CompareRadar";
 import { CompareStickyHeader } from "./CompareStickyHeader";
 
 /**
@@ -61,6 +62,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
     seriesColors,
     bars,
     advantages,
+    radar,
     sections,
     hasRows,
     differingRowCount,
@@ -225,6 +227,11 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
         </p>
       ) : null}
 
+      {/**
+       * Shape first, then numbers, then the verdict: the radar summarises what the bars below it
+       * then quantify, and both sit under the table whose raw values they are drawn from.
+       */}
+      <CompareRadar t={t} radar={radar} products={products} seriesColors={seriesColors} />
       <CompareBars t={t} bars={bars} products={products} seriesColors={seriesColors} />
       <CompareAdvantages t={t} products={products} advantages={advantages} seriesColors={seriesColors} />
     </div>

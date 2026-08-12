@@ -6,6 +6,7 @@ import {
   buildCompareAdvantages,
   buildCompareBars,
   buildCompareRows,
+  buildRadarData,
   compareCategoryId,
   getCompareProducts,
   parseCompareIds,
@@ -91,6 +92,8 @@ export const useComparePresenter = (fixedIds = null) => {
 
   const bars = useMemo(() => buildCompareBars(products), [products]);
   const advantages = useMemo(() => buildCompareAdvantages(products), [products]);
+  /** Memoized for identity, not cost: `CompareRadar` derives its visible set from this object. */
+  const radar = useMemo(() => buildRadarData(products), [products]);
 
   const table = useMemo(
     () => (products.length ? buildCompareRows(products, t) : { sections: [] }),
@@ -132,6 +135,7 @@ export const useComparePresenter = (fixedIds = null) => {
     seriesColors,
     bars,
     advantages,
+    radar,
     sections: visibleSections,
     hasRows: table.sections.length > 0,
     differingRowCount,

@@ -1064,6 +1064,18 @@ const am = {
     countForAria: "Համեմատության մեջ",
     openWithCount: "Անցնել համեմատությանը ({{count}})",
     editComparison: "Փոխել համեմատությունը",
+    /**
+     * The radar section. `scaleNote` is not decoration: the scores are min/max positions inside
+     * the category's own catalog, and without saying so the chart reads as an absolute verdict on
+     * a product rather than as "where it sits among its neighbours".
+     */
+    radar: {
+      heading: "Համեմատություն մեկ հայացքով",
+      ariaLabel: "Ընտրված ապրանքների բնութագրերի դիագրամ",
+      legendAria: "Ընտրեք, թե որ ապրանքները ցույց տալ դիագրամին",
+      capNote: "Դիագրամին ցուցադրվում է առավելագույնը երեք ապրանք։ Չորրորդն ընտրելիս առաջինը փոխարինվում է։",
+      scaleNote: "Գնահատականները հարաբերական են այս կատեգորիայի կատալոգի նկատմամբ, ոչ թե բացարձակ գնահատական։",
+    },
     /** Heading above the per-attribute bars, keyed off `comparePage.attr.*` for each row's own label. */
     bars: {
       heading: "Համեմատություն թվերով",
