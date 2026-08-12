@@ -119,4 +119,27 @@ describe("markup conventions", () => {
 
     expect(offenders).toEqual([]);
   });
+
+  /**
+   * `/products`, `/catalog`, `/variety` are still `ComingSoon` stubs (see `CatalogPage.jsx`,
+   * `ProductsPage.jsx`, `VarietyPage.jsx`) — every other surface that means "browse the
+   * catalog" already points at `/filter`, the real browsing page. A literal link to one of
+   * these three paths is either a leftover from before that migration or a fresh mistake.
+   */
+  test("no link targets a ComingSoon stub route", () => {
+    const STUB_ROUTES = ["/products", "/catalog", "/variety"];
+    const offenders = [];
+
+    jsxFiles.forEach((file) => {
+      const rel = relative(file);
+      elementTags(readFileSync(file, "utf8")).forEach((tag) => {
+        const match = tag.match(/\b(?:to|href)=["']([^"']*)["']/);
+        if (match && STUB_ROUTES.includes(match[1])) {
+          offenders.push(`${rel}: ${tag.slice(0, 90)}`);
+        }
+      });
+    });
+
+    expect(offenders).toEqual([]);
+  });
 });

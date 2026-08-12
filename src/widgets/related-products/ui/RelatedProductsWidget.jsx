@@ -90,7 +90,7 @@ const RelatedProductsWidget = () => {
           {t("relatedProducts.title")}
         </h2>
         <LocalizedLink
-          to="/products"
+          to="/filter"
           className="text-sm font-medium text-link-blue no-underline transition-colors hover:text-navy md:text-sm lg:text-base"
         >
           {t("relatedProducts.viewMoreLabel")}
