@@ -1064,6 +1064,14 @@ const am = {
     countForAria: "Համեմատության մեջ",
     openWithCount: "Անցնել համեմատությանը ({{count}})",
     editComparison: "Փոխել համեմատությունը",
+    /** Heading above the per-attribute bars, keyed off `comparePage.attr.*` for each row's own label. */
+    bars: {
+      heading: "Համեմատություն թվերով",
+    },
+    /** `{{title}}` is the product's own title — see the manual `.replace` pattern in `pair` below. */
+    advantages: {
+      heading: "Ինչու՞ ընտրել {{title}}",
+    },
     /** The generated `/compare/<a>-vs-<b>` pages. `{{first}}`/`{{second}}` are product titles. */
     pair: {
       heading: "{{first}} թե՞ {{second}}",

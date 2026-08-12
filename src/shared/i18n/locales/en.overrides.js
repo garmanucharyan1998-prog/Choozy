@@ -861,6 +861,12 @@ export const enOverrides = {
     countForAria: "In comparison",
     openWithCount: "Open comparison ({{count}})",
     editComparison: "Edit this comparison",
+    bars: {
+      heading: "Compared by the numbers",
+    },
+    advantages: {
+      heading: "Why choose {{title}}",
+    },
     pair: {
       heading: "{{first}} or {{second}}",
       intro: "Both models' specifications and shop prices in Armenia, side by side.",

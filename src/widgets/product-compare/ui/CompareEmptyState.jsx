@@ -17,13 +17,15 @@ export const CompareEmptyState = ({ t }) => (
     >
       <FaBalanceScale className="h-7 w-7" />
     </span>
-    <h2 className="m-0 text-lg font-bold text-navy md:text-xl">{t("comparePage.empty.heading")}</h2>
-    <p className="m-0 max-w-xl text-sm leading-relaxed text-text-muted md:text-base">
+    <h2 className="m-0 text-base font-bold text-navy sm:text-lg md:text-xl">
+      {t("comparePage.empty.heading")}
+    </h2>
+    <p className="m-0 max-w-xl text-xs leading-relaxed text-text-muted sm:text-sm md:text-base">
       {t("comparePage.empty.text")}
     </p>
     <LocalizedLink
       to="/filter"
-      className="rounded-xl bg-navy px-6 py-3 text-sm font-semibold text-white no-underline transition-opacity hover:opacity-90"
+      className="rounded-xl bg-navy px-6 py-3 text-xs font-semibold text-white no-underline transition-opacity hover:opacity-90 sm:text-sm"
     >
       {t("comparePage.empty.cta")}
     </LocalizedLink>

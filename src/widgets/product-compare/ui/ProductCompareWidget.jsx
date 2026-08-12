@@ -3,6 +3,8 @@ import { FaCheck, FaPlus, FaTimes } from "react-icons/fa";
 import { useComparePresenter } from "features/product-compare";
 import { LocalizedLink } from "shared/ui/link";
 import { ProductCardImage } from "shared/ui/product-card-image";
+import { CompareAdvantages } from "./CompareAdvantages";
+import { CompareBars } from "./CompareBars";
 import { CompareEmptyState } from "./CompareEmptyState";
 import { CompareStickyHeader } from "./CompareStickyHeader";
 
@@ -28,7 +30,7 @@ import { CompareStickyHeader } from "./CompareStickyHeader";
  * layout is more forgiving there.
  */
 
-const CELL = "px-3 py-3 text-sm break-words md:px-4 md:text-base";
+const CELL = "px-3 py-3 text-xs break-words sm:text-sm md:px-4 md:text-base";
 const LABEL_CELL = `${CELL} sticky left-0 z-10 w-24 bg-white text-start font-semibold text-navy md:w-56`;
 /**
  * Sized so exactly two product columns fit next to the (narrower, on mobile) label column at
@@ -43,7 +45,7 @@ const PRODUCT_COL = `${CELL} w-[7.75rem] snap-start align-top md:w-[12rem]`;
  * as intended sentence case from the dictionary.
  */
 const SECTION_CELL =
-  "bg-subtle-bg px-3 py-2 text-start text-xs font-bold tracking-wide text-text-muted md:px-4";
+  "bg-subtle-bg px-3 py-2 text-start text-[11px] font-bold tracking-wide text-text-muted sm:text-xs md:px-4 md:text-sm";
 
 /**
  * @param {{ fixedIds?: string[] }} props — supplied by `/compare/<a>-vs-<b>`, which shows one
@@ -56,6 +58,9 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
     isFixed,
     editHref,
     products,
+    seriesColors,
+    bars,
+    advantages,
     sections,
     hasRows,
     differingRowCount,
@@ -86,7 +91,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
       />
       <div ref={tableTopRef} aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-navy">
+        <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-navy sm:text-sm">
           <input
             type="checkbox"
             checked={onlyDifferences}
@@ -100,7 +105,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
         {isFixed ? (
           <LocalizedLink
             to={editHref}
-            className="rounded-lg px-3 py-2 text-sm font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue"
+            className="rounded-lg px-3 py-2 text-xs font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue sm:text-sm"
           >
             {t("comparePage.editComparison")}
           </LocalizedLink>
@@ -108,7 +113,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
           <button
             type="button"
             onClick={clearAll}
-            className="rounded-lg px-3 py-2 text-sm font-semibold text-link-blue transition-colors hover:bg-hover-blue"
+            className="rounded-lg px-3 py-2 text-xs font-semibold text-link-blue transition-colors hover:bg-hover-blue sm:text-sm"
           >
             {t("comparePage.clearAll")}
           </button>
@@ -129,7 +134,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                     <ProductCardImage variant="compare" src={product.image} alt={product.title} />
                     <LocalizedLink
                       to={product.href}
-                      className="line-clamp-3 text-sm font-semibold text-navy no-underline hover:underline"
+                      className="line-clamp-3 text-xs font-semibold text-navy no-underline hover:underline sm:text-sm"
                     >
                       {product.title}
                     </LocalizedLink>
@@ -137,7 +142,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                       <button
                         type="button"
                         onClick={() => removeProduct(product.id)}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-text-muted transition-colors hover:text-navy"
+                        className="inline-flex items-center gap-1.5 text-[11px] font-medium text-text-muted transition-colors hover:text-navy sm:text-xs"
                       >
                         <FaTimes className="h-3 w-3" aria-hidden />
                         {t("comparePage.remove")}
@@ -150,7 +155,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                 <th scope="col" className={PRODUCT_COL}>
                   <LocalizedLink
                     to={addMoreHref}
-                    className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border-blue text-sm font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue"
+                    className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border-blue text-xs font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue sm:text-sm"
                   >
                     <FaPlus className="h-4 w-4" aria-hidden />
                     {t("comparePage.addMore")}
@@ -200,7 +205,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                        * cheapest shop for *this* product, never a verdict between products.
                        */}
                       {cell.isLowest ? (
-                        <span className="block text-xs font-normal text-text-muted">
+                        <span className="block text-[11px] font-normal text-text-muted sm:text-xs">
                           {t("comparePage.lowestPrice")}
                         </span>
                       ) : null}
@@ -215,10 +220,13 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
       </div>
 
       {hasRows && sections.length === 0 ? (
-        <p className="m-0 rounded-xl bg-subtle-bg px-4 py-6 text-center text-sm text-text-muted">
+        <p className="m-0 rounded-xl bg-subtle-bg px-4 py-6 text-center text-xs text-text-muted sm:text-sm">
           {t("comparePage.noDifferences")}
         </p>
       ) : null}
+
+      <CompareBars t={t} bars={bars} products={products} seriesColors={seriesColors} />
+      <CompareAdvantages t={t} products={products} advantages={advantages} seriesColors={seriesColors} />
     </div>
   );
 };

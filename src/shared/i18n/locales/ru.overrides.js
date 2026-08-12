@@ -860,6 +860,12 @@ export const ruOverrides = {
     countForAria: "В сравнении",
     openWithCount: "Перейти к сравнению ({{count}})",
     editComparison: "Изменить сравнение",
+    bars: {
+      heading: "Сравнение в цифрах",
+    },
+    advantages: {
+      heading: "Почему стоит выбрать {{title}}",
+    },
     pair: {
       heading: "{{first}} или {{second}}",
       intro: "Характеристики двух моделей и цены магазинов Армении — бок о бок.",

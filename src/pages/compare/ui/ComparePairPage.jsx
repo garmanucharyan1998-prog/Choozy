@@ -113,8 +113,10 @@ const ComparePairPage = () => {
           ]}
         />
         <header className="flex flex-col gap-2">
-          <h1 className="m-0 text-xl font-bold text-navy md:text-2xl lg:text-[32px]">{heading}</h1>
-          <p className="m-0 max-w-3xl text-sm leading-relaxed text-text-muted md:text-base">
+          <h1 className="m-0 text-lg font-bold text-navy sm:text-xl md:text-2xl lg:text-[32px]">
+            {heading}
+          </h1>
+          <p className="m-0 max-w-3xl text-xs leading-relaxed text-text-muted sm:text-sm md:text-base">
             {fill("comparePage.pair.intro")}
           </p>
         </header>

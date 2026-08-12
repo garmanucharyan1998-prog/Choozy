@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useLanguage } from "contexts";
 import {
   MAX_COMPARE_ITEMS,
+  buildCompareAdvantages,
+  buildCompareBars,
   buildCompareRows,
   compareCategoryId,
   getCompareProducts,
@@ -13,6 +15,7 @@ import {
   writeCompareIds,
 } from "entities/product-compare";
 import { useProductCompare } from "../model/useProductCompare";
+import { assignSeriesColors } from "../model/compareSeriesColors";
 
 /**
  * The compare page's own state: which products are on screen, the rows to draw, and the two
@@ -75,6 +78,20 @@ export const useComparePresenter = (fixedIds = null) => {
   const products = useMemo(() => getCompareProducts(ids), [ids]);
   const categoryId = useMemo(() => compareCategoryId(ids), [ids]);
 
+  /**
+   * Assigned during render (not in an effect): the server and the first client render must
+   * agree on which colour goes with which product, and both start from the same empty ref and
+   * the same `products` order, so they land on the same result without a hydration gate.
+   */
+  const seriesColorsRef = useRef({});
+  const seriesColors = useMemo(() => {
+    seriesColorsRef.current = assignSeriesColors(products, seriesColorsRef.current);
+    return seriesColorsRef.current;
+  }, [products]);
+
+  const bars = useMemo(() => buildCompareBars(products), [products]);
+  const advantages = useMemo(() => buildCompareAdvantages(products), [products]);
+
   const table = useMemo(
     () => (products.length ? buildCompareRows(products, t) : { sections: [] }),
     [products, t],
@@ -112,6 +129,9 @@ export const useComparePresenter = (fixedIds = null) => {
     editHref: `/compare?ids=${serializeCompareIds(ids)}`,
     products,
     categoryId,
+    seriesColors,
+    bars,
+    advantages,
     sections: visibleSections,
     hasRows: table.sections.length > 0,
     differingRowCount,
