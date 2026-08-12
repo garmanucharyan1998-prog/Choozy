@@ -121,6 +121,32 @@ describe("markup conventions", () => {
   });
 
   /**
+   * A product's own photo goes through `ProductCardImage`, not a raw `<img>` — it's the only
+   * place that gives a broken image a placeholder fallback, defers loading correctly, and
+   * fits the photo with `object-contain` rather than cropping it (`ProductCompareWidget`
+   * used to crop this exact way before switching to the shared component).
+   */
+  test("product photos render through ProductCardImage, not a raw img", () => {
+    /** Small in-form preview thumbnails already using `object-contain` — real bugs, if any, are elsewhere. */
+    const ALLOWED_RAW_PRODUCT_IMAGES = ["widgets/shop-account-dashboard/ui/ShopAccountDashboardWidget.jsx"];
+    const offenders = [];
+
+    jsxFiles.forEach((file) => {
+      const rel = relative(file);
+      if (ALLOWED_RAW_PRODUCT_IMAGES.includes(rel)) return;
+      elementTags(readFileSync(file, "utf8"))
+        .filter((tag) => /^<img[\s/>]/.test(tag))
+        .forEach((tag) => {
+          if (/\bsrc=\{[^}]*\.image\b/.test(tag)) {
+            offenders.push(`${rel}: ${tag.slice(0, 90)}`);
+          }
+        });
+    });
+
+    expect(offenders).toEqual([]);
+  });
+
+  /**
    * `/products`, `/catalog`, `/variety` are still `ComingSoon` stubs (see `CatalogPage.jsx`,
    * `ProductsPage.jsx`, `VarietyPage.jsx`) — every other surface that means "browse the
    * catalog" already points at `/filter`, the real browsing page. A literal link to one of

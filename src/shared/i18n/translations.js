@@ -472,7 +472,7 @@ const am = {
       microphone: "Ներկառուցված միկրոֆոն:",
       technology: "Տեխնոլոգիա:",
       technologyValue: "Liquid Retina XDR",
-      matrix: "Մատրիցայի կետայնություն:",
+      camera: "Հիմնական տեսախցիկ:",
       ssd: "SSD կուտակիչ:",
       ssdValue: "512 GB",
       bluetooth: "Bluetooth տարբերակ:",

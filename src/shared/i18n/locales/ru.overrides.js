@@ -380,7 +380,7 @@ export const ruOverrides = {
       screenType: "Тип экрана:",
       microphone: "Встроенный микрофон:",
       technology: "Технология:",
-      matrix: "Плотность пикселей:",
+      camera: "Камера:",
       ssd: "Объём SSD:",
       bluetooth: "Версия Bluetooth:",
       refreshRate: "Частота обновления:",

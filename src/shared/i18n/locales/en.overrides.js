@@ -381,7 +381,7 @@ export const enOverrides = {
       screenType: "Screen type:",
       microphone: "Built-in microphone:",
       technology: "Technology:",
-      matrix: "Pixel density:",
+      camera: "Camera:",
       ssd: "SSD capacity:",
       bluetooth: "Bluetooth version:",
       refreshRate: "Refresh rate:",

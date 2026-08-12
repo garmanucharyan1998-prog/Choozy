@@ -201,11 +201,17 @@ const buildExtended = (p) => {
       return withoutEmptyValues([
         { labelKey: "productDetail.specsExtended.screenType", value: "OLED" },
         {
-          labelKey: "productDetail.specsExtended.matrix",
+          labelKey: "productDetail.specsExtended.camera",
           valueKey: "productDetail.specsExtended.values.mainCamera",
           valueParams: { mp: "48" },
         },
-        storageRow(p, "productDetail.specsExtended.ssd"),
+        /**
+         * `productDetail.specsBrief.storage`, not `specsExtended.ssd` — a phone's flash
+         * storage isn't a solid-state drive, unlike the laptops case below which genuinely
+         * has one. Reuses the brief section's already-neutral "Storage:" label instead of
+         * minting a near-duplicate key.
+         */
+        storageRow(p, "productDetail.specsBrief.storage"),
         refreshRateRow(p, "productDetail.specsExtended.refreshRate"),
         bluetooth,
         ...buildUniversalExtended(p, manufacturer),
@@ -213,7 +219,7 @@ const buildExtended = (p) => {
     case "tablets":
       return withoutEmptyValues([
         { labelKey: "productDetail.specsExtended.screenType", value: "Liquid Retina" },
-        storageRow(p, "productDetail.specsExtended.ssd"),
+        storageRow(p, "productDetail.specsBrief.storage"),
         refreshRateRow(p, "productDetail.specsExtended.refreshRate"),
         bluetooth,
         ...buildUniversalExtended(p, manufacturer),
@@ -230,7 +236,7 @@ const buildExtended = (p) => {
     case "wearables":
       return withoutEmptyValues([
         { labelKey: "productDetail.specsExtended.screenType", value: "Always-On Retina" },
-        storageRow(p, "productDetail.specsExtended.ssd"),
+        storageRow(p, "productDetail.specsBrief.storage"),
         bluetooth,
         ...buildUniversalExtended(p, manufacturer),
       ]);
