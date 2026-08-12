@@ -159,6 +159,60 @@ describe("the specs section", () => {
   });
 
   /**
+   * `isBest` is the new, deliberately cross-column judgement for specs backed by a known
+   * numeric fact (unlike `allSame`, which only compares formatted text). RAM is "higher is
+   * better", so whichever laptop reports the bigger `ramGb` should be the one marked.
+   */
+  test("marks the cell with the higher raw RAM value as isBest, on a row with real numeric backing", () => {
+    const byRam = new Map();
+    LAPTOPS.forEach((p) => {
+      const bucket = byRam.get(p.ramGb) ?? [];
+      bucket.push(p);
+      byRam.set(p.ramGb, bucket);
+    });
+    const ramValues = [...byRam.keys()];
+    const higherRam = LAPTOPS.find((p) => p.ramGb === Math.max(...ramValues));
+    const lowerRam = LAPTOPS.find((p) => p.ramGb === Math.min(...ramValues));
+    expect(higherRam.ramGb).toBeGreaterThan(lowerRam.ramGb);
+
+    const result = buildCompareRows(byIds(lowerRam.id, higherRam.id), t);
+    const row = rowByLabel(result, "productDetail.specsBrief.ram");
+
+    expect(row.direction).toBe("higher");
+    expect(row.cells.find((c) => c.productId === higherRam.id).isBest).toBe(true);
+    expect(row.cells.find((c) => c.productId === lowerRam.id).isBest).toBe(false);
+    expect(row.cells.find((c) => c.productId === higherRam.id).raw).toBe(higherRam.ramGb);
+  });
+
+  test("never marks isBest on a row where every column agrees", () => {
+    const byRam = new Map();
+    LAPTOPS.forEach((p) => {
+      const bucket = byRam.get(p.ramGb) ?? [];
+      bucket.push(p);
+      byRam.set(p.ramGb, bucket);
+    });
+    const sameRamPair = [...byRam.values()].find((bucket) => bucket.length > 1);
+    const result = buildCompareRows(byIds(sameRamPair[0].id, sameRamPair[1].id), t);
+    const row = rowByLabel(result, "productDetail.specsBrief.ram");
+    expect(row.allSame).toBe(true);
+    expect(row.cells.every((cell) => cell.isBest === false)).toBe(true);
+  });
+
+  /**
+   * A row with no known numeric backing at all (e.g. a purely categorical fact like screen
+   * technology) carries no `direction` and never marks a winner — there is no "better" OLED.
+   */
+  test("a non-numeric spec row carries no direction and marks no cell isBest", () => {
+    const result = buildCompareRows(byIds(LAPTOPS[0].id, LAPTOPS[1].id), t);
+    const screenTypeRow = allRows(result).find(
+      (row) => row.labelKey === "productDetail.specsExtended.screenType",
+    );
+    if (!screenTypeRow) return;
+    expect(screenTypeRow.direction).toBeNull();
+    expect(screenTypeRow.cells.every((cell) => cell.isBest === false)).toBe(true);
+  });
+
+  /**
    * `normalizeCompareIds` makes a mixed-category selection unreachable through the UI, but the
    * union is what keeps this function total: it must not produce a ragged table if it is ever
    * handed one, and the gap must read as a gap rather than as an empty cell.
