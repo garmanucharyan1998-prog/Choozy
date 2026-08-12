@@ -29,7 +29,8 @@
     "lint": "eslint . --report-unused-disable-directives",
     "typecheck": "react-router typegen && tsc --noEmit",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css}\"",
-    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,css}\""
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,css}\"",
+    "verify:pages": "node scripts/verify-rendered-pages.mjs"
   },
   "browserslist": {
     "production": [
