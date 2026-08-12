@@ -17,15 +17,25 @@ import { CompareStickyHeader } from "./CompareStickyHeader";
  * Width is handled by scrolling the table inside its own container rather than by shrinking
  * the columns — four products at a readable type size do not fit a phone, and the label column
  * is pinned so a scrolled-away row never loses its name.
+ *
+ * `table-fixed` (mobile) is load-bearing, not decoration: under the default `table-layout: auto`
+ * a single unbreakable long word (Armenian row labels routinely are — e.g. "Թարմացման
+ * հաճախականություն") forces its whole column to grow to fit it, since `width` is only a hint
+ * under `auto`. That blew the label column from 96px out to ~190px and pushed the two product
+ * columns off past the edge of the screen. Fixed layout makes column widths authoritative, and
+ * `break-words` lets the same long labels wrap onto a second line instead of overflowing the now
+ * non-negotiable column box. Desktop reverts to `auto` since it never exhibited the bug and auto
+ * layout is more forgiving there.
  */
 
-const CELL = "px-3 py-3 text-sm md:px-4 md:text-base";
-const LABEL_CELL = `${CELL} sticky left-0 z-10 bg-white text-start font-semibold text-navy`;
+const CELL = "px-3 py-3 text-sm break-words md:px-4 md:text-base";
+const LABEL_CELL = `${CELL} sticky left-0 z-10 w-24 bg-white text-start font-semibold text-navy md:w-56`;
 /**
  * Sized so exactly two product columns fit next to the (narrower, on mobile) label column at
- * a 360px viewport — a phone showing 1.4 columns invites a swipe that lands nowhere.
+ * a 360px viewport — a phone showing 1.4 columns invites a swipe that lands nowhere. A real
+ * `width` (not `min-width`): under `table-fixed` only the former is authoritative.
  */
-const PRODUCT_COL = `${CELL} min-w-[7.75rem] snap-start align-top md:min-w-[12rem]`;
+const PRODUCT_COL = `${CELL} w-[7.75rem] snap-start align-top md:w-[12rem]`;
 /**
  * No `uppercase`: Tailwind's text-transform runs on the rendered string, and Armenian's `և`
  * uppercases to the archaic `ԵՒ` instead of `ԵՎ` — silent for the current section labels
@@ -106,11 +116,11 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-border-blue bg-white snap-x snap-proximity">
-        <table className="w-full min-w-[500px] border-collapse text-start">
+        <table className="w-full min-w-[500px] table-fixed border-collapse text-start md:table-auto">
           <caption className="sr-only">{t("comparePage.tableCaption")}</caption>
           <thead>
             <tr className="border-b border-border-blue">
-              <th scope="col" className={`${LABEL_CELL} w-24 md:w-56`}>
+              <th scope="col" className={LABEL_CELL}>
                 <span className="sr-only">{t("comparePage.rowLabelHeader")}</span>
               </th>
               {products.map((product) => (
