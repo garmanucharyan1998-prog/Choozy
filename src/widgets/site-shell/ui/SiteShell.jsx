@@ -75,7 +75,7 @@ const SiteShell = ({ mainBackground = "white" }) => {
       <main
         id="main-content"
         tabIndex={-1}
-        className={`flex flex-1 flex-col ${MAIN_BACKGROUND_CLASSES[mainBackground]} px-2.5 py-6 pb-[calc(var(--mobile-bottom-nav-height,0px)+var(--compare-tray-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] md:py-10 lg:px-[50px] lg:pb-[calc(var(--compare-tray-height,0px)+40px)] 2xl:px-[100px]`}
+        className={`flex flex-1 flex-col ${MAIN_BACKGROUND_CLASSES[mainBackground]} px-2.5 py-6 pb-[calc(var(--mobile-bottom-nav-height,0px)+var(--compare-tray-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] md:py-10 md:pb-[calc(var(--compare-tray-height,0px)+40px)] lg:px-[50px] 2xl:px-[100px]`}
       >
         <Outlet />
       </main>

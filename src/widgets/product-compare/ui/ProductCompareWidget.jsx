@@ -37,8 +37,14 @@ const LABEL_CELL = `${CELL} sticky left-0 z-10 w-24 bg-white text-start font-sem
  * Sized so exactly two product columns fit next to the (narrower, on mobile) label column at
  * a 360px viewport — a phone showing 1.4 columns invites a swipe that lands nowhere. A real
  * `width` (not `min-width`): under `table-fixed` only the former is authoritative.
+ *
+ * 96 + 120 + 120 = 336, against the 338px the scroller actually gets inside a 360px viewport.
+ * The table carries no `min-width` for the same reason: under `table-fixed` a min-width larger
+ * than the declared columns is redistributed across them proportionally, which on a two-product
+ * pair page inflated all three columns until only one product fitted on screen — the exact
+ * opposite of what a page called "X vs Y" is for.
  */
-const PRODUCT_COL = `${CELL} w-[7.75rem] snap-start align-top md:w-[12rem]`;
+const PRODUCT_COL = `${CELL} w-[7.5rem] snap-start align-top md:w-[12rem]`;
 /**
  * No `uppercase`: Tailwind's text-transform runs on the rendered string, and Armenian's `և`
  * uppercases to the archaic `ԵՒ` instead of `ԵՎ` — silent for the current section labels
@@ -122,8 +128,15 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
         )}
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-border-blue bg-white snap-x snap-proximity">
-        <table className="w-full min-w-[500px] table-fixed border-collapse text-start md:table-auto">
+      {/**
+       * `relative` is load-bearing. `sr-only` is `position: absolute`, and an absolutely
+       * positioned element anchors to its nearest *positioned* ancestor — `overflow-x: auto`
+       * clips but does not position. Without this, the winner cells' sr-only text escaped the
+       * scroller entirely, anchored to the document at the column's scrolled-out x (~415px on a
+       * 360px phone) and gave the whole page 55px of horizontal scroll.
+       */}
+      <div className="relative overflow-x-auto rounded-2xl border border-border-blue bg-white snap-x snap-proximity">
+        <table className="w-full table-fixed border-collapse text-start md:table-auto">
           <caption className="sr-only">{t("comparePage.tableCaption")}</caption>
           <thead>
             <tr className="border-b border-border-blue">

@@ -56,7 +56,8 @@ export const CompareTray = () => {
                 type="button"
                 onClick={() => removeProduct(product.id)}
                 aria-label={`${t("comparePage.remove")} — ${product.title}`}
-                className="absolute end-0 top-0 flex h-5 w-5 items-center justify-center rounded-full border border-border-blue bg-white text-text-muted transition-colors hover:bg-hover-blue hover:text-navy"
+                /** 24px is the WCAG 2.2 AA floor for a target this small; 20 was under it. */
+                className="absolute end-0 top-0 flex h-6 w-6 items-center justify-center rounded-full border border-border-blue bg-white text-text-muted transition-colors hover:bg-hover-blue hover:text-navy"
               >
                 <FaTimes className="h-2.5 w-2.5" aria-hidden />
               </button>

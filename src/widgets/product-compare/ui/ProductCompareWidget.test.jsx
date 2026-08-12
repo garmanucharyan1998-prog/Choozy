@@ -67,6 +67,36 @@ describe("ProductCompareWidget", () => {
     expect(bestCell.querySelector(".sr-only")?.textContent).toBeTruthy();
   });
 
+  /**
+   * `sr-only` is `position: absolute`, and an absolutely positioned element anchors to its
+   * nearest *positioned* ancestor — `overflow-x: auto` clips but does not position. Without
+   * `relative` here the winner cells' sr-only text escaped the scroller, anchored to the document
+   * at the column's scrolled-out x, and gave the whole page 55px of horizontal scroll at 360px.
+   * jsdom does no layout, so the class contract is what can be asserted; the measurement that
+   * caught it lives in the responsive audit.
+   */
+  test("the horizontal scroller is positioned, so sr-only text cannot escape it", () => {
+    const { container } = renderWidget();
+    const scroller = container.querySelector('[class*="overflow-x-auto"]');
+
+    expect(scroller).toBeTruthy();
+    expect(scroller.className).toMatch(/\brelative\b/);
+    expect(container.querySelectorAll(".sr-only").length).toBeGreaterThan(0);
+  });
+
+  /**
+   * A `min-width` larger than the declared column widths is redistributed across them under
+   * `table-fixed`, which on a two-product pair page inflated every column until only one product
+   * fitted on a 360px screen.
+   */
+  test("the table declares no min-width that could inflate its columns", () => {
+    const { container } = renderWidget();
+    const table = container.querySelector("table");
+
+    expect(table.className).toMatch(/\btable-fixed\b/);
+    expect(table.className).not.toMatch(/min-w-\[/);
+  });
+
   test("a tied spec (screen size, identical on both phones) marks no cell as best", () => {
     const { container } = renderWidget();
     const screenCells = [...container.querySelectorAll("td")].filter((cell) =>
