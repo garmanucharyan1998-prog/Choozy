@@ -47,12 +47,16 @@ export const CompareNotice = () => {
    * The live region is always in the DOM, empty. A `role="status"` inserted at the same moment
    * as its text is not reliably announced — assistive tech has to be watching the region
    * before the text arrives.
+   *
+   * It rides above the compare tray when one is on screen (`--compare-tray-height`, published by
+   * the tray itself). The limit message is precisely the moment a visitor needs to see the tray
+   * to drop something, so a toast parked on top of it would hide the fix it is asking for.
    */
   return (
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center px-4 md:bottom-8"
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(var(--compare-tray-height,0px)+6rem)] z-50 flex justify-center px-4 md:bottom-[calc(var(--compare-tray-height,0px)+2rem)]"
     >
       {reason ? (
         <p className="m-0 max-w-md rounded-xl bg-navy px-4 py-3 text-center text-sm font-medium text-white shadow-[0_8px_24px_rgba(0,0,0,0.18)]">

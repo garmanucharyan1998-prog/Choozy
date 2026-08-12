@@ -1084,6 +1084,17 @@ const am = {
     advantages: {
       heading: "Ինչու՞ ընտրել {{title}}",
     },
+    /**
+     * The site-wide selection bar. `count` is screen-reader text for the bare "2/4" digits beside
+     * it, and is phrased so no locale has to agree a noun with the number — Russian would need
+     * three plural forms for a sentence `t()` has no way to inflect.
+     */
+    tray: {
+      ariaLabel: "Համեմատության ցանկ",
+      count: "Ընտրված է {{count}} {{max}}-ից",
+      compareCta: "Համեմատել",
+      needMore: "Ավելացրեք ևս մեկը",
+    },
     /** The generated `/compare/<a>-vs-<b>` pages. `{{first}}`/`{{second}}` are product titles. */
     pair: {
       heading: "{{first}} թե՞ {{second}}",

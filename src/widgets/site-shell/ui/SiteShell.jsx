@@ -1,5 +1,6 @@
 import { Outlet } from "react-router";
 import { CompareNotice } from "features/product-compare";
+import { CompareTray } from "widgets/compare-tray";
 import { FooterWidget } from "widgets/footer";
 import { HeaderWidget } from "widgets/header";
 import { NavPanelWidget } from "widgets/nav-panel";
@@ -74,7 +75,7 @@ const SiteShell = ({ mainBackground = "white" }) => {
       <main
         id="main-content"
         tabIndex={-1}
-        className={`flex flex-1 flex-col ${MAIN_BACKGROUND_CLASSES[mainBackground]} px-2.5 py-6 pb-[calc(var(--mobile-bottom-nav-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] md:py-10 lg:px-[50px] lg:pb-10 2xl:px-[100px]`}
+        className={`flex flex-1 flex-col ${MAIN_BACKGROUND_CLASSES[mainBackground]} px-2.5 py-6 pb-[calc(var(--mobile-bottom-nav-height,0px)+var(--compare-tray-height,0px)+24px)] text-start sm:px-[15px] md:px-[30px] md:py-10 lg:px-[50px] lg:pb-[calc(var(--compare-tray-height,0px)+40px)] 2xl:px-[100px]`}
       >
         <Outlet />
       </main>
@@ -82,6 +83,12 @@ const SiteShell = ({ mainBackground = "white" }) => {
       <div className="mt-auto shrink-0">
         <FooterWidget />
       </div>
+
+      {/**
+       * The selection, reachable from every page. Renders nothing until it has something to
+       * show, and hides itself on `/compare*`, where the table already is the tray.
+       */}
+      <CompareTray />
 
       {/**
        * One live region for the whole app. A refused compare click changes nothing on screen,

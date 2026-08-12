@@ -874,6 +874,12 @@ export const enOverrides = {
     advantages: {
       heading: "Why choose {{title}}",
     },
+    tray: {
+      ariaLabel: "Comparison list",
+      count: "{{count}} of {{max}} selected",
+      compareCta: "Compare",
+      needMore: "Add one more",
+    },
     pair: {
       heading: "{{first}} or {{second}}",
       intro: "Both models' specifications and shop prices in Armenia, side by side.",

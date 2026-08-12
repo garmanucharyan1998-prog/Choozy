@@ -873,6 +873,12 @@ export const ruOverrides = {
     advantages: {
       heading: "Почему стоит выбрать {{title}}",
     },
+    tray: {
+      ariaLabel: "Список сравнения",
+      count: "Выбрано {{count}} из {{max}}",
+      compareCta: "Сравнить",
+      needMore: "Добавьте ещё один",
+    },
     pair: {
       heading: "{{first}} или {{second}}",
       intro: "Характеристики двух моделей и цены магазинов Армении — бок о бок.",
