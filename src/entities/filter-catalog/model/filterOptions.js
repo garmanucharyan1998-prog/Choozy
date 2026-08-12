@@ -1,28 +1,38 @@
 /**
- * Filter facet metadata. Screen and storage options are **derived from the catalog** rather
- * than hardcoded, which is the only way to guarantee the invariant that matters: every
+ * Filter facet metadata. Screen, brand and storage options are **derived from the catalog**
+ * rather than hardcoded, which is the only way to guarantee the invariant that matters: every
  * option a visitor can tick returns at least one product, and every product is reachable
  * through some option. The hardcoded lists broke both halves — `RAM_OPTIONS` offered
  * 4/8/16/32/128 GB while the Galaxy S25 Ultra carried 12, so that product was silently
  * unfilterable and its count was computed but never rendered.
  *
- * Colors stay hand-listed: their labels are real UI copy that has to be translated, and the
- * set is closed and stable.
+ * Colors are the exception, because their names are real UI copy that has to be translated —
+ * but they are no longer a *second* list: `COLOR_OPTIONS` is projected from the catalog's own
+ * `COLOR_HEX`, which is what the detail page's swatches read. The two used to be separate
+ * literals with different hex values for the same name.
  */
-import { getBrandLabel, PRODUCT_CATALOG } from "entities/product";
+import { COLOR_HEX, getBrandLabel, PRODUCT_CATALOG } from "entities/product";
 
 /**
  * Screen sizes are bucketed rather than listed one value per option: with honest diagonals
- * the catalog spans 1.9″ to 55″, and a flat list of every distinct value would be a
- * thirteen-checkbox facet where most options match a single product.
+ * the catalog spans 1.4″ to 85″, and a flat list of every distinct value would be a
+ * forty-checkbox facet where most options match a single product.
  *
- * `maxInch` is exclusive so the ranges can't overlap or leave a gap.
+ * `maxInch` is exclusive so the ranges can't overlap. They may leave a gap (nothing in this
+ * catalog has a 3″–6″ or 33″–40″ screen) but a gap must never contain a product: a screen
+ * size in one would make that product unreachable through this facet, which is the same
+ * silent hole the hardcoded lists had. `filterOptions.test.js` asserts it stays that way.
  */
 const SCREEN_SIZE_BUCKETS = [
   { id: "to-3", minInch: 0, maxInch: 3 },
+  { id: "3-6", minInch: 3, maxInch: 6 },
   { id: "6-7", minInch: 6, maxInch: 7 },
+  { id: "7-11", minInch: 7, maxInch: 11 },
+  { id: "11-13", minInch: 11, maxInch: 13 },
   { id: "13-15", minInch: 13, maxInch: 15 },
   { id: "15-17", minInch: 15, maxInch: 17 },
+  { id: "17-24", minInch: 17, maxInch: 24 },
+  { id: "24-33", minInch: 24, maxInch: 33 },
   { id: "over-40", minInch: 40, maxInch: Infinity },
 ];
 
@@ -64,11 +74,14 @@ export const STORAGE_OPTIONS = [
   .sort((a, b) => a - b)
   .map((gb) => ({ id: String(gb), gb }));
 
-export const COLOR_OPTIONS = [
-  { id: "black", hex: "#1a1a1a" },
-  { id: "grey", hex: "#9ca3af" },
-  { id: "white", hex: "#f3f4f6" },
-  { id: "navy", hex: "#152147" },
-  { id: "blue", hex: "#2563eb" },
-  { id: "orange", hex: "#f97316" },
-];
+/**
+ * The swatch row: every color the catalog actually stocks, in `COLOR_HEX`'s declared order.
+ * Not the full palette — `COLOR_HEX` also carries alternate colors offered on a product's
+ * detail page (see `buildColorOptionsForProduct`) that need not be anyone's primary catalog
+ * color, and a swatch nobody can ever match is the same silent dead end this file's other
+ * facets already guard against. Every id here still owes the dictionary a
+ * `filterPage.filters.colorNames.<id>` entry.
+ */
+export const COLOR_OPTIONS = Object.keys(COLOR_HEX)
+  .filter((id) => PRODUCT_CATALOG.some((product) => product.colorId === id))
+  .map((id) => ({ id, hex: COLOR_HEX[id] }));

@@ -54,6 +54,16 @@ export function headers() {
 }
 
 /**
+ * Search-console verification and analytics are per-environment opt-ins: with no id configured
+ * neither renders at all, so a preview or demo deploy ships no third-party script and no stray
+ * verification claim. Read from `import.meta.env`, which Vite inlines at build time and is
+ * therefore identical on the server and the client — a runtime lookup would put a different
+ * `<head>` in the SSR HTML than in the first client render, i.e. a hydration mismatch on every page.
+ */
+const GSC_VERIFICATION: string | undefined = import.meta.env.VITE_GSC_VERIFICATION;
+const GA4_MEASUREMENT_ID: string | undefined = import.meta.env.VITE_GA4_MEASUREMENT_ID;
+
+/**
  * The document shell. Rendered for both the happy path and `ErrorBoundary` below, so it
  * can't assume any route has actually matched — no `useLanguage()` here, just the raw
  * pathname. `lang` is computed straight from the URL instead of patched in by an effect
@@ -78,8 +88,34 @@ export function Layout({ children }: { children: ReactNode }) {
         <link rel="manifest" href="/manifest.json" />
         <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://flagcdn.com" />
+        {GSC_VERIFICATION ? (
+          <meta name="google-site-verification" content={GSC_VERIFICATION} />
+        ) : null}
         <Meta />
         <Links />
+        {/**
+         * Loaded last in `<head>` and `async`, so the tag never blocks the document. `anonymize_ip`
+         * is set in the same call that configures the stream rather than in the Analytics UI, so the
+         * guarantee the privacy policy makes lives in the code that has to keep it.
+         */}
+        {GA4_MEASUREMENT_ID ? (
+          <>
+            <link rel="preconnect" href="https://www.googletagmanager.com" />
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html:
+                  "window.dataLayer=window.dataLayer||[];" +
+                  "function gtag(){dataLayer.push(arguments);}" +
+                  "gtag('js',new Date());" +
+                  `gtag('config',${JSON.stringify(GA4_MEASUREMENT_ID)},{anonymize_ip:true});`,
+              }}
+            />
+          </>
+        ) : null}
       </head>
       <body>
         <noscript>{t("noscript")}</noscript>

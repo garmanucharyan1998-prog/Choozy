@@ -8,6 +8,6 @@
  *
  * Bump this when product data or page copy actually changes.
  */
-export const CONTENT_LAST_MODIFIED = "2026-08-11";
+export const CONTENT_LAST_MODIFIED = "2026-08-12";
 
 export default CONTENT_LAST_MODIFIED;

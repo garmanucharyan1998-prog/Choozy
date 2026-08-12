@@ -1,19 +1,20 @@
 import { buildLocale } from "./mergeLocale.js";
-import { carouselProductsAm } from "./locales/carouselProducts.am.js";
 import { enOverrides } from "./locales/en.overrides.js";
 import { ruOverrides } from "./locales/ru.overrides.js";
 
 /**
  * Centralized UI text dictionary (am base + en/ru mock locales).
  */
+/**
+ * No `home.pageTitle` here any more: nothing read it, and what it said — that Choosy is an
+ * "electronics online store" — is the opposite of what this site is. The page's real title
+ * comes from `seo.home.title` via the route's `meta()`.
+ */
 const am = {
-  home: {
-    pageTitle: "Choosy — էլեկտրոնիկայի առցանց խանութ",
-  },
   header: {
     brandAriaLabel: "Choosy — գլխավոր էջ",
-    brandTitle: "Choosy — էլեկտրոնիկայի առցանց խանութ",
-    brandAlt: "Choosy — էլեկտրոնիկայի առցանց խանութի լոգոն",
+    brandTitle: "Choosy՝ գների համեմատություն Հայաստանում",
+    brandAlt: "Choosy-ի լոգոն",
     mainNavigationAriaLabel: "Հիմնական նավիգացիա",
     aboutLinkLabel: "Մեր մասին",
     aboutLinkTitle: "Իմանալ ավելին Choosy ընկերության մասին",
@@ -87,11 +88,11 @@ const am = {
       },
     },
     mobileMenuItems: {
-      topProducts: "Թոփ Ապրանքներ",
+      topProducts: "Թոփ ապրանքներ",
       varietyProducts: "Տեսականի",
-      contact: "Կապ Մեզ Հետ",
-      aboutUs: "Մեր Մասին",
-      privacy: "Գաղտնիության Քաղաքականություն",
+      contact: "Կապ մեզ հետ",
+      aboutUs: "Մեր մասին",
+      privacy: "Գաղտնիության քաղաքականություն",
     },
   },
   navPanel: {
@@ -101,13 +102,12 @@ const am = {
     mobileCatalogAriaLabel: "Բջջային կատալոգի վահանակ",
     closeCatalogAriaLabel: "Փակել կատալոգը",
     catalogLinksAriaLabel: "Կատալոգի հղումներ",
-    items: {
-      techElectronics: "Տեխնիկա և էլեկտրոնիկա",
-      portableSpeakers: "Շարժական բարձրախոսներ",
-      homeAppliances: "Կենցաղային Տեխնիկա",
-      kitchenAppliances: "Խոհանոցային Տեխնիկա",
-      beautyCare: "Գեղեցկություն և խնամք",
-    },
+    /**
+     * No `items` here: the category bar's labels come from `filterPage.categories.*` via
+     * `entities/navigation`, so the five names that used to sit here were read by nothing —
+     * and three of them ("home appliances", "kitchen appliances", "beauty & care") named
+     * categories this catalog has never carried.
+     */
   },
   gridCatalog: {
     heading: "Կատալոգ",
@@ -115,6 +115,8 @@ const am = {
       smartphones: "Սմարթֆոն",
       speakers: "Շարժական բարձրախոսներ",
       laptops: "Նոթբուքեր",
+      tablets: "Պլանշետներ",
+      accessories: "Պարագաներ",
       headphones: "Ականջակալներ",
     },
   },
@@ -143,12 +145,15 @@ const am = {
     categories: {
       smartphones: "Սմարթֆոն",
       laptops: "Նոթբուքեր",
-      speakers: "Շարժական բարձրախոսներ",
-      headphones: "Ականջակալներ",
       tablets: "Պլանշետ",
+      monitors: "Մոնիտորներ",
       tv: "Հեռուստացույց",
+      headphones: "Ականջակալներ",
+      speakers: "Շարժական բարձրախոսներ",
       wearables: "Ժամացույց",
       cameras: "Տեսախցիկ",
+      consoles: "Խաղային կոնսոլներ",
+      accessories: "Պարագաներ",
     },
     filters: {
       price: "Արժեք",
@@ -158,7 +163,7 @@ const am = {
       brandTitle: "Ապրանքանիշ",
       storage: "Հիշողության ծավալ",
       color: "Գույն",
-      seeMore: "Տեսնել Ավելին",
+      seeMore: "Տեսնել ավելին",
       seeLess: "Պակաս ցուցադրել",
       /**
        * Screen options are data-derived ranges built in the presenter, so the only copy the
@@ -168,25 +173,27 @@ const am = {
       screenSizes: {
         unit: "դյույմ",
       },
-      brandNames: {
-        apple: "Apple",
-        samsung: "Samsung",
-        sony: "Sony",
-        hp: "HP",
-        lenovo: "Lenovo",
-        dell: "Dell",
-      },
       /**
-       * Storage options carry no keys at all: "256 GB" / "1 TB" is the same text in every
-       * locale, so the presenter builds them from the catalog with `formatStorageGb`.
+       * No `brandNames` here: brand ids and labels are the same thing (`getBrandLabel`
+       * in `entities/product`) — proper nouns read the same in every locale. This block
+       * used to duplicate six of them as translation keys nothing ever read, and would
+       * have drifted the moment a seventh brand joined the catalog without a matching key.
+       *
+       * Storage options carry no keys at all either: "256 GB" / "1 TB" is the same text in
+       * every locale, so the presenter builds them from the catalog with `formatStorageGb`.
        */
       colorNames: {
         black: "Սև",
         grey: "Մոխրագույն",
         white: "Սպիտակ",
+        silver: "Արծաթագույն",
         navy: "Կապույտ",
         blue: "Երկնագույն",
+        green: "Կանաչ",
+        red: "Կարմիր",
         orange: "Նարնջագույն",
+        purple: "Մանուշակագույն",
+        beige: "Բեժ",
       },
     },
     pagination: {
@@ -199,17 +206,24 @@ const am = {
     empty: "Արդյունքներ չեն գտնվել",
   },
   noscript: "Այս կայքի աշխատանքի համար անհրաժեշտ է միացնել JavaScript-ը։",
+  /**
+   * `trust` deliberately names no category count: `t()` takes a fallback, not interpolation
+   * params, so a hardcoded "8 categories" could never track the catalog, and would quietly
+   * become a lie the first time a category is added.
+   */
   homeIntro: {
+    eyebrow: "Հայաստանի խանութներից",
     heading: "Գների համեմատություն Հայաստանում",
-    body: "Choosy-ը հավաքում է սմարթֆոնների, նոութբուքերի, պլանշետների, հեռուստացույցների, ականջակալների և ժամացույցների առաջարկները Հայաստանի խանութներից՝ մեկ էջում։ Համեմատեք գները, բնութագրերը և առկայությունը, ապա անցեք ընտրված խանութ։",
+    body: "Choosy-ն հավաքում է սմարթֆոնների, նոութբուքերի, պլանշետների, հեռուստացույցների, ականջակալների և ժամացույցների առաջարկները Հայաստանի խանութներից՝ մեկ էջում։ Համեմատեք գները, բնութագրերը և առկայությունը, ապա անցեք ընտրված խանութ։",
+    trust: "Անվճար համեմատություն · Առանց գրանցման · Թարմացվող գներ",
   },
   aboutPage: {
     seoTitle: "Choosy-ի մասին — գների համեմատություն Հայաստանում",
     seoDescription:
-      "Ինչ է Choosy-ը, ինչպես են հավաքվում Հայաստանի խանութների գները և ինչպես է աշխատում համեմատությունը։",
+      "Ինչ է Choosy-ն, ինչպես են հավաքվում Հայաստանի խանութների գները և ինչպես է աշխատում համեմատությունը։",
     heading: "Choosy-ի մասին",
     intro:
-      "Choosy-ը գների համեմատության հարթակ է Հայաստանի համար։ Մենք հավաքում ենք էլեկտրոնիկայի առաջարկները՝ սմարթֆոններ, նոութբուքեր, պլանշետներ, հեռուստացույցներ, ականջակալներ, բարձրախոսներ, ժամացույցներ և ֆոտոխցիկներ՝ տեղական խանութներից, և ցույց ենք տալիս մեկ էջում, որպեսզի ընտրությունը, որը նախկինում պահանջում էր տասնյակ բացված էջեր, տեղավորվի մեկ համեմատության մեջ։",
+      "Choosy-ն գների համեմատության հարթակ է Հայաստանի համար։ Մենք հավաքում ենք էլեկտրոնիկայի առաջարկները՝ սմարթֆոններ, նոութբուքեր, պլանշետներ, հեռուստացույցներ, ականջակալներ, բարձրախոսներ, ժամացույցներ և ֆոտոխցիկներ՝ տեղական խանութներից, և ցույց ենք տալիս մեկ էջում, որպեսզի ընտրությունը, որը նախկինում պահանջում էր տասնյակ բացված էջեր, տեղավորվի մեկ համեմատության մեջ։",
     sections: [
       {
         heading: "Ինչ ենք անում",
@@ -229,17 +243,17 @@ const am = {
       },
       {
         heading: "Կապ",
-        body: "Հարցեր, հայտարարության ուղղումներ կամ խանութի միանալու հայտ՝ գրեք info@choosy.am հասցեին, և մենք կպատասխանենք։",
+        body: "Հարցեր, հայտարարության ուղղումներ կամ խանութի միանալու հայտ՝ գրեք info@choosy.com հասցեին, և մենք կպատասխանենք։",
       },
     ],
   },
   privacyPage: {
     seoTitle: "Գաղտնիության քաղաքականություն — Choosy",
     seoDescription:
-      "Ինչ տվյալներ է պահում Choosy-ը, որտեղ են դրանք և ինչ վերահսկողություն ունեք դրանց նկատմամբ։",
+      "Ինչ տվյալներ է պահում Choosy-ն, որտեղ են դրանք և ինչ վերահսկողություն ունեք դրանց նկատմամբ։",
     heading: "Գաղտնիության քաղաքականություն",
     intro:
-      "Այստեղ նկարագրված է, թե ինչ է Choosy-ը պահում կայքից օգտվելիս, ինչու, և ինչ վերահսկողություն ունեք դրա նկատմամբ։ Տեքստը գրված է կարդալու համար, և տվյալների ծավալը մենք պահում ենք այնպիսին, որ այն տեղավորվի մեկ էջում։",
+      "Այստեղ նկարագրված է, թե ինչ է Choosy-ն պահում կայքից օգտվելիս, ինչու, և ինչ վերահսկողություն ունեք դրա նկատմամբ։ Տեքստը գրված է կարդալու համար, և տվյալների ծավալը մենք պահում ենք այնպիսին, որ այն տեղավորվի մեկ էջում։",
     sections: [
       {
         heading: "Ինչ է պահվում ձեր բրաուզերում",
@@ -251,7 +265,7 @@ const am = {
       },
       {
         heading: "Cookie-ներ",
-        body: "Մեկ cookie գրանցում է, որ դուք մուտք եք գործել, և ձեր հաշվի տեսակը՝ որպեսզի բացվեն ճիշտ էջերը։ Այն ժամկետանց է դառնում 30 օր հետո, իսկ հաշվից դուրս գալը ջնջում է այն։ Գովազդային և հետագծող cookie-ներ մենք չենք օգտագործում։",
+        body: "Մեկ cookie գրանցում է, որ դուք մուտք եք գործել, և ձեր հաշվի տեսակը՝ որպեսզի բացվեն ճիշտ էջերը։ Այն ժամկետանց է դառնում 30 օր հետո, իսկ հաշվից դուրս գալը ջնջում է այն։ Կայքի աշխատանքը հասկանալու և բարելավելու համար օգտագործում ենք նաև Google Analytics՝ անանունացված IP հասցեով. այն տալիս է ընդհանրացված այցելության վիճակագրություն և չի կապվում ձեր հաշվի հետ։ Գովազդային և վերաուղղորդող cookie-ներ մենք չենք օգտագործում։",
       },
       {
         heading: "Խանութ անցնելը",
@@ -259,7 +273,7 @@ const am = {
       },
       {
         heading: "Ձեր հնարավորությունները",
-        body: "Տեղային տվյալները կարող եք ցանկացած պահի մաքրել բրաուզերի միջոցներով, իսկ հաշվից օգտվելը դադարեցնել՝ պարզապես դուրս գալով։ Կոնկրետ հասցեի վերաբերյալ պահվողն իմանալու կամ այն ջնջելու համար գրեք info@choosy.am։",
+        body: "Տեղային տվյալները կարող եք ցանկացած պահի մաքրել բրաուզերի միջոցներով, իսկ հաշվից օգտվելը դադարեցնել՝ պարզապես դուրս գալով։ Կոնկրետ հասցեի վերաբերյալ պահվողն իմանալու կամ այն ջնջելու համար գրեք info@choosy.com։",
       },
       {
         heading: "Փոփոխություններ",
@@ -277,7 +291,7 @@ const am = {
     sections: [
       {
         heading: "Ինչ է ծառայությունը",
-        body: "Choosy-ը համեմատում է Հայաստանում վաճառողների հրապարակած գները։ Մենք գործարքի կողմ չենք։ Առք ու վաճառքի պայմանագիրը կնքվում է ձեր և ընտրված խանութի միջև՝ նրա պայմաններով, իսկ վճարման, առաքման, երաշխիքի և վերադարձի հարցերը լուծվում են նրա հետ։",
+        body: "Choosy-ն համեմատում է Հայաստանում վաճառողների հրապարակած գները։ Մենք գործարքի կողմ չենք։ Առք ու վաճառքի պայմանագիրը կնքվում է ձեր և ընտրված խանութի միջև՝ նրա պայմաններով, իսկ վճարման, առաքման, երաշխիքի և վերադարձի հարցերը լուծվում են նրա հետ։",
       },
       {
         heading: "Գների ճշգրտությունը",
@@ -301,7 +315,7 @@ const am = {
       },
       {
         heading: "Կապ",
-        body: "Պայմանների վերաբերյալ հարցեր՝ info@choosy.am։",
+        body: "Պայմանների վերաբերյալ հարցեր՝ info@choosy.com։",
       },
     ],
   },
@@ -317,16 +331,19 @@ const am = {
     wearables: "Տիտանե խելացի ժամացույց՝ երկարացված մարտկոցով և GPS հետագծմամբ։",
     cameras: "Լայն դիաֆրագմայով օբյեկտիվ՝ դիմանկարների, ցածր լուսավորության և փողոցային լուսանկարչության համար։",
     speakers: "Շարժական Bluetooth բարձրախոս՝ հարուստ բասով և ջրակայուն կառուցվածքով։",
+    monitors: "{{screen}} մոնիտոր՝ ճշգրիտ գունափոխանցումով և աշխատանքի ու խաղերի համար հարմար թարմացման հաճախականությամբ։",
+    consoles: "Խաղային կոնսոլ կամ պարագա՝ բարձր արագագործությամբ խաղարկության և ընտանեկան զվարճանքի համար։",
+    accessories: "Համակարգչային կամ բջջային պարագա, որը դարձնում է ամենօրյա աշխատանքն ու օգտագործումը ավելի հարմար։",
   },
   productShowcase: {
-    viewMoreLabel: "Տեսնել Ավելին",
+    viewMoreLabel: "Տեսնել ավելին",
     retryLabel: "Կրկնել",
     loadingLabel: "Բեռնվում է...",
     loadErrorMessage: "Չհաջողվեց բեռնել ապրանքները",
   },
   relatedProducts: {
     title: "Ապրանքի հետ",
-    viewMoreLabel: "Տեսնել Ավելին",
+    viewMoreLabel: "Տեսնել ավելին",
     sectionAriaLabel: "Ապրանքի հետ կապակցված ապրանքներ",
     carouselAriaLabel: "Կապակցված ապրանքների սլայդեր",
     compareAriaLabel: "Ավելացնել համեմատությանը կամ հանել",
@@ -347,7 +364,14 @@ const am = {
     wishlistAddAriaLabel: "Ավելացնել նախընտրելիներին",
     wishlistRemoveAriaLabel: "Հանել նախընտրելիներից",
   },
-  carouselProducts: carouselProductsAm,
+  /**
+   * No `carouselProducts` block. Nothing read it: the carousels take their descriptions from
+   * `buildProductDescription`, which composes `productDescriptions.*` from each product's real
+   * category and specs. The 36 strings that used to live here (12 items × 3 locales) were keyed
+   * by `top-1`…`var-6`, ids the catalog stopped using — and every one of the Armenian ones had
+   * been corrupted into non-words ("եկրանովլ" for "էկրանով", "հիշոգոթյանբ" for "հիշողությամբ"),
+   * which no test could see precisely because no page rendered them.
+   */
   servicesOverview: {
     heading: "Մեր ծառայությունները",
     listAriaLabel: "Ծառայությունների ցանկ",
@@ -355,29 +379,30 @@ const am = {
       aiPoweredSearch: {
         title: "Ամեն ինչ մեկ վայրում",
         description:
-          "Choosy-ն նախատեսված է ինտերնետ-խանութներում ապրանքների որոնման և գների համեմատության համար։ Այն ընդգրկում է ամենատարբեր ապրանքների կատեգորիաներ՝ էլեկտրոնիկա, համակարգիչներ, կենցաղային տեխնիկա, ավտոմասեր, վերանորոգման և շինարարական սարքավորումներ, զբոսաշրջային հանդերձանք, մանկական ապրանքներ և շատ ավելին։ Մեր նպատակն է օգնել գնորդներին արագ և հարմարավետ գտնել ամենաարդյունավետ առաջարկը։",
+          "Choosy-ն մեկ էջում հավաքում է էլեկտրոնիկայի առաջարկները Հայաստանի խանութներից՝ սմարթֆոններ, նոութբուքեր, պլանշետներ, հեռուստացույցներ, ականջակալներ, բարձրախոսներ, խելացի ժամացույցներ և ֆոտոխցիկներ։ Տասնյակ էջեր բացելու փոխարեն՝ բոլոր գները երևում են կողք կողքի։",
       },
       smartRecommendations: {
-        title: "Ճկուն Կարգավորումներ",
+        title: "Ճկուն որոնում և զտիչներ",
         description:
-          "Նրանց համար, ովքեր դեռ չեն կողմնորոշվել ընտրության հարցում, յուրաքանչյուր բաժնում հասանելի է պարամետրերով ընտրություն և հնարավորություն ապրանքները միմյանց հետ համեմատելու։ Կա նաև հարմար տեքստային որոնում, որը թույլ է տալիս գտնել ինչպես անհրաժեշտ բաժինները, այնպես էլ կոնկրետ ապրանքները ըստ անվանման։ Իսկ յուրաքանչյուր մոդելի էջում ներկայացված է մանրամասն տեղեկատվություն, որը կօգնի որոշում կայացնել՝ նկարագրություն, տեխնիկական բնութագրեր, լուսանկարներ և վիդեոներ, օգտակար հղումներ և կարծիքներ։",
+          "Զտեք ըստ ապրանքանիշի, հիշողության ծավալի, էկրանի չափսի, գույնի և գնի, համեմատեք մոդելները միմյանց հետ կամ գտեք կոնկրետ ապրանքը տեքստային որոնմամբ։ Յուրաքանչյուր մոդելի էջում կան բնութագրերը, լուսանկարները և գնի պատմությունը։",
       },
       personalizedService: {
-        title: "Choosy-n ամեն վայրում",
+        title: "Թարմ գներ տեղական խանութներից",
         description:
-          "Choosy-ի համակարգին միացված է ավելի քան 3000 խանութ՝ 1,5 միլիոն ապրանքներով, որոնց վերաբերյալ տվյալները մշտապես թարմացվում են։ Դրա շնորհիվ դուք կարող եք ոչ միայն ընտրել համապատասխան ապրանքը, այլև ձեռք բերել այն ամենաօպտիմալ պայմաններով։ Այսօր մենք գործում ենք տարբեր երկրների շուկաներում՝ Ուկրաինայում, Լեհաստանում, ԱՄՆ-ում, Մեծ Բրիտանիայում, Ղազախստանում, և ձգտում ենք ընդլայնել մեր աշխարհագրությունը։",
+          "Գները գալիս են հենց խանութներից և պարբերաբար թարմացվում են, իսկ չթարմացված հայտարարությունները ժամկետանց են դառնում։ Երբ գտնում եք լավագույն առաջարկը, մեկ սեղմումով անցնում եք ընտրված խանութ։",
       },
     },
   },
   aboutUs: {
-    sectionAriaLabel: "Մեր Մասին",
-    title: "Մեր Մասին",
+    sectionAriaLabel: "Մեր մասին",
+    title: "Մեր մասին",
     descriptionStart:
-      "-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։ Ունենալով ուշադիր ընտրված ապրանքների տեսականի՝",
-    descriptionEnd: "-ն առաջարկում է հարթ և հարմարավետ գնումների փորձ։",
-    learnMoreLabel: "Իմանալ Ավելին",
-    imageAlt: "Choosy առցանց շուկայի նկարագրական պատկեր",
-    imageCaption: "Choosy - անհատականացված գնումների հարթակ",
+      "-ն օգնում է համեմատել էլեկտրոնիկայի գները Հայաստանի խանութներից՝ մեկ էջում հավաքելով սմարթֆոնների, նոութբուքերի և այլ սարքերի առաջարկները։ Իսկ",
+    descriptionEnd:
+      "-ն ինքը ապրանք չի վաճառում. այն ցույց է տալիս, թե որտեղ է ամենաշահավետ գինը, և տանում ուղիղ դեպի ընտրված խանութ։",
+    learnMoreLabel: "Իմանալ ավելին",
+    imageAlt: "Choosy-ի գների համեմատության պատկերազարդում",
+    imageCaption: "Choosy՝ գների համեմատության հարթակ",
   },
   productDetail: {
     title: "Apple MacBook Pro",
@@ -437,6 +462,10 @@ const am = {
         yes: "Այո",
         batteryHours: "{{hours}} ժամ",
         mainCamera: "{{mp}} ՄՊ հիմնական տեսախցիկ",
+        warrantyMonths: "{{months}} ամիս",
+        mirrorlessBody: "Անհայելային ֆոտոխցիկի կորպուս",
+        actionCamera: "Արկածային տեսախցիկ",
+        droneCamera: "Խցիկով անօդաչու թռչող սարք",
       },
       screenType: "Էկրանի տեսակ:",
       screenTypeValue: "LCD",
@@ -448,6 +477,10 @@ const am = {
       ssdValue: "512 GB",
       bluetooth: "Bluetooth տարբերակ:",
       bluetoothValue: "5.3",
+      refreshRate: "Թարմացման հաճախականություն:",
+      weight: "Քաշ:",
+      warranty: "Երաշխիք:",
+      modelNumber: "Մոդելի համար:",
       manufacturer: "Արտադրող:",
       manufacturerValue: "Apple",
     },
@@ -460,12 +493,29 @@ const am = {
       specs: "Բնութագիր",
     },
     goToShopAria: "Բացել խանութի կայքը",
+    /**
+     * Shop names are Latin-script proper nouns, same in every locale — like brand names in
+     * `entities/product`, they live only here and `en`/`ru` fall through to this dictionary
+     * without needing their own override (see `copyIntegrity.test.js`: the fallback rule it
+     * guards against is Armenian *prose* leaking through, not a proper noun with no Armenian
+     * letters in it to begin with).
+     */
     shops: {
       zigzag: "Zigzag.am",
       vega: "Vega Digital",
       mobileCentre: "Mobile Centre",
+      vlv: "VLV",
+      ispace: "iSpace",
+      gadget: "Gadget.am",
+      multimedia: "Multimedia",
+      tegh: "Tegh",
+      tashir: "Tashir",
+      sas: "SAS",
+      unicomp: "Unicomp",
+      elektronika: "Elektronika",
     },
-    offerDescription: "Choosy-ը նոր առցանց շուկա է՝\nնախատեսված խելամիտ",
+    offerDescription:
+      "Համեմատեք այս ապրանքի գները Հայաստանի խանութներից և ընտրեք լավագույն առաջարկը։",
     badges: {
       discount: "Զեղչ",
       new: "Նորույթ",
@@ -475,12 +525,12 @@ const am = {
     },
     bestOffers: {
       sectionAriaLabel: "Լավագույն առաջարկներ",
-      title: "Լավագույն Առաջարկները",
+      title: "Լավագույն առաջարկները",
       tableAriaLabel: "Ապրանքի առաջարկների աղյուսակ",
       sortBy: "Դասավորել ըստ",
       sortMenuAriaLabel: "Դասավորման եղանակներ",
       openSortAriaLabel: "Բացել դասավորման ընտրությունը",
-      seeMore: "Տեսնել Ավելին",
+      seeMore: "Տեսնել ավելին",
       seeLess: "Պակաս ցուցադրել",
       variantsAriaLabel: "Կոնֆիգուրացիայի ընտրություն",
       colorsAriaLabel: "Գույնի ընտրություն",
@@ -492,7 +542,7 @@ const am = {
     },
   },
   account: {
-    pageTitle: "Անձնական Էջ",
+    pageTitle: "Անձնական էջ",
     sidebarNavAria: "Անձնական էջի բաժիններ",
     personalTabsAria: "Անձնական տվյալների ներդիրներ",
     sidebar: {
@@ -529,10 +579,10 @@ const am = {
       remove: "Հեռացնել նկարը",
     },
     password: {
-      sectionTitle: "Փոփոխել Գաղտնաբառը",
-      old: "Հին Գաղտնաբառ",
-      new: "Նոր Գաղտնաբառ",
-      confirm: "Կրկնել Նոր Գաղտնաբառը",
+      sectionTitle: "Փոփոխել գաղտնաբառը",
+      old: "Հին գաղտնաբառ",
+      new: "Նոր գաղտնաբառ",
+      confirm: "Կրկնել նոր գաղտնաբառը",
       tooShort: "Գաղտնաբառը պետք է լինի առնվազն 6 նիշ։",
       mismatch: "Գաղտնաբառերը չեն համընկնում։",
       wrongOld: "Հին գաղտնաբառը սխալ է։",
@@ -564,18 +614,18 @@ const am = {
       settingsIntro: "Կարգավորեք, թե ինչ տեսակի ծանուցումներ եք ցանկանում ստանալ։",
       feed: {
         sampleBody:
-          "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
+          "Ձեր հետևած ապրանքներից մեկի գինը փոխվել է. ստուգեք նոր առաջարկները։",
         items: {
           recent: {
-            title: "Լորեմ Իպսում",
+            title: "Գնի իջեցում նախընտրելիներում",
             timeLabel: "3 ր",
           },
           hour: {
-            title: "Լորեմ Իպսում",
+            title: "Նոր առաջարկ պահված ապրանքի համար",
             timeLabel: "1 ժ",
           },
           dated: {
-            title: "Լորեմ Իպսում",
+            title: "Ապրանքը կրկին առկա է",
             timeLabel: "16.09.2025",
           },
         },
@@ -594,7 +644,7 @@ const am = {
       title: "Վերջին դիտած պրոդուկտները",
       empty: "Դեռ ոչինչ չեք դիտել։",
       clear: "Մաքրել պատմությունը",
-      seeMore: "Տեսնել Ավելին",
+      seeMore: "Տեսնել ավելին",
       seeLess: "Պակաս ցուցադրել",
     },
     subscription: {
@@ -627,7 +677,7 @@ const am = {
     shopTabsAria: "Խանութի տվյալների ներդիրներ",
     sidebar: {
       details: "Խանութի տվյալներ",
-      products: "Ապրանքի Կառավարում",
+      products: "Ապրանքի կառավարում",
       statistics: "Ստատիստիկա",
       finance: "Ֆինանսներ",
     },
@@ -682,25 +732,25 @@ const am = {
       settingsIntro: "Կարգավորեք, թե ինչ տեսակի ծանուցումներ եք ցանկանում ստանալ։",
       feed: {
         sampleBody:
-          "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
+          "Թարմացրեք հայտարարությունները, որպեսզի դրանք ակտիվ մնան գնորդների համար։",
         items: {
           recent: {
-            title: "Լորեմ Իպսում",
+            title: "Ձեր ապրանքը ավելացվել է նախընտրելիներում",
             timeLabel: "3 ր",
           },
           hour: {
-            title: "Լորեմ Իպսում",
+            title: "Մրցակիցն իջեցրել է գինը",
             timeLabel: "1 ժ",
           },
           dated: {
-            title: "Լորեմ Իպսում",
+            title: "Հայտարարությունը շուտով կժամկետանց լինի",
             timeLabel: "16.09.2025",
           },
         },
       },
     },
     products: {
-      sectionTitle: "Ապրանքի Կառավարում",
+      sectionTitle: "Ապրանքի կառավարում",
       listTitle: "Ապրանքներ",
       addProduct: "Ավելացնել ապրանք",
       addShort: "Ավելացնել",
@@ -834,7 +884,7 @@ const am = {
       },
     },
     placeholders: {
-      productsTitle: "Ապրանքի Կառավարում",
+      productsTitle: "Ապրանքի կառավարում",
       productsBody: "Այս բաժինը շուտով հասանելի կլինի՝ ապրանքների ավելացման և խմբագրման համար։",
       statisticsTitle: "Ստատիստիկա",
       statisticsBody: "Վաճառքների և այցելությունների վիճակագրությունը շուտով կցուցադրվի այստեղ։",
@@ -895,19 +945,25 @@ const am = {
     columns: {
       primary: {
         home: "Գլխավոր",
-        about: "Մեր Մասին",
+        about: "Մեր մասին",
         catalog: "Կատալոգ",
       },
       contact: {
-        contact: "Կապ Մեզ Հետ",
+        contact: "Կապ մեզ հետ",
         email: "info@choosy.com",
       },
       legal: {
         privacy: "Գաղտնիություն",
-        terms: "Ծառայության Պայմաններ",
+        terms: "Ծառայության պայմաններ",
       },
     },
-    copyright: "© 2025, Choosy. All Rights Reserved",
+    /**
+     * Was English prose sitting in the Armenian base with no override, so every visitor read
+     * "All Rights Reserved" whatever language they picked — `localeCoverage` could not see it,
+     * because its leak rule only fires on strings that contain Armenian letters. The year is
+     * hand-maintained, like `CONTENT_LAST_MODIFIED`: this dictionary has no runtime clock.
+     */
+    copyright: "© 2026, Choosy. Բոլոր իրավունքները պաշտպանված են։",
   },
   breadcrumbs: {
     ariaLabel: "Նավիգացիայի շղթա",
@@ -931,38 +987,14 @@ const am = {
     message: "Էջը շուտով հասանելի կլինի։",
     seoDescription: "Այս բաժինը դեռ պատրաստման փուլում է։ Շուտով հասանելի կլինի Choosy-ում։",
     titles: {
-      about: "Մեր Մասին",
+      about: "Մեր մասին",
       catalog: "Կատալոգ",
-      compare: "Համեմատել",
       products: "Ապրանքներ",
       variety: "Տեսականի",
       privacyPolicy: "Գաղտնիության քաղաքականություն",
       termsOfService: "Ծառայության պայմաններ",
     },
   },
-  seo: {
-    siteName: "Choosy",
-    home: {
-      title: "Choosy՝ էլեկտրոնիկայի և տեխնիկայի առցանց շուկա",
-      description:
-        "Choosy-ում գտեք էլեկտրոնիկա, կենցաղային և խոհանոցային տեխնիկա, համեմատեք գներ և գնումներ կատարեք հարմարավետ։",
-    },
-    filter: {
-      title: "Կատալոգ և գների համեմատություն — Choosy",
-      description:
-        "Ընտրեք ապրանքներ ըստ ապրանքանիշի, գնի, էկրանի և հիշողության։ Համեմատեք առաջարկները Հայաստանի խանութներից Choosy-ում։",
-      /** Appended to a category title/canonical for page 2 and beyond. */
-      pageSuffix: "էջ {{page}}",
-    },
-    /**
-     * One entry per catalog category. These are the site's highest-intent landing pages —
-     * they all used to share the generic `filter` title and description above and canonicalize
-     * to bare `/filter`, so Google dropped all 24 of them (8 categories × 3 languages).
-     * `intro` is the visible keyword copy rendered above the results.
-     */
-    filterCategories: {
-      smartphones: {
-        title: "Սմարթֆոնների գներ Հայաստանում — համեմատեք և ընտրեք | Choosy",
   /**
    * `comingSoon.titles.compare` is gone from here: `/compare` is a real page now, so the key
    * would have been copy nothing renders — and unread copy is copy that drifts.
@@ -1014,17 +1046,47 @@ const am = {
         "Համեմատեք {{first}} և {{second}} մոդելները՝ բնութագրերը և Հայաստանի խանութների գները մեկ աղյուսակում։",
     },
   },
+  seo: {
+    siteName: "Choosy",
+    /**
+     * The home page's title and description — the site's single most valuable pair of strings.
+     * They used to sell an "online marketplace" of "home and kitchen appliances": the wrong
+     * business (Choosy sells nothing) advertising categories this catalog does not carry, and
+     * competing for a query the site cannot honestly win. They now lead with the term the
+     * visible H1 targets, in the same shape as the category titles below.
+     */
+    home: {
+      title: "Էլեկտրոնիկայի գների համեմատություն Հայաստանում | Choosy",
+      description:
+        "Համեմատեք սմարթֆոնների, նոութբուքերի, պլանշետների, հեռուստացույցների և ականջակալների գները Հայաստանի խանութներից՝ մեկ էջում։ Գտեք լավագույն առաջարկը և անցեք ընտրված խանութ։",
+    },
+    filter: {
+      title: "Կատալոգ և գների համեմատություն — Choosy",
+      description:
+        "Ընտրեք ապրանքներ ըստ ապրանքանիշի, գնի, էկրանի և հիշողության։ Համեմատեք առաջարկները Հայաստանի խանութներից Choosy-ում։",
+      /** Appended to a category title/canonical for page 2 and beyond. */
+      pageSuffix: "էջ {{page}}",
+    },
+    /**
+     * One entry per catalog category. These are the site's highest-intent landing pages —
+     * they all used to share the generic `filter` title and description above and canonicalize
+     * to bare `/filter`, so Google dropped all 24 of them (8 categories × 3 languages).
+     * `intro` is the visible keyword copy rendered above the results.
+     */
+    filterCategories: {
+      smartphones: {
+        title: "Սմարթֆոնների գներ Հայաստանում — համեմատեք և ընտրեք | Choosy",
         description:
           "iPhone, Samsung Galaxy և այլ սմարթֆոնների գները Հայաստանի խանութներից։ Համեմատեք գները, հիշողությունը և գույները մեկ էջում։",
         intro:
-          "Choosy-ը հավաքում է սմարթֆոնների առաջարկները Հայաստանի խանութներից՝ որպեսզի տեսնեք, թե որտեղ է ամենացածր գինը։ Զտեք ըստ ապրանքանիշի, հիշողության ծավալի, էկրանի չափսի և գույնի, ապա անցեք ապրանքի էջ՝ բոլոր խանութների գները միասին տեսնելու համար։",
+          "Choosy-ն հավաքում է սմարթֆոնների առաջարկները Հայաստանի խանութներից՝ որպեսզի տեսնեք, թե որտեղ է ամենացածր գինը։ Զտեք ըստ ապրանքանիշի, հիշողության ծավալի, էկրանի չափսի և գույնի, ապա անցեք ապրանքի էջ՝ բոլոր խանութների գները միասին տեսնելու համար։",
       },
       laptops: {
         title: "Նոութբուքերի գներ Հայաստանում — համեմատեք և ընտրեք | Choosy",
         description:
           "MacBook, Dell, Lenovo, HP և Samsung նոութբուքերի գները Հայաստանի խանութներից։ Համեմատեք էկրանը, հիշողությունը և գինը։",
         intro:
-          "Աշխատանքի, ուսման կամ խաղերի համար նոութբուք ընտրելիս գինը տարբեր խանութներում կարող է զգալիորեն տարբերվել։ Choosy-ը ցույց է տալիս առաջարկները կողք կողքի՝ ըստ ապրանքանիշի, էկրանի չափսի և հիշողության ծավալի։",
+          "Աշխատանքի, ուսման կամ խաղերի համար նոութբուք ընտրելիս գինը տարբեր խանութներում կարող է զգալիորեն տարբերվել։ Choosy-ն ցույց է տալիս առաջարկները կողք կողքի՝ ըստ ապրանքանիշի, էկրանի չափսի և հիշողության ծավալի։",
       },
       speakers: {
         title: "Շարժական բարձրախոսների գներ Հայաստանում | Choosy",
@@ -1045,7 +1107,7 @@ const am = {
         description:
           "iPad և Samsung Galaxy Tab պլանշետների գները Հայաստանի խանութներից։ Համեմատեք էկրանը, հիշողությունը և գինը։",
         intro:
-          "Պլանշետներ՝ մեդիայի, նշումների և ստեղծագործական աշխատանքի համար։ Choosy-ը ցույց է տալիս, թե որ խանութում է ամենաշահավետ գինը։",
+          "Պլանշետներ՝ մեդիայի, նշումների և ստեղծագործական աշխատանքի համար։ Choosy-ն ցույց է տալիս, թե որ խանութում է ամենաշահավետ գինը։",
       },
       tv: {
         title: "Հեռուստացույցների գներ Հայաստանում — 4K Smart TV | Choosy",

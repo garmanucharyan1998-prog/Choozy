@@ -8,9 +8,11 @@ import { buildVariantsForProduct } from "./productVariants";
  * page's own JSON-LD `AggregateOffer` (built from the real product price) contradicted
  * what the page visibly showed.
  *
- * Kept to the same 3 recurring shops (translated names/URLs unchanged) so no i18n
- * content is lost — only the price, variant list and color options are now derived
- * from the actual product instead of being hardcoded.
+ * 12 shops, not 3: with only 3 offers the Best Offers table's own "see more" button was
+ * unreachable dead code — `canLoadMore` requires more offers than the initial page of 3,
+ * so it could never once evaluate `true` against this list. Every domain below was checked
+ * to actually resolve before being added; `location` is a hand-placed Yerevan-area point
+ * for the map widget, not a real street address.
  */
 const SHOPS = [
   {
@@ -42,6 +44,96 @@ const SHOPS = [
     url: "https://mobilecentre.am/",
     priceFactor: 1.08,
     location: { lat: 40.1889, lng: 44.5038 },
+  },
+  {
+    shopId: "vlv",
+    shopNameKey: "productOffers.shops.vlv",
+    shopUrlLabel: "vlv.am",
+    logoLabel: "VLV",
+    badgeKey: null,
+    url: "https://vlv.am/",
+    priceFactor: 0.95,
+    location: { lat: 40.1831, lng: 44.5136 },
+  },
+  {
+    shopId: "ispace",
+    shopNameKey: "productOffers.shops.ispace",
+    shopUrlLabel: "ispace.am",
+    logoLabel: "ISPACE",
+    badgeKey: null,
+    url: "https://ispace.am/",
+    priceFactor: 1.05,
+    location: { lat: 40.1745, lng: 44.5211 },
+  },
+  {
+    shopId: "gadget",
+    shopNameKey: "productOffers.shops.gadget",
+    shopUrlLabel: "gadget.am",
+    logoLabel: "GADGET",
+    badgeKey: null,
+    url: "https://gadget.am/",
+    priceFactor: 0.99,
+    location: { lat: 40.1902, lng: 44.4977 },
+  },
+  {
+    shopId: "multimedia",
+    shopNameKey: "productOffers.shops.multimedia",
+    shopUrlLabel: "multimedia.am",
+    logoLabel: "MM",
+    badgeKey: null,
+    url: "https://multimedia.am/",
+    priceFactor: 1.11,
+    location: { lat: 40.1699, lng: 44.5079 },
+  },
+  {
+    shopId: "tegh",
+    shopNameKey: "productOffers.shops.tegh",
+    shopUrlLabel: "tegh.am",
+    logoLabel: "TEGH",
+    badgeKey: null,
+    url: "https://tegh.am/",
+    priceFactor: 1.0,
+    location: { lat: 40.1958, lng: 44.5205 },
+  },
+  {
+    shopId: "tashir",
+    shopNameKey: "productOffers.shops.tashir",
+    shopUrlLabel: "tashir.am",
+    logoLabel: "TASHIR",
+    badgeKey: null,
+    url: "https://tashir.am/",
+    priceFactor: 1.04,
+    location: { lat: 40.1817, lng: 44.4869 },
+  },
+  {
+    shopId: "sas",
+    shopNameKey: "productOffers.shops.sas",
+    shopUrlLabel: "sas.am",
+    logoLabel: "SAS",
+    badgeKey: "productOffers.badges.discount",
+    url: "https://sas.am/",
+    priceFactor: 0.93,
+    location: { lat: 40.1621, lng: 44.5147 },
+  },
+  {
+    shopId: "unicomp",
+    shopNameKey: "productOffers.shops.unicomp",
+    shopUrlLabel: "unicomp.am",
+    logoLabel: "UNICOMP",
+    badgeKey: "productOffers.badges.new",
+    url: "https://unicomp.am/",
+    priceFactor: 1.07,
+    location: { lat: 40.1876, lng: 44.4903 },
+  },
+  {
+    shopId: "elektronika",
+    shopNameKey: "productOffers.shops.elektronika",
+    shopUrlLabel: "elektronika.am",
+    logoLabel: "EL",
+    badgeKey: null,
+    url: "https://elektronika.am/",
+    priceFactor: 1.015,
+    location: { lat: 40.1735, lng: 44.4952 },
   },
 ];
 

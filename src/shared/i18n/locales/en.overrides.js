@@ -1,13 +1,10 @@
 /** English mock copy — merged onto Armenian base. productRefreshed is intentionally omitted. */
 export const enOverrides = {
-  home: {
-    pageTitle: "Choosy — electronics online store",
-  },
   header: {
     aboutLinkLabel: "About us",
     brandAriaLabel: "Choosy — home page",
-    brandTitle: "Choosy — electronics online store",
-    brandAlt: "Choosy — electronics online store logo",
+    brandTitle: "Choosy — price comparison in Armenia",
+    brandAlt: "Choosy logo",
     mainNavigationAriaLabel: "Main navigation",
     aboutLinkTitle: "Learn more about Choosy",
     search: {
@@ -73,13 +70,6 @@ export const enOverrides = {
     mobileCatalogAriaLabel: "Mobile catalog panel",
     closeCatalogAriaLabel: "Close catalog",
     catalogLinksAriaLabel: "Catalog links",
-    items: {
-      techElectronics: "Tech & electronics",
-      portableSpeakers: "Portable speakers",
-      homeAppliances: "Home appliances",
-      kitchenAppliances: "Kitchen appliances",
-      beautyCare: "Beauty & care",
-    },
   },
   gridCatalog: {
     heading: "Catalog",
@@ -87,6 +77,8 @@ export const enOverrides = {
       smartphones: "Smartphones",
       speakers: "Portable speakers",
       laptops: "Laptops",
+      tablets: "Tablets",
+      accessories: "Accessories",
       headphones: "Headphones",
     },
   },
@@ -115,12 +107,15 @@ export const enOverrides = {
     categories: {
       smartphones: "Smartphones",
       laptops: "Laptops",
-      speakers: "Portable speakers",
-      headphones: "Headphones",
       tablets: "Tablets",
+      monitors: "Monitors",
       tv: "TV",
+      headphones: "Headphones",
+      speakers: "Portable speakers",
       wearables: "Wearables",
       cameras: "Cameras",
+      consoles: "Game consoles",
+      accessories: "Accessories",
     },
     filters: {
       price: "Price",
@@ -139,9 +134,14 @@ export const enOverrides = {
         black: "Black",
         grey: "Gray",
         white: "White",
+        silver: "Silver",
         navy: "Navy",
         blue: "Blue",
+        green: "Green",
+        red: "Red",
         orange: "Orange",
+        purple: "Purple",
+        beige: "Beige",
       },
     },
     pagination: {
@@ -155,8 +155,10 @@ export const enOverrides = {
   },
   noscript: "This site needs JavaScript enabled to work.",
   homeIntro: {
+    eyebrow: "From shops across Armenia",
     heading: "Price comparison in Armenia",
     body: "Choosy gathers offers for smartphones, laptops, tablets, TVs, headphones and watches from stores across Armenia onto one page. Compare prices, specifications and availability, then go straight to the shop you picked.",
+    trust: "Free comparison · No sign-up · Prices kept current",
   },
   aboutPage: {
     seoTitle: "About Choosy — price comparison across Armenia",
@@ -164,7 +166,7 @@ export const enOverrides = {
       "What Choosy is, how prices are collected from stores across Armenia, and how the comparison works.",
     heading: "About Choosy",
     intro:
-      "Choosy is a price-comparison marketplace for Armenia. We gather offers for electronics — smartphones, laptops, tablets, TVs, headphones, speakers, watches and cameras — from local shops and put them on one page, so a decision that used to mean opening a dozen tabs takes a single comparison.",
+      "Choosy is a price-comparison platform for Armenia. We gather offers for electronics — smartphones, laptops, tablets, TVs, headphones, speakers, watches and cameras — from local shops and put them on one page, so a decision that used to mean opening a dozen tabs takes a single comparison.",
     sections: [
       {
         heading: "What we do",
@@ -184,7 +186,7 @@ export const enOverrides = {
       },
       {
         heading: "Contact",
-        body: "Questions, corrections to a listing, or a shop that would like to be included — write to info@choosy.am and we will get back to you.",
+        body: "Questions, corrections to a listing, or a shop that would like to be included — write to info@choosy.com and we will get back to you.",
       },
     ],
   },
@@ -206,7 +208,7 @@ export const enOverrides = {
       },
       {
         heading: "Cookies",
-        body: "One cookie records that you are signed in and which kind of account you have, so the right pages open for you. It expires after 30 days, and signing out removes it. We do not use advertising or cross-site tracking cookies.",
+        body: "One cookie records that you are signed in and which kind of account you have, so the right pages open for you. It expires after 30 days, and signing out removes it. We also use Google Analytics, with IP addresses anonymised, to understand and improve how the site works: it gives us aggregate visit statistics and is not tied to your account. We do not use advertising or retargeting cookies.",
       },
       {
         heading: "Leaving for a shop",
@@ -214,7 +216,7 @@ export const enOverrides = {
       },
       {
         heading: "Your choices",
-        body: "You can clear locally stored data at any time from your browser, and you can stop using an account simply by signing out. To ask what is stored about an address or to have it removed, write to info@choosy.am.",
+        body: "You can clear locally stored data at any time from your browser, and you can stop using an account simply by signing out. To ask what is stored about an address or to have it removed, write to info@choosy.com.",
       },
       {
         heading: "Changes",
@@ -256,7 +258,7 @@ export const enOverrides = {
       },
       {
         heading: "Contact",
-        body: "Questions about these terms: info@choosy.am.",
+        body: "Questions about these terms: info@choosy.com.",
       },
     ],
   },
@@ -271,6 +273,9 @@ export const enOverrides = {
     wearables: "Titanium-built smartwatch with extended battery life and GPS tracking.",
     cameras: "Prime lens with a wide aperture for portraits, low light and street photography.",
     speakers: "Portable Bluetooth speaker with rich bass and a water-resistant build.",
+    monitors: "{{screen}} monitor with accurate color reproduction and a refresh rate suited to work and gaming alike.",
+    consoles: "Game console or accessory built for fast, responsive play and shared living-room entertainment.",
+    accessories: "Computer or mobile accessory that makes everyday work and daily use more comfortable.",
   },
   productShowcase: {
     viewMoreLabel: "View more",
@@ -288,60 +293,6 @@ export const enOverrides = {
   },
   topProducts: { title: "Top products", carouselAriaLabel: "Top products carousel" },
   variety: { title: "Catalog", carouselAriaLabel: "Product range carousel" },
-  carouselProducts: {
-    top: {
-      "top-1": {
-        description:
-          "Flagship iPhone with a bright OLED display, powerful camera system, and all-day battery life.",
-      },
-      "top-2": {
-        description:
-          "Premium noise-cancelling headphones with rich sound, soft cushions, and long battery life.",
-      },
-      "top-3": {
-        description:
-          "High-end Samsung phone with a sharp AMOLED screen, S Pen support, and advanced zoom camera.",
-      },
-      "top-4": {
-        description:
-          "Compact prime lens with a bright aperture for portraits, street photography, and low light.",
-      },
-      "top-5": {
-        description:
-          "Compact professional laptop with M-series performance, Liquid Retina XDR display, and fast SSD.",
-      },
-      "top-6": {
-        description:
-          "Slim 4K smart TV with vivid contrast, smooth motion, and built-in streaming apps.",
-      },
-    },
-    variety: {
-      "var-1": {
-        description:
-          "Fast iPhone with a pro camera system, durable titanium finish, and smooth iOS experience.",
-      },
-      "var-2": {
-        description:
-          "Compact earbuds with active noise cancellation, transparency mode, and spatial audio.",
-      },
-      "var-3": {
-        description:
-          "Rugged smartwatch with a bright display, advanced health tracking, and GPS features.",
-      },
-      "var-4": {
-        description:
-          "Large Android tablet for streaming, notes, drawing, and multitasking with a vivid display.",
-      },
-      "var-5": {
-        description:
-          "Thin and light MacBook with silent performance, long battery life, and a sharp Retina display.",
-      },
-      "var-6": {
-        description:
-          "Gaming laptop with a fast display, dedicated graphics, and strong cooling for modern games.",
-      },
-    },
-  },
   servicesOverview: {
     heading: "Our services",
     listAriaLabel: "Services list",
@@ -349,17 +300,17 @@ export const enOverrides = {
       aiPoweredSearch: {
         title: "Everything in one place",
         description:
-          "Choosy helps you search and compare prices across online stores. Electronics, computers, home appliances, auto parts, tools, travel gear, kids products, and more — find the best deal faster.",
+          "Choosy gathers electronics offers from shops across Armenia onto a single page — smartphones, laptops, tablets, TVs, headphones, speakers, smartwatches and cameras. Instead of opening a dozen tabs, you see every price side by side.",
       },
       smartRecommendations: {
-        title: "Flexible filters",
+        title: "Flexible search and filters",
         description:
-          "Filter by specs, compare models side by side, and use text search to find categories or products by name. Each product page includes descriptions, specs, photos, videos, and useful links.",
+          "Filter by brand, storage, screen size, colour and price, compare models against each other, or find a specific product by name. Every model's page carries its specifications, photos and price history.",
       },
       personalizedService: {
-        title: "Choosy everywhere",
+        title: "Live prices from local shops",
         description:
-          "3,000+ connected shops and 1.5M products with constantly updated data. Choose the right product and buy on the best terms. We operate in Ukraine, Poland, the US, the UK, Kazakhstan, and keep expanding.",
+          "Prices come straight from the shops and are refreshed regularly, while listings that go unrefreshed expire. When you find the best offer, one click takes you to the shop you picked.",
       },
     },
   },
@@ -367,11 +318,12 @@ export const enOverrides = {
     sectionAriaLabel: "About us",
     title: "About us",
     descriptionStart:
-      " is a new online marketplace for smart shoppers and sellers who value quality and personalization. With a curated catalog,",
-    descriptionEnd: " offers a smooth, convenient shopping experience.",
+      " helps you compare electronics prices from shops across Armenia, gathering offers for smartphones, laptops and other devices onto one page. And",
+    descriptionEnd:
+      " sells nothing itself — it shows you where the best price is and takes you straight to the shop you picked.",
     learnMoreLabel: "Learn more",
-    imageAlt: "Choosy marketplace illustration",
-    imageCaption: "Choosy — personalized shopping platform",
+    imageAlt: "Choosy price comparison illustration",
+    imageCaption: "Choosy — price comparison platform",
   },
   productDetail: {
     colorsAriaLabel: "Color selection",
@@ -421,6 +373,10 @@ export const enOverrides = {
         yes: "Yes",
         batteryHours: "{{hours}} hours",
         mainCamera: "{{mp}} MP main camera",
+        warrantyMonths: "{{months}} months",
+        mirrorlessBody: "Mirrorless camera body",
+        actionCamera: "Action camera",
+        droneCamera: "Camera drone",
       },
       screenType: "Screen type:",
       microphone: "Built-in microphone:",
@@ -428,6 +384,10 @@ export const enOverrides = {
       matrix: "Pixel density:",
       ssd: "SSD capacity:",
       bluetooth: "Bluetooth version:",
+      refreshRate: "Refresh rate:",
+      weight: "Weight:",
+      warranty: "Warranty:",
+      modelNumber: "Model number:",
       /** Lives here because `productSpecs` reads `specsExtended.manufacturer`. It used to
        *  sit under `specsBrief`, where nothing read it, so every English and Russian
        *  product page fell back to the Armenian label. */
@@ -439,7 +399,8 @@ export const enOverrides = {
     tabsAriaLabel: "Offer types",
     tabs: { sites: "Sites", specs: "Specs" },
     goToShopAria: "Open shop website",
-    offerDescription: "Choosy is a new online marketplace\nfor smart shoppers",
+    offerDescription:
+      "Compare this product's prices across shops in Armenia and pick the best offer.",
     badges: { discount: "Discount", new: "New" },
     map: { ariaLabel: "Yerevan stores map" },
     bestOffers: {
@@ -525,11 +486,11 @@ export const enOverrides = {
       settingsIntro: "Choose which notifications you want to receive.",
       feed: {
         sampleBody:
-          "Choosy is a new online marketplace for smart shoppers and sellers who value quality and personalization.",
+          "The price of something you follow has changed — check the new offers.",
         items: {
-          recent: { title: "Lorem ipsum", timeLabel: "3 min" },
-          hour: { title: "Lorem ipsum", timeLabel: "1 h" },
-          dated: { title: "Lorem ipsum", timeLabel: "16.09.2025" },
+          recent: { title: "Price drop in your favorites", timeLabel: "3 min" },
+          hour: { title: "New offer on a saved product", timeLabel: "1 h" },
+          dated: { title: "Back in stock", timeLabel: "16.09.2025" },
         },
       },
     },
@@ -627,12 +588,11 @@ export const enOverrides = {
       tabs: { feed: "Notifications", settings: "Settings" },
       settingsIntro: "Choose which notifications you want to receive.",
       feed: {
-        sampleBody:
-          "Choosy is a new online marketplace for smart shoppers and sellers who value quality and personalization.",
+        sampleBody: "Refresh your listings to keep them visible to shoppers.",
         items: {
-          recent: { title: "Lorem ipsum", timeLabel: "3 min" },
-          hour: { title: "Lorem ipsum", timeLabel: "1 h" },
-          dated: { title: "Lorem ipsum", timeLabel: "16.09.2025" },
+          recent: { title: "Your product was added to favorites", timeLabel: "3 min" },
+          hour: { title: "A competitor lowered their price", timeLabel: "1 h" },
+          dated: { title: "Your listing is about to expire", timeLabel: "16.09.2025" },
         },
       },
     },
@@ -774,6 +734,7 @@ export const enOverrides = {
         terms: "Terms of service",
       },
     },
+    copyright: "© 2026, Choosy. All rights reserved.",
   },
   auth: {
     closeAria: "Close dialog",
@@ -789,51 +750,6 @@ export const enOverrides = {
     subtitle: "Create a new account",
     emailLabel: "Email",
     passwordLabel: "Password",
-  comparePage: {
-    seoTitle: "Compare products side by side — Choosy",
-    seoDescription:
-      "Compare smartphones, laptops and other electronics side by side — specifications and prices from shops in Armenia, in one table.",
-    heading: "Compare products",
-    intro:
-      "Pick up to four products from one category and see their specifications and shop prices in a single table.",
-    empty: {
-      heading: "Nothing to compare yet",
-      text: "Tap the scales button in the catalog or on a product page to add it here.",
-      cta: "Browse the catalog",
-    },
-    limitReached: "You can compare up to four products. Remove one to add another.",
-    categoryMismatch:
-      "Only products from the same category can be compared. Clear the comparison to start one in another category.",
-    remove: "Remove",
-    clearAll: "Clear all",
-    addMore: "Add a product",
-    onlyDifferences: "Show differences only",
-    noDifferences: "The selected products match on every specification.",
-    tableCaption: "Specification and price comparison for the selected products",
-    rowLabelHeader: "Specification",
-    sections: {
-      overview: "Overview",
-      specs: "Specifications",
-      offers: "Shop prices",
-    },
-    rows: {
-      price: "Price from",
-      brand: "Manufacturer",
-      category: "Category",
-    },
-    lowestPrice: "Lowest price",
-    noValue: "—",
-    countForAria: "In comparison",
-    openWithCount: "Open comparison ({{count}})",
-    editComparison: "Edit this comparison",
-    pair: {
-      heading: "{{first}} or {{second}}",
-      intro: "Both models' specifications and shop prices in Armenia, side by side.",
-      seoTitle: "{{first}} or {{second}} — comparison | Choosy",
-      seoDescription:
-        "Compare {{first}} and {{second}}: specifications and prices from shops in Armenia, in one table.",
-    },
-  },
     confirmPasswordLabel: "Confirm password",
     submit: "Register",
     switchToLoginPrompt: "Already have an account?",
@@ -887,19 +803,63 @@ export const enOverrides = {
     titles: {
       about: "About us",
       catalog: "Catalog",
-      compare: "Compare",
       products: "Products",
       variety: "Product range",
       privacyPolicy: "Privacy policy",
       termsOfService: "Terms of service",
     },
   },
+  comparePage: {
+    seoTitle: "Compare products side by side — Choosy",
+    seoDescription:
+      "Compare smartphones, laptops and other electronics side by side — specifications and prices from shops in Armenia, in one table.",
+    heading: "Compare products",
+    intro:
+      "Pick up to four products from one category and see their specifications and shop prices in a single table.",
+    empty: {
+      heading: "Nothing to compare yet",
+      text: "Tap the scales button in the catalog or on a product page to add it here.",
+      cta: "Browse the catalog",
+    },
+    limitReached: "You can compare up to four products. Remove one to add another.",
+    categoryMismatch:
+      "Only products from the same category can be compared. Clear the comparison to start one in another category.",
+    remove: "Remove",
+    clearAll: "Clear all",
+    addMore: "Add a product",
+    onlyDifferences: "Show differences only",
+    noDifferences: "The selected products match on every specification.",
+    tableCaption: "Specification and price comparison for the selected products",
+    rowLabelHeader: "Specification",
+    sections: {
+      overview: "Overview",
+      specs: "Specifications",
+      offers: "Shop prices",
+    },
+    rows: {
+      price: "Price from",
+      brand: "Manufacturer",
+      category: "Category",
+    },
+    lowestPrice: "Lowest price",
+    noValue: "—",
+    countForAria: "In comparison",
+    openWithCount: "Open comparison ({{count}})",
+    editComparison: "Edit this comparison",
+    pair: {
+      heading: "{{first}} or {{second}}",
+      intro: "Both models' specifications and shop prices in Armenia, side by side.",
+      seoTitle: "{{first}} or {{second}} — comparison | Choosy",
+      seoDescription:
+        "Compare {{first}} and {{second}}: specifications and prices from shops in Armenia, in one table.",
+    },
+  },
   seo: {
     siteName: "Choosy",
     home: {
-      title: "Choosy — electronics and appliances marketplace",
+      title: "Electronics price comparison in Armenia | Choosy",
       description:
-        "Find electronics, home and kitchen appliances on Choosy, compare prices and shop with ease.",
+        "Compare prices for smartphones, laptops, tablets, TVs and headphones from shops across Armenia on one page. Find the best offer and go straight to the shop you picked.",
     },
     filter: {
       title: "Catalog and price comparison — Choosy",

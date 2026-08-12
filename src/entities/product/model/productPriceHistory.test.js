@@ -31,11 +31,11 @@ describe("buildPriceHistoryForProduct", () => {
     });
   });
 
-  test("returns 5 values roughly centered on the product's own price", () => {
+  test("returns a full trailing year, roughly centered on the product's own price", () => {
     const priceValue = 150000;
     const history = buildPriceHistoryForProduct({ id: "fp-9", priceValue });
 
-    expect(history).toHaveLength(5);
+    expect(history).toHaveLength(12);
     history.forEach((value) => {
       expect(value).toBeGreaterThan(priceValue * 0.85);
       expect(value).toBeLessThan(priceValue * 1.15);

@@ -18,7 +18,18 @@ export const getProductDescriptionKey = (product) => {
       ? "productDescriptions.smartphonesIos"
       : "productDescriptions.smartphonesAndroid";
   }
-  const known = ["laptops", "headphones", "tablets", "tv", "wearables", "cameras", "speakers"];
+  const known = [
+    "laptops",
+    "headphones",
+    "tablets",
+    "tv",
+    "wearables",
+    "cameras",
+    "speakers",
+    "monitors",
+    "consoles",
+    "accessories",
+  ];
   return known.includes(product?.categoryId)
     ? `productDescriptions.${product.categoryId}`
     : "productDescriptions.smartphonesAndroid";

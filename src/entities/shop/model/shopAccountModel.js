@@ -59,7 +59,7 @@ const normalizeSwatch = (raw, idx) => {
 export const defaultShopProfile = {
   shopName: "TechZone Electronics",
   description:
-    "Choosy-ը նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
+    "Choosy-ն նոր առցանց շուկա է՝ նախատեսված խելամիտ գնորդների և վաճառողների համար, ովքեր գնահատում են որակը և անհատականացումը։",
   email: "seller.demo@choosy.am",
   phoneLocal: "99887766",
   website: "techzone.am",

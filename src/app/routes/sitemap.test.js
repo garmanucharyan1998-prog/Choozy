@@ -60,10 +60,20 @@ describe("sitemap.xml resource route", () => {
 
   test("the category landing pages the canonical layer indexes are all advertised", async () => {
     const { xml } = await readSitemap();
-    ["smartphones", "laptops", "tablets", "tv", "headphones", "speakers", "wearables", "cameras"].forEach(
-      (categoryId) => {
-        expect(xml).toContain(`/filter?category=${categoryId}`.replace(/&/g, "&amp;"));
-      },
-    );
+    [
+      "smartphones",
+      "laptops",
+      "tablets",
+      "monitors",
+      "tv",
+      "headphones",
+      "speakers",
+      "wearables",
+      "cameras",
+      "consoles",
+      "accessories",
+    ].forEach((categoryId) => {
+      expect(xml).toContain(`/filter?category=${categoryId}`.replace(/&/g, "&amp;"));
+    });
   });
 });

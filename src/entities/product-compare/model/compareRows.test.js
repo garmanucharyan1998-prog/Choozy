@@ -131,8 +131,31 @@ describe("the specs section", () => {
       const texts = row.cells.map((cell) => cell.text);
       expect(row.allSame).toBe(new Set(texts).size === 1);
     });
-    /** RAM is a per-category fixture, so two laptops must agree on it — proves the flag fires. */
-    expect(rowByLabel(result, "productDetail.specsBrief.ram").allSame).toBe(true);
+  });
+
+  /**
+   * RAM is each laptop's own real `ramGb`, not one value shared by the whole category — two
+   * laptops can genuinely differ (a MacBook Pro's 24 GB really isn't an XPS 15's 32 GB), so
+   * `allSame` has to earn a `true` and a `false` here rather than getting one for free from a
+   * fixture that never varied in the first place.
+   */
+  test("the RAM row agrees only when the two laptops' real RAM matches", () => {
+    const byRam = new Map();
+    LAPTOPS.forEach((p) => {
+      const bucket = byRam.get(p.ramGb) ?? [];
+      bucket.push(p);
+      byRam.set(p.ramGb, bucket);
+    });
+    const sameRam = [...byRam.values()].find((bucket) => bucket.length > 1);
+    const differentRam = LAPTOPS.find((p) => p.ramGb !== sameRam[0].ramGb);
+    expect(sameRam, "fixture needs two laptops sharing a RAM size").toBeTruthy();
+    expect(differentRam, "fixture needs a laptop with a different RAM size").toBeTruthy();
+
+    const agreeing = buildCompareRows(byIds(sameRam[0].id, sameRam[1].id), t);
+    expect(rowByLabel(agreeing, "productDetail.specsBrief.ram").allSame).toBe(true);
+
+    const disagreeing = buildCompareRows(byIds(sameRam[0].id, differentRam.id), t);
+    expect(rowByLabel(disagreeing, "productDetail.specsBrief.ram").allSame).toBe(false);
   });
 
   /**

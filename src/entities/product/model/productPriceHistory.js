@@ -5,10 +5,15 @@
  * shape (same up/down months) and, for the cheapest and most expensive products, values
  * that overshot or vanished off the axis.
  *
+ * A full trailing year, not 5 months: `getTrailingMonthKeys` in `ProductDetailWidget`
+ * already derives however many month labels the array needs by walking backward from the
+ * current month, so this only had to change here — a price chart that covers less than a
+ * year is a thinner comparison point than shoppers expect from this kind of tool.
+ *
  * Seeded by the product id (not `Math.random()`) so the chart is stable across renders
  * and identical between the server render and the client's first paint.
  */
-const MONTH_COUNT = 5;
+const MONTH_COUNT = 12;
 
 const seededFraction = (seed, index) => {
   const x = Math.sin(seed * 12.9898 + index * 78.233) * 43758.5453;

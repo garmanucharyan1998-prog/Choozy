@@ -53,8 +53,26 @@ export const buildProductJsonLd = ({
       description,
       image: images,
       sku: product.id,
+      /** The manufacturer's own model code — matches the "Model number:" spec row. */
+      ...(typeof product.mpn === "string" && product.mpn ? { mpn: product.mpn } : {}),
       brand: { "@type": "Brand", name: getBrandLabel(product.brandId) },
       category: categoryLabel,
+      /**
+       * Guarded on both fields being present and `reviewCount` actually positive: an
+       * `AggregateRating` with a rating but zero reviews is a claim search engines
+       * specifically flag as unsubstantiated.
+       */
+      ...(typeof product.ratingValue === "number" &&
+      typeof product.reviewCount === "number" &&
+      product.reviewCount > 0
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: product.ratingValue,
+              reviewCount: product.reviewCount,
+            },
+          }
+        : {}),
       offers: {
         "@type": "AggregateOffer",
         priceCurrency: "AMD",

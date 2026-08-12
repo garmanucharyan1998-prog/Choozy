@@ -14,6 +14,7 @@ import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 import FilterProductCard from "shared/ui/filter-product-card/FilterProductCard";
 import { LocalizedLink } from "shared/ui/link";
+import { PageIntro } from "shared/ui/page-intro";
 
 /** Cards in the first grid row at the widest breakpoint — above the fold, so eager. */
 const FIRST_ROW_CARD_COUNT = 4;
@@ -498,14 +499,11 @@ const FilterCatalogWidget = () => {
        * so all eight category landing pages presented the same discounted heading to a search
        * engine. The intro paragraph gives each one its own keyword-bearing copy.
        */}
-      <header className="pb-5 text-start md:pb-7">
-        <h1 className="m-0 text-2xl font-bold text-navy md:text-3xl">{pageHeading}</h1>
-        {categoryIntro ? (
-          <p className="m-0 max-w-[75ch] pt-3 text-sm leading-relaxed text-text-muted md:text-base">
-            {categoryIntro}
-          </p>
-        ) : null}
-      </header>
+      {/**
+       * First thing on the page, so it cancels the shell's `main` top padding (`py-6 md:py-10`)
+       * and sits directly under the category bar instead of behind a band of empty page.
+       */}
+      <PageIntro className="-mt-6 md:-mt-10" heading={pageHeading} body={categoryIntro} />
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-10">
         <aside
           className="hidden w-full shrink-0 rounded-2xl border border-border-blue/60 bg-white p-4 shadow-sm sm:p-5 lg:block lg:w-[300px] xl:w-[320px]"

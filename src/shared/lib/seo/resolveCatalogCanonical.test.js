@@ -24,6 +24,9 @@ describe("resolveCatalogCanonical", () => {
     "tv",
     "wearables",
     "cameras",
+    "monitors",
+    "consoles",
+    "accessories",
   ])("?category=%s is its own indexable landing page", (categoryId) => {
     const result = resolve(`?category=${categoryId}`);
     expect(result.path).toBe(`/filter?category=${categoryId}`);
@@ -51,11 +54,17 @@ describe("resolveCatalogCanonical", () => {
     expect(result.noIndex).toBe(true);
   });
 
-  test.each(["?page=3", "?page=4", "?page=99"])(
+  /**
+   * The real last page, not a hardcoded number: hardcoding it here once meant this test
+   * silently stopped exercising "past the end" the moment the catalog grew past that fixed
+   * page count, without ever failing to say so.
+   */
+  const lastRealPage = getCatalogPageCount(null);
+  test.each([`?page=${lastRealPage + 1}`, `?page=${lastRealPage + 2}`, "?page=999"])(
     "%s is past the end of the catalog and is not indexed",
     (search) => {
       const result = resolve(search);
-      expect(result.path).toBe("/filter?page=2");
+      expect(result.path).toBe(`/filter?page=${lastRealPage}`);
       expect(result.noIndex).toBe(true);
     },
   );
