@@ -5,6 +5,13 @@
 
 import { getCategoryIdForGridItem } from "entities/filter-catalog/model/filterCatalogCategories";
 
+/**
+ * `public/assets/images/gridCatalog/` only has 5 product photos (smartphone, headphone,
+ * notebook, earphones, bag) for 6 tiles — no dedicated speaker or tablet shot exists yet.
+ * `speakers` and `tablets` below use the closest available photo as a stand-in rather than
+ * reusing another tile's exact image (which would make two tiles look identical). Swap
+ * these for real `speaker.png` / `tablet.png` assets once they exist.
+ */
 export const getCatalogItems = () => [
   {
     id: "smartphones",
@@ -16,7 +23,7 @@ export const getCatalogItems = () => [
   {
     id: "speakers",
     labelKey: "gridCatalog.items.speakers",
-    image: "/assets/images/gridCatalog/headphone.png",
+    image: "/assets/images/gridCatalog/earphones.png",
     className: "item-2 grid-item",
     filterCategoryId: getCategoryIdForGridItem("speakers"),
   },
@@ -44,7 +51,7 @@ export const getCatalogItems = () => [
   {
     id: "headphones",
     labelKey: "gridCatalog.items.headphones",
-    image: "/assets/images/gridCatalog/earphones.png",
+    image: "/assets/images/gridCatalog/headphone.png",
     className: "item-6 grid-item",
     filterCategoryId: getCategoryIdForGridItem("headphones"),
   },

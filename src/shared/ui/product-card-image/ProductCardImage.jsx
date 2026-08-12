@@ -4,8 +4,6 @@ import {
   PRODUCT_CARD_IMAGE_BG,
   PRODUCT_CARD_IMAGE_VARIANTS,
   PRODUCT_CARD_PLACEHOLDER_IMG,
-  PRODUCT_IMAGE_ASPECT_HEIGHT,
-  PRODUCT_IMAGE_ASPECT_WIDTH,
 } from "./productCardImageConstants";
 import "./ProductCardImage.css";
 
@@ -56,8 +54,8 @@ const ProductCardImage = ({
         imgClassName={styles.img}
         loading={eager || lcp ? "eager" : "lazy"}
         fetchPriority={lcp ? "high" : undefined}
-        width={PRODUCT_IMAGE_ASPECT_WIDTH}
-        height={PRODUCT_IMAGE_ASPECT_HEIGHT}
+        width={styles.aspectWidth}
+        height={styles.aspectHeight}
         onError={() => setResolvedSrc(PRODUCT_CARD_PLACEHOLDER_IMG)}
       />
       {children}

@@ -1,7 +1,7 @@
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { useComparePresenter } from "features/product-compare";
-import { PRODUCT_IMAGE_HEIGHT, PRODUCT_IMAGE_WIDTH } from "entities/product";
 import { LocalizedLink } from "shared/ui/link";
+import { ProductCardImage } from "shared/ui/product-card-image";
 import { CompareEmptyState } from "./CompareEmptyState";
 
 /**
@@ -19,7 +19,14 @@ import { CompareEmptyState } from "./CompareEmptyState";
 
 const CELL = "px-3 py-3 text-sm md:px-4 md:text-base";
 const LABEL_CELL = `${CELL} sticky left-0 z-10 bg-white text-start font-semibold text-navy`;
-const SECTION_CELL = "bg-subtle-bg px-3 py-2 text-start text-xs font-bold uppercase tracking-wide text-text-muted md:px-4";
+/**
+ * No `uppercase`: Tailwind's text-transform runs on the rendered string, and Armenian's `և`
+ * uppercases to the archaic `ԵՒ` instead of `ԵՎ` — silent for the current section labels
+ * (none contain it yet) but a trap for the next one that does. Section labels already read
+ * as intended sentence case from the dictionary.
+ */
+const SECTION_CELL =
+  "bg-subtle-bg px-3 py-2 text-start text-xs font-bold tracking-wide text-text-muted md:px-4";
 
 /**
  * @param {{ fixedIds?: string[] }} props — supplied by `/compare/<a>-vs-<b>`, which shows one
@@ -97,14 +104,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                   className={`${CELL} min-w-[9rem] align-top md:min-w-[12rem]`}
                 >
                   <div className="flex flex-col items-start gap-2">
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      width={PRODUCT_IMAGE_WIDTH}
-                      height={PRODUCT_IMAGE_HEIGHT}
-                      loading="lazy"
-                      className="h-24 w-full rounded-lg object-cover md:h-28"
-                    />
+                    <ProductCardImage variant="compare" src={product.image} alt={product.title} />
                     <LocalizedLink
                       to={product.href}
                       className="line-clamp-3 text-sm font-semibold text-navy no-underline hover:underline"
@@ -128,7 +128,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                 <th scope="col" className={`${CELL} min-w-[9rem] align-top md:min-w-[12rem]`}>
                   <LocalizedLink
                     to={addMoreHref}
-                    className="flex h-24 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border-blue text-sm font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue md:h-28"
+                    className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border-blue text-sm font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue"
                   >
                     <FaPlus className="h-4 w-4" aria-hidden />
                     {t("comparePage.addMore")}

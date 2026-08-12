@@ -24,7 +24,7 @@ const ImgWrap = ({ listMode, product, eager, lcp }) => (
     <div className="pointer-events-auto absolute right-3 top-3 z-20 flex flex-col gap-2">
       <button
         type="button"
-        onClick={() => product.onToggleCompare(product.id)}
+        onClick={() => product.onToggleCompare?.(product.id)}
         aria-pressed={product.inCompare}
         aria-label={product.compareAria}
         className={ACTION_BTN}
@@ -33,7 +33,7 @@ const ImgWrap = ({ listMode, product, eager, lcp }) => (
       </button>
       <button
         type="button"
-        onClick={() => product.onToggleWishlist(product)}
+        onClick={() => product.onToggleWishlist?.(product)}
         aria-pressed={product.inWishlist}
         aria-label={product.wishlistAria}
         className={ACTION_BTN}

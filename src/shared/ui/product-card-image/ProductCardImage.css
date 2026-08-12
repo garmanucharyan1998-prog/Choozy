@@ -45,3 +45,12 @@
     height: 160px;
   }
 }
+
+/* Comparison table column headers and the compare tray — the product itself must be a
+   perfect square, never cropped, so two products of different shapes stay visually
+   comparable side by side. */
+.product-card-image--compare {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: 0.75rem;
+}

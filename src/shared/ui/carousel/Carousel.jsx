@@ -135,25 +135,47 @@ const Carousel = ({ items, ariaLabel, wishlistIds, onToggleWishlist, compareIds,
                       </div>
                     </ProductCardImage>
 
-                    {/* Single stretched link: the anchor text stays the product title,
-                      while `after:inset-0` keeps the whole card clickable. */}
-                    <LocalizedLink
-                      to={detailPath}
-                      className="flex grow flex-col gap-1.5 pt-2.5 text-inherit no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:pt-3"
-                    >
-                      <h3 className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base">
-                        {product.title}
-                      </h3>
-                      <p
-                        className="m-0 line-clamp-2 overflow-hidden text-[11px] leading-[1.25em] text-text-muted sm:text-xs md:text-sm md:leading-[1.2em]"
-                        title={product.description}
+                    {/**
+                     * Single stretched link when there's somewhere to go: the anchor text
+                     * stays the product title, `after:inset-0` keeps the whole card clickable.
+                     * A missing `href` used to fall through to `LocalizedLink`, which silently
+                     * links a card with nowhere real to go to the home page — rendered as
+                     * plain text instead, so a bad card reads as inert, not as a wrong link.
+                     */}
+                    {detailPath ? (
+                      <LocalizedLink
+                        to={detailPath}
+                        className="flex grow flex-col gap-1.5 pt-2.5 text-inherit no-underline after:absolute after:inset-0 after:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy sm:pt-3"
                       >
-                        {product.description}
-                      </p>
-                      <p className="m-0 mt-auto text-sm font-semibold text-navy 2xl:text-base">
-                        {formatPriceAmd(product.priceValue, currencySuffix) || product.price}
-                      </p>
-                    </LocalizedLink>
+                        <h3 className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base">
+                          {product.title}
+                        </h3>
+                        <p
+                          className="m-0 line-clamp-2 overflow-hidden text-[11px] leading-[1.25em] text-text-muted sm:text-xs md:text-sm md:leading-[1.2em]"
+                          title={product.description}
+                        >
+                          {product.description}
+                        </p>
+                        <p className="m-0 mt-auto text-sm font-semibold text-navy 2xl:text-base">
+                          {formatPriceAmd(product.priceValue, currencySuffix) || product.price}
+                        </p>
+                      </LocalizedLink>
+                    ) : (
+                      <div className="flex grow flex-col gap-1.5 pt-2.5 text-inherit sm:pt-3">
+                        <h3 className="m-0 line-clamp-2 text-xs font-semibold leading-tight text-navy sm:text-sm md:text-base">
+                          {product.title}
+                        </h3>
+                        <p
+                          className="m-0 line-clamp-2 overflow-hidden text-[11px] leading-[1.25em] text-text-muted sm:text-xs md:text-sm md:leading-[1.2em]"
+                          title={product.description}
+                        >
+                          {product.description}
+                        </p>
+                        <p className="m-0 mt-auto text-sm font-semibold text-navy 2xl:text-base">
+                          {formatPriceAmd(product.priceValue, currencySuffix) || product.price}
+                        </p>
+                      </div>
+                    )}
                   </article>
                 </SwiperSlide>
               );
