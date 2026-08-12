@@ -45,4 +45,34 @@ describe("ProductCompareWidget", () => {
 
     expect(screen.queryAllByRole("button", { name: /remove|հեռացնել|удалить/i })).toHaveLength(0);
   });
+
+  /**
+   * fp-4 (Samsung Galaxy S25 Ultra) has more storage than fp-1 (iPhone 17 Pro Max, 256 GB vs
+   * 512 GB) — a row with a real numeric winner, unlike screen size or RAM, which tie between
+   * these two and must show no winner at all.
+   */
+  test("marks the higher-storage column's cell as best, with a visible and an accessible cue", () => {
+    const { container } = renderWidget();
+    const cells = [...container.querySelectorAll("td")];
+
+    const bestCell = cells.find((cell) => cell.textContent.includes("512"));
+    const otherCell = cells.find((cell) => cell.textContent.includes("256"));
+    expect(bestCell).toBeTruthy();
+    expect(otherCell).toBeTruthy();
+
+    expect(bestCell.className).toMatch(/bg-emerald-50/);
+    expect(otherCell.className).not.toMatch(/bg-emerald-50/);
+    // an accessible cue beyond colour: the checkmark icon and the sr-only "best value" text
+    expect(bestCell.querySelector("svg")).toBeTruthy();
+    expect(bestCell.querySelector(".sr-only")?.textContent).toBeTruthy();
+  });
+
+  test("a tied spec (screen size, identical on both phones) marks no cell as best", () => {
+    const { container } = renderWidget();
+    const screenCells = [...container.querySelectorAll("td")].filter((cell) =>
+      cell.textContent.includes("6.9"),
+    );
+    expect(screenCells.length).toBeGreaterThan(0);
+    screenCells.forEach((cell) => expect(cell.className).not.toMatch(/bg-emerald-50/));
+  });
 });

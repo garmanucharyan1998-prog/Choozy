@@ -1038,7 +1038,27 @@ const am = {
       brand: "Արտադրող",
       category: "Կատեգորիա",
     },
+    /**
+     * Short on purpose: these double as radar-chart axis labels (see
+     * `entities/product-compare/model/compareAttributes.js`), where a long word wraps onto a
+     * second line and crowds the polygon. Kept in sync with the equivalent
+     * `productDetail.specsBrief`/`specsExtended` labels used elsewhere.
+     */
+    attr: {
+      screen: "Էկրան",
+      refresh: "Թարմացում",
+      storage: "Հիշողություն",
+      ram: "RAM",
+      battery: "Մարտկոց",
+      price: "Գին",
+      weight: "Քաշ",
+      year: "Տարեթիվ",
+      warranty: "Երաշխիք",
+    },
     lowestPrice: "Ամենացածր գինը",
+    /** Read by screen readers next to the winning spec cell's checkmark — see the sr-only text in ProductCompareWidget. */
+    bestValue: "Լավագույն արժեքը",
+    stickyHeaderAria: "Համեմատվող ապրանքները՝ ամփոփ",
     /** An em dash reads the same in every language, so the locales repeat it deliberately. */
     noValue: "—",
     countForAria: "Համեմատության մեջ",

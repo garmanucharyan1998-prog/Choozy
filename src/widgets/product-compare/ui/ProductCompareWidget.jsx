@@ -1,8 +1,10 @@
-import { FaPlus, FaTimes } from "react-icons/fa";
+import { useRef } from "react";
+import { FaCheck, FaPlus, FaTimes } from "react-icons/fa";
 import { useComparePresenter } from "features/product-compare";
 import { LocalizedLink } from "shared/ui/link";
 import { ProductCardImage } from "shared/ui/product-card-image";
 import { CompareEmptyState } from "./CompareEmptyState";
+import { CompareStickyHeader } from "./CompareStickyHeader";
 
 /**
  * The comparison table.
@@ -19,6 +21,11 @@ import { CompareEmptyState } from "./CompareEmptyState";
 
 const CELL = "px-3 py-3 text-sm md:px-4 md:text-base";
 const LABEL_CELL = `${CELL} sticky left-0 z-10 bg-white text-start font-semibold text-navy`;
+/**
+ * Sized so exactly two product columns fit next to the (narrower, on mobile) label column at
+ * a 360px viewport — a phone showing 1.4 columns invites a swipe that lands nowhere.
+ */
+const PRODUCT_COL = `${CELL} min-w-[7.75rem] snap-start align-top md:min-w-[12rem]`;
 /**
  * No `uppercase`: Tailwind's text-transform runs on the rendered string, and Armenian's `և`
  * uppercases to the archaic `ԵՒ` instead of `ԵՎ` — silent for the current section labels
@@ -49,6 +56,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
     canAddMore,
     addMoreHref,
   } = useComparePresenter(fixedIds);
+  const tableTopRef = useRef(null);
 
   if (products.length === 0) {
     return <CompareEmptyState t={t} />;
@@ -59,6 +67,14 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
 
   return (
     <div className="flex flex-col gap-4">
+      <CompareStickyHeader
+        t={t}
+        products={products}
+        isFixed={isFixed}
+        removeProduct={removeProduct}
+        sentinelRef={tableTopRef}
+      />
+      <div ref={tableTopRef} aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-navy">
           <input
@@ -89,20 +105,16 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
         )}
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-border-blue bg-white">
-        <table className="w-full min-w-[640px] border-collapse text-start">
+      <div className="overflow-x-auto rounded-2xl border border-border-blue bg-white snap-x snap-proximity">
+        <table className="w-full min-w-[500px] border-collapse text-start">
           <caption className="sr-only">{t("comparePage.tableCaption")}</caption>
           <thead>
             <tr className="border-b border-border-blue">
-              <th scope="col" className={`${LABEL_CELL} w-40 md:w-56`}>
+              <th scope="col" className={`${LABEL_CELL} w-24 md:w-56`}>
                 <span className="sr-only">{t("comparePage.rowLabelHeader")}</span>
               </th>
               {products.map((product) => (
-                <th
-                  scope="col"
-                  key={product.id}
-                  className={`${CELL} min-w-[9rem] align-top md:min-w-[12rem]`}
-                >
+                <th scope="col" key={product.id} className={PRODUCT_COL}>
                   <div className="flex flex-col items-start gap-2">
                     <ProductCardImage variant="compare" src={product.image} alt={product.title} />
                     <LocalizedLink
@@ -125,7 +137,7 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                 </th>
               ))}
               {showAddColumn ? (
-                <th scope="col" className={`${CELL} min-w-[9rem] align-top md:min-w-[12rem]`}>
+                <th scope="col" className={PRODUCT_COL}>
                   <LocalizedLink
                     to={addMoreHref}
                     className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border-blue text-sm font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue"
@@ -151,12 +163,30 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                     {t(row.labelKey)}
                   </th>
                   {row.cells.map((cell) => (
-                    <td key={cell.productId} className={`${CELL} align-top text-navy`}>
-                      <span className={cell.isLowest ? "font-semibold text-link-blue" : undefined}>
+                    <td
+                      key={cell.productId}
+                      className={`${CELL} align-top text-navy ${cell.isBest ? "bg-emerald-50" : ""}`}
+                    >
+                      <span
+                        className={
+                          cell.isLowest || cell.isBest ? "font-semibold text-link-blue" : undefined
+                        }
+                      >
+                        {/**
+                         * Never colour alone: a checkmark carries the win for anyone who can't
+                         * see the green background, and `sr-only` text carries it for anyone
+                         * who can't see either.
+                         */}
+                        {cell.isBest ? (
+                          <FaCheck className="mr-1 inline h-3 w-3 text-emerald-600" aria-hidden />
+                        ) : null}
                         {cell.text}
+                        {cell.isBest ? (
+                          <span className="sr-only"> — {t("comparePage.bestValue")}</span>
+                        ) : null}
                       </span>
                       {/**
-                       * Colour alone would not carry this. The note is per column — the
+                       * Colour alone would not carry this either. The note is per column — the
                        * cheapest shop for *this* product, never a verdict between products.
                        */}
                       {cell.isLowest ? (
