@@ -216,14 +216,53 @@ const MEASURE = `(() => {
     });
   });
 
+  /**
+   * Every interactive element on the page, not just the compare furniture this started with.
+   * Widened after a four-width sweep found the footer links, the language switcher, the search
+   * field, the breadcrumb trail and eight other controls all standing 16-20px tall — under the
+   * 24px WCAG 2.2 AA floor, on every page, in every language. Cheap to check here and invisible
+   * to jsdom, which returns a zero rect for everything.
+   */
   const smallTargets = [];
+  const smallInputs = [];
+  /** sr-only text is a 1x1 clipped box by design; the skip link is full-size only once focused. */
+  const isScreenReaderOnly = (el) => el.closest(".sr-only") !== null;
+  const TEXT_ENTRY = /^(text|search|email|password|tel|url|number|date|time|datetime-local|month|week)$/;
+
   document
-    .querySelectorAll('[role="region"][class*="fixed"] a, [role="region"][class*="fixed"] button, [aria-labelledby="compare-radar-heading"] button')
+    .querySelectorAll(
+      'a[href], button, input:not([type="hidden"]), select, textarea, [role="button"], [role="link"], label:has(input[type="checkbox"]), label:has(input[type="radio"])'
+    )
     .forEach((el) => {
+      const style = getComputedStyle(el);
+      if (style.display === "none" || style.visibility === "hidden") return;
       const r = el.getBoundingClientRect();
       if (r.width === 0 && r.height === 0) return;
-      if (r.width < ${MIN_TAP_TARGET} || r.height < ${MIN_TAP_TARGET}) {
-        smallTargets.push(describe(el) + " " + Math.round(r.width) + "x" + Math.round(r.height));
+      if (isScreenReaderOnly(el) || isExcused(el) || el.closest('[aria-hidden="true"]')) return;
+
+      /** A checkbox is judged by the label wrapping it — that is what a thumb actually hits. */
+      const box =
+        el.tagName === "INPUT" && /^(checkbox|radio)$/.test(el.type)
+          ? (el.closest("label") || el).getBoundingClientRect()
+          : r;
+      if (box.width < ${MIN_TAP_TARGET} || box.height < ${MIN_TAP_TARGET}) {
+        smallTargets.push(describe(el) + " " + Math.round(box.width) + "x" + Math.round(box.height));
+      }
+
+      /**
+       * iOS Safari zooms the whole viewport when a focused field's text is under 16px, and does
+       * not zoom back out — the visitor is left on a page wider than the screen, mid-form. Phone
+       * widths only: above the md breakpoint the compact 14px type is deliberate, and no
+       * desktop browser zooms on focus.
+       */
+      const zooms =
+        vw < 768 &&
+        (el.tagName === "TEXTAREA" ||
+          el.tagName === "SELECT" ||
+          (el.tagName === "INPUT" && TEXT_ENTRY.test(el.type || "text")));
+      if (zooms) {
+        const size = parseFloat(style.fontSize);
+        if (size && size < 16) smallInputs.push(describe(el) + " " + size + "px");
       }
     });
 
@@ -242,7 +281,8 @@ const MEASURE = `(() => {
     radar,
     table: tableInfo,
     barPanels,
-    smallTargets,
+    smallTargets: [...new Set(smallTargets)].slice(0, 8),
+    smallInputs: [...new Set(smallInputs)].slice(0, 6),
   };
 })()`;
 
@@ -515,6 +555,9 @@ const main = async () => {
         );
         m.smallTargets.forEach((target) =>
           findings.push(`${label}: tap target under ${MIN_TAP_TARGET}px — ${target}`),
+        );
+        (m.smallInputs ?? []).forEach((field) =>
+          findings.push(`${label}: field text under 16px, iOS zooms on focus — ${field}`),
         );
         (m.barPanels ?? []).forEach((panel) => {
           if (panel.trackSpread > 1) {

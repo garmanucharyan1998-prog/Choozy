@@ -91,7 +91,8 @@ const RelatedProductsWidget = () => {
         </h2>
         <LocalizedLink
           to="/filter"
-          className="text-sm font-medium text-link-blue no-underline transition-colors hover:text-navy md:text-sm lg:text-base"
+          /** `py-1 -my-1`: 20px of bare text was the whole tap target, under the 24px floor. */
+          className="inline-flex items-center py-1 -my-1 text-sm font-medium text-link-blue no-underline transition-colors hover:text-navy md:text-sm lg:text-base"
         >
           {t("relatedProducts.viewMoreLabel")}
         </LocalizedLink>

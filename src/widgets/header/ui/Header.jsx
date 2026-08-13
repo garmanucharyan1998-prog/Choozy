@@ -315,7 +315,12 @@ const Header = ({
           aria-autocomplete="list"
           role="combobox"
           /* Placeholder was #8a8f9c (~3.1:1 on the input background) — below AA. */
-          className="search-input min-w-0 flex-1 border-none bg-transparent p-0 text-xs leading-none text-[#171717] outline-none transition-all duration-300 placeholder:text-[#6b7280] sm:text-sm"
+          /**
+           * `min-h-6`: nothing outside the input focuses it, so the 19px text box *was* the tap
+           * target however tall the pill around it looked. The pill is taller than 24px already,
+           * so this only claims height the input was leaving unused.
+           */
+          className="search-input min-h-6 min-w-0 flex-1 border-none bg-transparent p-0 text-xs leading-none text-[#171717] outline-none transition-all duration-300 placeholder:text-[#6b7280] sm:text-sm"
           value={searchQuery}
           onChange={handleSearchInputChange}
           onFocus={handleSearchFocus}
@@ -679,7 +684,8 @@ const Header = ({
           <button
             type="button"
             onClick={toggleLanguageDropdown}
-            className="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0"
+            /** `py-1 -my-1`: a 28px hit area over a 20px button, without moving the header. */
+            className="flex cursor-pointer items-center gap-1 border-none bg-transparent p-0 py-1 -my-1"
             aria-label={`${t("header.currentLanguagePrefix")}: ${currentLanguage.alt}`}
             aria-expanded={isLanguageDropdownOpen}
             aria-haspopup="listbox"

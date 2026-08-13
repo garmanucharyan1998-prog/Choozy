@@ -28,7 +28,8 @@ const Breadcrumbs = ({ items }) => {
               ) : (
                 <LocalizedLink
                   to={item.href}
-                  className="text-link-blue no-underline hover:underline"
+                  /** 16px of text is a 16px tap target; `py-1 -my-1` makes it 24 without moving the trail. */
+                  className="inline-flex items-center py-1 -my-1 text-link-blue no-underline hover:underline"
                 >
                   {item.label}
                 </LocalizedLink>

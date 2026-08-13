@@ -102,7 +102,8 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
         blockRef={tableBlockRef}
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-navy sm:text-sm">
+        {/** The label is the tap target for the 16px box inside it; `py-1 -my-1` gets it to 24. */}
+        <label className="inline-flex cursor-pointer items-center gap-2 py-1 -my-1 text-xs font-medium text-navy sm:text-sm">
           <input
             type="checkbox"
             checked={onlyDifferences}
@@ -163,7 +164,8 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
                       <button
                         type="button"
                         onClick={() => removeProduct(product.id)}
-                        className="inline-flex items-center gap-1.5 text-[11px] font-medium text-text-muted transition-colors hover:text-navy sm:text-xs"
+                        /** 11px of text is an 11px target; the padding takes it to 24 in place. */
+                        className="inline-flex items-center gap-1.5 py-1 -my-1 text-[11px] font-medium text-text-muted transition-colors hover:text-navy sm:text-xs"
                       >
                         <FaTimes className="h-3 w-3" aria-hidden />
                         {t("comparePage.remove")}

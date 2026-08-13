@@ -267,6 +267,14 @@ const FilterCatalogWidget = () => {
     );
   }, [visibleBrandOptions, overlayQueryLower]);
 
+  /**
+   * Every field below reads `text-base md:text-sm` rather than plain `text-sm`, and that is a
+   * behaviour fix, not a type-scale preference: iOS Safari zooms the whole viewport when a
+   * focused field's text is under 16px, and it does not zoom back out — the visitor is left on a
+   * page wider than the screen, mid-filter, pinching their way back. `Header.css` already does
+   * this for the site search; these seven controls were the ones still under the line. Desktop
+   * keeps the compact size.
+   */
   const renderFilterForm = (idSuffix) => (
     <>
       <div className="border-b border-border-blue/50 pb-2">
@@ -285,7 +293,7 @@ const FilterCatalogWidget = () => {
               <input
                 id={`filter-price-min${idSuffix}`}
                 type="number"
-                className="w-full min-w-0 rounded-lg border border-border-blue px-2 py-2 text-sm text-navy"
+                className="w-full min-w-0 rounded-lg border border-border-blue px-2 py-2 text-base text-navy md:text-sm"
                 value={priceMinDraft}
                 min={globalMin}
                 max={globalMax}
@@ -305,7 +313,7 @@ const FilterCatalogWidget = () => {
               <input
                 id={`filter-price-max${idSuffix}`}
                 type="number"
-                className="w-full min-w-0 rounded-lg border border-border-blue px-2 py-2 text-sm text-navy"
+                className="w-full min-w-0 rounded-lg border border-border-blue px-2 py-2 text-base text-navy md:text-sm"
                 value={priceMaxDraft}
                 min={globalMin}
                 max={globalMax}
@@ -324,7 +332,7 @@ const FilterCatalogWidget = () => {
                 <span className="text-xs text-text-muted">{t("filterPage.filters.priceMin")}</span>
                 <input
                   type="range"
-                  className="w-full accent-navy"
+                  className="h-6 w-full accent-navy"
                   min={globalMin}
                   max={priceMax}
                   value={priceMin}
@@ -336,7 +344,7 @@ const FilterCatalogWidget = () => {
                 <span className="text-xs text-text-muted">{t("filterPage.filters.priceMax")}</span>
                 <input
                   type="range"
-                  className="w-full accent-navy"
+                  className="h-6 w-full accent-navy"
                   min={priceMin}
                   max={globalMax}
                   value={priceMax}
@@ -363,7 +371,7 @@ const FilterCatalogWidget = () => {
           >
             {screenOptions.map((opt) => (
               <li key={opt.id}>
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
+                <label className="flex cursor-pointer items-center gap-2 py-1 -my-1 text-sm text-navy">
                   <input
                     type="checkbox"
                     className="h-4 w-4 rounded border-border-blue accent-navy"
@@ -392,7 +400,7 @@ const FilterCatalogWidget = () => {
             <ul className="m-0 flex list-none flex-col gap-2 p-0">
               {brandOptionsForOverlay.map((opt) => (
                 <li key={opt.id}>
-                  <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
+                  <label className="flex cursor-pointer items-center gap-2 py-1 -my-1 text-sm text-navy">
                     <input
                       type="checkbox"
                       className="h-4 w-4 rounded border-border-blue accent-navy"
@@ -433,7 +441,7 @@ const FilterCatalogWidget = () => {
           >
             {storageOptions.map((opt) => (
               <li key={opt.id}>
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-navy">
+                <label className="flex cursor-pointer items-center gap-2 py-1 -my-1 text-sm text-navy">
                   <input
                     type="checkbox"
                     className="h-4 w-4 rounded border-border-blue accent-navy"
@@ -535,7 +543,7 @@ const FilterCatalogWidget = () => {
                   value={sort}
                   onChange={onSortChange}
                   title={t(sortOptions.find((o) => o.value === sort)?.labelKey)}
-                  className="h-11 w-full min-w-0 truncate rounded-xl border border-border-blue bg-white px-3 text-xs text-navy"
+                  className="h-11 w-full min-w-0 truncate rounded-xl border border-border-blue bg-white px-3 text-base text-navy md:text-xs"
                 >
                   {sortOptions.map((o) => (
                     <option key={o.value} value={o.value}>
@@ -558,7 +566,7 @@ const FilterCatalogWidget = () => {
               onChange={onSearchChange}
               placeholder={t("filterPage.searchPlaceholder")}
               aria-label={t("filterPage.searchPlaceholder")}
-              className="h-11 w-full rounded-xl border border-border-blue px-4 text-sm text-navy"
+              className="h-11 w-full rounded-xl border border-border-blue px-4 text-base text-navy md:text-sm"
             />
           </div>
 
@@ -582,7 +590,7 @@ const FilterCatalogWidget = () => {
                   <select
                     value={sort}
                     onChange={onSortChange}
-                    className="h-11 rounded-lg border border-border-blue bg-white px-3 text-sm text-navy"
+                    className="h-11 rounded-lg border border-border-blue bg-white px-3 text-base text-navy md:text-sm"
                   >
                     {sortOptions.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -722,7 +730,7 @@ const FilterCatalogWidget = () => {
                   <select
                     value={pageSize}
                     onChange={onPageSizeChange}
-                    className="rounded-lg border border-border-blue bg-white px-2 py-2"
+                    className="rounded-lg border border-border-blue bg-white px-2 py-2 text-base md:text-sm"
                   >
                     {pageSizeOptions.map((n) => (
                       <option key={n} value={n}>
@@ -772,7 +780,7 @@ const FilterCatalogWidget = () => {
                 onChange={(e) => setOverlayOptionQuery(e.target.value)}
                 placeholder={t("filterPage.overlaySearchPlaceholder")}
                 aria-label={t("filterPage.overlaySearchPlaceholder")}
-                className="h-11 w-full rounded-xl border border-border-blue px-4 text-sm text-navy"
+                className="h-11 w-full rounded-xl border border-border-blue px-4 text-base text-navy md:text-sm"
               />
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">

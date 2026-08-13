@@ -67,7 +67,8 @@ const MOBILE_DESC_CLASS =
   "m-0 line-clamp-3 overflow-hidden text-ellipsis text-sm leading-snug text-text-muted";
 
 const OFFER_SHOP_LINK_CLASS =
-  "text-sm font-semibold leading-snug text-link-blue underline-offset-2 hover:underline";
+  /** `py-1 -my-1`: 19px of shop name was the whole tap target, under the 24px AA floor. */
+  "inline-flex items-center py-1 -my-1 text-sm font-semibold leading-snug text-link-blue underline-offset-2 hover:underline";
 
 const OFFER_PRICE_TEXT_CLASS =
   "whitespace-nowrap text-sm font-bold text-text-dark md:max-lg:text-base lg:text-lg 2xl:text-xl";
@@ -298,7 +299,8 @@ const BestOffersWidget = () => {
             aria-haspopup="listbox"
             aria-expanded={isSortOpen}
             aria-label={t("productOffers.bestOffers.openSortAriaLabel")}
-            className="inline-flex items-center gap-2 text-sm font-medium text-text-dark transition-colors hover:text-link-blue md:text-base"
+            /** `py-1 -my-1`: the sort trigger was 20px of text with nothing around it to hit. */
+            className="inline-flex items-center gap-2 py-1 -my-1 text-sm font-medium text-text-dark transition-colors hover:text-link-blue md:text-base"
           >
             <span className="text-text-muted">{t("productOffers.bestOffers.sortBy")}</span>
             <span className="text-text-dark">{t(activeSortOption.labelKey)}</span>

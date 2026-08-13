@@ -46,8 +46,15 @@ const footerColumnsConfig = [
 
 const columnClassName =
   "flex flex-col gap-2 items-center text-center min-w-0 sm:gap-[10px] md:gap-4 md:items-stretch md:text-left md:min-w-[150px] lg:min-w-[200px]";
+/**
+ * `py-1 -my-1` is a hit area, not spacing. At 11px these links stood 20px tall, under the 24px
+ * WCAG 2.2 AA floor, and every one of them — six links, on every page, in every language. The
+ * padding grows the tappable box to 28px while the negative margin gives the same amount back to
+ * the flow, so the footer looks identical and the column gap (8px, and more above `sm`) is wide
+ * enough that neighbouring hit areas meet without overlapping.
+ */
 const textLinkClassName =
-  "flex items-center text-white no-underline text-[11px] mr-auto transition-opacity duration-300 hover:opacity-80 sm:text-xs md:text-sm md:mr-0";
+  "flex items-center text-white no-underline text-[11px] mr-auto py-1 -my-1 transition-opacity duration-300 hover:opacity-80 sm:text-xs md:text-sm md:mr-0";
 
 const SocialLink = ({ href, label, iconPath }) => (
   <a

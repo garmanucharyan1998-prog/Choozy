@@ -275,7 +275,8 @@ const ProductDetailWidget = () => {
                 {compareCount > 1 ? (
                   <LocalizedLink
                     to="/compare"
-                    className="text-sm font-semibold text-link-blue underline-offset-4 hover:underline"
+                    /** `py-1 -my-1`: 20px of bare text was the whole tap target, under the 24px floor. */
+                    className="inline-flex items-center py-1 -my-1 text-sm font-semibold text-link-blue underline-offset-4 hover:underline"
                   >
                     {t("comparePage.openWithCount").replace("{{count}}", String(compareCount))}
                   </LocalizedLink>

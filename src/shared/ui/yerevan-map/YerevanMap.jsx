@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+/** Loaded after Leaflet's own sheet, so the attribution overrides in it win. */
+import "./YerevanMap.css";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import markerIconRetina from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";

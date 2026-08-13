@@ -1,0 +1,18 @@
+/*
+ * Leaflet ships its attribution as 11px links roughly 14px tall — the two smallest tap targets
+ * on the product page, and the ones a visitor is most likely to hit by accident while panning.
+ * The links are required (OpenStreetMap's licence asks for the credit) so they cannot simply be
+ * removed; giving them real vertical padding brings them to the 24px WCAG 2.2 AA floor.
+ *
+ * Scoped to the attribution control rather than applied through Tailwind: this markup is built
+ * by Leaflet itself at runtime, so there is no JSX to put a class on.
+ */
+.leaflet-control-attribution a {
+  display: inline-block;
+  padding-block: 5px;
+}
+
+/* The control's own box would otherwise clip the taller links. */
+.leaflet-control-attribution {
+  line-height: 1.2;
+}

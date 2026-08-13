@@ -36,7 +36,12 @@ const ProductShowcaseSection = ({
           </h2>
           <LocalizedLink
             to={moreHref}
-            className="cursor-pointer no-underline text-xs sm:text-sm font-semibold text-link-blue p-0 rounded-lg transition-all duration-300 hover:bg-[#f0f4ff] hover:text-navy lg:text-base lg:px-4 lg:py-2"
+            /**
+             * `py-1 -my-1` below `lg`, where the link is bare text 16px tall and nothing else
+             * is clickable around it. From `lg` the real padding takes over and supplies the
+             * height on its own.
+             */
+            className="inline-flex items-center cursor-pointer no-underline text-xs sm:text-sm font-semibold text-link-blue px-0 py-1 -my-1 rounded-lg transition-all duration-300 hover:bg-[#f0f4ff] hover:text-navy lg:text-base lg:my-0 lg:px-4 lg:py-2"
             aria-label={`${t("productShowcase.viewMoreLabel")}: ${title}`}
           >
             {t("productShowcase.viewMoreLabel")}
