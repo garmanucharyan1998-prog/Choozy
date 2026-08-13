@@ -1,0 +1,36 @@
+/*
+ * Only the two things Tailwind cannot express live here; everything else about the bars is a
+ * utility class on the element itself.
+ *
+ * The grow-in has to be an animation rather than a transition: the final width is an inline
+ * style computed from the data, so a transition would need a post-mount state flip to animate
+ * from — the exact server/client divergence `ProgressiveImage.css` documents next door. `both`
+ * holds the bar at zero through its stagger delay, so a row reveals left to right instead of
+ * all four bars twitching at once.
+ *
+ * `scaleX` rather than `width` keeps it on the compositor (a comparison of four products
+ * across eight attributes is 32 of these on one screen). The rounded cap squashes for the few
+ * hundred milliseconds the bar is growing, which at 6px tall is not visible.
+ */
+.compare-bars__fill {
+  /* A ratio near zero still has to read as a bar and not as a rendering artifact. */
+  min-width: 0.375rem;
+  /* All three locales are LTR; a right-to-left one would need `100% 50%`. */
+  transform-origin: 0 50%;
+  animation: compare-bar-grow 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes compare-bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compare-bars__fill {
+    animation: none;
+  }
+}

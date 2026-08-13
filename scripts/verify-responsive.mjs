@@ -50,6 +50,13 @@ const CHROME_CANDIDATES = [
 const DEBUG_PORT = Number(process.env.CDP_PORT || 9339);
 /** WCAG 2.2 AA: a control this small needs at least 24x24 CSS px. */
 const MIN_TAP_TARGET = 24;
+/**
+ * Narrower than this and a bar is a swatch, not a measurement: the shortest ratio the catalog
+ * produces (a 25,000 AMD accessory beside a 1,290,000 AMD laptop) has to stay distinguishable
+ * from the next one up. Set against the narrowest panel the layout can produce — one column on
+ * a 360px phone.
+ */
+const MIN_BAR_TRACK = 90;
 
 const VIEWPORTS = [
   { name: "360 phone", width: 360, height: 740, mobile: true },
@@ -178,6 +185,37 @@ const MEASURE = `(() => {
     };
   }
 
+  /**
+   * The compare bars. Each attribute panel lays its lanes out as one three-column grid so that
+   * every track inside it ends at the same x — two bars at the same ratio have to be the same
+   * length, and sizing lanes individually would let a panel's longest printed value shorten
+   * only its own track. That invariant lives in a single grid-template-columns, is invisible in
+   * the DOM, and jsdom cannot measure it, so it is checked here.
+   */
+  const barPanels = [];
+  document.querySelectorAll('[role="group"][aria-labelledby^="compare-bar-"]').forEach((panel) => {
+    const panelBox = panel.getBoundingClientRect();
+    const tracks = [...panel.querySelectorAll('[aria-hidden="true"] > .compare-bars__fill')].map(
+      (fill) => fill.parentElement.getBoundingClientRect(),
+    );
+    if (tracks.length === 0) return;
+    const widths = tracks.map((r) => r.width);
+    const values = [...panel.querySelectorAll(".tabular-nums")].map((el) =>
+      el.getBoundingClientRect(),
+    );
+    barPanels.push({
+      key: panel.getAttribute("aria-labelledby").replace("compare-bar-", ""),
+      lanes: tracks.length,
+      trackWidth: Math.round(Math.min(...widths)),
+      /** Anything above a subpixel means the lanes were not sized by one shared grid. */
+      trackSpread: Math.round(Math.max(...widths) - Math.min(...widths)),
+      /** A value wide enough to leave the panel is a number the visitor cannot read. */
+      valueOverflow: Math.round(
+        Math.max(0, ...values.map((r) => r.right - panelBox.right + 0.5)),
+      ),
+    });
+  });
+
   const smallTargets = [];
   document
     .querySelectorAll('[role="region"][class*="fixed"] a, [role="region"][class*="fixed"] button, [aria-labelledby="compare-radar-heading"] button')
@@ -203,6 +241,7 @@ const MEASURE = `(() => {
     mainPadBottom: main ? Math.round(parseFloat(getComputedStyle(main).paddingBottom)) : null,
     radar,
     table: tableInfo,
+    barPanels,
     smallTargets,
   };
 })()`;
@@ -408,6 +447,23 @@ const main = async () => {
         m.smallTargets.forEach((target) =>
           findings.push(`${label}: tap target under ${MIN_TAP_TARGET}px — ${target}`),
         );
+        (m.barPanels ?? []).forEach((panel) => {
+          if (panel.trackSpread > 1) {
+            findings.push(
+              `${label}: compare bars "${panel.key}" tracks differ by ${panel.trackSpread}px — equal ratios would draw unequal bars`,
+            );
+          }
+          if (panel.valueOverflow > 0) {
+            findings.push(
+              `${label}: compare bars "${panel.key}" value runs ${panel.valueOverflow}px past its panel`,
+            );
+          }
+          if (panel.trackWidth < MIN_BAR_TRACK) {
+            findings.push(
+              `${label}: compare bars "${panel.key}" track is only ${panel.trackWidth}px — the bar stops carrying the comparison`,
+            );
+          }
+        });
         if (m.tray && m.mainPadBottom !== null && m.tray.height > m.mainPadBottom) {
           findings.push(
             `${label}: tray ${m.tray.height}px exceeds main's bottom padding ${m.mainPadBottom}px — content hides under it`,
@@ -432,6 +488,11 @@ const main = async () => {
         row.table
           ? `cols=${row.table.visibleCols}/${row.table.headCells} scroll=${row.table.scrollWidth}/${row.table.clientWidth}`
           : "table=-",
+        row.barPanels?.length
+          ? `bars=${row.barPanels.length}p/${row.barPanels[0].lanes}l track=${Math.min(
+              ...row.barPanels.map((panel) => panel.trackWidth),
+            )}px`
+          : "bars=-",
       ].join("  "),
     );
   });

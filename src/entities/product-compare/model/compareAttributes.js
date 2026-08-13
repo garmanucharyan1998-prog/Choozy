@@ -12,7 +12,7 @@
  * normalizing that tight a band would inflate a real 0.3-star difference into a full radar
  * spoke, the kind of chart that lies about how much the numbers actually differ.
  */
-import { formatAmd } from "shared/lib/formatAmd";
+import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 
 /**
  * `batteryMah` (a capacity — phones, tablets, consoles, accessories) and `batteryHours` (a
@@ -31,6 +31,22 @@ const formatWeight = (grams) =>
   grams >= 1000 ? `${Math.round((grams / 1000) * 100) / 100} kg` : `${grams} g`;
 
 const formatStorage = (gb) => (gb >= 1000 ? `${gb / 1000} TB` : `${gb} GB`);
+
+/**
+ * `GB`, `Hz`, `mAh`, `g`/`kg` and `″` are unit symbols — the same glyphs in all three
+ * languages, and the product pages already print them untranslated. "months" and "hours" are
+ * not: they are English words, and the bars used to render "24 mo" and "30 h" to an Armenian
+ * reader on a page whose every other number carried a translated unit. Same for the price,
+ * which printed a bare "739,000" beside a table row reading "739,000 դր.".
+ *
+ * `t` is threaded down here rather than applied by the widget because `formatted` is consumed
+ * twice — once by the bars, once by the advantage cards — and a unit word applied at one call
+ * site is a unit word missing at the other. The English fallback only exists for callers that
+ * genuinely have no translator (the model's own unit tests); every rendering path passes one,
+ * and `compareBarsModel.test.js` pins that per locale.
+ */
+const localizedUnit = (t, key, token, value, fallback) =>
+  typeof t === "function" ? t(key).replace(`{{${token}}}`, String(value)) : fallback;
 
 export const COMPARE_ATTRIBUTES = [
   {
@@ -70,7 +86,10 @@ export const COMPARE_ATTRIBUTES = [
     labelKey: "comparePage.attr.battery",
     direction: "higher",
     getValue: batteryRawValue,
-    formatValue: (v, p) => (typeof p.batteryMah === "number" ? `${v} mAh` : `${v} h`),
+    formatValue: (v, p, t) =>
+      typeof p.batteryMah === "number"
+        ? `${v} mAh`
+        : localizedUnit(t, "productDetail.specsExtended.values.batteryHours", "hours", v, `${v} h`),
     showBar: true,
   },
   {
@@ -78,7 +97,8 @@ export const COMPARE_ATTRIBUTES = [
     labelKey: "comparePage.attr.price",
     direction: "lower",
     getValue: (p) => (typeof p.priceValue === "number" ? p.priceValue : null),
-    formatValue: (v) => formatAmd(v),
+    formatValue: (v, p, t) =>
+      formatPriceAmd(v, typeof t === "function" ? t("productDetail.currencySuffix") : ""),
     showBar: true,
   },
   {
@@ -103,7 +123,8 @@ export const COMPARE_ATTRIBUTES = [
     labelKey: "comparePage.attr.warranty",
     direction: "higher",
     getValue: (p) => (typeof p.warrantyMonths === "number" ? p.warrantyMonths : null),
-    formatValue: (v) => `${v} mo`,
+    formatValue: (v, p, t) =>
+      localizedUnit(t, "productDetail.specsExtended.values.warrantyMonths", "months", v, `${v} mo`),
     showBar: true,
   },
 ];

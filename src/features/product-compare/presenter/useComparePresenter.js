@@ -90,8 +90,8 @@ export const useComparePresenter = (fixedIds = null) => {
     return seriesColorsRef.current;
   }, [products]);
 
-  const bars = useMemo(() => buildCompareBars(products), [products]);
-  const advantages = useMemo(() => buildCompareAdvantages(products), [products]);
+  const bars = useMemo(() => buildCompareBars(products, t), [products, t]);
+  const advantages = useMemo(() => buildCompareAdvantages(products, t), [products, t]);
   /** Memoized for identity, not cost: `CompareRadar` derives its visible set from this object. */
   const radar = useMemo(() => buildRadarData(products), [products]);
 

@@ -998,9 +998,15 @@ export const enOverrides = {
     },
     bars: {
       heading: "Compared by the numbers",
+      legendAria: "The compared products and their numbers",
+      leadNote: "The leader beats {{baseline}} by {{percent}} percent",
+      deltaNote:
+        "The percentage shows how far the leader is ahead of the weakest option in this comparison.",
+      tie: "The same for every product",
     },
     advantages: {
       heading: "Why choose {{title}}",
+      betterThan: "{{percent}}% better than {{baseline}}",
     },
     tray: {
       ariaLabel: "Comparison list",

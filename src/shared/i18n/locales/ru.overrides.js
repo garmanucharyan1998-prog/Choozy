@@ -998,9 +998,15 @@ export const ruOverrides = {
     },
     bars: {
       heading: "Сравнение в цифрах",
+      legendAria: "Сравниваемые товары и их номера",
+      leadNote: "Лидер опережает {{baseline}} на {{percent}} процентов",
+      deltaNote:
+        "Процент показывает, насколько лидер опережает самый слабый вариант в этом сравнении.",
+      tie: "Одинаково у всех товаров",
     },
     advantages: {
       heading: "Почему стоит выбрать {{title}}",
+      betterThan: "на {{percent}}% лучше, чем {{baseline}}",
     },
     tray: {
       ariaLabel: "Список сравнения",

@@ -1,3 +1,4 @@
+import { getTranslator } from "shared/i18n";
 import { buildCompareBars } from "./compareBarsModel";
 
 const productA = {
@@ -87,5 +88,70 @@ describe("buildCompareBars", () => {
   test("year is excluded — showBar is false for it", () => {
     const bars = buildCompareBars([productA, productB]);
     expect(bars.find((row) => row.key === "year")).toBeUndefined();
+  });
+
+  /**
+   * `deltaPercent` is measured against the worst value in the row, and a percentage printed
+   * without its base is unreadable — "+300%" more than what? The row carries the answer.
+   */
+  test("a row's margin comes with the value it was measured against", () => {
+    const t = getTranslator("en");
+    const bars = buildCompareBars([productA, productB], t);
+
+    const storage = bars.find((row) => row.key === "storage");
+    expect(storage.bars.find((bar) => bar.isWinner).deltaPercent).toBe(100);
+    expect(storage.baselineFormatted).toBe("128 GB");
+
+    /** On a "lower is better" row the baseline is the worst — here the *highest* price. */
+    const price = bars.find((row) => row.key === "price");
+    expect(price.baselineFormatted).toBe("739,000 AMD");
+  });
+
+  test("a tied row has no margin and so states no baseline", () => {
+    const tiedA = { ...productA, ramGb: 12 };
+    const tiedB = { ...productB, ramGb: 12 };
+    const bars = buildCompareBars([tiedA, tiedB], getTranslator("en"));
+    expect(bars.find((row) => row.key === "ram").baselineFormatted).toBeNull();
+  });
+
+  /** The UI draws an arrow from this: on a price row the longest bar is the smallest number. */
+  test("every row states which end of its range wins", () => {
+    const bars = buildCompareBars([productA, productB]);
+    expect(bars.find((row) => row.key === "price").direction).toBe("lower");
+    expect(bars.find((row) => row.key === "weight").direction).toBe("lower");
+    expect(bars.find((row) => row.key === "storage").direction).toBe("higher");
+  });
+});
+
+/**
+ * The three attributes whose unit is a word rather than a symbol. Each shipped in English to
+ * every reader — "739,000" with no currency at all beside a table row reading "739,000 դր.",
+ * "12 mo", "30 h" — because `formatValue` had no translator to ask.
+ */
+describe("buildCompareBars unit words follow the locale", () => {
+  const headphonesA = { id: "a", categoryId: "headphones", priceValue: 90000, batteryHours: 30 };
+  const headphonesB = { id: "b", categoryId: "headphones", priceValue: 60000, batteryHours: 20 };
+
+  test.each([
+    ["am", "739,000 դր.", "12 ամիս", "30 ժամ"],
+    ["en", "739,000 AMD", "12 months", "30 hours"],
+    ["ru", "739,000 драм", "12 мес.", "30 ч"],
+  ])("%s prints its own currency, months and hours", (language, price, warranty, hours) => {
+    const t = getTranslator(language);
+
+    const phoneBars = buildCompareBars([productA, productB], t);
+    expect(phoneBars.find((row) => row.key === "price").bars[0].formatted).toBe(price);
+    expect(phoneBars.find((row) => row.key === "warranty").bars[0].formatted).toBe(warranty);
+
+    const headphoneBars = buildCompareBars([headphonesA, headphonesB], t);
+    expect(headphoneBars.find((row) => row.key === "battery").bars[0].formatted).toBe(hours);
+  });
+
+  /** Unit *symbols* are the same glyphs everywhere and stay out of the dictionary. */
+  test("symbols are not translated in any locale", () => {
+    const bars = buildCompareBars([productA, productB], getTranslator("ru"));
+    expect(bars.find((row) => row.key === "ram").bars[0].formatted).toBe("12 GB");
+    expect(bars.find((row) => row.key === "battery").bars[0].formatted).toBe("4832 mAh");
+    expect(bars.find((row) => row.key === "screen").bars[0].formatted).toBe("6.9″");
   });
 });

@@ -1205,13 +1205,37 @@ const am = {
       capNote: "Դիագրամին ցուցադրվում է առավելագույնը երեք ապրանք։ Չորրորդն ընտրելիս առաջինը փոխարինվում է։",
       scaleNote: "Գնահատականները հարաբերական են այս կատեգորիայի կատալոգի նկատմամբ, ոչ թե բացարձակ գնահատական։",
     },
-    /** Heading above the per-attribute bars, keyed off `comparePage.attr.*` for each row's own label. */
+    /**
+     * The per-attribute bars, keyed off `comparePage.attr.*` for each panel's own label.
+     * `leadNote` and `tie` are the words behind the two badges a panel can carry: the badge
+     * itself is an arrow and a percentage, which says how much but not which way a row is read.
+     */
     bars: {
       heading: "Համեմատություն թվերով",
+      legendAria: "Համեմատվող ապրանքները և դրանց համարները",
+      /**
+       * Phrased around «քան» so no Armenian case ending has to attach to `{{baseline}}`: the
+       * baseline is a runtime value ("128 GB", "739,000 դր."), and which of `-ը`/`-ն` it would
+       * take depends on how its last sound is read — not something a template can decide.
+       */
+      leadNote: "Առաջատարն ավելի լավ է {{percent}} տոկոսով, քան {{baseline}}",
+      /**
+       * Says out loud what the badge's percentage is measured against. Without it the badge
+       * answers "more than what?" with nothing, and a reader is left to guess whether it means
+       * more than the next product, the average, or the catalog.
+       */
+      deltaNote: "Տոկոսը ցույց է տալիս, թե որքանով է առաջատարը գերազանցում այս համեմատության ամենաթույլ տարբերակին։",
+      tie: "Բոլոր ապրանքների մոտ նույնն է",
     },
-    /** `{{title}}` is the product's own title — see the manual `.replace` pattern in `pair` below. */
+    /**
+     * `{{title}}` is the product's own title — see the manual `.replace` pattern in `pair` below.
+     * `betterThan` prints a margin next to the value it was measured against, for the same
+     * reason `bars.deltaNote` exists: the card is about one product, so the other side of the
+     * comparison has to be named.
+     */
     advantages: {
       heading: "Ինչու՞ ընտրել {{title}}",
+      betterThan: "{{percent}}%-ով ավելի լավ, քան {{baseline}}",
     },
     /**
      * The site-wide selection bar. `count` is screen-reader text for the bare "2/4" digits beside

@@ -13,7 +13,7 @@ import { FaCheck } from "react-icons/fa";
  * @param {{
  *   t: (key: string, fallback?: string) => string,
  *   products: { id: string, title: string }[],
- *   advantages: Record<string, { labelKey: string, formatted: string, deltaPercent: number | null }[]>,
+ *   advantages: Record<string, { labelKey: string, formatted: string, deltaPercent: number | null, baselineFormatted: string | null }[]>,
  *   seriesColors: Record<string, string>,
  * }} props
  */
@@ -25,6 +25,12 @@ export const CompareAdvantages = ({ t, products, advantages, seriesColors }) => 
   if (cards.length === 0) return null;
 
   const headingTemplate = t("comparePage.advantages.heading");
+  /**
+   * `(+100%)` on its own states a margin over a baseline the reader cannot see: the card lists
+   * one product's wins, so the value that was beaten is never on screen next to it. Printing it
+   * turns a floating number into a claim that can be checked.
+   */
+  const betterThanTemplate = t("comparePage.advantages.betterThan");
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -43,8 +49,13 @@ export const CompareAdvantages = ({ t, products, advantages, seriesColors }) => 
                 <FaCheck className="mt-0.5 h-3 w-3 shrink-0 text-emerald-600" aria-hidden />
                 <span>
                   {t(item.labelKey)}: <strong>{item.formatted}</strong>
-                  {item.deltaPercent != null ? (
-                    <span className="text-emerald-600"> (+{item.deltaPercent}%)</span>
+                  {item.deltaPercent != null && item.baselineFormatted ? (
+                    <span className="text-emerald-700">
+                      {" — "}
+                      {betterThanTemplate
+                        .replace("{{percent}}", String(item.deltaPercent))
+                        .replace("{{baseline}}", item.baselineFormatted)}
+                    </span>
                   ) : null}
                 </span>
               </li>

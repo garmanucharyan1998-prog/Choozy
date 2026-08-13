@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { buildCompareAdvantages } from "entities/product-compare";
 import { assignSeriesColors } from "features/product-compare";
 import { getTranslator } from "shared/i18n";
@@ -52,16 +52,49 @@ describe("CompareAdvantages", () => {
     expect(screen.getByRole("heading", { name: /Product B/ })).toBeInTheDocument();
   });
 
-  test("lists a product's real wins as bullets, each with its winning margin", () => {
+  /**
+   * A margin has to name what it was measured against. "(+300%)" on a card about one product
+   * states a number whose other half is nowhere on screen — the reader cannot tell whether it
+   * beats the next product, the average, or the catalog.
+   */
+  test("prints every winning margin next to the value it was measured against", () => {
     const products = [PRODUCT_A, PRODUCT_B];
-    const advantages = buildCompareAdvantages(products);
+    const advantages = buildCompareAdvantages(products, t);
     const seriesColors = assignSeriesColors(products, {});
 
     render(<CompareAdvantages t={t} products={products} advantages={advantages} seriesColors={seriesColors} />);
 
-    // A wins price by a wide margin (150,000 vs 400,000) — its own strongest, most-relevant bullet.
-    expect(screen.getByText(/\+63%/)).toBeInTheDocument();
-    // B wins storage by the widest margin of all (512 GB vs 128 GB).
-    expect(screen.getByText(/\+300%/)).toBeInTheDocument();
+    // B wins storage by the widest margin of all — 512 GB against A's 128 GB.
+    expect(screen.getByText(/300% better than 128 GB/)).toBeInTheDocument();
+    // A wins price (150,000 against 400,000), and the baseline carries its currency.
+    expect(screen.getByText(/63% better than 400,000 AMD/)).toBeInTheDocument();
+  });
+
+  /** The price fallback is a plain fact about one product, so there is no margin to explain. */
+  test("states no margin for a product that won nothing", () => {
+    const dominant = { ...PRODUCT_B, id: "dominant", title: "Dominant" };
+    const dominated = {
+      ...PRODUCT_A,
+      id: "dominated",
+      title: "Dominated",
+      /** Worse than `dominant` on every attribute, including the two where lower wins. */
+      priceValue: 900000,
+      weightGrams: 300,
+    };
+    const products = [dominant, dominated];
+    const advantages = buildCompareAdvantages(products, t);
+
+    render(
+      <CompareAdvantages
+        t={t}
+        products={products}
+        advantages={advantages}
+        seriesColors={assignSeriesColors(products, {})}
+      />,
+    );
+
+    const card = screen.getByRole("heading", { name: /Dominated/ }).closest("article");
+    expect(within(card).getAllByRole("listitem")).toHaveLength(1);
+    expect(within(card).queryByText(/better than/)).not.toBeInTheDocument();
   });
 });

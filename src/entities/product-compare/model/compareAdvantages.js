@@ -11,14 +11,16 @@ const MAX_ADVANTAGES = 6;
 
 /**
  * @param {import("entities/product").CatalogProduct[]} products - 2–4 items
+ * @param {(key: string, fallback?: string) => string} [t] - passed straight through to
+ *   `buildCompareBars`, so a bullet and the bar it was derived from print the same units.
  * @returns {Record<string, { labelKey: string, formatted: string, deltaPercent: number }[]>}
  *   keyed by product id
  */
-export const buildCompareAdvantages = (products) => {
+export const buildCompareAdvantages = (products, t) => {
   const advantagesByProductId = new Map((products ?? []).map((product) => [product.id, []]));
   if (!Array.isArray(products) || products.length < 2) return {};
 
-  const bars = buildCompareBars(products);
+  const bars = buildCompareBars(products, t);
 
   bars.forEach((row) => {
     row.bars.forEach((bar) => {
@@ -27,6 +29,12 @@ export const buildCompareAdvantages = (products) => {
           labelKey: row.labelKey,
           formatted: bar.formatted,
           deltaPercent: bar.deltaPercent,
+          /**
+           * The value the margin was measured against. A bullet reading "120 Hz (+100%)" states
+           * a number whose base the reader has no way to recover — the card is about one
+           * product, so the other side of the comparison has to be named, not implied.
+           */
+          baselineFormatted: row.baselineFormatted,
         });
       }
     });
@@ -47,7 +55,12 @@ export const buildCompareAdvantages = (products) => {
       if (list.length > 0) return;
       const priceBar = priceRow.bars.find((bar) => bar.productId === product.id);
       if (priceBar) {
-        list.push({ labelKey: priceRow.labelKey, formatted: priceBar.formatted, deltaPercent: null });
+        list.push({
+          labelKey: priceRow.labelKey,
+          formatted: priceBar.formatted,
+          deltaPercent: null,
+          baselineFormatted: null,
+        });
       }
     });
   }
