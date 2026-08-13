@@ -261,7 +261,12 @@ const PINNED_STRIP = `(() => {
   const table = document.querySelector("table");
   if (!table) return null;
   const block = table.closest('[class*="overflow-x-auto"]');
-  const shell = document.querySelector(".header-shell-spacer");
+  /**
+   * The painted header, not the spacer that reserves room for it. Once the header compacts on
+   * scroll the two are ~47px apart, and measuring the reservation is exactly the mistake that
+   * left the strip hanging in mid-air below the header.
+   */
+  const shell = document.querySelector("[data-header-shell]");
   const shellBottom = shell ? Math.round(shell.getBoundingClientRect().bottom) : 0;
   const blockRect = block.getBoundingClientRect();
   const strip = [...document.querySelectorAll('[role="region"]')].find((el) => {
@@ -285,6 +290,8 @@ const PINNED_STRIP = `(() => {
     top: Math.round(r.top),
     bottom: Math.round(r.bottom),
     underHeader: r.top < shellBottom - 1,
+    /** The other direction: pinned to something taller than the header, leaving a visible band. */
+    detachedBy: Math.max(0, Math.round(r.top - shellBottom)),
     occluded: !(painted && strip.contains(painted)),
     paintedInstead: painted ? painted.tagName.toLowerCase() : null,
   };
@@ -545,6 +552,11 @@ const main = async () => {
             if (pinned.underHeader) {
               findings.push(
                 `${label}: pinned strip starts at ${pinned.top}, above the header shell's ${pinned.shellBottom} — it sits behind the site header`,
+              );
+            }
+            if (pinned.detachedBy > 1) {
+              findings.push(
+                `${label}: pinned strip floats ${pinned.detachedBy}px below the header (strip at ${pinned.top}, header ends at ${pinned.shellBottom}) — the table scrolls through the gap`,
               );
             }
             if (pinned.occluded) {

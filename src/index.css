@@ -72,6 +72,24 @@
     height: var(--header-shell-height, 132px);
   }
 
+  /*
+   * The spacer reserves the *expanded* height and keeps it once the header compacts, so from
+   * that moment on its lower ~47px is empty box sitting at `z-70` over whatever is beneath.
+   * Transparent, but not inert: it swallowed every click aimed at the compare page's pinned
+   * product strip, which pins flush under the painted header and therefore lands inside that
+   * band. A spacer reserves space; it has no business intercepting pointers.
+   *
+   * The header itself is the absolutely positioned child, so interactivity is handed straight
+   * back to it — and to everything it contains, including the mobile drawer and the nav panel.
+   */
+  .header-shell-spacer {
+    pointer-events: none;
+  }
+
+  .header-shell-spacer > * {
+    pointer-events: auto;
+  }
+
   @media (min-width: 768px) {
     .header-shell-spacer {
       height: var(--header-shell-height, 160px);

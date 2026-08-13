@@ -45,8 +45,16 @@ const SiteShell = ({ mainBackground = "white" }) => {
       />
 
       <div className="header-shell-spacer sticky top-0 z-[70] shrink-0">
+        {/**
+         * The spacer above reserves the *expanded* height so the page never jumps when the
+         * header compacts; this inner element is the header as actually painted, and the two
+         * differ by ~47px on a desktop viewport once compact. Anything pinning itself below the
+         * header has to measure this one — `--header-shell-height` is the reservation, not the
+         * edge. `data-header-shell` is that handle: a behavioural hook, not a style class.
+         */}
         <div
           ref={headerShellRef}
+          data-header-shell
           className={`absolute inset-x-0 top-0 bg-white transition-all duration-300 ${
             isCompactHeader ? "shadow-[0_6px_18px_rgba(0,0,0,0.08)]" : ""
           }`}

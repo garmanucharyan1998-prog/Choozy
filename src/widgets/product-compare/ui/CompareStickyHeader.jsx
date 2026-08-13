@@ -15,18 +15,22 @@ import { LocalizedLink } from "shared/ui/link";
  * vertically and therefore never moves. Measured in a real browser: with `sticky; top: 200px`
  * on the header cells the row still rode away to -1121px. Hence a separate pinned strip.
  *
- * Two things about *where* it pins were wrong before and are the point of this file:
+ * Three things about *where* it pins were wrong before, and between them they are the point of
+ * this file:
  *
  * 1. It pinned at `top: 0` under a header shell that is itself `sticky top-0` at `z-70` and
- *    198px tall on a desktop viewport — so the strip painted underneath it and was never once
- *    visible. `elementFromPoint` at its centre returned the search input. It now pins below
- *    the shell, using the `--header-shell-height` the shell already publishes.
- * 2. It was anchored to a sentinel *above* the table, so once passed it stayed for the rest of
+ *    ~200px tall on a desktop viewport — so the strip painted underneath it and was never once
+ *    visible. `elementFromPoint` at its centre returned the search input.
+ * 2. It then pinned to `--header-shell-height`, which is the height the layout *reserves*, not
+ *    the header's edge; once the header compacts on scroll the two differ, and the strip hung
+ *    47px below it with the table scrolling through the gap. It now measures the painted header
+ *    (see `pinOffset`).
+ * 3. It was anchored to a sentinel *above* the table, so once passed it stayed for the rest of
  *    the page — still hovering over the radar, the bars and the footer, naming columns of a
  *    table that had scrolled away thousands of pixels earlier. It is now anchored to the table
  *    block itself and leaves with it.
  *
- * `isVisible` starts `false` and only a browser-only effect ever flips it, so the server and
+ * `pinnedTop` starts `null` and only a browser-only effect ever sets it, so the server and
  * the first client render agree by construction and this needs no separate hydration gate.
  * A scroll listener rather than an `IntersectionObserver`: the condition is "the block spans
  * the pin line", which is a comparison against a live offset, not a threshold crossing an
@@ -36,8 +40,23 @@ import { LocalizedLink } from "shared/ui/link";
 /** What `index.css` reserves for the shell before it has been measured. */
 const DEFAULT_HEADER_SHELL_HEIGHT = 132;
 
-/** The y the strip pins at: the bottom edge of the site's own sticky header shell. */
+/**
+ * The y the strip pins at: the bottom edge of the header shell *as painted right now*.
+ *
+ * Deliberately not `--header-shell-height`. That variable is the height the layout *reserves*,
+ * and `useSiteShellPresenter` only ever republishes it while the header is expanded — on purpose,
+ * so the spacer keeps its size and the page does not jump when the header compacts on scroll.
+ * The painted header is shorter than the reservation from that moment on: 154px against 201px on
+ * a desktop viewport, 151 against 176 on a phone. Pinning to the reservation left the strip
+ * floating 47px below the header with the table scrolling through the gap.
+ */
 const pinOffset = () => {
+  const shell = document.querySelector("[data-header-shell]");
+  if (shell) {
+    const { bottom } = shell.getBoundingClientRect();
+    if (bottom > 0) return bottom;
+  }
+  /** No shell in the tree — a component test, or the widget mounted on its own. */
   const declared = getComputedStyle(document.documentElement).getPropertyValue(
     "--header-shell-height",
   );
@@ -91,8 +110,20 @@ export const CompareStickyHeader = ({ t, products, isFixed, removeProduct, block
     measure();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
+
+    /**
+     * The header's height animates over 300ms as it compacts. Scrolling usually keeps firing
+     * through that, but a visitor who stops exactly at the threshold would otherwise leave the
+     * strip parked at the pre-animation offset.
+     */
+    const shell = document.querySelector("[data-header-shell]");
+    const shellObserver =
+      shell && typeof ResizeObserver !== "undefined" ? new ResizeObserver(schedule) : null;
+    if (shellObserver) shellObserver.observe(shell);
+
     return () => {
       if (frame) cancelAnimationFrame(frame);
+      if (shellObserver) shellObserver.disconnect();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
