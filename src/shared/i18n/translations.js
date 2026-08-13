@@ -514,8 +514,32 @@ const am = {
       unicomp: "Unicomp",
       elektronika: "Elektronika",
     },
-    offerDescription:
-      "Համեմատեք այս ապրանքի գները Հայաստանի խանութներից և ընտրեք լավագույն առաջարկը։",
+    /**
+     * One blurb per shop, keyed by the same `shopId` as `shops` above. Replaces
+     * `offerDescription`, a single sentence every row of every offers table repeated
+     * verbatim — twelve shops that differ in price, coverage and terms described by one
+     * identical line, which told a shopper nothing about which of them to pick.
+     */
+    shopTerms: {
+      zigzag:
+        "Zigzag.am-ի պաշտոնական խանութ · անվճար առաքում Երևանում 1-2 օրում · ապառիկ մինչև 24 ամիս",
+      vlv: "VLV-ի խանութների ցանց · առաքում 1-3 օրում ամբողջ Հայաստանում · վերադարձ 14 օրվա ընթացքում",
+      vega: "Vega Digital-ի պաշտոնական ներկայացուցիչ · 0% ապառիկ 6 ամսով · առաքում 2-3 օրում",
+      mobileCentre:
+        "Բջջային տեխնիկայի մասնագիտացված սրահ · գործարանային երաշխիք 12 ամիս · փոխանակում 7 օրում",
+      ispace:
+        "Apple-ի պաշտոնական վերավաճառող · միայն Apple տեխնիկա · սպասարկում պաշտոնական սերվիս կենտրոնում",
+      tegh: "Խանութ-սրահ Երևանի կենտրոնում · վճարում քարտով կամ կանխիկ · առաքում 2-4 օրում",
+      gadget:
+        "Gadget.am-ի առցանց խանութ · առաքում ամբողջ Հայաստանում 2-3 օրում · ապառիկ 12 ամսով",
+      unicomp:
+        "Համակարգչային տեխնիկայի մասնագետներ · հավաքում և տեղադրում · երաշխիք մինչև 36 ամիս",
+      multimedia: "Ֆոտո և համակարգչային տեխնիկա · խորհրդատվություն սրահում · առաքում 3-5 օրում",
+      tashir: "Tashir Electronics-ի ցանց · տեղադրում և միացում տանը · ապառիկ մինչև 18 ամիս",
+      elektronika:
+        "Աուդիո և վիդեո տեխնիկայի սրահ · ցուցադրական նմուշներ սրահում · առաքում 2-4 օրում",
+      sas: "SAS սուպերմարկետների տեխնիկայի բաժին · բոնուսային քարտով զեղչ · վերադարձ 14 օրում",
+    },
     badges: {
       discount: "Զեղչ",
       new: "Նորույթ",
@@ -534,10 +558,14 @@ const am = {
       seeLess: "Պակաս ցուցադրել",
       variantsAriaLabel: "Կոնֆիգուրացիայի ընտրություն",
       colorsAriaLabel: "Գույնի ընտրություն",
+      /** Screen-reader prefix for the score printed on each row (`4.6 (2140)` alone is unreadable). */
+      shopRatingLabel: "Խանութի գնահատականը՝",
+      shopReviewsLabel: "կարծիք",
       sortOptions: {
         priceAsc: "Գինը՝ աճման կարգով",
         priceDesc: "Գինը՝ նվազման կարգով",
         popular: "Ամենապահանջված",
+        rating: "Խանութի գնահատականը",
       },
     },
   },
@@ -612,21 +640,77 @@ const am = {
         settings: "Կարգավորումներ",
       },
       settingsIntro: "Կարգավորեք, թե ինչ տեսակի ծանուցումներ եք ցանկանում ստանալ։",
+      /**
+       * Each item's own `body`, not one `sampleBody` shared by all three: the shared line
+       * only ever matched the "price drop" item by coincidence, so a saved-product restock
+       * notice and a new-offer notice both read as if they were about a price drop too.
+       */
+      /**
+       * Keyed by the event, not by how long ago it happened: the three items used to be
+       * `recent`/`hour`/`dated`, which said nothing about what each one was and stopped being
+       * true the moment a fourth was added. Newest first — the order here is the render order.
+       */
       feed: {
-        sampleBody:
-          "Ձեր հետևած ապրանքներից մեկի գինը փոխվել է. ստուգեք նոր առաջարկները։",
         items: {
-          recent: {
+          priceDrop: {
             title: "Գնի իջեցում նախընտրելիներում",
             timeLabel: "3 ր",
+            body: "Ձեր նախընտրածներից մեկի գինը իջել է. ստուգեք նոր գինը։",
           },
-          hour: {
+          newOffer: {
             title: "Նոր առաջարկ պահված ապրանքի համար",
-            timeLabel: "1 ժ",
+            timeLabel: "26 ր",
+            body: "Հայտնվել է ավելի շահավետ առաջարկ ձեր պահած ապրանքներից մեկի համար։",
           },
-          dated: {
+          cheaperShop: {
+            title: "Ավելի ցածր գին մեկ այլ խանութում",
+            timeLabel: "1 ժ",
+            body: "Նույն ապրանքը հայտնվել է ավելի ցածր գնով մեկ այլ խանութում։",
+          },
+          backInStock: {
             title: "Ապրանքը կրկին առկա է",
+            timeLabel: "4 ժ",
+            body: "Ձեր հետևած ապրանքներից մեկը կրկին հասանելի է խանութներում։",
+          },
+          priceRise: {
+            title: "Գինը բարձրացել է",
+            timeLabel: "9 ժ",
+            body: "Ձեր հետևած ապրանքի գինը բարձրացել է վերջին օրվա ընթացքում։",
+          },
+          compareSaved: {
+            title: "Համեմատությունը պահված է",
+            timeLabel: "14 ժ",
+            body: "Ձեր ընտրած ապրանքների համեմատությունը հասանելի է անձնական էջում։",
+          },
+          newShopJoined: {
+            title: "Նոր խանութ է ավելացել",
+            timeLabel: "22 ժ",
+            body: "Ձեր հետևած ապրանքի համար հայտնվել է ևս մեկ խանութի առաջարկ։",
+          },
+          targetPriceHit: {
+            title: "Ցանկալի գինը հասանելի է",
             timeLabel: "16.09.2025",
+            body: "Ձեր նշած գնի սահմանին հասնող առաջարկ արդեն կա։",
+          },
+          searchAlert: {
+            title: "Նոր արդյունքներ ձեր որոնման համար",
+            timeLabel: "12.09.2025",
+            body: "Ձեր պահած որոնման համար ավելացել են նոր ապրանքներ։",
+          },
+          weeklyDigest: {
+            title: "Շաբաթվա ամփոփում",
+            timeLabel: "08.09.2025",
+            body: "Նախընտրելիների գների շաբաթական ամփոփումը պատրաստ է։",
+          },
+          offerExpired: {
+            title: "Առաջարկը ժամկետանց է",
+            timeLabel: "02.09.2025",
+            body: "Խանութը չի թարմացրել գինը, ուստի առաջարկը հանվել է ցուցակից։",
+          },
+          accountSecurity: {
+            title: "Նոր մուտք ձեր հաշվին",
+            timeLabel: "27.08.2025",
+            body: "Ձեր հաշվին մուտք է գործվել նոր սարքից. եթե դա ձեզ չէ, փոխեք գաղտնաբառը։",
           },
         },
       },
@@ -737,21 +821,68 @@ const am = {
         settings: "Կարգավորումներ",
       },
       settingsIntro: "Կարգավորեք, թե ինչ տեսակի ծանուցումներ եք ցանկանում ստանալ։",
+      /** Keyed by event and ordered newest first — see the same note on `account.notificationsPage.feed`. */
       feed: {
-        sampleBody:
-          "Թարմացրեք հայտարարությունները, որպեսզի դրանք ակտիվ մնան գնորդների համար։",
         items: {
-          recent: {
+          favoriteAdded: {
             title: "Ձեր ապրանքը ավելացվել է նախընտրելիներում",
             timeLabel: "3 ր",
+            body: "Գնորդներից մեկը ձեր հայտարարություններից մեկն ավելացրել է իր նախընտրելիներում։",
           },
-          hour: {
+          competitorPrice: {
             title: "Մրցակիցն իջեցրել է գինը",
-            timeLabel: "1 ժ",
+            timeLabel: "24 ր",
+            body: "Համեմատեք ձեր գինը մրցակցի նոր գնի հետ, մինչև դա չի ազդել վաճառքի վրա։",
           },
-          dated: {
+          shopVisits: {
+            title: "Անցումներ ձեր խանութ",
+            timeLabel: "1 ժ",
+            body: "Գնորդները ձեր առաջարկից անցել են խանութի կայք։",
+          },
+          stockLow: {
+            title: "Պահեստի մնացորդը սպառվում է",
+            timeLabel: "3 ժ",
+            body: "Ձեր հայտարարություններից մեկի մնացորդը նշված է որպես սահմանափակ։",
+          },
+          viewsSpike: {
+            title: "Դիտումների աճ",
+            timeLabel: "7 ժ",
+            body: "Ձեր ապրանքի էջը այսօր դիտվել է սովորականից ավելի հաճախ։",
+          },
+          listingApproved: {
+            title: "Հայտարարությունը հաստատված է",
+            timeLabel: "12 ժ",
+            body: "Ձեր նոր հայտարարությունն անցել է ստուգումը և արդեն երևում է որոնման մեջ։",
+          },
+          comparisonAppearance: {
+            title: "Ձեր ապրանքը համեմատության մեջ է",
+            timeLabel: "20 ժ",
+            body: "Գնորդը ձեր ապրանքը դրել է համեմատության մեջ մրցակցի առաջարկի կողքին։",
+          },
+          listingExpiring: {
             title: "Հայտարարությունը շուտով կժամկետանց լինի",
             timeLabel: "16.09.2025",
+            body: "Սեղմեք «Թարմացնել», որպեսզի հայտարարությունը շարունակի երևալ գնորդներին։",
+          },
+          weeklyReport: {
+            title: "Շաբաթական հաշվետվությունը պատրաստ է",
+            timeLabel: "12.09.2025",
+            body: "Դիտումների, անցումների և գների շաբաթական ամփոփումը հասանելի է վիճակագրության բաժնում։",
+          },
+          payoutSent: {
+            title: "Վճարումն ուղարկված է",
+            timeLabel: "08.09.2025",
+            body: "Ամսվա վճարումն ուղարկվել է ձեր նշած քարտին։",
+          },
+          photoRejected: {
+            title: "Լուսանկարը չի անցել ստուգումը",
+            timeLabel: "02.09.2025",
+            body: "Ապրանքի լուսանկարը չի համապատասխանում պահանջներին. ավելացրեք նորը։",
+          },
+          subscriptionRenewed: {
+            title: "Բաժանորդագրությունը երկարաձգվել է",
+            timeLabel: "27.08.2025",
+            body: "Ձեր փաթեթը երկարաձգվել է ևս մեկ ամսով։",
           },
         },
       },
@@ -881,8 +1012,6 @@ const am = {
         colAmount: "Գումար",
         statusApproved: "Հաստատված",
         statusRejected: "Մերժված",
-        sampleDate: "02.10.2025",
-        sampleAmount: "550,000 AMD",
         rows: {
           card4321: "Credit Card ****4321",
           idram: "IDram",
@@ -1187,6 +1316,33 @@ const am = {
           "Ֆոտոխցիկների և օբյեկտիվների գները Հայաստանի խանութներից։ Համեմատեք առաջարկները Choosy-ում։",
         intro:
           "Օբյեկտիվներ և ֆոտոխցիկներ՝ դիմանկարների, ցածր լուսավորության և փողոցային լուսանկարչության համար։ Համեմատեք գները Հայաստանի խանութներից։",
+      },
+      /**
+       * The three categories added with the larger catalog. Without an entry here the filter
+       * page rendered the dotted key itself — `seo.filterCategories.monitors.intro` was visible
+       * text on nine pages (three categories in three languages) until
+       * `scripts/verify-rendered-pages.mjs` walked the built site and found it.
+       */
+      monitors: {
+        title: "Մոնիտորների գներ Հայաստանում — 4K և խաղային | Choosy",
+        description:
+          "Dell, LG, Samsung և ASUS մոնիտորների գները Հայաստանի խանութներից։ Համեմատեք չափսը, թարմացման հաճախությունը և գինը։",
+        intro:
+          "Մոնիտորներ՝ աշխատանքի, դիզայնի և խաղերի համար։ Choosy-ն ցույց է տալիս Հայաստանի խանութների գները կողք կողքի՝ ըստ էկրանի չափսի, թարմացման հաճախության և ապրանքանիշի։",
+      },
+      consoles: {
+        title: "Խաղային կոնսոլների գներ Հայաստանում | Choosy",
+        description:
+          "PlayStation, Xbox և Nintendo Switch կոնսոլների գները Հայաստանի խանութներից։ Համեմատեք առաջարկները Choosy-ում։",
+        intro:
+          "Խաղային կոնսոլներ, վահանակներ և VR ակնոցներ՝ Հայաստանի խանութների գներով։ Համեմատեք առաջարկները և ընտրեք լավագույն գինը։",
+      },
+      accessories: {
+        title: "Համակարգչային պարագաների գներ Հայաստանում | Choosy",
+        description:
+          "Ստեղնաշարեր, մկնիկներ, երթուղիչներ և լիցքավորիչներ Հայաստանի խանութներից։ Համեմատեք գները Choosy-ում։",
+        intro:
+          "Ստեղնաշարեր, մկնիկներ, երթուղիչներ, արտաքին մարտկոցներ և պրոյեկտորներ՝ Հայաստանի խանութների գներով։ Համեմատեք առաջարկները մեկ էջում։",
       },
     },
     product: {

@@ -113,7 +113,7 @@ export const WEARABLES = [
     id: "fp-84",
     title: "Amazfit GTR 4 46mm Superspeed Black",
     priceValue: 95000,
-    image: PRODUCT_IMAGES.watchBlack,
+    image: PRODUCT_IMAGES.watchAngled,
     categoryId: "wearables",
     brandId: "amazfit",
     colorId: "black",

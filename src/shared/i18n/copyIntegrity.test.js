@@ -176,6 +176,8 @@ describe("copy integrity", () => {
       "iSpace",
       "MacBook",
       "AirPods",
+      /** Named in the game-console category copy — a product the catalog carries. */
+      "PlayStation",
       "JavaScript",
     ]);
     const midWordCapital = /\p{L}*\p{Ll}\p{Lu}\p{L}*/gu;

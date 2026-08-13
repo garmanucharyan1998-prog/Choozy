@@ -399,8 +399,22 @@ export const enOverrides = {
     tabsAriaLabel: "Offer types",
     tabs: { sites: "Sites", specs: "Specs" },
     goToShopAria: "Open shop website",
-    offerDescription:
-      "Compare this product's prices across shops in Armenia and pick the best offer.",
+    shopTerms: {
+      zigzag: "Official Zigzag.am store · free Yerevan delivery in 1-2 days · installments up to 24 months",
+      vlv: "VLV retail chain · delivery across Armenia in 1-3 days · returns within 14 days",
+      vega: "Authorized Vega Digital dealer · 0% installments over 6 months · delivery in 2-3 days",
+      mobileCentre:
+        "Specialist mobile showroom · 12-month manufacturer warranty · exchange within 7 days",
+      ispace:
+        "Apple premium reseller · Apple hardware only · serviced at the authorized service centre",
+      tegh: "Showroom in central Yerevan · pay by card or cash · delivery in 2-4 days",
+      gadget: "Gadget.am online store · delivery across Armenia in 2-3 days · installments over 12 months",
+      unicomp: "Computer hardware specialists · assembly and setup · warranty up to 36 months",
+      multimedia: "Photo and computer hardware · in-store consultation · delivery in 3-5 days",
+      tashir: "Tashir Electronics chain · installation and setup at home · installments up to 18 months",
+      elektronika: "Audio and video showroom · display units on the floor · delivery in 2-4 days",
+      sas: "Electronics aisle of the SAS supermarkets · bonus-card discount · returns within 14 days",
+    },
     badges: { discount: "Discount", new: "New" },
     map: { ariaLabel: "Yerevan stores map" },
     bestOffers: {
@@ -414,10 +428,13 @@ export const enOverrides = {
       seeLess: "Show less",
       variantsAriaLabel: "Configuration selection",
       colorsAriaLabel: "Color selection",
+      shopRatingLabel: "Shop rating:",
+      shopReviewsLabel: "reviews",
       sortOptions: {
         priceAsc: "Price: low to high",
         priceDesc: "Price: high to low",
         popular: "Most popular",
+        rating: "Shop rating",
       },
     },
   },
@@ -485,12 +502,67 @@ export const enOverrides = {
       tabs: { feed: "Notifications", settings: "Settings" },
       settingsIntro: "Choose which notifications you want to receive.",
       feed: {
-        sampleBody:
-          "The price of something you follow has changed — check the new offers.",
         items: {
-          recent: { title: "Price drop in your favorites", timeLabel: "3 min" },
-          hour: { title: "New offer on a saved product", timeLabel: "1 h" },
-          dated: { title: "Back in stock", timeLabel: "16.09.2025" },
+          priceDrop: {
+            title: "Price drop in your favorites",
+            timeLabel: "3 min",
+            body: "One of your favorites just got cheaper — check the new price.",
+          },
+          newOffer: {
+            title: "New offer on a saved product",
+            timeLabel: "26 min",
+            body: "A better offer just appeared for one of your saved products.",
+          },
+          cheaperShop: {
+            title: "Cheaper at another shop",
+            timeLabel: "1 h",
+            body: "The same product is now listed for less by a different shop.",
+          },
+          backInStock: {
+            title: "Back in stock",
+            timeLabel: "4 h",
+            body: "Something you were following is available in stores again.",
+          },
+          priceRise: {
+            title: "The price went up",
+            timeLabel: "9 h",
+            body: "A product you follow costs more than it did yesterday.",
+          },
+          compareSaved: {
+            title: "Comparison saved",
+            timeLabel: "14 h",
+            body: "The products you picked are waiting for you in your account.",
+          },
+          newShopJoined: {
+            title: "Another shop joined",
+            timeLabel: "22 h",
+            body: "One more shop is now quoting a price for a product you follow.",
+          },
+          targetPriceHit: {
+            title: "Your target price is available",
+            timeLabel: "16.09.2025",
+            body: "An offer has reached the price you were waiting for.",
+          },
+          searchAlert: {
+            title: "New results for your search",
+            timeLabel: "12.09.2025",
+            body: "Products have been added that match a search you saved.",
+          },
+          weeklyDigest: {
+            title: "Your week in prices",
+            timeLabel: "08.09.2025",
+            body: "The weekly summary of your favorites' prices is ready.",
+          },
+          offerExpired: {
+            title: "An offer expired",
+            timeLabel: "02.09.2025",
+            body: "The shop did not refresh its price, so the offer left the list.",
+          },
+          accountSecurity: {
+            title: "New sign-in to your account",
+            timeLabel: "27.08.2025",
+            body: "Your account was opened from a new device. If that was not you, change your password.",
+          },
         },
       },
     },
@@ -590,11 +662,67 @@ export const enOverrides = {
       tabs: { feed: "Notifications", settings: "Settings" },
       settingsIntro: "Choose which notifications you want to receive.",
       feed: {
-        sampleBody: "Refresh your listings to keep them visible to shoppers.",
         items: {
-          recent: { title: "Your product was added to favorites", timeLabel: "3 min" },
-          hour: { title: "A competitor lowered their price", timeLabel: "1 h" },
-          dated: { title: "Your listing is about to expire", timeLabel: "16.09.2025" },
+          favoriteAdded: {
+            title: "Your product was added to favorites",
+            timeLabel: "3 min",
+            body: "A shopper just added one of your listings to their favorites.",
+          },
+          competitorPrice: {
+            title: "A competitor lowered their price",
+            timeLabel: "24 min",
+            body: "Compare your price against the competitor's before it costs you the sale.",
+          },
+          shopVisits: {
+            title: "Visitors went through to your shop",
+            timeLabel: "1 h",
+            body: "Shoppers opened your website straight from your offer.",
+          },
+          stockLow: {
+            title: "Stock is running out",
+            timeLabel: "3 h",
+            body: "One of your listings is marked as having limited stock left.",
+          },
+          viewsSpike: {
+            title: "Views are up",
+            timeLabel: "7 h",
+            body: "Your product page was opened more often today than it usually is.",
+          },
+          listingApproved: {
+            title: "Listing approved",
+            timeLabel: "12 h",
+            body: "Your new listing passed review and already shows up in search.",
+          },
+          comparisonAppearance: {
+            title: "Your product is in a comparison",
+            timeLabel: "20 h",
+            body: "A shopper put your product side by side with a competitor's offer.",
+          },
+          listingExpiring: {
+            title: "Your listing is about to expire",
+            timeLabel: "16.09.2025",
+            body: 'Press "Refresh" so it stays visible to shoppers.',
+          },
+          weeklyReport: {
+            title: "Your weekly report is ready",
+            timeLabel: "12.09.2025",
+            body: "Views, click-throughs and prices for the week are in the statistics section.",
+          },
+          payoutSent: {
+            title: "Payout sent",
+            timeLabel: "08.09.2025",
+            body: "This month's payout has been sent to the card you registered.",
+          },
+          photoRejected: {
+            title: "A photo failed review",
+            timeLabel: "02.09.2025",
+            body: "One product photo does not meet the requirements — upload another one.",
+          },
+          subscriptionRenewed: {
+            title: "Subscription renewed",
+            timeLabel: "27.08.2025",
+            body: "Your plan has been extended by another month.",
+          },
         },
       },
     },
@@ -957,6 +1085,27 @@ export const enOverrides = {
           "Prices for cameras and lenses from stores across Armenia. Compare the offers on Choosy.",
         intro:
           "Lenses and cameras for portraits, low light and street photography. Compare prices from stores across Armenia.",
+      },
+      monitors: {
+        title: "Monitor prices in Armenia — 4K and gaming | Choosy",
+        description:
+          "Prices for Dell, LG, Samsung and ASUS monitors from stores across Armenia. Compare size, refresh rate and price.",
+        intro:
+          "Monitors for work, design and gaming. Choosy puts the shops' prices side by side, filtered by screen size, refresh rate and brand.",
+      },
+      consoles: {
+        title: "Game console prices in Armenia | Choosy",
+        description:
+          "Prices for PlayStation, Xbox and Nintendo Switch consoles from stores across Armenia. Compare the offers on Choosy.",
+        intro:
+          "Consoles, controllers and VR headsets at prices from stores across Armenia. Compare the offers and pick the best one.",
+      },
+      accessories: {
+        title: "Computer accessory prices in Armenia | Choosy",
+        description:
+          "Keyboards, mice, routers and power banks from stores across Armenia. Compare prices on Choosy.",
+        intro:
+          "Keyboards, mice, routers, power banks and projectors at prices from stores across Armenia. Compare every offer on one page.",
       },
     },
     product: {

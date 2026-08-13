@@ -49,7 +49,7 @@ export const SPEAKERS = [
     id: "fp-76",
     title: "JBL Flip 6 Portable Bluetooth Speaker Black",
     priceValue: 62000,
-    image: PRODUCT_IMAGES.speakerHome,
+    image: PRODUCT_IMAGES.speakerClip,
     categoryId: "speakers",
     brandId: "jbl",
     colorId: "black",

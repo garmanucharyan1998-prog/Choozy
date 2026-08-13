@@ -37,6 +37,49 @@ describe("fetchSuggestions", () => {
     });
   });
 
+  /**
+   * The UI has shipped in three languages while the synonym table only spoke two: a visitor
+   * reading the Russian site who typed the obvious Russian word matched nothing, because every
+   * catalog title is a Latin-script model name.
+   */
+  test("the category word in each language finds that category", () => {
+    const cases = [
+      { categoryId: "laptops", queries: ["laptop", "նոութբուկ", "ноутбук"] },
+      { categoryId: "smartphones", queries: ["smartphone", "հեռախոս", "смартфон"] },
+      { categoryId: "headphones", queries: ["headphones", "ականջակալ", "наушники"] },
+      { categoryId: "tv", queries: ["television", "հեռուստացույց", "телевизор"] },
+      { categoryId: "monitors", queries: ["monitor", "մոնիտոր", "монитор"] },
+      { categoryId: "consoles", queries: ["game console", "կոնսոլ", "приставка"] },
+      { categoryId: "cameras", queries: ["camera", "ֆոտոխցիկ", "фотоаппарат"] },
+      { categoryId: "tablets", queries: ["tablet", "պլանշետ", "планшет"] },
+      { categoryId: "speakers", queries: ["speaker", "բարձրախոս", "колонка"] },
+      { categoryId: "wearables", queries: ["smartwatch", "ժամացույց", "часы"] },
+    ];
+
+    cases.forEach(({ categoryId, queries }) => {
+      queries.forEach((query) => {
+        const hits = PRODUCT_CATALOG.filter((product) => productMatchesSearch(product, query));
+        expect(hits.length, `"${query}" found nothing`).toBeGreaterThan(0);
+        expect(
+          hits.some((product) => product.categoryId === categoryId),
+          `"${query}" found nothing in ${categoryId}`,
+        ).toBe(true);
+      });
+    });
+  });
+
+  /**
+   * The other half of the same bargain: an expansion wide enough to match everything is no
+   * better than no search at all. "gaming" was rejected as a console key for this reason — it
+   * would have put a PlayStation in the results for "gaming laptop".
+   */
+  test("a category word does not drag in the whole catalog", () => {
+    ["ноутбук", "наушники", "мышь", "роутер", "клавиатура"].forEach((query) => {
+      const hits = PRODUCT_CATALOG.filter((product) => productMatchesSearch(product, query));
+      expect(hits.length, `"${query}" matched too much`).toBeLessThan(PRODUCT_CATALOG.length / 2);
+    });
+  });
+
   test("a catalog query suggests real product titles", async () => {
     const { data } = await fetchSuggestions("macbook");
     expect(data.length).toBeGreaterThan(0);

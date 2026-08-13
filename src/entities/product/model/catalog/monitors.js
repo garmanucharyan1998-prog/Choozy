@@ -57,7 +57,7 @@ export const MONITORS = [
     id: "fp-59",
     title: "Samsung Odyssey G9 49-inch Curved Monitor",
     priceValue: 620000,
-    image: PRODUCT_IMAGES.monitorWhite,
+    image: PRODUCT_IMAGES.monitorCurved,
     categoryId: "monitors",
     brandId: "samsung",
     colorId: "white",

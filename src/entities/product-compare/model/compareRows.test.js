@@ -239,12 +239,40 @@ describe("the offers section", () => {
     expect(shopKeys.length).toBeGreaterThan(1);
   });
 
-  test("every shop quotes a price for every column", () => {
+  test("a quoted cell carries a real amount and an unquoted one reads as a gap", () => {
     offers.rows.forEach((row) => {
       row.cells.forEach((cell) => {
-        expect(cell.hasValue).toBe(true);
-        expect(cell.text).toMatch(/\d/);
+        if (cell.hasValue) {
+          expect(cell.text).toMatch(/\d/);
+        } else {
+          expect(cell.text).toBe(PLACEHOLDER);
+        }
       });
+    });
+  });
+
+  /**
+   * Shops carry the categories — and, for the Apple premium reseller, the brand — they
+   * actually stock, so comparing an Apple laptop against a Windows one puts that reseller in
+   * the union with nothing to say about the second column. The union exists precisely so this
+   * reads as a gap instead of dropping the shop (or the whole row) from the table.
+   */
+  test("a shop that carries only one of the two products still gets its own row", () => {
+    const apple = LAPTOPS.find((p) => p.brandId === "apple");
+    const other = LAPTOPS.find((p) => p.brandId !== "apple");
+    expect(apple && other, "the catalog needs both to make this case").toBeTruthy();
+
+    const rows = sectionOf(
+      buildCompareRows(byIds(apple.id, other.id), t),
+      COMPARE_SECTION_IDS.OFFERS,
+    ).rows;
+
+    const partial = rows.filter((row) => row.cells.some((cell) => !cell.hasValue));
+    expect(partial.length).toBeGreaterThan(0);
+    partial.forEach((row) => {
+      expect(row.cells.some((cell) => cell.hasValue), "a row nobody quotes is not emitted").toBe(
+        true,
+      );
     });
   });
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaStar } from "react-icons/fa";
 import { useLanguage } from "contexts";
 import { useBestOffersPresenter } from "features/best-offers";
 
@@ -138,6 +138,30 @@ const BestOffersWidget = () => {
     </div>
   );
 
+  /**
+   * The shop's own score, which is also what the "shop rating" sort option orders by — a sort
+   * criterion the visitor cannot see on the rows is indistinguishable from a random shuffle.
+   * `en-US` grouping rather than the visitor's locale so the server render and the client's
+   * first paint agree (same reason `formatAmd` pins its locale).
+   */
+  const renderShopRating = (offer) => {
+    const score = offer.shopRatingValue.toFixed(1);
+    const reviews = offer.shopReviewCount.toLocaleString("en-US");
+    return (
+      <p
+        className="m-0 flex items-center gap-1 whitespace-nowrap text-[11px] leading-none text-text-muted"
+        title={`${t("productOffers.bestOffers.shopRatingLabel")} ${score} · ${reviews} ${t(
+          "productOffers.bestOffers.shopReviewsLabel",
+        )}`}
+      >
+        <span className="sr-only">{t("productOffers.bestOffers.shopRatingLabel")}</span>
+        <FaStar className="h-2.5 w-2.5 text-[rgba(242,201,76,1)]" aria-hidden />
+        <span className="font-semibold text-text-dark">{score}</span>
+        <span>({reviews})</span>
+      </p>
+    );
+  };
+
   const renderShopMeta = (offer, metaClassName) => (
     <div className={metaClassName}>
       {offer.badgeKey ? renderBadge(offer.badgeKey) : null}
@@ -154,6 +178,7 @@ const BestOffersWidget = () => {
       >
         {offer.shopUrlLabel}
       </a>
+      {renderShopRating(offer)}
     </div>
   );
 

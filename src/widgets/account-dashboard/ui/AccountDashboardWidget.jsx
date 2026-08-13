@@ -35,7 +35,26 @@ const NOTIFICATIONS_PAGE_TABS = {
   SETTINGS: "settings",
 };
 
-const NOTIFICATIONS_FEED_ITEM_KEYS = ["recent", "hour", "dated"];
+/**
+ * Render order, newest first. Keyed by the event rather than by age (`recent`/`hour`/`dated`),
+ * which is what the old three-item feed used — names that carried no information and stopped
+ * being accurate as soon as there was a fourth entry. Copy lives in
+ * `account.notificationsPage.feed.items`.
+ */
+const NOTIFICATIONS_FEED_ITEM_KEYS = [
+  "priceDrop",
+  "newOffer",
+  "cheaperShop",
+  "backInStock",
+  "priceRise",
+  "compareSaved",
+  "newShopJoined",
+  "targetPriceHit",
+  "searchAlert",
+  "weeklyDigest",
+  "offerExpired",
+  "accountSecurity",
+];
 
 const RECENT_INITIAL_VISIBLE_COUNT = 4;
 const RECENT_LOAD_MORE_STEP = 4;
@@ -341,25 +360,22 @@ const AccountDashboardWidget = () => {
     </div>
   );
 
-  const renderNotificationsFeed = () => {
-    const body = t("account.notificationsPage.feed.sampleBody");
-    return (
-      <div
-        className="flex flex-col gap-3 sm:gap-4"
-        role="feed"
-        aria-label={t("account.notificationsPage.title")}
-      >
-        {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
-          <NotificationFeedCard
-            key={itemKey}
-            title={t(`account.notificationsPage.feed.items.${itemKey}.title`)}
-            timeLabel={t(`account.notificationsPage.feed.items.${itemKey}.timeLabel`)}
-            body={body}
-          />
-        ))}
-      </div>
-    );
-  };
+  const renderNotificationsFeed = () => (
+    <div
+      className="flex flex-col gap-3 sm:gap-4"
+      role="feed"
+      aria-label={t("account.notificationsPage.title")}
+    >
+      {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
+        <NotificationFeedCard
+          key={itemKey}
+          title={t(`account.notificationsPage.feed.items.${itemKey}.title`)}
+          timeLabel={t(`account.notificationsPage.feed.items.${itemKey}.timeLabel`)}
+          body={t(`account.notificationsPage.feed.items.${itemKey}.body`)}
+        />
+      ))}
+    </div>
+  );
 
   const renderReadMode = () => (
     <div className="p-5 md:p-8">

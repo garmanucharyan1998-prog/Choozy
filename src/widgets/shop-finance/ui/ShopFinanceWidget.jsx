@@ -11,11 +11,26 @@ const FINANCE_TABS = {
   PAYMENTS: "payments",
 };
 
-/** Demo rows until shop payment history API is wired. */
+/**
+ * Demo rows until shop payment history API is wired.
+ *
+ * `date` and `amountAmd` are each row's own — previously every row rendered the same shared
+ * `finance.payments.sampleDate` / `sampleAmount` dictionary keys, so any number of rows in
+ * this table showed the identical "02.10.2025 · 550,000 AMD" no matter which payment it was.
+ */
 const PAYMENT_HISTORY_ROWS = [
-  { id: "1", methodId: "card4321", status: "approved" },
-  { id: "2", methodId: "idram", status: "rejected" },
-  { id: "3", methodId: "visa0102", status: "approved" },
+  { id: "1", methodId: "card4321", status: "approved", date: "02.10.2025", amountAmd: 550_000 },
+  { id: "2", methodId: "idram", status: "rejected", date: "28.09.2025", amountAmd: 185_000 },
+  { id: "3", methodId: "visa0102", status: "approved", date: "21.09.2025", amountAmd: 920_000 },
+  { id: "4", methodId: "card4321", status: "approved", date: "14.09.2025", amountAmd: 245_000 },
+  { id: "5", methodId: "idram", status: "approved", date: "09.09.2025", amountAmd: 89_000 },
+  { id: "6", methodId: "visa0102", status: "rejected", date: "02.09.2025", amountAmd: 340_000 },
+  { id: "7", methodId: "card4321", status: "approved", date: "27.08.2025", amountAmd: 480_000 },
+  { id: "8", methodId: "idram", status: "approved", date: "19.08.2025", amountAmd: 165_000 },
+  { id: "9", methodId: "visa0102", status: "approved", date: "12.08.2025", amountAmd: 720_000 },
+  { id: "10", methodId: "card4321", status: "rejected", date: "05.08.2025", amountAmd: 195_000 },
+  { id: "11", methodId: "idram", status: "approved", date: "29.07.2025", amountAmd: 62_000 },
+  { id: "12", methodId: "visa0102", status: "approved", date: "22.07.2025", amountAmd: 385_000 },
 ];
 
 const PaymentStatusBadge = ({ status, t }) =>
@@ -117,13 +132,11 @@ const ShopFinanceWidget = () => {
                     {t(`shopAccount.finance.payments.rows.${row.methodId}`)}
                   </p>
                   <p className="m-0 shrink-0 text-sm font-bold leading-snug text-navy">
-                    {t("shopAccount.finance.payments.sampleAmount")}
+                    {formatPriceAmd(row.amountAmd, t("productDetail.currencySuffix"))}
                   </p>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs leading-none text-[#64748b]">
-                    {t("shopAccount.finance.payments.sampleDate")}
-                  </span>
+                  <span className="text-xs leading-none text-[#64748b]">{row.date}</span>
                   <PaymentStatusBadge status={row.status} t={t} />
                 </div>
               </li>
@@ -169,9 +182,7 @@ const ShopFinanceWidget = () => {
                     key={row.id}
                     className="border-b border-[#e2e8f0] transition-colors last:border-b-0 hover:bg-[#f8fafc]/60"
                   >
-                    <td className="px-4 py-4 text-[#64748b] sm:px-5 sm:py-5">
-                      {t("shopAccount.finance.payments.sampleDate")}
-                    </td>
+                    <td className="px-4 py-4 text-[#64748b] sm:px-5 sm:py-5">{row.date}</td>
                     <td className="px-4 py-4 font-bold text-navy sm:px-5 sm:py-5">
                       {t(`shopAccount.finance.payments.rows.${row.methodId}`)}
                     </td>
@@ -179,7 +190,7 @@ const ShopFinanceWidget = () => {
                       <PaymentStatusBadge status={row.status} t={t} />
                     </td>
                     <td className="px-4 py-4 text-right font-bold text-navy sm:px-5 sm:py-5">
-                      {t("shopAccount.finance.payments.sampleAmount")}
+                      {formatPriceAmd(row.amountAmd, t("productDetail.currencySuffix"))}
                     </td>
                   </tr>
                 ))}

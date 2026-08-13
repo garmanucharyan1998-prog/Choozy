@@ -168,9 +168,10 @@ export const buildCompareRows = (products, t) => {
     .filter(Boolean);
 
   /**
-   * Every product is offered by the same three shops, but that is a property of the current
-   * data, not a guarantee — the union keeps the table correct if one product ever carries a
-   * shop the others do not.
+   * The union of the shops quoting *any* of the compared products, in first-seen order. Shops
+   * carry only the categories they stock (and the Apple reseller only Apple), so two products
+   * genuinely differ in which shops list them — a shop with nothing to say about one column
+   * still gets its row, with the placeholder in that cell.
    */
   const shopKeys = [];
   products.forEach((product) => {

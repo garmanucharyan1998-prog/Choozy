@@ -12,9 +12,15 @@ export const SORT_OPTIONS = [
   { id: "popular", labelKey: "productOffers.bestOffers.sortOptions.popular" },
   { id: "priceAsc", labelKey: "productOffers.bestOffers.sortOptions.priceAsc" },
   { id: "priceDesc", labelKey: "productOffers.bestOffers.sortOptions.priceDesc" },
+  /** Backed by the shops' own `ratingValue` (see `productOffers.js`), which the row also prints. */
+  { id: "rating", labelKey: "productOffers.bestOffers.sortOptions.rating" },
 ];
 
 const comparePrice = (asc) => (a, b) => (asc ? a.priceAmd - b.priceAmd : b.priceAmd - a.priceAmd);
+
+/** Ties broken by review count: a 4.5 from 2000 shoppers outranks a 4.5 from twelve. */
+const compareRating = (a, b) =>
+  b.shopRatingValue - a.shopRatingValue || b.shopReviewCount - a.shopReviewCount;
 
 const buildInitialSelections = (offers) =>
   offers.reduce((acc, offer) => {
@@ -77,6 +83,8 @@ export const useBestOffersPresenter = () => {
   const sortedOffers = useMemo(() => {
     if (sortId === "priceAsc") return [...offers].sort(comparePrice(true));
     if (sortId === "priceDesc") return [...offers].sort(comparePrice(false));
+    if (sortId === "rating") return [...offers].sort(compareRating);
+    /** "Most popular" is the shop roster's own order — see the SHOPS comment in productOffers.js. */
     return offers;
   }, [offers, sortId]);
 

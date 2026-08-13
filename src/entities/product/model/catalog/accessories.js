@@ -131,7 +131,7 @@ export const ACCESSORIES = [
     id: "fp-107",
     title: "Anker Nano Power Bank 10000mAh White",
     priceValue: 24000,
-    image: PRODUCT_IMAGES.powerBank,
+    image: PRODUCT_IMAGES.powerBankCables,
     categoryId: "accessories",
     brandId: "anker",
     colorId: "white",

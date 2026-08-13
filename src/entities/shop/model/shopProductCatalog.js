@@ -11,21 +11,26 @@ import { DEMO_SHOP_PRODUCTS_SEED } from "./shopAccountModel";
 export const SHOP_PRODUCT_CATEGORY_IDS = [...FILTER_CATEGORY_IDS];
 
 /**
- * The filter catalog only has 8 categories (see FILTER_CATEGORY_IDS) and none of them are
- * "gaming consoles" or "accessories" — so Gaming/Accessories demo products need a
- * best-effort home rather than a perfect match. Picked explicitly here instead of falling
- * through to buildCatalogProducts' default, which used to silently put them somewhere
- * unrelated (Gaming → wearables, Accessories → smartphones by the default itself).
+ * Maps a demo shop listing's informal `category` string (chosen for the seller-facing
+ * table, not for `entities/filter-catalog`) onto a real, indexable filter category id.
+ *
+ * `Gaming` and `Accessories` used to have no matching id at all — the filter catalog's 8
+ * categories included neither, so both fell back to `buildCatalogProducts`' own default and
+ * landed somewhere unrelated (Gaming → wearables, Accessories → smartphones). Now that
+ * `consoles` and `accessories` are real catalog categories (see
+ * `filterCatalogCategories.js`), every demo category maps onto its actual home.
  */
 const DEMO_CATEGORY_TO_ID = {
   Smartphones: "smartphones",
   Laptops: "laptops",
   Audio: "headphones",
   Tablets: "tablets",
-  Gaming: "tv",
+  Wearables: "wearables",
+  Monitors: "monitors",
+  Gaming: "consoles",
   TV: "tv",
   Cameras: "cameras",
-  Accessories: "laptops",
+  Accessories: "accessories",
 };
 
 const STANDARD_MEMORY_OPTIONS = [

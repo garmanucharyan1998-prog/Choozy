@@ -40,7 +40,21 @@ const sidebarItems = [
 
 const notificationKeys = ["priceDrops", "wishlistUpdates", "accountNews"];
 
-const NOTIFICATIONS_FEED_ITEM_KEYS = ["recent", "hour", "dated"];
+/** Render order, newest first — see the same note in `AccountDashboardWidget`. */
+const NOTIFICATIONS_FEED_ITEM_KEYS = [
+  "favoriteAdded",
+  "competitorPrice",
+  "shopVisits",
+  "stockLow",
+  "viewsSpike",
+  "listingApproved",
+  "comparisonAppearance",
+  "listingExpiring",
+  "weeklyReport",
+  "payoutSent",
+  "photoRejected",
+  "subscriptionRenewed",
+];
 
 const SHOP_NAV_SCROLL_CLASS =
   "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory";
@@ -391,26 +405,23 @@ const ShopAccountDashboardWidget = () => {
     </div>
   );
 
-  const renderShopNotificationsFeed = () => {
-    const body = t("shopAccount.notificationsPage.feed.sampleBody");
-    return (
-      <div
-        className="flex flex-col gap-3 sm:gap-4"
-        role="feed"
-        aria-label={t("shopAccount.notificationsPage.title")}
-      >
-        {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
-          <NotificationFeedCard
-            key={itemKey}
-            title={t(`shopAccount.notificationsPage.feed.items.${itemKey}.title`)}
-            timeLabel={t(`shopAccount.notificationsPage.feed.items.${itemKey}.timeLabel`)}
-            body={body}
-            headingLevel={4}
-          />
-        ))}
-      </div>
-    );
-  };
+  const renderShopNotificationsFeed = () => (
+    <div
+      className="flex flex-col gap-3 sm:gap-4"
+      role="feed"
+      aria-label={t("shopAccount.notificationsPage.title")}
+    >
+      {NOTIFICATIONS_FEED_ITEM_KEYS.map((itemKey) => (
+        <NotificationFeedCard
+          key={itemKey}
+          title={t(`shopAccount.notificationsPage.feed.items.${itemKey}.title`)}
+          timeLabel={t(`shopAccount.notificationsPage.feed.items.${itemKey}.timeLabel`)}
+          body={t(`shopAccount.notificationsPage.feed.items.${itemKey}.body`)}
+          headingLevel={4}
+        />
+      ))}
+    </div>
+  );
 
   const renderShopNotificationsInner = () => (
     <>
