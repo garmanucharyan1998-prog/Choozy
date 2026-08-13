@@ -246,6 +246,68 @@ const MEASURE = `(() => {
   };
 })()`;
 
+/**
+ * The compare table's pinned product strip, measured mid-scroll.
+ *
+ * Every other check here runs at scroll position 0, and that is exactly how this element shipped
+ * invisible: it pinned at `top: 0` underneath a header shell that is itself sticky at the top and
+ * ~198px tall, so it painted behind the site's own search bar and no one ever saw it. Nothing that
+ * only looks at an unscrolled page can catch that, and jsdom cannot lay any of it out.
+ *
+ * `occluded` is the real test — not "is it in the DOM" but "does it actually paint": whatever
+ * `elementFromPoint` returns at the strip's own centre has to be the strip or something inside it.
+ */
+const PINNED_STRIP = `(() => {
+  const table = document.querySelector("table");
+  if (!table) return null;
+  const block = table.closest('[class*="overflow-x-auto"]');
+  const shell = document.querySelector(".header-shell-spacer");
+  const shellBottom = shell ? Math.round(shell.getBoundingClientRect().bottom) : 0;
+  const blockRect = block.getBoundingClientRect();
+  const strip = [...document.querySelectorAll('[role="region"]')].find((el) => {
+    const r = el.getBoundingClientRect();
+    return getComputedStyle(el).position === "fixed" && r.height > 0 && r.top < innerHeight / 2;
+  });
+  const base = {
+    shellBottom,
+    blockTop: Math.round(blockRect.top),
+    blockBottom: Math.round(blockRect.bottom),
+  };
+  if (!strip) return { ...base, present: false };
+  const r = strip.getBoundingClientRect();
+  const painted = document.elementFromPoint(
+    Math.round(r.left + r.width / 2),
+    Math.round(r.top + r.height / 2),
+  );
+  return {
+    ...base,
+    present: true,
+    top: Math.round(r.top),
+    bottom: Math.round(r.bottom),
+    underHeader: r.top < shellBottom - 1,
+    occluded: !(painted && strip.contains(painted)),
+    paintedInstead: painted ? painted.tagName.toLowerCase() : null,
+  };
+})()`;
+
+/** Puts the table across the pin line — its header gone, most of its rows still on screen. */
+const SCROLL_INTO_TABLE = `(() => {
+  const table = document.querySelector("table");
+  if (!table) return false;
+  const block = table.closest('[class*="overflow-x-auto"]');
+  scrollTo(0, block.getBoundingClientRect().top + scrollY + Math.round(block.offsetHeight / 2));
+  return true;
+})()`;
+
+/** And well past its end, where the strip has no table left to label. */
+const SCROLL_PAST_TABLE = `(() => {
+  const table = document.querySelector("table");
+  if (!table) return false;
+  const block = table.closest('[class*="overflow-x-auto"]');
+  scrollTo(0, block.getBoundingClientRect().bottom + scrollY + 200);
+  return true;
+})()`;
+
 class Cdp {
   constructor(ws) {
     this.ws = ws;
@@ -469,6 +531,41 @@ const main = async () => {
             `${label}: tray ${m.tray.height}px exceeds main's bottom padding ${m.mainPadBottom}px — content hides under it`,
           );
         }
+
+        /** Scroll-dependent, so it runs after everything measured at rest. */
+        if (m.table) {
+          await cdp.evaluate(SCROLL_INTO_TABLE);
+          await sleep(250);
+          const pinned = await cdp.evaluate(PINNED_STRIP);
+          if (!pinned?.present) {
+            findings.push(
+              `${label}: no pinned product strip while the table spans the viewport (block ${pinned?.blockTop}..${pinned?.blockBottom})`,
+            );
+          } else {
+            if (pinned.underHeader) {
+              findings.push(
+                `${label}: pinned strip starts at ${pinned.top}, above the header shell's ${pinned.shellBottom} — it sits behind the site header`,
+              );
+            }
+            if (pinned.occluded) {
+              findings.push(
+                `${label}: pinned strip is covered — <${pinned.paintedInstead}> paints at its centre`,
+              );
+            }
+            rows[rows.length - 1].pinned = pinned;
+          }
+
+          await cdp.evaluate(SCROLL_PAST_TABLE);
+          await sleep(250);
+          const after = await cdp.evaluate(PINNED_STRIP);
+          if (after?.present) {
+            findings.push(
+              `${label}: pinned strip still shown ${after.top}..${after.bottom} after its table ended at ${after.blockBottom}`,
+            );
+          }
+          await cdp.evaluate("scrollTo(0, 0), 1");
+          await sleep(150);
+        }
       }
     }
   }
@@ -493,6 +590,7 @@ const main = async () => {
               ...row.barPanels.map((panel) => panel.trackWidth),
             )}px`
           : "bars=-",
+        row.pinned ? `pinned=${row.pinned.top}..${row.pinned.bottom}` : "pinned=-",
       ].join("  "),
     );
   });

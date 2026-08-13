@@ -79,7 +79,11 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
     canAddMore,
     addMoreHref,
   } = useComparePresenter(fixedIds);
-  const tableTopRef = useRef(null);
+  /**
+   * The table's own scroll container. `CompareStickyHeader` measures it directly rather than a
+   * sentinel above it, so the pinned strip belongs to the table and leaves the screen with it.
+   */
+  const tableBlockRef = useRef(null);
 
   if (products.length === 0) {
     return <CompareEmptyState t={t} />;
@@ -95,9 +99,8 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
         products={products}
         isFixed={isFixed}
         removeProduct={removeProduct}
-        sentinelRef={tableTopRef}
+        blockRef={tableBlockRef}
       />
-      <div ref={tableTopRef} aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-navy sm:text-sm">
           <input
@@ -135,7 +138,10 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
        * scroller entirely, anchored to the document at the column's scrolled-out x (~415px on a
        * 360px phone) and gave the whole page 55px of horizontal scroll.
        */}
-      <div className="relative overflow-x-auto rounded-2xl border border-border-blue bg-white snap-x snap-proximity">
+      <div
+        ref={tableBlockRef}
+        className="relative overflow-x-auto rounded-2xl border border-border-blue bg-white snap-x snap-proximity"
+      >
         <table className="w-full table-fixed border-collapse text-start md:table-auto">
           <caption className="sr-only">{t("comparePage.tableCaption")}</caption>
           <thead>

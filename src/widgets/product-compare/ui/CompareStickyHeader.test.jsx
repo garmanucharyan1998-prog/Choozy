@@ -1,5 +1,6 @@
 import { createRef } from "react";
-import { render, screen } from "@testing-library/react";
+import { vi } from "vitest";
+import { act, render, screen } from "@testing-library/react";
 import { createRoutesStub } from "react-router";
 import { LanguageProvider } from "contexts";
 import { getTranslator } from "shared/i18n";
@@ -12,19 +13,32 @@ const PRODUCTS = [
   { id: "b", title: "Product B", image: "", priceValue: 200000, href: "/b" },
 ];
 
-const renderSticky = (sentinelRef) => {
+const PIN = 132;
+
+/**
+ * jsdom lays nothing out — every rect it returns is zero — so the table block's position is the
+ * one thing these tests have to supply. Each case is a scroll position expressed as where the
+ * block's top and bottom edges sit relative to the pin line.
+ */
+const renderSticky = (blockRect) => {
+  const blockRef = createRef();
   const Stub = createRoutesStub([
     {
       path: "/",
       Component: () => (
         <LanguageProvider>
-          <div ref={sentinelRef} />
+          <div
+            ref={(node) => {
+              blockRef.current = node;
+              if (node) node.getBoundingClientRect = () => blockRect;
+            }}
+          />
           <CompareStickyHeader
             t={t}
             products={PRODUCTS}
             isFixed={false}
             removeProduct={() => {}}
-            sentinelRef={sentinelRef}
+            blockRef={blockRef}
           />
         </LanguageProvider>
       ),
@@ -33,56 +47,72 @@ const renderSticky = (sentinelRef) => {
   return render(<Stub initialEntries={["/"]} />);
 };
 
+const scroll = () => {
+  act(() => {
+    window.dispatchEvent(new Event("scroll"));
+  });
+};
+
 describe("CompareStickyHeader", () => {
-  test("renders nothing before the sentinel has ever left the viewport (SSR-safe default)", () => {
-    // No IntersectionObserver at all — mirrors an environment (or SSR) where it's unavailable.
-    const original = global.IntersectionObserver;
-    delete global.IntersectionObserver;
-
-    const sentinelRef = createRef();
-    const { container } = renderSticky(sentinelRef);
-    expect(container.querySelector('[role="region"]')).toBeNull();
-
-    global.IntersectionObserver = original;
+  beforeEach(() => {
+    /** The effect measures through rAF; running it inline keeps each assertion synchronous. */
+    vi.stubGlobal("requestAnimationFrame", (callback) => {
+      callback(0);
+      return 1;
+    });
+    vi.stubGlobal("cancelAnimationFrame", () => {});
   });
 
-  test("appears once the sentinel scrolls out of view, listing every compared product", () => {
-    let observedCallback = null;
-    global.IntersectionObserver = class {
-      constructor(callback) {
-        observedCallback = callback;
-      }
-      observe() {
-        // Simulate the sentinel having scrolled above the viewport.
-        observedCallback([{ isIntersecting: false }]);
-      }
-      disconnect() {}
-    };
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
-    const sentinelRef = createRef();
-    renderSticky(sentinelRef);
+  test("stays hidden while the table's own header is still on screen", () => {
+    const { container } = renderSticky({ top: PIN + 200, bottom: PIN + 1800 });
+    scroll();
+    expect(container.querySelector('[role="region"]')).toBeNull();
+  });
 
-    const region = screen.getByRole("region", { name: t("comparePage.stickyHeaderAria") });
-    expect(region).toBeInTheDocument();
+  test("appears once the table has scrolled under the pin line, listing every compared product", () => {
+    renderSticky({ top: -400, bottom: PIN + 900 });
+    scroll();
+
+    expect(
+      screen.getByRole("region", { name: t("comparePage.stickyHeaderAria") }),
+    ).toBeInTheDocument();
     expect(screen.getByText("Product A")).toBeInTheDocument();
     expect(screen.getByText("Product B")).toBeInTheDocument();
   });
 
-  test("hides again once the sentinel scrolls back into view", () => {
-    let observedCallback = null;
-    global.IntersectionObserver = class {
-      constructor(callback) {
-        observedCallback = callback;
-      }
-      observe() {
-        observedCallback([{ isIntersecting: false }]);
-        observedCallback([{ isIntersecting: true }]);
-      }
-      disconnect() {}
-    };
+  /**
+   * The defect this replaces: anchored to a sentinel above the table, the strip stayed pinned
+   * for the rest of the page, naming the columns of a table thousands of pixels above.
+   */
+  test("leaves with its table — hidden once the block's bottom passes the pin line", () => {
+    const { container } = renderSticky({ top: -2300, bottom: PIN - 1 });
+    scroll();
+    expect(container.querySelector('[role="region"]')).toBeNull();
+  });
 
-    const sentinelRef = createRef();
-    const { container } = renderSticky(sentinelRef);
+  test("renders nothing on the server, before any measurement has happened", () => {
+    const blockRef = createRef();
+    const Stub = createRoutesStub([
+      {
+        path: "/",
+        Component: () => (
+          <LanguageProvider>
+            <CompareStickyHeader
+              t={t}
+              products={PRODUCTS}
+              isFixed={false}
+              removeProduct={() => {}}
+              blockRef={blockRef}
+            />
+          </LanguageProvider>
+        ),
+      },
+    ]);
+    const { container } = render(<Stub initialEntries={["/"]} />);
     expect(container.querySelector('[role="region"]')).toBeNull();
   });
 });
