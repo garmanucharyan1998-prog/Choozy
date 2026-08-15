@@ -16,6 +16,8 @@ import {
   SHOP_PRODUCT_CATEGORY_IDS,
   SHOP_ACCOUNT_PERSIST_ERROR_EVENT,
   SHOP_ACCOUNT_STORAGE_EVENT,
+  shopAccountPathForSidebar,
+  shopSidebarIdFromPath,
   SHOP_INNER_TABS,
   SHOP_NOTIFICATIONS_PAGE_TABS,
   SHOP_SIDEBAR_IDS,
@@ -24,14 +26,7 @@ import {
 import { useLanguage } from "contexts";
 import { formatAmd } from "shared/lib/formatAmd";
 import { parseAmdInput } from "shared/lib/parseAmdInput";
-import { stripLanguageFromPath, useLocalizedNavigate } from "shared/lib/locale";
-
-const SHOP_ACCOUNT_PATH_BY_SIDEBAR = {
-  [SHOP_SIDEBAR_IDS.DETAILS]: "/account/shop-account",
-  [SHOP_SIDEBAR_IDS.PRODUCTS]: "/account/shop-account/products",
-  [SHOP_SIDEBAR_IDS.STATISTICS]: "/account/shop-account/statistics",
-  [SHOP_SIDEBAR_IDS.FINANCE]: "/account/shop-account/finance",
-};
+import { useLocalizedNavigate } from "shared/lib/locale";
 
 /**
  * What a status message *is*, not just what it says.
@@ -63,14 +58,6 @@ const emptyProductDraft = () => ({
   selectedMemoryIds: [],
   selectedColorIds: [],
 });
-
-const sidebarIdFromPathname = (pathname) => {
-  const base = stripLanguageFromPath(pathname).replace(/\/$/, "") || "/account/shop-account";
-  if (base === "/account/shop-account/products") return SHOP_SIDEBAR_IDS.PRODUCTS;
-  if (base === "/account/shop-account/statistics") return SHOP_SIDEBAR_IDS.STATISTICS;
-  if (base === "/account/shop-account/finance") return SHOP_SIDEBAR_IDS.FINANCE;
-  return SHOP_SIDEBAR_IDS.DETAILS;
-};
 
 const newShopProductId = () =>
   typeof window !== "undefined" &&
@@ -136,7 +123,7 @@ export const useShopAccountPresenter = () => {
    */
   const [shopState, setShopState] = useState(getServerDefaultShopAccountState);
   const [activeSidebarId, setActiveSidebarId] = useState(() =>
-    sidebarIdFromPathname(location.pathname),
+    shopSidebarIdFromPath(location.pathname),
   );
   const [shopInnerTab, setShopInnerTab] = useState(SHOP_INNER_TABS.DATA);
   const [notificationsPageTab, setNotificationsPageTab] = useState(
@@ -197,7 +184,7 @@ export const useShopAccountPresenter = () => {
   }, []);
 
   useEffect(() => {
-    setActiveSidebarId(sidebarIdFromPathname(location.pathname));
+    setActiveSidebarId(shopSidebarIdFromPath(location.pathname));
   }, [location.pathname]);
 
   useEffect(() => {
@@ -258,7 +245,7 @@ export const useShopAccountPresenter = () => {
       setEditingProductId(null);
       setProductDraft(emptyProductDraft());
       setFormErrorKey("");
-      const path = SHOP_ACCOUNT_PATH_BY_SIDEBAR[id] || "/account/shop-account";
+      const path = shopAccountPathForSidebar(id);
       navigate(path);
     },
     [navigate, dismissStatus],

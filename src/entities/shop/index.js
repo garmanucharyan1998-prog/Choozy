@@ -41,6 +41,12 @@ export {
   SHOP_PRODUCT_STALE_DAYS,
 } from "./model/shopProductExpiry";
 export {
+  shopAccountPathForSidebar,
+  shopSidebarIdFromPath,
+  SHOP_ACCOUNT_ROOT_PATH,
+  SHOP_SIDEBAR_LABEL_KEYS,
+} from "./model/shopAccountRoutes";
+export {
   selectShopProducts,
   shopProductCategoryIdsInUse,
   summarizeShopProducts,
