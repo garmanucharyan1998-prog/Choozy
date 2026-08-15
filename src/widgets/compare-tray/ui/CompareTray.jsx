@@ -35,7 +35,12 @@ export const CompareTray = () => {
       ref={trayRef}
       role="region"
       aria-label={t("comparePage.tray.ariaLabel")}
-      className="fixed inset-x-0 z-30 border-t border-border-blue bg-white shadow-[0_-4px_18px_rgba(21,33,71,0.10)]"
+      /**
+       * Slides up from the edge it lives on when the first product joins the selection, so the
+       * bar reads as arriving rather than as content that was always there and only now got
+       * painted. `motion-reduce:animate-none` for anyone who asked for less (§34).
+       */
+      className="fixed inset-x-0 z-30 animate-rise-in border-t border-border-blue bg-white shadow-[0_-4px_18px_rgba(21,33,71,0.10)] motion-reduce:animate-none"
       style={{
         bottom:
           "calc(var(--mobile-bottom-nav-height, 0px) + var(--mobile-viewport-offset-bottom, 0px))",

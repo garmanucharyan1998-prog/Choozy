@@ -13,7 +13,7 @@ import { SIDEBAR_IDS, toggleWishlistProduct } from "entities/user";
 import { getProductDetailHref } from "entities/product-detail";
 import { useAccountPresenter } from "features/account";
 import { useProductCompare } from "features/product-compare";
-import { useLogout } from "features/session";
+import { LogoutConfirmDialog, useLogoutConfirm } from "features/session";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 import { MainCard, NotificationFeedCard, ToggleRow } from "shared/ui/dashboard-cards";
@@ -184,7 +184,7 @@ const AccountDashboardWidget = () => {
     setAvatarFromFile,
     clearAvatar,
   } = useAccountPresenter();
-  const handleLogout = useLogout();
+  const { isConfirming: isConfirmingLogout, requestLogout, cancelLogout } = useLogoutConfirm();
 
   useEffect(() => {
     if (activeSidebarId === sidebarIds.NOTIFICATIONS) {
@@ -646,7 +646,13 @@ const AccountDashboardWidget = () => {
           <button
             type="button"
             onClick={clearRecentlyViewed}
-            className="text-sm font-bold text-link-blue underline"
+            /**
+             * `py-1 -my-1` is a hit area, not spacing — the same pattern the footer links use.
+             * At `text-sm` this button stood 20px tall, under the 24px WCAG 2.2 AA floor, at
+             * every width in every language. The padding takes the tappable box to 28px and the
+             * negative margin returns the space to the flow, so the header row looks unchanged.
+             */
+            className="self-start py-1 -my-1 text-sm font-bold text-link-blue underline sm:self-auto"
           >
             {t("account.recent.clear")}
           </button>
@@ -857,16 +863,21 @@ const AccountDashboardWidget = () => {
 
             {/* Outside the nav (not a sidebarItems entry): logout is a form submission via
                 useLogout, not a selectSidebar(id) tab switch, and keeping it out of the
-                <ul> keeps the tabs' aria-current="page" semantics honest. */}
+                <ul> keeps the tabs' aria-current="page" semantics honest. It opens a
+                confirmation first: the click ends the session with no undo, and it sits
+                directly under the last sidebar tab, a thumb's width from an ordinary
+                navigation choice. */}
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={requestLogout}
               className="mt-2 flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#e1e6ef] bg-white px-4 py-3 text-sm font-bold text-navy transition hover:bg-[#f4f6fb]"
             >
               <FaSignOutAlt size={14} aria-hidden="true" />
               {t("auth.logout")}
             </button>
           </aside>
+
+          <LogoutConfirmDialog isOpen={isConfirmingLogout} onCancel={cancelLogout} />
 
           <div className="relative min-w-0 flex-1">
             {renderStatusToastOverlay()}

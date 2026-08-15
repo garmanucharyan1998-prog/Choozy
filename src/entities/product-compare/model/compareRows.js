@@ -21,6 +21,10 @@
  * from the formatted string. `isBest` is only ever set when *every* cell in the row has a raw
  * number — a missing spec is unknown, not a loss, and never left looking like one — and never
  * when the row is `allSame`.
+ *
+ * Offer cells carry `raw` (the price in dram) alongside their formatted text so the offers
+ * section can be reordered by one column without re-parsing "735,000 դր." back into a number —
+ * see `sortOfferRowsByPrice`.
  */
 import {
   buildSpecsForProduct,
@@ -31,6 +35,7 @@ import {
 } from "entities/product";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 import { COMPARE_ATTRIBUTE_BY_KEY } from "./compareAttributes";
+import { COMPARE_SPEC_GROUPS, specGroupIdForLabelKey } from "./compareSpecGroups";
 
 /**
  * Connects a spec row's `labelKey` (from `productSpecs.js`, e.g.
@@ -49,13 +54,33 @@ const SPEC_LABEL_KEY_TO_ATTRIBUTE_KEY = {
   "productDetail.specsExtended.weight": "weight",
   "productDetail.specsExtended.warranty": "warranty",
   "productDetail.specsBrief.year": "year",
+  "productDetail.specsExtended.antutu": "antutu",
+  "productDetail.specsExtended.geekbenchSingle": "geekbenchSingle",
+  "productDetail.specsExtended.geekbenchMulti": "geekbenchMulti",
 };
 
+/**
+ * What a section *is*, as opposed to which one it is. The spec rows are now split across several
+ * semantic groups (see `compareSpecGroups.js`), so a consumer that needs "the shop prices" or
+ * "anything that is a spec" asks by `kind`; `section.id` stays unique per rendered block, which
+ * is what a React key, a jump-link anchor and a collapse toggle each need.
+ */
 export const COMPARE_SECTION_IDS = {
   OVERVIEW: "overview",
   SPECS: "specs",
   OFFERS: "offers",
 };
+
+/**
+ * How many cells may carry `isBest` before the mark stops meaning anything.
+ *
+ * Three of four phones released in 2025 and one in 2024 is a real difference, but painting three
+ * "best" ticks says nothing a reader can act on — it just spends the page's strongest signal on
+ * the majority. The rule is that a win has to be a *minority* position to be marked: 1 of 2 and
+ * 2 of 4 still mark, 3 of 4 does not. The row is untouched otherwise — it still shows every
+ * value, and still counts as a difference for "show differences only", so nothing is hidden.
+ */
+const marksWinners = (cells, winnerCount) => winnerCount > 0 && winnerCount * 2 <= cells.length;
 
 /**
  * Builds one row from a per-product lookup, marking it `allSame` when every column agrees.
@@ -88,9 +113,12 @@ const buildRow = (labelKey, products, valueFor, placeholder, direction = null) =
       direction === "lower"
         ? Math.min(...cells.map((cell) => cell.raw))
         : Math.max(...cells.map((cell) => cell.raw));
-    cells.forEach((cell) => {
-      cell.isBest = cell.raw === best;
-    });
+    const winnerCount = cells.filter((cell) => cell.raw === best).length;
+    if (marksWinners(cells, winnerCount)) {
+      cells.forEach((cell) => {
+        cell.isBest = cell.raw === best;
+      });
+    }
   }
 
   return { labelKey, cells, allSame, direction };
@@ -200,6 +228,7 @@ export const buildCompareRows = (products, t) => {
           return {
             text: formatPriceAmd(offer.priceAmd, currencySuffix),
             isLowest: offer.priceAmd === cheapestOfferByProductId.get(product.id),
+            raw: offer.priceAmd,
           };
         },
         placeholder,
@@ -207,13 +236,89 @@ export const buildCompareRows = (products, t) => {
     )
     .filter(Boolean);
 
+  /**
+   * The spec rows, filed under semantic headings instead of one flat run. Rows keep the
+   * first-seen order `specLabelKeys` established *within* each group, and a group that the
+   * selection produced no rows for never appears — a "Camera" heading over an empty body is
+   * worse than no heading at all.
+   */
+  const rowsByGroupId = new Map();
+  specs.forEach((row) => {
+    const groupId = specGroupIdForLabelKey(row.labelKey);
+    if (!rowsByGroupId.has(groupId)) rowsByGroupId.set(groupId, []);
+    rowsByGroupId.get(groupId).push(row);
+  });
+  const specSections = COMPARE_SPEC_GROUPS.filter((group) => rowsByGroupId.has(group.id)).map(
+    (group) => ({
+      id: `specs-${group.id}`,
+      kind: COMPARE_SECTION_IDS.SPECS,
+      labelKey: group.labelKey,
+      rows: rowsByGroupId.get(group.id),
+    }),
+  );
+
   return {
     sections: [
-      { id: COMPARE_SECTION_IDS.OVERVIEW, labelKey: "comparePage.sections.overview", rows: overview },
-      { id: COMPARE_SECTION_IDS.SPECS, labelKey: "comparePage.sections.specs", rows: specs },
-      { id: COMPARE_SECTION_IDS.OFFERS, labelKey: "comparePage.sections.offers", rows: offers },
+      {
+        id: COMPARE_SECTION_IDS.OVERVIEW,
+        kind: COMPARE_SECTION_IDS.OVERVIEW,
+        labelKey: "comparePage.sections.overview",
+        rows: overview,
+      },
+      ...specSections,
+      {
+        id: COMPARE_SECTION_IDS.OFFERS,
+        kind: COMPARE_SECTION_IDS.OFFERS,
+        labelKey: "comparePage.sections.offers",
+        rows: offers,
+      },
     ].filter((section) => section.rows.length > 0),
   };
+};
+
+export const OFFER_SORT_DIRECTIONS = { ASC: "asc", DESC: "desc" };
+
+/**
+ * Reorders the offers section by the price in **one** column, leaving every other column's
+ * numbers exactly where they were — the cells are read, never rewritten, so a shop's row still
+ * carries the same prices after the sort as before it. Returns the rows untouched (same array)
+ * when there is nothing to sort by, so a presenter can call it unconditionally.
+ *
+ * A shop that does not stock the sorted product sinks to the bottom in **both** directions
+ * rather than counting as free or as expensive — the same rule `isBest` follows for a missing
+ * spec: unknown is not a value, and must not be made to look like one.
+ *
+ * The pre-sort index breaks ties, which does two things: equal prices keep the shop order
+ * `buildCompareRows` emitted (most popular first), and the result does not depend on the
+ * engine's sort stability. That default order is also what the view returns to when the visitor
+ * cycles the control off, which is why sorting happens here rather than inside the builder.
+ *
+ * @param {{ labelKey: string, cells: { productId: string, raw: number | null }[] }[]} rows
+ * @param {string | null} productId - the column to sort by
+ * @param {"asc" | "desc" | null} direction
+ */
+export const sortOfferRowsByPrice = (rows, productId, direction) => {
+  const isKnownDirection =
+    direction === OFFER_SORT_DIRECTIONS.ASC || direction === OFFER_SORT_DIRECTIONS.DESC;
+  if (!productId || !isKnownDirection) return rows;
+
+  const priceFor = (row) => {
+    const cell = row.cells.find((entry) => entry.productId === productId);
+    return cell && typeof cell.raw === "number" ? cell.raw : null;
+  };
+
+  return rows
+    .map((row, index) => ({ row, index, price: priceFor(row) }))
+    .sort((a, b) => {
+      if (a.price === null || b.price === null) {
+        if (a.price === b.price) return a.index - b.index;
+        return a.price === null ? 1 : -1;
+      }
+      const delta =
+        direction === OFFER_SORT_DIRECTIONS.ASC ? a.price - b.price : b.price - a.price;
+      return delta || a.index - b.index;
+    })
+    .map((entry) => entry.row);
 };
 
 export default buildCompareRows;

@@ -6,6 +6,15 @@ const BAR_MUTED = "#dadfe8";
 const GRID_STROKE = "#dde3f8";
 
 /**
+ * One height, declared once. The box class and the value handed to `initialDimension` have to
+ * agree — a mismatch would make Recharts' first paint the wrong size and then resize, which is
+ * the flicker the initial dimension exists to avoid. `PriceHistoryChartClientOnly` renders a
+ * placeholder of the same height, so the three must not drift apart.
+ */
+const CHART_HEIGHT = 280;
+const CHART_BOX = "h-[280px]";
+
+/**
  * Mini price history column chart — dashed horizontal grid, rounded bar tops,
  * optional highlighted bar (navy vs light gray).
  *
@@ -33,8 +42,20 @@ const PriceHistoryChart = ({ data, ariaLabel }) => {
   const yTicks = [1, 2, 3, 4].map((i) => Math.round((maxY / 4) * i));
 
   return (
-    <div className="h-[280px] w-full min-w-0" role="img" aria-label={ariaLabel}>
-      <ResponsiveContainer width="100%" height="100%">
+    <div className={`${CHART_BOX} w-full min-w-0`} role="img" aria-label={ariaLabel}>
+      {/**
+       * `initialDimension` defaults to `{ width: -1, height: -1 }`, and Recharts renders once at
+       * that size before its ResizeObserver reports — logging "The width(-1) and height(-1) of
+       * chart should be greater than 0" three times per page load on every product page. The
+       * client-only wrapper already removed the server-side half of this; the browser half is
+       * this prop. The height is not a guess (the box above fixes it at 280px); the width is a
+       * starting value the first measurement immediately replaces.
+       */}
+      <ResponsiveContainer
+        width="100%"
+        height="100%"
+        initialDimension={{ width: 320, height: CHART_HEIGHT }}
+      >
         <BarChart
           data={rows}
           margin={{ top: 12, right: 8, left: 4, bottom: 8 }}

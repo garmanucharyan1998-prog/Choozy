@@ -480,6 +480,9 @@ const am = {
       refreshRate: "Թարմացման հաճախականություն:",
       weight: "Քաշ:",
       warranty: "Երաշխիք:",
+      antutu: "AnTuTu:",
+      geekbenchSingle: "Geekbench 6 (մեկ միջուկ):",
+      geekbenchMulti: "Geekbench 6 (բազմամիջուկ):",
       modelNumber: "Մոդելի համար:",
       manufacturer: "Արտադրող:",
       manufacturerValue: "Apple",
@@ -756,7 +759,6 @@ const am = {
     },
   },
   shopAccount: {
-    pageTitle: "Խանութի էջ",
     sidebarNavAria: "Խանութի էջի բաժիններ",
     shopTabsAria: "Խանութի տվյալների ներդիրներ",
     /**
@@ -796,6 +798,7 @@ const am = {
     avatar: {
       uploadAria: "Վերբեռնել խանութի լոգոն",
       remove: "Հեռացնել նկարը",
+      uploading: "Լոգոն բեռնվում է",
     },
     notifications: {
       items: {
@@ -889,30 +892,83 @@ const am = {
     },
     products: {
       sectionTitle: "Ապրանքի կառավարում",
-      listTitle: "Ապրանքներ",
       addProduct: "Ավելացնել ապրանք",
-      addShort: "Ավելացնել",
       tableAria: "Ապրանքների աղյուսակ",
       tableHeaders: {
         product: "Ապրանք",
         available: "Հասանելի",
         color: "Գույն",
+        refreshed: "Թարմացում",
         price: "Արժեք",
         actions: "Գործողություններ",
       },
       edit: "Խմբագրել",
       refresh: "Թարմացնել",
+      delete: "Ջնջել",
       editAria: "Խմբագրել ապրանքը",
       refreshAria: "Թարմացնել ապրանքը",
+      refreshedAria: "Ապրանքը թարմացվեց",
+      refreshedShort: "Թարմացվեց",
+      deleteAria: "Ջնջել ապրանքը",
       editPriceAria: "Փոխել գինը",
-      priceHoverUsd: "≈ {{amount}} USD",
-      priceHoverRub: "≈ {{amount}} RUB",
       editFormTitle: "Խմբագրել ապրանք",
-      staleHint: "Ապրանքները ավտոմատ հեռացվում են, եթե 5 օրվա ընթացքում «Թարմացնել» չեք սեղմել։",
-      amd: "AMD",
       formTitle: "Նոր ապրանք",
       formHint:
         "Ընտրեք կատեգորիան, ապրանքը, հիշողությունը, գույները և հասանելիությունը։ Միայն գինը մուտքագրեք ձեռքով։",
+      /** `{{days}}` comes from `SHOP_PRODUCT_STALE_DAYS`, so the copy cannot outlive the rule. */
+      staleHint: "Ապրանքն ավտոմատ հեռացվում է, եթե {{days}} օրվա ընթացքում «Թարմացնել» չեք սեղմել։",
+      refreshedToday: "Այսօր",
+      refreshedDaysAgo: "{{count}} օր առաջ",
+      expiry: {
+        daysLeft: "Մնաց {{count}} օր",
+        overdue: "Ժամկետը լրացել է",
+      },
+      attention: {
+        body: "{{count}} հայտարարություն շուտով կհեռացվի՝ {{days}} օրվա կանոնի պատճառով։",
+        show: "Ցուցադրել",
+        refreshAll: "Թարմացնել բոլորը",
+      },
+      searchLabel: "Որոնել ապրանքներ",
+      searchPlaceholder: "Անվանում, կատեգորիա, կոնֆիգուրացիա",
+      searchClear: "Մաքրել որոնումը",
+      filters: {
+        groupAria: "Ապրանքների զտիչներ",
+        all: "Բոլորը",
+        inStock: "Առկա",
+        outOfStock: "Առկա չէ",
+        needsRefresh: "Թարմացման կարիք",
+        allCategories: "Բոլոր կատեգորիաները",
+        categoryAria: "Զտել ըստ կատեգորիայի",
+        reset: "Մաքրել զտիչները",
+        resultCount: "Ցուցադրված է {{count}} / {{total}}",
+      },
+      sort: {
+        aria: "Դասավորել ապրանքները",
+        newest: "Սկզբում նորերը",
+        oldest: "Սկզբում հները",
+        refreshed: "Վերջին թարմացումով",
+        price_desc: "Գինը՝ նվազման",
+        price_asc: "Գինը՝ աճման",
+        title: "Անվանումով",
+      },
+      bulk: {
+        selected: "Ընտրված է՝ {{count}}",
+        selectAria: "Ընտրել ապրանքը",
+        selectAllAria: "Ընտրել բոլորը",
+        clear: "Չեղարկել ընտրությունը",
+      },
+      showMore: "Ցուցադրել ևս {{count}}",
+      options: {
+        showAll: "Ցուցադրել բոլորը՝ ևս {{count}}",
+        showFewer: "Ցուցադրել ավելի քիչ",
+      },
+      deleteConfirm: {
+        title: "Ջնջե՞լ ապրանքը",
+        titleMany: "Ջնջե՞լ {{count}} ապրանք",
+        body: "Հայտարարությունը կհեռացվի խանութից։ Գործողությունը հետ չի շրջվում։",
+        bodyMany: "Հայտարարությունները կհեռացվեն խանութից։ Գործողությունը հետ չի շրջվում։",
+        confirm: "Ջնջել",
+      },
       placeholders: {
         category: "Ընտրել կատեգորիա",
         product: "Ընտրել ապրանք",
@@ -924,30 +980,23 @@ const am = {
         title: "Անվանում*",
         price: "Գին*",
         category: "Կատեգորիա*",
-        description: "Նկարագրություն",
-        image: "Նկար",
         availability: "Հասանելիություն",
         memories: "Հիշողություն / կոնֆիգուրացիա*",
-        memoryPlaceholder: "256 / 12gb",
         colors: "Գույներ*",
       },
       availabilityOptions: {
         inStock: "Առկա",
         outOfStock: "Առկա չէ",
       },
-      addMemoryRow: "Ավելացնել տող",
-      removeMemoryRowAria: "Հեռացնել հիշողության տողը",
-      addColorRow: "Ավելացնել գույն",
-      removeColorRowAria: "Հեռացնել գույնը",
-      uploadImage: "Վերբեռնել նկար",
-      removeImage: "Հեռացնել նկարը",
       cancel: "Չեղարկել",
       save: "Պահպանել",
-      empty: "Դեռ ապրանքներ չկան։ Սեղմեք «Ավելացնել ապրանք»՝ ստեղծելու համար։",
-      viewInStore: "Դիտել կայքում",
-      deleteAria: "Հեռացնել ապրանքը",
+      empty: {
+        title: "Դեռ ապրանքներ չկան",
+        body: "Այս բաժնում եք ավելացնում և կառավարում ձեր հայտարարությունները՝ գին, առկայություն, կոնֆիգուրացիա և գույներ։",
+        filteredTitle: "Համընկնումներ չկան",
+        filteredBody: "Փոխեք որոնումը կամ մաքրեք զտիչները՝ մնացած ապրանքները տեսնելու համար։",
+      },
       messages: {
-        required: "Լրացրեք անվանումը և գինը։",
         categoryRequired: "Ընտրեք կատեգորիան։",
         productRequired: "Ընտրեք ապրանքը։",
         priceRequired: "Մուտքագրեք գինը։",
@@ -956,10 +1005,11 @@ const am = {
         productAdded: "Ապրանքը ավելացվեց։",
         productUpdated: "Ապրանքը թարմացվեց։",
         productRefreshed: "Ապրանքի թարմացման ամսաթիվը թարմացվեց։",
+        productsRefreshed: "Թարմացվեց {{count}} ապրանք։",
         priceUpdated: "Գինը թարմացվեց։",
-        autoRemoved: "5 օր չթարմացված ապրանքները հեռացվեցին։",
+        autoRemoved: "Հեռացվեց {{count}} չթարմացված ապրանք։",
         productRemoved: "Ապրանքը հեռացվեց։",
-        imageTooLarge: "Նկարը չափազանց մեծ է (առավելագույնը 200 ԿԲ)։",
+        productsRemoved: "Հեռացվեց {{count}} ապրանք։",
       },
       stock: {
         in: "Առկա",
@@ -1035,6 +1085,10 @@ const am = {
       avatarSaved: "Լոգոն պահպանվեց։",
       avatarRemoved: "Լոգոն հեռացվեց։",
       avatarTooLarge: "Նկարը չափազանց մեծ է (առավելագույնը 200 ԿԲ)։",
+      avatarNotAnImage: "Ընտրեք նկարի ֆայլ։",
+      avatarFailed: "Չհաջողվեց կարդալ ֆայլը։ Փորձեք մեկ ուրիշը։",
+      /** The one message about a write that did not land — see SHOP_ACCOUNT_PERSIST_ERROR_EVENT. */
+      saveFailed: "Չհաջողվեց պահպանել փոփոխությունը։ Այն կկորչի էջը թարմացնելուց հետո։",
     },
   },
   auth: {
@@ -1045,6 +1099,10 @@ const am = {
     roleSeller: "Վաճառող",
     logout: "Ելք",
     logoutAria: "Ելք հաշվից",
+    logoutConfirmTitle: "Դուրս գա՞լ հաշվից",
+    logoutConfirmBody: "Հաշվին վերադառնալու համար պետք է նորից մուտք գործեք։",
+    logoutConfirmSubmit: "Դուրս գալ",
+    logoutConfirmCancel: "Չեղարկել",
   },
   register: {
     title: "Գրանցում",
@@ -1072,6 +1130,7 @@ const am = {
     switchToRegisterButton: "Գրանցվել",
     errors: {
       required: "Լրացրեք բոլոր դաշտերը։",
+      invalidCredentials: "Սխալ էլ. հասցե կամ գաղտնաբառ։",
     },
   },
   scrollToTop: {
@@ -1153,14 +1212,96 @@ const am = {
     remove: "Հեռացնել",
     clearAll: "Մաքրել բոլորը",
     addMore: "Ավելացնել ապրանք",
-    onlyDifferences: "Ցույց տալ միայն տարբերությունները",
     noDifferences: "Ընտրված ապրանքները համընկնում են բոլոր բնութագրերով։",
-    tableCaption: "Ընտրված ապրանքների բնութագրերի և գների համեմատություն",
     rowLabelHeader: "Բնութագիր",
+    /** Shown under both tables on a phone, where a column is genuinely off screen. */
+    scrollHint: "Սահեցրեք աղյուսակը՝ մյուս սյունակները տեսնելու համար",
+    /** One product is a product page, not a comparison — every chart below needs two columns. */
+    needSecond: "Ավելացրեք ևս մեկ ապրանք՝ համեմատությունը սկսելու համար։",
+    /**
+     * Section headings inside the specification table. `overview` and `offers` are the two the
+     * table has always had; the rest split what used to be one flat "Specifications" run of a
+     * dozen rows, and each appears only when the selected category actually produced rows for it
+     * — see `entities/product-compare/model/compareSpecGroups.js`.
+     */
     sections: {
       overview: "Ընդհանուր",
-      specs: "Բնութագրեր",
+      display: "Էկրան",
+      performance: "Հզորություն և հիշողություն",
+      camera: "Տեսախցիկ",
+      battery: "Մարտկոց",
+      connectivity: "Կապ",
+      design: "Չափսեր և քաշ",
+      details: "Այլ բնութագրեր",
       offers: "Գները խանութներում",
+    },
+    /** The product cards above the table. */
+    strip: {
+      heading: "Համեմատվող ապրանքները",
+      aria: "Համեմատվող ապրանքների ցանկ",
+      ratingAria: "գնահատականը 5 բալից",
+    },
+    /**
+     * The page's own controls. The scope choice is a two-state radio group rather than a
+     * checkbox: both of its states are worth naming, and "show all" is an answer, not the
+     * absence of one.
+     */
+    controls: {
+      scopeAria: "Ի՞նչ ցույց տալ աղյուսակում",
+      showAll: "Բոլոր բնութագրերը",
+      onlyDifferences: "Միայն տարբերությունները",
+      jumpAria: "Էջի բաժինները",
+    },
+    jump: {
+      products: "Ապրանքները",
+      differences: "Տարբերությունները",
+      prices: "Գները",
+      specs: "Բնութագրերը",
+      shops: "Խանութները",
+      charts: "Դիագրամները",
+      verdict: "Ո՞րն ընտրել",
+    },
+    /**
+     * The summary above the table. `note` is not decoration: only attributes whose better end
+     * the catalog declares (more storage, lower price, less weight) can be ranked, so the list
+     * is silent about real differences like "OLED instead of LCD" — and says so rather than
+     * leaving the reader to assume it found everything.
+     */
+    keyDifferences: {
+      heading: "Հիմնական տարբերությունները",
+      intro: "Այն ցուցանիշները, որոնցով ընտրված ապրանքներն ամենաշատն են տարբերվում միմյանցից։",
+      none: "Թվային ցուցանիշներով էական տարբերություն չկա՝ ընտրվածները շատ մոտ են։",
+      note: "Այստեղ նշվում են միայն այն ցուցանիշները, որոնց համար հայտնի է՝ որ արժեքն է ավելի լավը։",
+      seeAll: "Տեսնել բոլոր {{count}} տարբերությունը",
+    },
+    /**
+     * The cheapest offer per product. `saveUpTo` is a saving *within* one product — the gap
+     * between its cheapest and dearest shop — never a comparison between two products, which
+     * would be a claim about value rather than a fact about price.
+     */
+    bestPrices: {
+      heading: "Լավագույն գները",
+      intro: "Ամենացածր գինը յուրաքանչյուր ապրանքի համար՝ Հայաստանի խանութներից։",
+      cheapestBadge: "Ամենացածր գինը",
+      /**
+       * Phrased as a label with the number after it, in all three locales, so no dictionary has
+       * to agree a noun with a count `t()` cannot inflate — Russian would need three forms of
+       * "магазин" for the same string. `tray.count` already solved this the same way.
+       */
+      shopCount: "Խանութներ՝ {{count}}",
+      saveUpTo: "Խնայեք մինչև {{amount}}",
+      noOffers: "Առաջարկ չկա",
+      viewOffers: "Տեսնել բոլոր առաջարկները",
+    },
+    specs: {
+      heading: "Բնութագրերի աղյուսակ",
+      intro: "Բոլոր բնութագրերը՝ խմբերով. սեղմեք խմբի վերնագրին՝ այն ծալելու համար։",
+      tableCaption: "Ընտրված ապրանքների բնութագրերի համեմատություն",
+    },
+    shops: {
+      intro:
+        "Յուրաքանչյուր խանութի գինը՝ բոլոր ապրանքների համար։ Սյունակի կոճակով դասավորեք տողերն ըստ այդ ապրանքի գնի։",
+      tableCaption: "Ընտրված ապրանքների գները խանութներում",
     },
     rows: {
       price: "Գինը՝ սկսած",
@@ -1183,8 +1324,17 @@ const am = {
       weight: "Քաշ",
       year: "Տարեթիվ",
       warranty: "Երաշխիք",
+      antutu: "AnTuTu",
+      geekbenchSingle: "Geekbench 6 (մեկ միջուկ)",
+      geekbenchMulti: "Geekbench 6 (բազմամիջուկ)",
     },
     lowestPrice: "Ամենացածր գինը",
+    /**
+     * The accessible name of the shop-prices sort control, composed at the call site with the
+     * product title so four columns don't get four identically named buttons — see
+     * `OfferSortHeaderCell` in ProductCompareWidget.
+     */
+    sortByPrice: "Դասավորել գնով",
     /** Read by screen readers next to the winning spec cell's checkmark — see the sr-only text in ProductCompareWidget. */
     bestValue: "Լավագույն արժեքը",
     stickyHeaderAria: "Համեմատվող ապրանքները՝ ամփոփ",
@@ -1200,6 +1350,7 @@ const am = {
      */
     radar: {
       heading: "Համեմատություն մեկ հայացքով",
+      intro: "Յուրաքանչյուր ապրանքի ուժեղ և թույլ կողմերը՝ մեկ պատկերով։",
       ariaLabel: "Ընտրված ապրանքների բնութագրերի դիագրամ",
       legendAria: "Ընտրեք, թե որ ապրանքները ցույց տալ դիագրամին",
       capNote: "Դիագրամին ցուցադրվում է առավելագույնը երեք ապրանք։ Չորրորդն ընտրելիս առաջինը փոխարինվում է։",
@@ -1234,6 +1385,9 @@ const am = {
      * comparison has to be named.
      */
     advantages: {
+      sectionHeading: "Ո՞րն ընտրել",
+      sectionIntro:
+        "Յուրաքանչյուր ապրանքի չափելի առավելությունները՝ այն արժեքներով, որոնց վրա հիմնված են։",
       heading: "Ինչու՞ ընտրել {{title}}",
       betterThan: "{{percent}}%-ով ավելի լավ, քան {{baseline}}",
     },

@@ -1,245 +1,296 @@
-import { useRef } from "react";
-import { FaCheck, FaPlus, FaTimes } from "react-icons/fa";
+import { useCallback, useRef } from "react";
 import { useComparePresenter } from "features/product-compare";
-import { LocalizedLink } from "shared/ui/link";
-import { ProductCardImage } from "shared/ui/product-card-image";
 import { CompareAdvantages } from "./CompareAdvantages";
 import { CompareBars } from "./CompareBars";
+import { CompareBestPrices } from "./CompareBestPrices";
+import { CompareColumnHeader } from "./CompareColumnHeader";
+import { CompareControls } from "./CompareControls";
 import { CompareEmptyState } from "./CompareEmptyState";
+import { CompareKeyDifferences } from "./CompareKeyDifferences";
+import { CompareProductStrip } from "./CompareProductStrip";
 import { CompareRadar } from "./CompareRadar";
 import { CompareStickyHeader } from "./CompareStickyHeader";
+import { CompareTable } from "./CompareTable";
+import { SECTION_HEADING, SECTION_SUBHEADING, SURFACE, SECTION_PAD } from "./compareStyles";
+import "./ProductCompare.css";
 
 /**
- * The comparison table.
+ * The comparison experience, in the order a purchase decision is actually made.
  *
- * A real `<table>`, not a grid of divs: the relationship between "Screen size" and "14.2″" is
- * the entire content of this page, and only a table with `scope`d headers carries it to a
- * screen reader. Row headers are `<th scope="row">`, product headers `<th scope="col">`, and
- * each section gets its own `<tbody>` under a spanning heading row.
+ * The page used to be one thing: a twenty-row table with a checkbox above it and three charts
+ * below. Everything on it carried the same visual weight, so answering "which of these should I
+ * buy" meant reading all of it. It is now six blocks, each answering one question:
  *
- * Width is handled by scrolling the table inside its own container rather than by shrinking
- * the columns — four products at a readable type size do not fit a phone, and the label column
- * is pinned so a scrolled-away row never loses its name.
+ *   1. products    — which four am I looking at, and what do they cost
+ *   2. controls    — how much of this do I want to see, and where do I want to go
+ *   3. differences — what actually separates them            (the scanning, done for the reader)
+ *   4. prices      — where is each one cheapest right now    (the site's whole reason to exist)
+ *   5. tables      — the evidence: every spec, every shop    (unchanged in content, regrouped)
+ *   6. charts + verdict — the shape of the comparison, then why you might pick each one
  *
- * `table-fixed` (mobile) is load-bearing, not decoration: under the default `table-layout: auto`
- * a single unbreakable long word (Armenian row labels routinely are — e.g. "Թարմացման
- * հաճախականություն") forces its whole column to grow to fit it, since `width` is only a hint
- * under `auto`. That blew the label column from 96px out to ~190px and pushed the two product
- * columns off past the edge of the screen. Fixed layout makes column widths authoritative, and
- * `break-words` lets the same long labels wrap onto a second line instead of overflowing the now
- * non-negotiable column box. Desktop reverts to `auto` since it never exhibited the bug and auto
- * layout is more forgiving there.
+ * Nothing was dropped to get there. Every row, every offer, every chart the old page rendered is
+ * still on this one; what changed is that the answers now come before the evidence instead of
+ * being buried inside it.
+ *
+ * The specifications and the shop prices are two `<table>`s rather than one. They were one table
+ * with two very different kinds of section in it — "screen size, by product" and "Zigzag's price,
+ * by product" — sharing a heading, a caption and a sort control that only ever applied to half of
+ * them. Splitting them gives each its own `<h2>`, its own caption for a screen reader, and lets
+ * the sort controls sit in the column headers where `aria-sort` belongs.
  */
 
-const CELL = "px-3 py-3 text-xs break-words sm:text-sm md:px-4 md:text-base";
-const LABEL_CELL = `${CELL} sticky left-0 z-10 w-24 bg-white text-start font-semibold text-navy md:w-56`;
 /**
- * Sized so exactly two product columns fit next to the (narrower, on mobile) label column at
- * a 360px viewport — a phone showing 1.4 columns invites a swipe that lands nowhere. A real
- * `width` (not `min-width`): under `table-fixed` only the former is authoritative.
+ * Clears the sticky site header when a jump link lands on a section.
  *
- * 96 + 120 + 120 = 336, against the 338px the scroller actually gets inside a 360px viewport.
- * The table carries no `min-width` for the same reason: under `table-fixed` a min-width larger
- * than the declared columns is redistributed across them proportionally, which on a two-product
- * pair page inflated all three columns until only one product fitted on screen — the exact
- * opposite of what a page called "X vs Y" is for.
+ * Almost nothing at `short`, where the header does not stick (see SiteShell's `short:relative`)
+ * and there is nothing to clear. Reserving the header's height there would spend ~150px of a
+ * 375px-tall landscape screen — 40% of the viewport — on blank space above the section the
+ * visitor asked to see.
  */
-const PRODUCT_COL = `${CELL} w-[7.5rem] snap-start align-top md:w-[12rem]`;
-/**
- * No `uppercase`: Tailwind's text-transform runs on the rendered string, and Armenian's `և`
- * uppercases to the archaic `ԵՒ` instead of `ԵՎ` — silent for the current section labels
- * (none contain it yet) but a trap for the next one that does. Section labels already read
- * as intended sentence case from the dictionary.
- */
-const SECTION_CELL =
-  "bg-subtle-bg px-3 py-2 text-start text-[11px] font-bold tracking-wide text-text-muted sm:text-xs md:px-4 md:text-sm";
+const ANCHOR_OFFSET =
+  "scroll-mt-[calc(var(--header-shell-height,132px)+1rem)] short:scroll-mt-4";
 
-/**
- * @param {{ fixedIds?: string[] }} props — supplied by `/compare/<a>-vs-<b>`, which shows one
- *   specific pair at one indexable address and so offers no column editing; it links out to
- *   `/compare?ids=…` for that instead.
- */
 const ProductCompareWidget = ({ fixedIds = null }) => {
   const {
     t,
     isFixed,
     editHref,
     products,
+    brandLabels,
     seriesColors,
     bars,
     advantages,
+    bestOffers,
+    keyDifferences,
     radar,
-    sections,
+    specSections,
+    offersSection,
+    collapsedSectionIds,
+    toggleSectionCollapsed,
     hasRows,
-    differingRowCount,
+    sections,
+    differingSpecCount,
     onlyDifferences,
-    toggleOnlyDifferences,
+    setOnlyDifferences,
+    offersSort,
+    toggleOffersSort,
     removeProduct,
     clearAll,
     canAddMore,
     addMoreHref,
   } = useComparePresenter(fixedIds);
+
   /**
-   * The table's own scroll container. `CompareStickyHeader` measures it directly rather than a
-   * sentinel above it, so the pinned strip belongs to the table and leaves the screen with it.
+   * Both tables, as one block. `CompareStickyHeader` measures this directly rather than a
+   * sentinel above it, so the pinned recap of the columns belongs to the tables and leaves the
+   * screen with them — it used to hang over the charts and the footer, naming columns of a table
+   * that had scrolled away thousands of pixels earlier.
    */
-  const tableBlockRef = useRef(null);
+  const tablesRef = useRef(null);
+
+  /**
+   * Jump links are real anchors, so they survive with JavaScript off and can be copied out of
+   * the address bar; this only upgrades the landing to a smooth one, and only where motion is
+   * welcome. `matchMedia` is read at click time rather than cached, because the setting can
+   * change while the page is open.
+   */
+  const jumpTo = useCallback((id) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    /** Moves the keyboard's place, not just the viewport — a jump link that only scrolls
+        leaves the next Tab back at the top of the page. */
+    target.setAttribute("tabindex", "-1");
+    target.focus({ preventScroll: true });
+  }, []);
 
   if (products.length === 0) {
     return <CompareEmptyState t={t} />;
   }
 
-  const showAddColumn = canAddMore && !isFixed;
-  const columnCount = products.length + (showAddColumn ? 1 : 0);
+  /** The label column plus one per product; the "add" card lives in the strip, not the table. */
+  const columnCount = products.length + 1;
+  const canFilter = differingSpecCount > 0;
+  const hasComparison = products.length > 1;
+
+  const anchors = [
+    { id: "compare-products", labelKey: "comparePage.jump.products" },
+    keyDifferences.length > 0
+      ? { id: "compare-differences", labelKey: "comparePage.jump.differences" }
+      : null,
+    { id: "compare-prices", labelKey: "comparePage.jump.prices" },
+    specSections.length > 0 ? { id: "compare-specs", labelKey: "comparePage.jump.specs" } : null,
+    offersSection ? { id: "compare-shops", labelKey: "comparePage.jump.shops" } : null,
+    bars.length > 0 ? { id: "compare-charts", labelKey: "comparePage.jump.charts" } : null,
+    hasComparison ? { id: "compare-verdict", labelKey: "comparePage.jump.verdict" } : null,
+  ].filter(Boolean);
+
+  const productHeaderCells = (sort, onToggleSort) =>
+    products.map((product, index) => (
+      <CompareColumnHeader
+        key={product.id}
+        t={t}
+        product={product}
+        index={index}
+        color={seriesColors[product.id]}
+        sort={sort}
+        onToggleSort={onToggleSort}
+      />
+    ));
+
+  /** Repeated under both tables, and only where a column is actually off screen. */
+  const scrollHint = hasComparison ? (
+    <p className="m-0 text-[11px] text-text-muted md:hidden">{t("comparePage.scrollHint")}</p>
+  ) : null;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6 md:gap-8">
       <CompareStickyHeader
         t={t}
         products={products}
+        seriesColors={seriesColors}
         isFixed={isFixed}
         removeProduct={removeProduct}
-        blockRef={tableBlockRef}
+        blockRef={tablesRef}
       />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/** The label is the tap target for the 16px box inside it; `py-1 -my-1` gets it to 24. */}
-        <label className="inline-flex cursor-pointer items-center gap-2 py-1 -my-1 text-xs font-medium text-navy sm:text-sm">
-          <input
-            type="checkbox"
-            checked={onlyDifferences}
-            onChange={toggleOnlyDifferences}
-            className="h-4 w-4 accent-navy"
-            /** Disabled rather than hidden: its absence would look like a missing feature. */
-            disabled={differingRowCount === 0}
-          />
-          {t("comparePage.onlyDifferences")}
-        </label>
-        {isFixed ? (
-          <LocalizedLink
-            to={editHref}
-            className="rounded-lg px-3 py-2 text-xs font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue sm:text-sm"
-          >
-            {t("comparePage.editComparison")}
-          </LocalizedLink>
-        ) : (
-          <button
-            type="button"
-            onClick={clearAll}
-            className="rounded-lg px-3 py-2 text-xs font-semibold text-link-blue transition-colors hover:bg-hover-blue sm:text-sm"
-          >
-            {t("comparePage.clearAll")}
-          </button>
+
+      <section id="compare-products" className={`flex flex-col gap-3 ${ANCHOR_OFFSET}`}>
+        <h2 className="sr-only">{t("comparePage.strip.heading")}</h2>
+        <CompareProductStrip
+          t={t}
+          products={products}
+          brandLabels={brandLabels}
+          bestOffers={bestOffers}
+          seriesColors={seriesColors}
+          isFixed={isFixed}
+          removeProduct={removeProduct}
+          canAddMore={canAddMore}
+          addMoreHref={addMoreHref}
+        />
+        {/**
+         * One product is a product page, not a comparison — every chart and every verdict below
+         * needs two columns to say anything. Saying so beats rendering a table with one column
+         * and letting the reader work out why the rest of the page is missing.
+         */}
+        {hasComparison ? null : (
+          <p className="m-0 rounded-xl bg-hover-blue px-4 py-3 text-xs text-navy sm:text-sm">
+            {t("comparePage.needSecond")}
+          </p>
         )}
+      </section>
+
+      <CompareControls
+        t={t}
+        onlyDifferences={onlyDifferences}
+        setOnlyDifferences={setOnlyDifferences}
+        differingSpecCount={differingSpecCount}
+        canFilter={canFilter}
+        anchors={anchors}
+        onJump={jumpTo}
+        isFixed={isFixed}
+        editHref={editHref}
+        clearAll={clearAll}
+      />
+
+      {keyDifferences.length > 0 ? (
+        <div id="compare-differences" className={ANCHOR_OFFSET}>
+          <CompareKeyDifferences
+            t={t}
+            differences={keyDifferences}
+            products={products}
+            seriesColors={seriesColors}
+            differingSpecCount={differingSpecCount}
+            canFilter={canFilter}
+            onShowDifferences={() => {
+              setOnlyDifferences(true);
+              jumpTo("compare-specs");
+            }}
+          />
+        </div>
+      ) : null}
+
+      <div id="compare-prices" className={ANCHOR_OFFSET}>
+        <CompareBestPrices
+          t={t}
+          bestOffers={bestOffers}
+          products={products}
+          seriesColors={seriesColors}
+        />
       </div>
 
       {/**
-       * `relative` is load-bearing. `sr-only` is `position: absolute`, and an absolutely
-       * positioned element anchors to its nearest *positioned* ancestor — `overflow-x: auto`
-       * clips but does not position. Without this, the winner cells' sr-only text escaped the
-       * scroller entirely, anchored to the document at the column's scrolled-out x (~415px on a
-       * 360px phone) and gave the whole page 55px of horizontal scroll.
+       * `data-compare-tables` is the anchor `CompareStickyHeader` is measured against, and the
+       * one `scripts/verify-responsive.mjs` looks for: the strip now spans two tables, so a check
+       * that found "the table" with `querySelector("table")` would call the strip stale the
+       * moment the specifications ended, while the shop prices it also labels were still on
+       * screen.
        */}
-      <div
-        ref={tableBlockRef}
-        className="relative overflow-x-auto rounded-2xl border border-border-blue bg-white snap-x snap-proximity"
-      >
-        <table className="w-full table-fixed border-collapse text-start md:table-auto">
-          <caption className="sr-only">{t("comparePage.tableCaption")}</caption>
-          <thead>
-            <tr className="border-b border-border-blue">
-              <th scope="col" className={LABEL_CELL}>
-                <span className="sr-only">{t("comparePage.rowLabelHeader")}</span>
-              </th>
-              {products.map((product) => (
-                <th scope="col" key={product.id} className={PRODUCT_COL}>
-                  <div className="flex flex-col items-start gap-2">
-                    <ProductCardImage variant="compare" src={product.image} alt={product.title} />
-                    <LocalizedLink
-                      to={product.href}
-                      className="line-clamp-3 text-xs font-semibold text-navy no-underline hover:underline sm:text-sm"
-                    >
-                      {product.title}
-                    </LocalizedLink>
-                    {isFixed ? null : (
-                      <button
-                        type="button"
-                        onClick={() => removeProduct(product.id)}
-                        /** 11px of text is an 11px target; the padding takes it to 24 in place. */
-                        className="inline-flex items-center gap-1.5 py-1 -my-1 text-[11px] font-medium text-text-muted transition-colors hover:text-navy sm:text-xs"
-                      >
-                        <FaTimes className="h-3 w-3" aria-hidden />
-                        {t("comparePage.remove")}
-                      </button>
-                    )}
-                  </div>
-                </th>
-              ))}
-              {showAddColumn ? (
-                <th scope="col" className={PRODUCT_COL}>
-                  <LocalizedLink
-                    to={addMoreHref}
-                    className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border-blue text-xs font-semibold text-link-blue no-underline transition-colors hover:bg-hover-blue sm:text-sm"
-                  >
-                    <FaPlus className="h-4 w-4" aria-hidden />
-                    {t("comparePage.addMore")}
-                  </LocalizedLink>
-                </th>
-              ) : null}
-            </tr>
-          </thead>
+      <div ref={tablesRef} data-compare-tables className="flex flex-col gap-6 md:gap-8">
+        {specSections.length > 0 ? (
+          <section
+            id="compare-specs"
+            aria-labelledby="compare-specs-heading"
+            className={`${SURFACE} ${SECTION_PAD} flex flex-col gap-4 ${ANCHOR_OFFSET}`}
+          >
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <div className="flex flex-col gap-1.5">
+                <h2 id="compare-specs-heading" className={SECTION_HEADING}>
+                  {t("comparePage.specs.heading")}
+                </h2>
+                <p className={SECTION_SUBHEADING}>{t("comparePage.specs.intro")}</p>
+              </div>
+              {scrollHint}
+            </div>
+            {/**
+             * The bordered frame is a sibling of the card's padding, not the card itself: the
+             * table has to run edge to edge inside its own scroller for the sticky label column
+             * to reach the frame's left edge, and `-mx-*` gives it back the padding the card
+             * takes away.
+             */}
+            <div className="-mx-4 overflow-hidden border-y border-border-blue md:-mx-6 md:rounded-xl md:border-x">
+              <CompareTable
+                t={t}
+                captionKey="comparePage.specs.tableCaption"
+                sections={specSections}
+                columnCount={columnCount}
+                renderHeaderCells={() => productHeaderCells()}
+                collapsedSectionIds={collapsedSectionIds}
+                onToggleSection={toggleSectionCollapsed}
+                idPrefix="compare-specs"
+              />
+            </div>
+          </section>
+        ) : null}
 
-          {sections.map((section) => (
-            <tbody key={section.id}>
-              <tr>
-                <th scope="colgroup" colSpan={columnCount + 1} className={SECTION_CELL}>
-                  {t(section.labelKey)}
-                </th>
-              </tr>
-              {section.rows.map((row) => (
-                <tr key={row.labelKey} className="border-t border-border-blue/60">
-                  <th scope="row" className={LABEL_CELL}>
-                    {t(row.labelKey)}
-                  </th>
-                  {row.cells.map((cell) => (
-                    <td
-                      key={cell.productId}
-                      className={`${CELL} align-top text-navy ${cell.isBest ? "bg-emerald-50" : ""}`}
-                    >
-                      <span
-                        className={
-                          cell.isLowest || cell.isBest ? "font-semibold text-link-blue" : undefined
-                        }
-                      >
-                        {/**
-                         * Never colour alone: a checkmark carries the win for anyone who can't
-                         * see the green background, and `sr-only` text carries it for anyone
-                         * who can't see either.
-                         */}
-                        {cell.isBest ? (
-                          <FaCheck className="mr-1 inline h-3 w-3 text-emerald-600" aria-hidden />
-                        ) : null}
-                        {cell.text}
-                        {cell.isBest ? (
-                          <span className="sr-only"> — {t("comparePage.bestValue")}</span>
-                        ) : null}
-                      </span>
-                      {/**
-                       * Colour alone would not carry this either. The note is per column — the
-                       * cheapest shop for *this* product, never a verdict between products.
-                       */}
-                      {cell.isLowest ? (
-                        <span className="block text-[11px] font-normal text-text-muted sm:text-xs">
-                          {t("comparePage.lowestPrice")}
-                        </span>
-                      ) : null}
-                    </td>
-                  ))}
-                  {showAddColumn ? <td className={CELL} /> : null}
-                </tr>
-              ))}
-            </tbody>
-          ))}
-        </table>
+        {offersSection ? (
+          <section
+            id="compare-shops"
+            aria-labelledby="compare-shops-heading"
+            className={`${SURFACE} ${SECTION_PAD} flex flex-col gap-4 ${ANCHOR_OFFSET}`}
+          >
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <div className="flex flex-col gap-1.5">
+                <h2 id="compare-shops-heading" className={SECTION_HEADING}>
+                  {t("comparePage.sections.offers")}
+                </h2>
+                <p className={SECTION_SUBHEADING}>{t("comparePage.shops.intro")}</p>
+              </div>
+              {scrollHint}
+            </div>
+            <div className="-mx-4 overflow-hidden border-y border-border-blue md:-mx-6 md:rounded-xl md:border-x">
+              <CompareTable
+                t={t}
+                captionKey="comparePage.shops.tableCaption"
+                sections={[offersSection]}
+                columnCount={columnCount}
+                renderHeaderCells={() => productHeaderCells(offersSort, toggleOffersSort)}
+                showSectionHeadings={false}
+                idPrefix="compare-shops"
+              />
+            </div>
+          </section>
+        ) : null}
       </div>
 
       {hasRows && sections.length === 0 ? (
@@ -249,12 +300,26 @@ const ProductCompareWidget = ({ fixedIds = null }) => {
       ) : null}
 
       {/**
-       * Shape first, then numbers, then the verdict: the radar summarises what the bars below it
-       * then quantify, and both sit under the table whose raw values they are drawn from.
+       * Shape first, then numbers: the radar summarises what the bars beside it quantify, and
+       * both are drawn from the same values the tables above already listed.
        */}
-      <CompareRadar t={t} radar={radar} products={products} seriesColors={seriesColors} />
-      <CompareBars t={t} bars={bars} products={products} seriesColors={seriesColors} />
-      <CompareAdvantages t={t} products={products} advantages={advantages} seriesColors={seriesColors} />
+      {bars.length > 0 || radar.axes.length > 0 ? (
+        <div id="compare-charts" className={`flex flex-col gap-6 md:gap-8 ${ANCHOR_OFFSET}`}>
+          <CompareRadar t={t} radar={radar} products={products} seriesColors={seriesColors} />
+          <CompareBars t={t} bars={bars} products={products} seriesColors={seriesColors} />
+        </div>
+      ) : null}
+
+      {hasComparison ? (
+        <div id="compare-verdict" className={ANCHOR_OFFSET}>
+          <CompareAdvantages
+            t={t}
+            products={products}
+            advantages={advantages}
+            seriesColors={seriesColors}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

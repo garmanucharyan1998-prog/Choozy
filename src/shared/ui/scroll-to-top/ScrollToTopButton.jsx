@@ -27,16 +27,18 @@ const ScrollToTopButton = () => {
   }
 
   /**
-   * The bottom offset stacks three published heights: the mobile bottom navigation, the mobile
-   * browser-chrome inset (both from the header) and `--compare-tray-height` from the compare
-   * tray, which parks in this same corner — without the last one the button lands on top of the
-   * tray's own call to action.
+   * The bottom offset stacks four published heights: the mobile bottom navigation, the mobile
+   * browser-chrome inset (both from the header), `--compare-tray-height` from the compare tray,
+   * and `--page-action-bar-height` from whichever page has a pinned action bar up — the seller
+   * dashboard's bulk bar is the one that does. Every one of them parks in this same corner, and
+   * without its term the button lands on top of that thing's own call to action. Each defaults
+   * to 0px, so a page with none of them is unaffected.
    */
   return (
     <button
       type="button"
       onClick={handleScrollToTop}
-      className="fixed right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border-none bg-navy text-white shadow-[0_4px_14px_rgba(21,33,71,0.35)] transition-all duration-200 hover:scale-105 hover:bg-active-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:right-6 md:h-12 md:w-12 bottom-[calc(var(--mobile-bottom-nav-height,0px)+var(--mobile-viewport-offset-bottom,0px)+var(--compare-tray-height,0px)+1rem)] md:bottom-[calc(var(--compare-tray-height,0px)+2rem)]"
+      className="fixed right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full border-none bg-navy text-white shadow-[0_4px_14px_rgba(21,33,71,0.35)] transition-all duration-200 hover:scale-105 hover:bg-active-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy md:right-6 md:h-12 md:w-12 bottom-[calc(var(--mobile-bottom-nav-height,0px)+var(--mobile-viewport-offset-bottom,0px)+var(--compare-tray-height,0px)+var(--page-action-bar-height,0px)+1rem)] md:bottom-[calc(var(--compare-tray-height,0px)+var(--page-action-bar-height,0px)+2rem)]"
       aria-label={t("scrollToTop.ariaLabel")}
     >
       <FaChevronUp size={18} aria-hidden="true" />

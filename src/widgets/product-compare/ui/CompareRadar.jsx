@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { RadarChart } from "shared/ui/radar-chart";
+import { FOCUS_RING, SECTION_HEADING, SECTION_PAD, SECTION_SUBHEADING, SURFACE } from "./compareStyles";
 
 /**
  * The radar section: the shape of a comparison at a glance, above the per-attribute bars that
@@ -22,7 +23,7 @@ export const MAX_RADAR_OVERLAYS = 3;
 const MIN_RADAR_OVERLAYS = 2;
 
 const CHIP_BASE =
-  "inline-flex items-center gap-2 rounded-pill border px-3 py-1.5 text-start text-xs font-medium transition-colors sm:text-sm";
+  `inline-flex items-center gap-2 rounded-pill border px-3 py-1.5 text-start text-xs font-medium transition-colors sm:text-sm ${FOCUS_RING}`;
 
 /**
  * @param {{
@@ -90,17 +91,23 @@ export const CompareRadar = ({ t, radar, products, seriesColors }) => {
   return (
     <section
       aria-labelledby="compare-radar-heading"
-      className="flex flex-col gap-4 rounded-2xl border border-border-blue bg-white p-4 md:p-6"
+      className={`${SURFACE} ${SECTION_PAD} flex flex-col gap-4`}
     >
-      <h2
-        id="compare-radar-heading"
-        className="m-0 text-base font-bold text-navy sm:text-lg md:text-xl"
-      >
-        {t("comparePage.radar.heading")}
-      </h2>
+      <div className="flex flex-col gap-1.5">
+        <h2 id="compare-radar-heading" className={SECTION_HEADING}>
+          {t("comparePage.radar.heading")}
+        </h2>
+        <p className={SECTION_SUBHEADING}>{t("comparePage.radar.intro")}</p>
+      </div>
 
-      <div className="flex flex-col items-center gap-4 md:flex-row md:justify-center md:gap-8">
-        <div className="w-full max-w-[340px] shrink-0 md:max-w-[400px]">
+      {/**
+       * Two equal halves from `md` up rather than a centred pair. The chart used to sit at a
+       * fixed 400px in the middle of a 1180px card with the legend tucked beside it, so the
+       * widest viewport got the smallest usable chart — a shape you are meant to read at a glance
+       * drawn at the size a phone gets. It now takes half the card and grows with it.
+       */}
+      <div className="flex flex-col items-center gap-4 md:grid md:grid-cols-2 md:items-center md:gap-8">
+        <div className="w-full max-w-[340px] shrink-0 justify-self-center md:max-w-[460px]">
           <RadarChart
             axes={chartAxes}
             items={chartItems}
@@ -111,7 +118,7 @@ export const CompareRadar = ({ t, radar, products, seriesColors }) => {
         <div
           role="group"
           aria-label={t("comparePage.radar.legendAria")}
-          className="flex w-full flex-col gap-2 md:w-auto md:max-w-[16rem]"
+          className="flex w-full flex-col gap-2 md:max-w-[20rem]"
         >
           {items.map((item) => {
             const isActive = activeIds.includes(item.id);

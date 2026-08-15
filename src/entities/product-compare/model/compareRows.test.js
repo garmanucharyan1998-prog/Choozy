@@ -1,6 +1,11 @@
 import { getTranslator } from "shared/i18n";
 import { PRODUCT_CATALOG, getCatalogProductById, getOffersForProduct } from "entities/product";
-import { COMPARE_SECTION_IDS, buildCompareRows } from "./compareRows";
+import {
+  COMPARE_SECTION_IDS,
+  OFFER_SORT_DIRECTIONS,
+  buildCompareRows,
+  sortOfferRowsByPrice,
+} from "./compareRows";
 
 const t = getTranslator("en");
 
@@ -18,18 +23,51 @@ const LAPTOPS = inCategory("laptops");
 const HEADPHONES = inCategory("headphones");
 
 const sectionOf = (result, id) => result.sections.find((section) => section.id === id);
+/**
+ * The spec rows are split across several semantic groups (see `compareSpecGroups.js`), so
+ * `section.id` is unique per rendered block and `section.kind` is what says "this is a spec
+ * section". Most of what these tests assert is about the rows themselves, not about which
+ * heading they happen to sit under.
+ */
+const rowsOfKind = (result, kind) =>
+  result.sections.filter((section) => section.kind === kind).flatMap((section) => section.rows);
 const allRows = (result) => result.sections.flatMap((section) => section.rows);
 const rowByLabel = (result, labelKey) => allRows(result).find((row) => row.labelKey === labelKey);
 
 describe("buildCompareRows — table shape", () => {
   const result = buildCompareRows(byIds(LAPTOPS[0].id, LAPTOPS[1].id, LAPTOPS[2].id), t);
 
-  test("emits the three sections in a fixed order", () => {
-    expect(result.sections.map((section) => section.id)).toEqual([
-      COMPARE_SECTION_IDS.OVERVIEW,
-      COMPARE_SECTION_IDS.SPECS,
-      COMPARE_SECTION_IDS.OFFERS,
-    ]);
+  /**
+   * The overview first, the shop prices last, and every specification group in between — a
+   * reader meets "what is this and what does it cost", then the specifications, then where to
+   * buy. The middle used to be one flat section; it is now one per semantic group, which is why
+   * this asserts the *kinds* rather than a fixed list of three ids.
+   */
+  test("emits the sections in a fixed order: overview, spec groups, offers", () => {
+    const kinds = result.sections.map((section) => section.kind);
+
+    expect(kinds.at(0)).toBe(COMPARE_SECTION_IDS.OVERVIEW);
+    expect(kinds.at(-1)).toBe(COMPARE_SECTION_IDS.OFFERS);
+    expect(kinds.slice(1, -1)).not.toHaveLength(0);
+    kinds.slice(1, -1).forEach((kind) => expect(kind).toBe(COMPARE_SECTION_IDS.SPECS));
+  });
+
+  /** Two blocks sharing an id would collide as React keys and as `aria-controls` targets. */
+  test("every section id is unique", () => {
+    const ids = result.sections.map((section) => section.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  /**
+   * Grouping is allowed to decide which heading a row sits under; it is never allowed to lose
+   * one. Anything `compareSpecGroups` does not know about falls into the trailing group.
+   */
+  test("grouping keeps every spec row the flat build would have emitted", () => {
+    const grouped = rowsOfKind(result, COMPARE_SECTION_IDS.SPECS).map((row) => row.labelKey);
+    expect(new Set(grouped).size).toBe(grouped.length);
+    grouped.forEach((labelKey) => {
+      expect(labelKey).toMatch(/^productDetail\.specs(Brief|Extended)\./);
+    });
   });
 
   test("every section carries a heading key and at least one row", () => {
@@ -107,10 +145,45 @@ describe("the overview section", () => {
   });
 });
 
+/**
+ * A win is only marked when it is a *minority* position. Three of four phones released in 2025
+ * and one in 2024 is a real difference, but painting three "best" ticks says nothing a reader can
+ * act on — it spends the table's strongest signal on the majority and leaves the one value that
+ * actually stands out unmarked. The row keeps every value either way, and still counts as a
+ * difference for "show differences only", so nothing is hidden by this.
+ */
+describe("marking a winner only when the win is a minority", () => {
+  const YEAR = "productDetail.specsBrief.year";
+
+  test("marks a value two of four columns share", () => {
+    const row = rowByLabel(buildCompareRows(byIds("fp-1", "fp-4", "fp-16", "fp-20"), t), YEAR);
+
+    expect(row.allSame).toBe(false);
+    expect(row.cells.filter((cell) => cell.isBest)).toHaveLength(2);
+    expect(new Set(row.cells.filter((cell) => cell.isBest).map((cell) => cell.text)).size).toBe(1);
+  });
+
+  test("marks nothing when three of four columns share the best value", () => {
+    const row = rowByLabel(buildCompareRows(byIds("fp-30", "fp-31", "fp-32", "fp-33"), t), YEAR);
+
+    expect(row.allSame, "a row where everything agrees would prove nothing").toBe(false);
+    expect(row.cells.filter((cell) => cell.isBest)).toHaveLength(0);
+  });
+
+  /** One of two is still a minority — otherwise a pair page could never mark anything. */
+  test("still marks the winner of a two-column comparison", () => {
+    const row = rowByLabel(buildCompareRows(byIds("fp-1", "fp-16"), t), YEAR);
+
+    expect(row.cells.filter((cell) => cell.isBest)).toHaveLength(1);
+  });
+});
+
 describe("the specs section", () => {
   test("uses the same label keys the product page's spec table does", () => {
     const result = buildCompareRows(byIds(LAPTOPS[0].id, LAPTOPS[1].id), t);
-    sectionOf(result, COMPARE_SECTION_IDS.SPECS).rows.forEach((row) => {
+    const rows = rowsOfKind(result, COMPARE_SECTION_IDS.SPECS);
+    expect(rows.length).toBeGreaterThan(0);
+    rows.forEach((row) => {
       expect(row.labelKey).toMatch(/^productDetail\.specs(Brief|Extended)\./);
     });
   });
@@ -126,7 +199,7 @@ describe("the specs section", () => {
 
   test("marks a row every column agrees on as allSame", () => {
     const result = buildCompareRows(byIds(LAPTOPS[0].id, LAPTOPS[1].id), t);
-    const rows = sectionOf(result, COMPARE_SECTION_IDS.SPECS).rows;
+    const rows = rowsOfKind(result, COMPARE_SECTION_IDS.SPECS);
     rows.forEach((row) => {
       const texts = row.cells.map((cell) => cell.text);
       expect(row.allSame).toBe(new Set(texts).size === 1);
@@ -299,5 +372,121 @@ describe("the offers section", () => {
 
     expect(rows.filter((row) => row.cells[0].isLowest)).toHaveLength(1);
     expect(rows.filter((row) => row.cells[1].isLowest)).toHaveLength(1);
+  });
+
+  /** Sorting reads this, and re-parsing "735,000 դր." back into a number would be absurd. */
+  test("every quoted cell carries the raw price alongside its formatted text", () => {
+    offers.rows.forEach((row) => {
+      row.cells.forEach((cell) => {
+        if (cell.hasValue) {
+          expect(typeof cell.raw).toBe("number");
+          expect(cell.text).toContain(cell.raw.toLocaleString("en-US"));
+        } else {
+          expect(cell.raw).toBeNull();
+        }
+      });
+    });
+  });
+});
+
+describe("sortOfferRowsByPrice", () => {
+  const twoLaptops = byIds(LAPTOPS[0].id, LAPTOPS[1].id);
+  const rowsFor = (products) =>
+    sectionOf(buildCompareRows(products, t), COMPARE_SECTION_IDS.OFFERS).rows;
+  const pricesIn = (rows, productId) =>
+    rows.map((row) => row.cells.find((cell) => cell.productId === productId).raw);
+
+  test("orders the shops cheapest-first for the chosen column", () => {
+    const sorted = sortOfferRowsByPrice(
+      rowsFor(twoLaptops),
+      LAPTOPS[0].id,
+      OFFER_SORT_DIRECTIONS.ASC,
+    );
+    const prices = pricesIn(sorted, LAPTOPS[0].id);
+
+    expect(prices).toEqual([...prices].sort((a, b) => a - b));
+    expect(new Set(prices).size, "the fixture needs prices that actually differ").toBeGreaterThan(1);
+  });
+
+  test("orders them dearest-first the other way", () => {
+    const sorted = sortOfferRowsByPrice(
+      rowsFor(twoLaptops),
+      LAPTOPS[0].id,
+      OFFER_SORT_DIRECTIONS.DESC,
+    );
+    const prices = pricesIn(sorted, LAPTOPS[0].id);
+
+    expect(prices).toEqual([...prices].sort((a, b) => b - a));
+  });
+
+  /**
+   * The other column keeps its own prices — the rows move as units. A sort that reordered one
+   * column's numbers independently would be inventing offers no shop ever quoted.
+   */
+  test("moves whole rows, so every column still quotes what its shop quoted", () => {
+    const rows = rowsFor(twoLaptops);
+    const before = new Map(
+      rows.map((row) => [row.labelKey, row.cells.map((cell) => cell.raw).join("/")]),
+    );
+    const sorted = sortOfferRowsByPrice(rows, LAPTOPS[1].id, OFFER_SORT_DIRECTIONS.ASC);
+
+    expect(sorted).toHaveLength(rows.length);
+    sorted.forEach((row) => {
+      expect(row.cells.map((cell) => cell.raw).join("/")).toBe(before.get(row.labelKey));
+    });
+  });
+
+  /**
+   * Unknown is not a price: it must not sort as free, and it must not sort as expensive either.
+   * The gap here is the Apple-only reseller, which quotes the MacBook column and has nothing to
+   * say about the Windows one — so the *Windows* column is the one with a hole in it.
+   */
+  test("a shop that does not stock the sorted product sinks to the bottom in both directions", () => {
+    const apple = LAPTOPS.find((p) => p.brandId === "apple");
+    const other = LAPTOPS.find((p) => p.brandId !== "apple");
+    const rows = rowsFor(byIds(apple.id, other.id));
+    const gapKeys = rows
+      .filter((row) => row.cells.find((cell) => cell.productId === other.id).raw === null)
+      .map((row) => row.labelKey);
+    expect(gapKeys.length, "the fixture needs a shop with a gap in that column").toBeGreaterThan(0);
+
+    [OFFER_SORT_DIRECTIONS.ASC, OFFER_SORT_DIRECTIONS.DESC].forEach((direction) => {
+      const sorted = sortOfferRowsByPrice(rows, other.id, direction);
+      const tail = sorted.slice(-gapKeys.length).map((row) => row.labelKey);
+      expect(new Set(tail)).toEqual(new Set(gapKeys));
+    });
+  });
+
+  test("leaves the rows alone when there is nothing to sort by", () => {
+    const rows = rowsFor(twoLaptops);
+
+    expect(sortOfferRowsByPrice(rows, null, OFFER_SORT_DIRECTIONS.ASC)).toBe(rows);
+    expect(sortOfferRowsByPrice(rows, LAPTOPS[0].id, null)).toBe(rows);
+    expect(sortOfferRowsByPrice(rows, LAPTOPS[0].id, "sideways")).toBe(rows);
+  });
+
+  test("does not mutate the rows it was given", () => {
+    const rows = rowsFor(twoLaptops);
+    const originalOrder = rows.map((row) => row.labelKey);
+
+    sortOfferRowsByPrice(rows, LAPTOPS[0].id, OFFER_SORT_DIRECTIONS.DESC);
+
+    expect(rows.map((row) => row.labelKey)).toEqual(originalOrder);
+  });
+
+  /**
+   * Equal prices keep the popularity order the builder emitted, which is also the order the view
+   * returns to when the visitor cycles the control off — so the sort must not shuffle ties.
+   */
+  test("ties keep their original relative order", () => {
+    const rows = rowsFor(twoLaptops);
+    const tiedPrice = rows[0].cells[0].raw;
+    const flat = rows.map((row) => ({
+      ...row,
+      cells: row.cells.map((cell) => ({ ...cell, raw: tiedPrice })),
+    }));
+
+    const sorted = sortOfferRowsByPrice(flat, LAPTOPS[0].id, OFFER_SORT_DIRECTIONS.DESC);
+    expect(sorted.map((row) => row.labelKey)).toEqual(rows.map((row) => row.labelKey));
   });
 });

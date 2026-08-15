@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 import { FaArrowDown, FaArrowUp, FaEquals } from "react-icons/fa";
+import { CompareSeriesToken } from "./CompareSeriesToken";
+import { SECTION_HEADING, SECTION_PAD, SURFACE, SURFACE_INSET } from "./compareStyles";
 import "./CompareBars.css";
 
 /**
@@ -38,22 +40,6 @@ import "./CompareBars.css";
 /** Each lane starts a beat after the one above it, so a panel fills in reading order. */
 const LANE_STAGGER_MS = 70;
 
-/**
- * The number, not the colour, is what ties a lane to the legend. It sits on white with a ring
- * in the series colour rather than on a filled swatch because two of the four series colours
- * (the amber and the teal) cannot carry legible white text — a filled badge would have made
- * the one element that identifies the lane the one element nobody could read.
- */
-const SeriesToken = ({ index, color }) => (
-  <span
-    className="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md bg-white text-[10px] font-bold leading-none text-navy"
-    style={{ boxShadow: `inset 0 0 0 1.5px ${color}` }}
-    aria-hidden="true"
-  >
-    {index + 1}
-  </span>
-);
-
 export const CompareBars = ({ t, bars, products, seriesColors }) => {
   if (!bars || bars.length === 0) return null;
 
@@ -64,12 +50,12 @@ export const CompareBars = ({ t, bars, products, seriesColors }) => {
   return (
     <section
       aria-labelledby="compare-bars-heading"
-      className="flex flex-col gap-4 rounded-2xl border border-border-blue bg-white p-4 md:gap-5 md:p-6"
+      className={`${SURFACE} ${SECTION_PAD} flex flex-col gap-4 md:gap-5`}
     >
       <div className="flex flex-col gap-3">
         <h2
           id="compare-bars-heading"
-          className="m-0 text-base font-bold text-navy sm:text-lg md:text-xl"
+          className={SECTION_HEADING}
         >
           {t("comparePage.bars.heading")}
         </h2>
@@ -87,7 +73,7 @@ export const CompareBars = ({ t, bars, products, seriesColors }) => {
               key={product.id}
               className="flex items-center gap-2 text-[11px] font-medium text-navy sm:text-xs"
             >
-              <SeriesToken index={index} color={seriesColors[product.id]} />
+              <CompareSeriesToken index={index} color={seriesColors[product.id]} />
               <span>{product.title}</span>
             </li>
           ))}
@@ -112,7 +98,7 @@ export const CompareBars = ({ t, bars, products, seriesColors }) => {
               key={row.key}
               role="group"
               aria-labelledby={labelId}
-              className="flex flex-col gap-3 rounded-xl bg-subtle-bg p-3 md:p-4"
+              className={`${SURFACE_INSET} flex flex-col gap-3 p-3 md:p-4`}
             >
               <div className="flex items-center justify-between gap-2">
                 <p id={labelId} className="m-0 text-xs font-semibold text-navy sm:text-sm">
@@ -146,7 +132,7 @@ export const CompareBars = ({ t, bars, products, seriesColors }) => {
                   const color = seriesColors[bar.productId];
                   return (
                     <Fragment key={bar.productId}>
-                      <SeriesToken index={seriesIndexById.get(bar.productId) ?? laneIndex} color={color} />
+                      <CompareSeriesToken index={seriesIndexById.get(bar.productId) ?? laneIndex} color={color} />
                       <span className="block h-1.5 w-full rounded-full bg-white" aria-hidden="true">
                         {bar.ratio > 0 ? (
                           <span

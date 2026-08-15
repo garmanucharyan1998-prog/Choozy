@@ -4,6 +4,7 @@ import { CompareTray } from "widgets/compare-tray";
 import { FooterWidget } from "widgets/footer";
 import { HeaderWidget } from "widgets/header";
 import { NavPanelWidget } from "widgets/nav-panel";
+import { useTruncationTitles } from "shared/lib/useTruncationTitles";
 import { useSiteShellPresenter } from "widgets/site-shell/presenter/useSiteShellPresenter";
 
 const MAIN_BACKGROUND_CLASSES = {
@@ -34,6 +35,13 @@ const SiteShell = ({ mainBackground = "white" }) => {
     headerShellRef,
   } = useSiteShellPresenter();
 
+  /**
+   * Mounted here because this layout route outlives every page navigation, so one observer
+   * covers the whole site instead of one per page. See the hook for why this is measured
+   * centrally rather than declared at each of the ~24 truncating elements.
+   */
+  useTruncationTitles();
+
   return (
     <div className="flex min-h-screen min-w-[320px] flex-col bg-white">
       <div
@@ -44,7 +52,17 @@ const SiteShell = ({ mainBackground = "white" }) => {
         aria-hidden="true"
       />
 
-      <div className="header-shell-spacer sticky top-0 z-[70] shrink-0">
+      {/**
+       * Pinned everywhere except on a viewport too short to afford it. On a 667x375 landscape
+       * phone the header holds 180px and the fixed bottom nav 92px, leaving 103px of page — the
+       * chrome had become the content. Below `short` it scrolls away like any other block and
+       * the bottom nav carries navigation, which is what it is for.
+       *
+       * `short:relative`, not `short:static`: the painted header inside is `absolute inset-x-0`,
+       * so this element has to keep establishing its containing block. Turning it static would
+       * hand the header to whatever positioned ancestor came next and tear the layout apart.
+       */}
+      <div className="header-shell-spacer sticky short:relative top-0 z-[70] shrink-0">
         {/**
          * The spacer above reserves the *expanded* height so the page never jumps when the
          * header compacts; this inner element is the header as actually painted, and the two

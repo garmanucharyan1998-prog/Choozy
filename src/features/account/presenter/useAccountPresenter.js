@@ -10,6 +10,7 @@ import {
   SIDEBAR_IDS,
   writeAccountState,
 } from "entities/user";
+import { rememberPasswordForEmail } from "entities/session";
 import { useLanguage, useSession } from "contexts";
 import { stripLanguageFromPath, useLocalizedNavigate } from "shared/lib/locale";
 
@@ -215,12 +216,19 @@ export const useAccountPresenter = () => {
 
       const newHash = await hashPassword(newPassword);
       persist((state) => ({ ...state, passwordHash: newHash }));
+      /**
+       * And in the account registry, which is what the login form checks — it is the only store
+       * keyed by a typed email and readable before a session exists. Without this line the two
+       * would drift the moment anyone changed their password: the new one would be rejected at
+       * login and the old one would still work.
+       */
+      rememberPasswordForEmail(session.email, newHash);
       setPasswordDraft(emptyPasswordDraft());
       setStatusKey("account.messages.passwordSaved");
     } catch {
       setPasswordErrorKey("account.password.saveFailed");
     }
-  }, [passwordDraft, persist]);
+  }, [passwordDraft, persist, session.email]);
 
   const cancelPasswordEdit = useCallback(() => {
     setPasswordDraft(emptyPasswordDraft());

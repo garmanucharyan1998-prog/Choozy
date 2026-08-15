@@ -114,7 +114,21 @@ const Footer = () => {
             </div>
           </div>
 
-          <nav className="flex flex-col gap-3 w-full sm:gap-5 md:flex-row md:gap-10 md:w-auto md:flex-1 md:justify-end lg:gap-20 lg:px-20">
+          {/**
+           * The wide spacing waits for `xl`, not `lg`, because it does not fit at `lg`.
+           *
+           * A flex item cannot shrink below its min-content width (`min-width: auto`), and at
+           * `lg` this nav's min-content was 920px: three 200px columns (`lg:min-w-[200px]`) plus
+           * two 80px gaps plus 160px of its own padding. The `lg` breakpoint starts at 1024px,
+           * where the row only has 800px to give it — so the nav stood 120px wider than its
+           * parent, broke out of the footer's right padding, and put 60px of horizontal scroll
+           * on *every page of the site* at that width. It went unseen because 1024 sits exactly
+           * in the gap between the two widths the responsive harness used to check, 768 and 1280.
+           *
+           * At `lg` the columns and their 48px gaps come to 696px, inside the 800px available;
+           * by `xl` (1280px) the row has 1056px, so the original 80px gaps and padding fit.
+           */}
+          <nav className="flex flex-col gap-3 w-full sm:gap-5 md:flex-row md:gap-10 md:w-auto md:flex-1 md:justify-end lg:gap-12 xl:gap-20 xl:px-20">
             {footerColumns.map((column) => (
               <ul key={column[0].id} className={`m-0 list-none p-0 ${columnClassName}`}>
                 {column.map((link) => (

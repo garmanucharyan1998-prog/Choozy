@@ -94,3 +94,26 @@ describe("Header — signed in as seller", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("Header — the mobile navigation panel", () => {
+  /**
+   * jsdom lays nothing out, so the overflow itself cannot be reproduced here — this pins the
+   * declaration that decides it.
+   *
+   * The defect: the panel is a fixed box exactly one viewport tall with `overflow-y: visible`.
+   * Measured on a 667x375 landscape phone, 288px of links sat in a 235px box and the last entry
+   * ("Privacy policy") painted at y=388, off the bottom of the screen — the panel would not
+   * scroll, and `body` is locked while the menu is open, so the page would not either. It was
+   * unreachable, and signing in adds another entry to the same list.
+   */
+  test("scrolls its own contents rather than hiding the entries that overflow", async () => {
+    const { container } = renderHeaderAs(SIGNED_OUT);
+    await screen.findByRole("navigation", { name: dict.header.userNavigationAriaLabel });
+
+    const panel = container.querySelector("aside");
+    expect(panel).not.toBeNull();
+    expect(panel.className).toMatch(/\boverflow-y-auto\b/);
+    /** And that scroll must not chain to the locked page behind it once the panel bottoms out. */
+    expect(panel.className).toMatch(/\boverscroll-contain\b/);
+  });
+});

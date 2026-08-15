@@ -108,7 +108,17 @@ const ShopStatisticsWidget = () => {
           aria-label={t("shopAccount.statistics.chartAria")}
         >
           {hasMounted && (
-            <ResponsiveContainer width="100%" height="100%">
+            /**
+             * Same reason as the price-history chart: `initialDimension` defaults to
+             * `{ width: -1, height: -1 }`, so Recharts renders once at that size and warns
+             * before its ResizeObserver reports. 260 is this box's height at its smallest
+             * (`h-[260px]`, `md:h-[300px]`); the first measurement corrects both numbers.
+             */
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              initialDimension={{ width: 320, height: 260 }}
+            >
               <LineChart data={chartData} margin={{ top: 12, right: 8, left: 4, bottom: 4 }}>
                 <CartesianGrid
                   stroke={GRID_STROKE}

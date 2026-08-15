@@ -18,15 +18,23 @@ export {
   clearCompareIds,
   notifyCompareRejected,
 } from "./model/compareStorage";
-export { COMPARE_SECTION_IDS, buildCompareRows } from "./model/compareRows";
+export {
+  COMPARE_SECTION_IDS,
+  OFFER_SORT_DIRECTIONS,
+  buildCompareRows,
+  sortOfferRowsByPrice,
+} from "./model/compareRows";
 export {
   COMPARE_ATTRIBUTES,
   COMPARE_ATTRIBUTE_BY_KEY,
   pickRadarAxes,
 } from "./model/compareAttributes";
+export { COMPARE_SPEC_GROUPS, specGroupIdForLabelKey } from "./model/compareSpecGroups";
 export { buildRadarData } from "./model/compareNormalize";
 export { buildCompareBars } from "./model/compareBarsModel";
 export { buildCompareAdvantages } from "./model/compareAdvantages";
+export { buildCompareBestOffers } from "./model/compareBestOffers";
+export { buildCompareKeyDifferences } from "./model/compareKeyDifferences";
 export {
   COMPARE_PAIRS,
   buildComparePairSlug,

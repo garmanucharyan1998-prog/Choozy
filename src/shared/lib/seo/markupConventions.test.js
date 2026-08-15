@@ -127,13 +127,15 @@ describe("markup conventions", () => {
    * used to crop this exact way before switching to the shared component).
    */
   test("product photos render through ProductCardImage, not a raw img", () => {
-    /** Small in-form preview thumbnails already using `object-contain` — real bugs, if any, are elsewhere. */
-    const ALLOWED_RAW_PRODUCT_IMAGES = ["widgets/shop-account-dashboard/ui/ShopAccountDashboardWidget.jsx"];
+    /**
+     * No exemptions. The seller dashboard's add-product preview was the last one — a raw `<img>`
+     * with its own `object-contain` — and it now goes through `ProductCardImage` like every other
+     * product photo, so it gets the same broken-image fallback and deferred loading.
+     */
     const offenders = [];
 
     jsxFiles.forEach((file) => {
       const rel = relative(file);
-      if (ALLOWED_RAW_PRODUCT_IMAGES.includes(rel)) return;
       elementTags(readFileSync(file, "utf8"))
         .filter((tag) => /^<img[\s/>]/.test(tag))
         .forEach((tag) => {

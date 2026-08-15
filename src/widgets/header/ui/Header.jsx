@@ -15,7 +15,7 @@ import {
 } from "react-icons/fa";
 import { useHeaderPresenter } from "features/header";
 import { LoginModal } from "features/login";
-import { useLogout } from "features/session";
+import { LogoutConfirmDialog, useLogoutConfirm } from "features/session";
 import { useProductCompare } from "features/product-compare";
 import { ACCOUNT_STORAGE_EVENT, adoptGuestShelfForSession, readAccountState } from "entities/user";
 import { dashboardPathForRole, ROLES } from "entities/session";
@@ -51,17 +51,21 @@ function HeaderCountBadge({ text }) {
 }
 
 /**
- * `useLogout` calls `useSubmit()`, which needs a data router — fine in the real app, but
- * `SiteShell.test.jsx` renders the header under a plain declarative `MemoryRouter` with
- * no signed-in session. Calling `useLogout()` here, in a component only ever mounted
- * inside an `isAuthenticated` branch, keeps it out of Header's own unconditional render
- * path — same fix as LoginModal/LoginModalDialog for the same underlying constraint.
+ * Opens the logout confirmation rather than logging out.
+ *
+ * It used to call `useLogout()` itself, which is why it is a component at all: `useSubmit()`
+ * needs a data router, and `SiteShell.test.jsx` renders the header under a plain declarative
+ * `MemoryRouter`, so the call had to stay inside an `isAuthenticated` branch. The submission now
+ * lives in the dialog — which mounts only once opened — so this is an ordinary button, and the
+ * constraint is satisfied by construction instead of by where the component is placed.
+ *
+ * `onBeforeLogout` still runs first: the mobile entry uses it to close the navigation panel, so
+ * the question is not asked from underneath it.
  */
-function LogoutButton({ className, children, onBeforeLogout, ...rest }) {
-  const handleLogout = useLogout();
+function LogoutButton({ className, children, onBeforeLogout, onRequestLogout, ...rest }) {
   const handleClick = () => {
     onBeforeLogout?.();
-    handleLogout();
+    onRequestLogout();
   };
   return (
     <button type="button" className={className} onClick={handleClick} {...rest}>
@@ -90,6 +94,12 @@ const Header = ({
   const [wishlistCount, setWishlistCount] = useState(0);
   /** Same hydration story, handled inside the hook: starts at 0, fills in after mount. */
   const { compareCount } = useProductCompare();
+  /**
+   * One confirmation shared by both logout triggers — the compact icon in the header row and the
+   * entry in the mobile navigation panel. Holds a boolean only, no router hooks, so it is safe on
+   * Header's unconditional render path.
+   */
+  const { isConfirming: isConfirmingLogout, requestLogout, cancelLogout } = useLogoutConfirm();
   const headerRef = useRef(null);
   const mobileBottomNavRef = useRef(null);
 
@@ -640,6 +650,7 @@ const Header = ({
                 className={logoutButtonClassName}
                 title={t("auth.logoutAria")}
                 aria-label={t("auth.logoutAria")}
+                onRequestLogout={requestLogout}
               >
                 <FaSignOutAlt size={16} aria-hidden="true" />
               </LogoutButton>
@@ -713,7 +724,18 @@ const Header = ({
 
           {isLanguageDropdownOpen && (
             <div
-              className="absolute top-[calc(100%+8px)] right-1/2 z-50 min-w-[7.5rem] translate-x-1/2 overflow-hidden rounded-xl border border-[#d1d5db] bg-white py-1.5 shadow-[0_4px_14px_rgba(15,23,42,0.12)] md:right-0 md:translate-x-0"
+              /**
+               * Anchored to the trigger's right edge at every width, not centred on it.
+               *
+               * `right-1/2 translate-x-1/2` centred the panel on its button, and this button is
+               * the last thing in the header — so half of a 120px panel hung off the right edge
+               * of the screen. Opening the language menu on a phone put 18px of horizontal
+               * scroll on the page (20px in Russian, whose language names are longer), which in
+               * turn dragged the bottom nav and the compare tray out past the viewport with it.
+               * Only reachable by opening the menu, so nothing that measures pages at rest saw
+               * it. `md:right-0` was already doing the correct thing above the md breakpoint.
+               */
+              className="absolute top-[calc(100%+8px)] right-0 z-50 min-w-[7.5rem] overflow-hidden rounded-xl border border-[#d1d5db] bg-white py-1.5 shadow-[0_4px_14px_rgba(15,23,42,0.12)]"
               role="listbox"
               aria-label={t("header.selectLanguageAriaLabel")}
             >
@@ -768,6 +790,7 @@ const Header = ({
       loginLinkClassName,
       logoutButtonClassName,
       openLoginModal,
+      requestLogout,
       isAuthenticated,
       isSeller,
       dashboardPath,
@@ -796,8 +819,24 @@ const Header = ({
         {UserNavigationSection}
       </div>
 
+      {/**
+       * Two separate reasons this panel could not show all of its entries on a short screen.
+       *
+       * It did not scroll: a fixed box exactly one viewport tall with `overflow-y: visible`, and
+       * contents that are not. Measured on a 667x375 landscape phone, 288px of links in a 235px
+       * box, with "Privacy policy" painted at y=388 — off the bottom, with `body` locked so the
+       * page would not scroll either. `overflow-y-auto` fixes that half; `overscroll-contain`
+       * keeps the scroll from chaining to the locked page behind it.
+       *
+       * And it ran under the bottom navigation: the panel is `z-40` and so is the fixed bottom
+       * nav, which spans the last 91px of the viewport and wins on paint order. Scrolled fully,
+       * the last entry landed at y=311 and `elementFromPoint` returned a bottom-nav button — on
+       * screen, and still untappable. So the panel's height subtracts that band, exactly as the
+       * compare tray, the footer and the scroll-to-top button already do. One more entry appears
+       * here when signed in, which is why both halves matter.
+       */}
       <aside
-        className={`fixed top-[var(--header-height,72px)] right-0 z-40 w-[75vw] max-w-[300px] h-[calc(100vh-var(--header-height,72px))] bg-white border-l border-[#e6e9f2] px-3 py-5 sm:px-4 sm:py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
+        className={`fixed top-[var(--header-height,72px)] right-0 z-40 w-[75vw] max-w-[300px] h-[calc(100vh-var(--header-height,72px)-var(--mobile-bottom-nav-height,0px)-var(--mobile-viewport-offset-bottom,0px))] overflow-y-auto overscroll-contain bg-white border-l border-[#e6e9f2] px-3 py-5 sm:px-4 sm:py-6 shadow-[0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-[400ms] ease-in-out md:hidden ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-label={t("header.mobileNavigationAriaLabel")}
@@ -824,6 +863,7 @@ const Header = ({
             <LogoutButton
               className="block w-full border-0 bg-transparent p-0 text-left text-sm font-medium text-[#171717]"
               onBeforeLogout={handleMobileMenuClose}
+              onRequestLogout={requestLogout}
             >
               {t("auth.logout")}
             </LogoutButton>
@@ -889,6 +929,11 @@ const Header = ({
       </nav>
 
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      {/**
+       * Rendered from the header rather than from each trigger, so the compact icon and the
+       * mobile panel entry raise the same dialog — and so it survives the panel closing under it.
+       */}
+      <LogoutConfirmDialog isOpen={isConfirmingLogout} onCancel={cancelLogout} />
     </header>
   );
 };

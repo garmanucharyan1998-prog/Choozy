@@ -25,7 +25,9 @@
  * untranslated on every Armenian and Russian product page. The view resolves `valueKey`
  * when present and falls back to `value`.
  */
+import { formatAmd } from "shared/lib/formatAmd";
 import { formatStorageGb } from "shared/lib/formatStorageGb";
+import { benchmarksForProduct } from "./productBenchmarks";
 import { getBrandLabel } from "./productBrands";
 
 /** Drops rows whose value came out empty because the product has no such field. */
@@ -168,8 +170,29 @@ const buildBrief = (p) => {
   }
 };
 
+/**
+ * Benchmark rows, for the categories the benchmarks run on.
+ *
+ * Emitted from the universal builder rather than repeated across four category branches: the
+ * model returns `null` for anything AnTuTu and Geekbench do not apply to, which becomes an empty
+ * value, which `withoutEmptyValues` drops. A monitor gets no benchmark row because it has no
+ * score, not because a branch remembered to leave one out.
+ *
+ * The numbers are demo data — see `productBenchmarks.js`. `formatAmd` is used for the grouping
+ * only ("1,240,000"); nothing here is a currency.
+ */
+const benchmarkRows = (p) => {
+  const { antutu, geekbenchSingle, geekbenchMulti } = benchmarksForProduct(p);
+  return [
+    { labelKey: "productDetail.specsExtended.antutu", value: formatAmd(antutu) },
+    { labelKey: "productDetail.specsExtended.geekbenchSingle", value: formatAmd(geekbenchSingle) },
+    { labelKey: "productDetail.specsExtended.geekbenchMulti", value: formatAmd(geekbenchMulti) },
+  ];
+};
+
 /** Facts every category's product carries, appended to every extended table. */
 const buildUniversalExtended = (p, manufacturer) => [
+  ...benchmarkRows(p),
   weightRow(p, "productDetail.specsExtended.weight"),
   warrantyRow(p, "productDetail.specsExtended.warranty"),
   modelNumberRow(p, "productDetail.specsExtended.modelNumber"),

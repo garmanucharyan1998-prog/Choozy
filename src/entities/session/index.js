@@ -15,4 +15,10 @@ export {
   SESSION_MAX_AGE_SECONDS,
   SHOP_ACCOUNT_ROOT,
 } from "./model/sessionModel";
-export { readRoleForEmail, rememberRoleForEmail } from "./model/roleRegistry";
+export {
+  hasAccountForEmail,
+  readPasswordHashForEmail,
+  readRoleForEmail,
+  rememberPasswordForEmail,
+  rememberRoleForEmail,
+} from "./model/roleRegistry";

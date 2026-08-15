@@ -1,15 +1,34 @@
 import { FaCheck } from "react-icons/fa";
+import { CompareSeriesToken } from "./CompareSeriesToken";
+import {
+  SECTION_HEADING,
+  SECTION_PAD,
+  SECTION_SUBHEADING,
+  SURFACE,
+  SURFACE_INSET,
+} from "./compareStyles";
 
 /**
- * A "why this one" card per compared product — the same numbers the bars already show, reframed
- * as a verdict instead of a grid. This is the unique, per-pair prose the 100+ generated
- * `/compare/<a>-vs-<b>` pages were otherwise missing: two pages comparing different phones
- * against the same third one used to render an otherwise-identical table shape.
+ * "Why you might choose this one" — one card per compared product, and the last thing on the page
+ * because it is the last question: everything above establishes what the differences are, and this
+ * says what each of them is worth choosing for.
  *
- * Every product gets a card — `buildCompareAdvantages` guarantees at least one bullet each
- * (falling back to its own price as a plain fact) — so a product with no real strengths never
- * renders as a silently missing card next to the others.
+ * These are deliberately **not** a single "best overall" verdict. A composite score across price,
+ * storage, RAM, battery and weight needs weights, and the catalog has no basis for choosing them —
+ * any number this page invented would be precision it cannot support, dressed up as advice. What
+ * it can defend is the per-attribute winner, with the value that won and the value it beat, which
+ * is what every bullet here is.
  *
+ * `buildCompareAdvantages` guarantees at least one bullet per product (falling back to its own
+ * price, stated as a plain fact rather than as a claim), so a product with no measured strengths
+ * never renders as a silently missing card next to three full ones.
+ *
+ * This is also the unique per-pair prose the 100+ generated `/compare/<a>-vs-<b>` pages were
+ * otherwise missing — two pages comparing different phones against the same third one used to
+ * render an otherwise-identical table shape and nothing else.
+ */
+
+/**
  * @param {{
  *   t: (key: string, fallback?: string) => string,
  *   products: { id: string, title: string }[],
@@ -19,7 +38,7 @@ import { FaCheck } from "react-icons/fa";
  */
 export const CompareAdvantages = ({ t, products, advantages, seriesColors }) => {
   const cards = products
-    .map((product) => ({ product, items: advantages[product.id] ?? [] }))
+    .map((product, index) => ({ product, index, items: advantages[product.id] ?? [] }))
     .filter(({ items }) => items.length > 0);
 
   if (cards.length === 0) return null;
@@ -33,37 +52,49 @@ export const CompareAdvantages = ({ t, products, advantages, seriesColors }) => 
   const betterThanTemplate = t("comparePage.advantages.betterThan");
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {cards.map(({ product, items }) => (
-        <article
-          key={product.id}
-          className="flex flex-col gap-3 rounded-2xl border border-t-4 border-border-blue bg-white p-4 md:p-5"
-          style={{ borderTopColor: seriesColors[product.id] }}
-        >
-          <h3 className="m-0 text-sm font-bold text-navy sm:text-base md:text-lg">
-            {headingTemplate.replace("{{title}}", product.title)}
-          </h3>
-          <ul className="m-0 flex list-none flex-col gap-2 p-0 text-xs text-navy sm:text-sm md:text-base">
-            {items.map((item) => (
-              <li key={item.labelKey} className="flex items-start gap-2">
-                <FaCheck className="mt-0.5 h-3 w-3 shrink-0 text-emerald-600" aria-hidden />
-                <span>
-                  {t(item.labelKey)}: <strong>{item.formatted}</strong>
-                  {item.deltaPercent != null && item.baselineFormatted ? (
-                    <span className="text-emerald-700">
-                      {" — "}
-                      {betterThanTemplate
-                        .replace("{{percent}}", String(item.deltaPercent))
-                        .replace("{{baseline}}", item.baselineFormatted)}
-                    </span>
-                  ) : null}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </article>
-      ))}
-    </div>
+    <section
+      aria-labelledby="compare-verdict-heading"
+      className={`${SURFACE} ${SECTION_PAD} flex flex-col gap-4`}
+    >
+      <div className="flex flex-col gap-1.5">
+        <h2 id="compare-verdict-heading" className={SECTION_HEADING}>
+          {t("comparePage.advantages.sectionHeading")}
+        </h2>
+        <p className={SECTION_SUBHEADING}>{t("comparePage.advantages.sectionIntro")}</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {cards.map(({ product, index, items }) => (
+          <article
+            key={product.id}
+            className={`${SURFACE_INSET} flex flex-col gap-3 p-3 md:p-4`}
+          >
+            <h3 className="m-0 flex items-center gap-2 text-xs font-bold text-navy sm:text-sm md:text-base">
+              <CompareSeriesToken index={index} color={seriesColors[product.id]} />
+              {headingTemplate.replace("{{title}}", product.title)}
+            </h3>
+            <ul className="m-0 flex list-none flex-col gap-2 p-0 text-xs text-navy sm:text-sm">
+              {items.map((item) => (
+                <li key={item.labelKey} className="flex items-start gap-2">
+                  <FaCheck className="mt-0.5 h-3 w-3 shrink-0 text-emerald-600" aria-hidden />
+                  <span>
+                    {t(item.labelKey)}: <strong className="tabular-nums">{item.formatted}</strong>
+                    {item.deltaPercent != null && item.baselineFormatted ? (
+                      <span className="text-text-muted">
+                        {" — "}
+                        {betterThanTemplate
+                          .replace("{{percent}}", String(item.deltaPercent))
+                          .replace("{{baseline}}", item.baselineFormatted)}
+                      </span>
+                    ) : null}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 };
 

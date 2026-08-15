@@ -1,0 +1,33 @@
+/*
+ * The scroll affordance for the comparison tables.
+ *
+ * A horizontally scrolling table on a phone has one hard problem: nothing on screen says there is
+ * more to the right. The columns are cut off flush at the frame's edge, which reads as "the table
+ * ends here" rather than "keep swiping". The usual fixes are a JavaScript scroll listener toggling
+ * a class, or a permanent arrow that lies once you reach the end.
+ *
+ * This is the CSS-only version of the same idea, and it is exact rather than approximate. Two
+ * gradients are painted at the right-hand edge: a shadow attached `scroll` (pinned to the box) and
+ * a white cover attached `local` (it scrolls with the content). At the end of the scroll range the
+ * cover sits over the shadow and hides it; anywhere before that the cover has moved away and the
+ * shadow shows. So the shadow exists exactly while there is more table to the right, and vanishes
+ * exactly when there is not — no listener, no state, nothing to fall out of sync on a resize or a
+ * column being removed.
+ *
+ * Only the right-hand edge is treated. The left one is permanently covered by the opaque
+ * `sticky left-0` label column, so a shadow there would be a smudge nobody could see the point of.
+ */
+.compare-scroller {
+  --compare-scroll-shadow: rgba(21, 33, 71, 0.13);
+  background-image:
+    linear-gradient(to left, #fff 25%, rgba(255, 255, 255, 0)),
+    linear-gradient(to left, var(--compare-scroll-shadow), rgba(21, 33, 71, 0));
+  background-position:
+    100% 0,
+    100% 0;
+  background-repeat: no-repeat;
+  background-size:
+    36px 100%,
+    14px 100%;
+  background-attachment: local, scroll;
+}

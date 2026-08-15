@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import {
   getCatalogProductById,
@@ -14,6 +14,7 @@ import {
   SHOP_COLOR_OPTIONS,
   SHOP_MEMORY_OPTIONS,
   SHOP_PRODUCT_CATEGORY_IDS,
+  SHOP_ACCOUNT_PERSIST_ERROR_EVENT,
   SHOP_ACCOUNT_STORAGE_EVENT,
   SHOP_INNER_TABS,
   SHOP_NOTIFICATIONS_PAGE_TABS,
@@ -32,13 +33,25 @@ const SHOP_ACCOUNT_PATH_BY_SIDEBAR = {
   [SHOP_SIDEBAR_IDS.FINANCE]: "/account/shop-account/finance",
 };
 
-const sidebarIdFromPathname = (pathname) => {
-  const base = stripLanguageFromPath(pathname).replace(/\/$/, "") || "/account/shop-account";
-  if (base === "/account/shop-account/products") return SHOP_SIDEBAR_IDS.PRODUCTS;
-  if (base === "/account/shop-account/statistics") return SHOP_SIDEBAR_IDS.STATISTICS;
-  if (base === "/account/shop-account/finance") return SHOP_SIDEBAR_IDS.FINANCE;
-  return SHOP_SIDEBAR_IDS.DETAILS;
+/**
+ * What a status message *is*, not just what it says.
+ *
+ * Every message used to render in the same green "saved" panel, including
+ * `avatarTooLarge` and every "you forgot a field" — an interface telling a seller their upload
+ * failed while painting it as a success. Callers now name the tone, and the two error paths
+ * (a rejected input, a write that could not be persisted) look like errors.
+ */
+export const SHOP_STATUS_TONES = {
+  SUCCESS: "success",
+  ERROR: "error",
+  INFO: "info",
 };
+
+/** Long enough to read a confirmation, short enough not to sit over the next action. */
+const STATUS_AUTO_DISMISS_MS = 5000;
+
+/** How long a row shows "refreshed just now" — and stays un-clickable, so one click is one refresh. */
+const REFRESH_ACK_MS = 2500;
 
 const emptyProfileDraft = () => ({ ...readShopAccountState().profile });
 
@@ -50,6 +63,14 @@ const emptyProductDraft = () => ({
   selectedMemoryIds: [],
   selectedColorIds: [],
 });
+
+const sidebarIdFromPathname = (pathname) => {
+  const base = stripLanguageFromPath(pathname).replace(/\/$/, "") || "/account/shop-account";
+  if (base === "/account/shop-account/products") return SHOP_SIDEBAR_IDS.PRODUCTS;
+  if (base === "/account/shop-account/statistics") return SHOP_SIDEBAR_IDS.STATISTICS;
+  if (base === "/account/shop-account/finance") return SHOP_SIDEBAR_IDS.FINANCE;
+  return SHOP_SIDEBAR_IDS.DETAILS;
+};
 
 const newShopProductId = () =>
   typeof window !== "undefined" &&
@@ -123,10 +144,51 @@ export const useShopAccountPresenter = () => {
   );
   const [isShopEditMode, setIsShopEditMode] = useState(false);
   const [profileDraft, setProfileDraft] = useState(() => emptyProfileDraft());
-  const [statusKey, setStatusKey] = useState("");
+  const [status, setStatus] = useState(null);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
   const [productDraft, setProductDraft] = useState(() => emptyProductDraft());
+  /**
+   * A rejected field is reported next to the form that rejected it, not in the page-level
+   * toast: "choose a category" floating above a form the seller has scrolled past is a message
+   * about nothing they can see.
+   */
+  const [formErrorKey, setFormErrorKey] = useState("");
+  const [profileErrorKey, setProfileErrorKey] = useState("");
+  const [isAvatarUploading, setIsAvatarUploading] = useState(false);
+  const [justRefreshedIds, setJustRefreshedIds] = useState(() => new Set());
+  /** The listings a confirmation dialog is currently asking about. Empty = no dialog. */
+  const [pendingDeleteIds, setPendingDeleteIds] = useState([]);
+
+  const statusTimerRef = useRef(0);
+  const refreshTimersRef = useRef(new Map());
+
+  const dismissStatus = useCallback(() => {
+    window.clearTimeout(statusTimerRef.current);
+    setStatus(null);
+  }, []);
+
+  /**
+   * Success and information disappear on their own — a seller refreshing twelve listings does
+   * not want to dismiss twelve panels. Errors stay until read, because the thing they report
+   * has not been fixed by time passing.
+   */
+  const announce = useCallback((key, tone = SHOP_STATUS_TONES.SUCCESS, values = null) => {
+    window.clearTimeout(statusTimerRef.current);
+    setStatus({ key, tone, values });
+    if (tone !== SHOP_STATUS_TONES.ERROR) {
+      statusTimerRef.current = window.setTimeout(() => setStatus(null), STATUS_AUTO_DISMISS_MS);
+    }
+  }, []);
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(statusTimerRef.current);
+      refreshTimersRef.current.forEach((timerId) => window.clearTimeout(timerId));
+      refreshTimersRef.current.clear();
+    },
+    [],
+  );
 
   const persist = useCallback((updater) => {
     const saved = writeShopAccountState(updater);
@@ -149,58 +211,82 @@ export const useShopAccountPresenter = () => {
     return () => window.removeEventListener(SHOP_ACCOUNT_STORAGE_EVENT, sync);
   }, []);
 
+  /**
+   * A write that never reached storage is a change the seller will lose without being told.
+   * The model refuses to throw from there (a `FileReader` callback has nothing to catch it), so
+   * it announces instead and this turns the announcement into a visible error.
+   */
+  useEffect(() => {
+    const onPersistError = () =>
+      announce("shopAccount.messages.saveFailed", SHOP_STATUS_TONES.ERROR);
+    window.addEventListener(SHOP_ACCOUNT_PERSIST_ERROR_EVENT, onPersistError);
+    return () => window.removeEventListener(SHOP_ACCOUNT_PERSIST_ERROR_EVENT, onPersistError);
+  }, [announce]);
+
   useEffect(() => {
     if (activeSidebarId !== SHOP_SIDEBAR_IDS.PRODUCTS) return undefined;
 
     const pruneExpired = () => {
-      let removed = false;
+      let removed = 0;
       persist((state) => {
         const pruned = pruneStaleShopProducts(state.shopProducts);
         if (pruned.length === state.shopProducts.length) return state;
-        removed = true;
+        removed = state.shopProducts.length - pruned.length;
         return { ...state, shopProducts: pruned };
       });
-      if (removed) setStatusKey("shopAccount.products.messages.autoRemoved");
+      if (removed > 0) {
+        announce("shopAccount.products.messages.autoRemoved", SHOP_STATUS_TONES.INFO, {
+          count: removed,
+        });
+      }
     };
 
     pruneExpired();
     const intervalId = window.setInterval(pruneExpired, 60 * 60 * 1000);
     return () => window.clearInterval(intervalId);
-  }, [activeSidebarId, persist]);
+  }, [activeSidebarId, persist, announce]);
 
   const selectSidebar = useCallback(
     (id) => {
       setActiveSidebarId(id);
-      setStatusKey("");
+      dismissStatus();
       setIsShopEditMode(false);
       setProfileDraft(emptyProfileDraft());
+      setProfileErrorKey("");
       setShopInnerTab(SHOP_INNER_TABS.DATA);
       setShowProductForm(false);
       setEditingProductId(null);
       setProductDraft(emptyProductDraft());
+      setFormErrorKey("");
       const path = SHOP_ACCOUNT_PATH_BY_SIDEBAR[id] || "/account/shop-account";
       navigate(path);
     },
-    [navigate],
+    [navigate, dismissStatus],
   );
 
-  const selectShopInnerTab = useCallback((tabId) => {
-    setShopInnerTab(tabId);
-    setStatusKey("");
-    if (tabId !== SHOP_INNER_TABS.DATA) {
-      setIsShopEditMode(false);
-      setProfileDraft(emptyProfileDraft());
-    }
-  }, []);
+  const selectShopInnerTab = useCallback(
+    (tabId) => {
+      setShopInnerTab(tabId);
+      dismissStatus();
+      if (tabId !== SHOP_INNER_TABS.DATA) {
+        setIsShopEditMode(false);
+        setProfileDraft(emptyProfileDraft());
+        setProfileErrorKey("");
+      }
+    },
+    [dismissStatus],
+  );
 
   const enterShopEdit = useCallback(() => {
     setProfileDraft({ ...readShopAccountState().profile });
     setIsShopEditMode(true);
-    setStatusKey("");
-  }, []);
+    setProfileErrorKey("");
+    dismissStatus();
+  }, [dismissStatus]);
 
   const exitShopEdit = useCallback(() => {
     setIsShopEditMode(false);
+    setProfileErrorKey("");
     setProfileDraft({ ...readShopAccountState().profile });
   }, []);
 
@@ -226,9 +312,10 @@ export const useShopAccountPresenter = () => {
       const shopName = profileDraft.shopName.trim();
       const email = profileDraft.email.trim();
       if (!shopName || !email) {
-        setStatusKey("shopAccount.messages.profileRequired");
+        setProfileErrorKey("shopAccount.messages.profileRequired");
         return;
       }
+      setProfileErrorKey("");
       persist((state) => ({
         ...state,
         profile: {
@@ -240,34 +327,44 @@ export const useShopAccountPresenter = () => {
           website: profileDraft.website.trim(),
         },
       }));
-      setStatusKey("shopAccount.messages.profileSaved");
+      announce("shopAccount.messages.profileSaved");
       setIsShopEditMode(false);
     },
-    [persist, profileDraft],
+    [persist, profileDraft, announce],
   );
 
   const setAvatarFromFile = useCallback(
     (file) => {
-      if (!file || !file.type.startsWith("image/")) return;
-      if (file.size > 200 * 1024) {
-        setStatusKey("shopAccount.messages.avatarTooLarge");
+      if (!file || !file.type.startsWith("image/")) {
+        announce("shopAccount.messages.avatarNotAnImage", SHOP_STATUS_TONES.ERROR);
         return;
       }
+      if (file.size > 200 * 1024) {
+        announce("shopAccount.messages.avatarTooLarge", SHOP_STATUS_TONES.ERROR);
+        return;
+      }
+      /** The one genuinely asynchronous step in this dashboard, so it is the one with a spinner. */
+      setIsAvatarUploading(true);
       const reader = new FileReader();
       reader.onload = () => {
         const result = typeof reader.result === "string" ? reader.result : "";
         persist((state) => ({ ...state, avatarDataUrl: result }));
-        setStatusKey("shopAccount.messages.avatarSaved");
+        setIsAvatarUploading(false);
+        announce("shopAccount.messages.avatarSaved");
+      };
+      reader.onerror = () => {
+        setIsAvatarUploading(false);
+        announce("shopAccount.messages.avatarFailed", SHOP_STATUS_TONES.ERROR);
       };
       reader.readAsDataURL(file);
     },
-    [persist],
+    [persist, announce],
   );
 
   const clearAvatar = useCallback(() => {
     persist((state) => ({ ...state, avatarDataUrl: "" }));
-    setStatusKey("shopAccount.messages.avatarRemoved");
-  }, [persist]);
+    announce("shopAccount.messages.avatarRemoved");
+  }, [persist, announce]);
 
   const toggleShopNotification = useCallback(
     (key) => {
@@ -278,9 +375,9 @@ export const useShopAccountPresenter = () => {
           [key]: !state.notificationPrefs[key],
         },
       }));
-      setStatusKey("shopAccount.messages.notificationsSaved");
+      announce("shopAccount.messages.notificationsSaved");
     },
-    [persist],
+    [persist, announce],
   );
 
   const formattedPhone = useMemo(() => {
@@ -346,9 +443,10 @@ export const useShopAccountPresenter = () => {
   const openProductForm = useCallback(() => {
     setEditingProductId(null);
     setProductDraft(emptyProductDraft());
+    setFormErrorKey("");
     setShowProductForm(true);
-    setStatusKey("");
-  }, []);
+    dismissStatus();
+  }, [dismissStatus]);
 
   const openProductEdit = useCallback(
     (productId) => {
@@ -356,16 +454,18 @@ export const useShopAccountPresenter = () => {
       if (!product) return;
       setEditingProductId(productId);
       setProductDraft(productToDraft(product, t));
+      setFormErrorKey("");
       setShowProductForm(true);
-      setStatusKey("");
+      dismissStatus();
     },
-    [shopState.shopProducts, t],
+    [shopState.shopProducts, t, dismissStatus],
   );
 
   const cancelProductForm = useCallback(() => {
     setShowProductForm(false);
     setEditingProductId(null);
     setProductDraft(emptyProductDraft());
+    setFormErrorKey("");
   }, []);
 
   const catalogProductsForDraft = useMemo(
@@ -383,16 +483,16 @@ export const useShopAccountPresenter = () => {
       event.preventDefault();
       const price = productDraft.price.trim();
       if (!productDraft.categoryId) {
-        setStatusKey("shopAccount.products.messages.categoryRequired");
+        setFormErrorKey("shopAccount.products.messages.categoryRequired");
         return;
       }
       if (!productDraft.catalogProductId) {
-        setStatusKey("shopAccount.products.messages.productRequired");
+        setFormErrorKey("shopAccount.products.messages.productRequired");
         return;
       }
       const catalogProduct = getCatalogProductById(productDraft.catalogProductId);
       if (!catalogProduct) {
-        setStatusKey("shopAccount.products.messages.productRequired");
+        setFormErrorKey("shopAccount.products.messages.productRequired");
         return;
       }
       /**
@@ -403,7 +503,7 @@ export const useShopAccountPresenter = () => {
        */
       const { price: formattedPrice, priceAmd } = formatShopPrice(price);
       if (!formattedPrice) {
-        setStatusKey("shopAccount.products.messages.priceRequired");
+        setFormErrorKey("shopAccount.products.messages.priceRequired");
         return;
       }
       const variants = productDraft.selectedMemoryIds
@@ -413,7 +513,7 @@ export const useShopAccountPresenter = () => {
         })
         .filter(Boolean);
       if (variants.length === 0) {
-        setStatusKey("shopAccount.products.messages.memoryRequired");
+        setFormErrorKey("shopAccount.products.messages.memoryRequired");
         return;
       }
       const colorPayload = productDraft.selectedColorIds
@@ -424,9 +524,10 @@ export const useShopAccountPresenter = () => {
         })
         .filter(Boolean);
       if (colorPayload.length === 0) {
-        setStatusKey("shopAccount.products.messages.colorsRequired");
+        setFormErrorKey("shopAccount.products.messages.colorsRequired");
         return;
       }
+      setFormErrorKey("");
       const availability =
         productDraft.availability === "out_of_stock" ? "out_of_stock" : "in_stock";
       const now = Date.now();
@@ -456,7 +557,7 @@ export const useShopAccountPresenter = () => {
               : entry,
           ),
         }));
-        setStatusKey("shopAccount.products.messages.productUpdated");
+        announce("shopAccount.products.messages.productUpdated");
       } else {
         persist((state) => ({
           ...state,
@@ -470,36 +571,72 @@ export const useShopAccountPresenter = () => {
             }),
           ],
         }));
-        setStatusKey("shopAccount.products.messages.productAdded");
+        announce("shopAccount.products.messages.productAdded");
       }
 
       setShowProductForm(false);
       setEditingProductId(null);
       setProductDraft(emptyProductDraft());
     },
-    [editingProductId, persist, productDraft, t],
+    [editingProductId, persist, productDraft, t, announce],
   );
 
-  const refreshShopProduct = useCallback(
-    (productId) => {
+  /**
+   * Marks a row as "just refreshed" for a couple of seconds and, while that lasts, refuses to
+   * refresh it again. The write itself is synchronous, so there is no progress to report and
+   * none is faked (§22): what the seller gets is an acknowledgement that it happened, on the
+   * row it happened to, plus a control that cannot be double-fired by an impatient second click.
+   */
+  const acknowledgeRefresh = useCallback((productIds) => {
+    setJustRefreshedIds((prev) => new Set([...prev, ...productIds]));
+    productIds.forEach((productId) => {
+      window.clearTimeout(refreshTimersRef.current.get(productId));
+      const timerId = window.setTimeout(() => {
+        refreshTimersRef.current.delete(productId);
+        setJustRefreshedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(productId);
+          return next;
+        });
+      }, REFRESH_ACK_MS);
+      refreshTimersRef.current.set(productId, timerId);
+    });
+  }, []);
+
+  const refreshShopProducts = useCallback(
+    (productIds) => {
+      const ids = new Set(productIds);
+      if (ids.size === 0) return;
       const now = Date.now();
       persist((state) => ({
         ...state,
         shopProducts: state.shopProducts.map((entry) =>
-          entry.id === productId ? normalizeShopProduct({ ...entry, lastRefreshedAt: now }) : entry,
+          ids.has(entry.id) ? normalizeShopProduct({ ...entry, lastRefreshedAt: now }) : entry,
         ),
       }));
-      setStatusKey("shopAccount.products.messages.productRefreshed");
+      acknowledgeRefresh([...ids]);
+      announce(
+        ids.size === 1
+          ? "shopAccount.products.messages.productRefreshed"
+          : "shopAccount.products.messages.productsRefreshed",
+        SHOP_STATUS_TONES.SUCCESS,
+        { count: ids.size },
+      );
     },
-    [persist],
+    [persist, announce, acknowledgeRefresh],
+  );
+
+  const refreshShopProduct = useCallback(
+    (productId) => refreshShopProducts([productId]),
+    [refreshShopProducts],
   );
 
   const updateShopProductPrice = useCallback(
     (productId, rawPrice) => {
       const { price, priceAmd } = formatShopPrice(rawPrice);
       if (!price) {
-        setStatusKey("shopAccount.products.messages.priceRequired");
-        return;
+        announce("shopAccount.products.messages.priceRequired", SHOP_STATUS_TONES.ERROR);
+        return false;
       }
       persist((state) => ({
         ...state,
@@ -507,41 +644,54 @@ export const useShopAccountPresenter = () => {
           entry.id === productId ? normalizeShopProduct({ ...entry, price, priceAmd }) : entry,
         ),
       }));
-      setStatusKey("shopAccount.products.messages.priceUpdated");
+      announce("shopAccount.products.messages.priceUpdated");
+      return true;
     },
-    [persist],
+    [persist, announce],
   );
 
-  const removeShopProduct = useCallback(
-    (productId) => {
-      persist((state) => ({
-        ...state,
-        shopProducts: state.shopProducts.filter((p) => p.id !== productId),
-      }));
-      setStatusKey("shopAccount.products.messages.productRemoved");
-    },
-    [persist],
-  );
-
-  const sortedShopProducts = useMemo(
-    () => [...shopState.shopProducts].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)),
-    [shopState.shopProducts],
-  );
-
-  const dismissStatus = useCallback(() => {
-    setStatusKey("");
+  /** Deletion always goes through the dialog — nothing here removes a listing on one click. */
+  const requestDeleteProducts = useCallback((productIds) => {
+    const ids = productIds.filter(Boolean);
+    if (ids.length > 0) setPendingDeleteIds(ids);
   }, []);
+
+  const cancelDeleteProducts = useCallback(() => setPendingDeleteIds([]), []);
+
+  const confirmDeleteProducts = useCallback(() => {
+    const ids = new Set(pendingDeleteIds);
+    if (ids.size === 0) return;
+    persist((state) => ({
+      ...state,
+      shopProducts: state.shopProducts.filter((product) => !ids.has(product.id)),
+    }));
+    setPendingDeleteIds([]);
+    announce(
+      ids.size === 1
+        ? "shopAccount.products.messages.productRemoved"
+        : "shopAccount.products.messages.productsRemoved",
+      SHOP_STATUS_TONES.SUCCESS,
+      { count: ids.size },
+    );
+  }, [pendingDeleteIds, persist, announce]);
+
+  const pendingDeleteProducts = useMemo(
+    () => shopState.shopProducts.filter((product) => pendingDeleteIds.includes(product.id)),
+    [shopState.shopProducts, pendingDeleteIds],
+  );
 
   return {
     t,
     shopState,
+    shopProducts: shopState.shopProducts,
     activeSidebarId,
     shopInnerTab,
     notificationsPageTab,
     setNotificationsPageTab,
     isShopEditMode,
     profileDraft,
-    statusKey,
+    profileErrorKey,
+    status,
     dismissStatus,
     sidebarIds: SHOP_SIDEBAR_IDS,
     innerTabs: SHOP_INNER_TABS,
@@ -556,6 +706,7 @@ export const useShopAccountPresenter = () => {
     updatePhoneLocal,
     saveShopProfile,
     setAvatarFromFile,
+    isAvatarUploading,
     clearAvatar,
     toggleShopNotification,
     formattedPhone,
@@ -563,9 +714,9 @@ export const useShopAccountPresenter = () => {
     showProductForm,
     editingProductId,
     productDraft,
+    formErrorKey,
     catalogProductsForDraft,
     selectedCatalogProduct,
-    sortedShopProducts,
     openProductForm,
     openProductEdit,
     cancelProductForm,
@@ -574,8 +725,13 @@ export const useShopAccountPresenter = () => {
     selectProductCategory,
     selectCatalogProduct,
     refreshShopProduct,
+    refreshShopProducts,
+    justRefreshedIds,
     updateShopProductPrice,
-    removeShopProduct,
+    requestDeleteProducts,
+    cancelDeleteProducts,
+    confirmDeleteProducts,
+    pendingDeleteProducts,
     setProductAvailability,
     toggleProductMemory,
     toggleProductColor,

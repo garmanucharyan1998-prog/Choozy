@@ -179,6 +179,12 @@ describe("copy integrity", () => {
       /** Named in the game-console category copy — a product the catalog carries. */
       "PlayStation",
       "JavaScript",
+      /**
+       * The benchmark's own spelling, and the only mid-word capital in the pair — "Geekbench"
+       * is a single capital and never trips this. Written as the vendor writes it, in all three
+       * languages, because a benchmark name is a proper noun rather than translatable copy.
+       */
+      "AnTuTu",
     ]);
     const midWordCapital = /\p{L}*\p{Ll}\p{Lu}\p{L}*/gu;
 

@@ -3,6 +3,17 @@ import { parseAmdInput } from "shared/lib/parseAmdInput";
 /** Fired on same-tab updates after `writeShopAccountState`. */
 export const SHOP_ACCOUNT_STORAGE_EVENT = "choozy-shop-account-storage";
 
+/**
+ * Fired when a write could not reach `localStorage` — quota exhausted (a shop avatar is allowed
+ * up to 200 KB as a base64 data URL) or storage disabled in private mode.
+ *
+ * The write is still reflected in the state the caller gets back, so the UI keeps working for
+ * the rest of the session; what changes is that the seller's edit will be gone on the next
+ * load. That used to happen in complete silence, which is the one thing a dashboard managing
+ * someone's listings must not do. The dashboard listens for this and says so.
+ */
+export const SHOP_ACCOUNT_PERSIST_ERROR_EVENT = "choozy-shop-account-persist-error";
+
 export const SHOP_ACCOUNT_STORAGE_KEY = "choozy.shopAccount.v1";
 
 /** Products are removed if not refreshed within this window. */
@@ -1410,19 +1421,30 @@ export const normalizeShopProduct = (raw) => {
 const DEMO_SEED_PRODUCT_IDS = new Set(DEMO_SHOP_PRODUCTS_SEED.map((product) => product.id));
 
 /**
+ * Listings the refresh deadline does not apply to.
+ *
+ * The demo catalog is fixture data, not a listing a seller is expected to refresh, so it never
+ * expires. Without this the whole shop emptied itself permanently: the seed carries no
+ * `lastRefreshedAt`, so `normalizeShopProduct` stamps it with "now" on every read — harmless
+ * until the first write froze that stamp into storage. Five days later the pruner deleted all
+ * of the demo products, and because storage now existed the seed was never consulted again,
+ * leaving the products tab blank forever.
+ *
+ * Exported because the dashboard has to ask the same question the pruner does: a row this
+ * returns `true` for gets no countdown and no "needs refresh" warning, since nothing will ever
+ * remove it (see `shopProductExpiry.js`).
+ *
+ * @param {{ id?: string }} product
+ */
+export const isShopProductExemptFromExpiry = (product) =>
+  Boolean(product?.id) && DEMO_SEED_PRODUCT_IDS.has(product.id);
+
+/**
  * @param {{ id?: string, lastRefreshedAt?: number; createdAt?: number }} product
  * @param {number} [now]
  */
 export const isShopProductStale = (product, now = Date.now()) => {
-  /**
-   * The demo catalog is fixture data, not a listing a seller is expected to refresh, so it
-   * never expires. Without this the whole shop emptied itself permanently: the seed carries
-   * no `lastRefreshedAt`, so `normalizeShopProduct` stamps it with "now" on every read —
-   * harmless until the first write froze that stamp into storage. Five days later the
-   * pruner deleted all 15 demo products, and because storage now existed the seed was
-   * never consulted again, leaving the products tab blank forever.
-   */
-  if (product?.id && DEMO_SEED_PRODUCT_IDS.has(product.id)) return false;
+  if (isShopProductExemptFromExpiry(product)) return false;
   const refreshedAt = product?.lastRefreshedAt ?? product?.createdAt ?? now;
   return now - refreshedAt > SHOP_PRODUCT_STALE_MS;
 };
@@ -1523,11 +1545,16 @@ export const writeShopAccountState = (partialOrFn) => {
     } catch {
       /**
        * Quota exceeded (a shop avatar is allowed up to 200 KB as a base64 data URL — see
-       * useShopAccountPresenter) or storage disabled in private mode. The write is lost,
-       * but the returned state still drives the UI; throwing from here took the whole page
-       * down, including from inside a FileReader callback where nothing catches it.
-       * Matches entities/user's writeAccountState and the pruning write above.
+       * useShopAccountPresenter) or storage disabled in private mode. Still never thrown:
+       * the returned state drives the UI, and throwing from here took the whole page down,
+       * including from inside a FileReader callback where nothing catches it. Matches
+       * entities/user's writeAccountState and the pruning write above.
+       *
+       * Silence is what changed. The failure is announced so the dashboard can tell the
+       * seller their change will not survive a reload, instead of showing a green
+       * "saved" toast for a write that never landed.
        */
+      window.dispatchEvent(new CustomEvent(SHOP_ACCOUNT_PERSIST_ERROR_EVENT));
     }
     window.dispatchEvent(new CustomEvent(SHOP_ACCOUNT_STORAGE_EVENT));
   }

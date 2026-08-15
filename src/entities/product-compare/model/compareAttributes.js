@@ -12,6 +12,8 @@
  * normalizing that tight a band would inflate a real 0.3-star difference into a full radar
  * spoke, the kind of chart that lies about how much the numbers actually differ.
  */
+import { benchmarksForProduct } from "entities/product";
+import { formatAmd } from "shared/lib/formatAmd";
 import { formatPriceAmd } from "shared/lib/formatPriceAmd";
 
 /**
@@ -125,6 +127,43 @@ export const COMPARE_ATTRIBUTES = [
     getValue: (p) => (typeof p.warrantyMonths === "number" ? p.warrantyMonths : null),
     formatValue: (v, p, t) =>
       localizedUnit(t, "productDetail.specsExtended.values.warrantyMonths", "months", v, `${v} mo`),
+    showBar: true,
+  },
+  /**
+   * Benchmarks. `getValue` returns `null` for every category the benchmark does not run on — a
+   * monitor has no AnTuTu score — which is the same filter every consumer here already applies.
+   *
+   * The scores themselves are demo data derived per product; see `productBenchmarks.js`. They
+   * are ranked by the same rules as every other row: a declared direction, a single winner, and
+   * a minority-only highlight. Nothing about being a benchmark earns them a louder claim.
+   */
+  {
+    key: "antutu",
+    labelKey: "comparePage.attr.antutu",
+    direction: "higher",
+    getValue: (p) => benchmarksForProduct(p).antutu,
+    formatValue: (v) => formatAmd(v),
+    showBar: true,
+  },
+  {
+    key: "geekbenchSingle",
+    labelKey: "comparePage.attr.geekbenchSingle",
+    direction: "higher",
+    getValue: (p) => benchmarksForProduct(p).geekbenchSingle,
+    formatValue: (v) => formatAmd(v),
+    /**
+     * No bar. Single-core scores across this catalog sit in a narrow band, and a proportional
+     * bar over a narrow band reads as a bigger gap than there is — the same reason `ratingValue`
+     * is kept off this list entirely. It still carries a direction, so the table marks a winner.
+     */
+    showBar: false,
+  },
+  {
+    key: "geekbenchMulti",
+    labelKey: "comparePage.attr.geekbenchMulti",
+    direction: "higher",
+    getValue: (p) => benchmarksForProduct(p).geekbenchMulti,
+    formatValue: (v) => formatAmd(v),
     showBar: true,
   },
 ];

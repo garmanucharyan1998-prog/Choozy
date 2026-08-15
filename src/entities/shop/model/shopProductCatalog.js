@@ -33,6 +33,24 @@ const DEMO_CATEGORY_TO_ID = {
   Accessories: "accessories",
 };
 
+/**
+ * The filter-catalog category a listing belongs to, whatever era of the data it came from.
+ *
+ * A listing added through the form stores its own `categoryId`. The demo seed predates that
+ * field and carries only the informal English `category` string above — so a dashboard that
+ * grouped or filtered by `categoryId` alone would file every one of the seeded listings under
+ * "no category". Both readings are the listing's own data; neither is invented.
+ *
+ * @param {{ categoryId?: string, category?: string }} product
+ * @returns {string} a `FILTER_CATEGORY_IDS` member, or "" when the listing names no category.
+ */
+export const resolveShopProductCategoryId = (product) => {
+  const explicit = typeof product?.categoryId === "string" ? product.categoryId.trim() : "";
+  if (explicit && SHOP_PRODUCT_CATEGORY_IDS.includes(explicit)) return explicit;
+  const informal = typeof product?.category === "string" ? product.category.trim() : "";
+  return DEMO_CATEGORY_TO_ID[informal] || "";
+};
+
 const STANDARD_MEMORY_OPTIONS = [
   { id: "mem-v256a", labelKey: "productDetail.variants.v256a" },
   { id: "mem-v256b", labelKey: "productDetail.variants.v256b" },
@@ -63,14 +81,14 @@ const buildMemoryOptions = () => {
   return options;
 };
 
-const COLOR_LABEL_KEYS = {
-  black: "filterPage.filters.colorNames.black",
-  grey: "filterPage.filters.colorNames.grey",
-  white: "filterPage.filters.colorNames.white",
-  navy: "filterPage.filters.colorNames.navy",
-  blue: "filterPage.filters.colorNames.blue",
-  orange: "filterPage.filters.colorNames.orange",
-};
+/**
+ * The catalog's colour ids all have a translated name under `filterPage.filters.colorNames`,
+ * so the key is derived rather than hand-listed. It used to be a literal map covering six of
+ * the eleven — which is why the seller's colour picker offered "silver", "green", "red",
+ * "purple" and "beige" in English inside an Armenian form: `resolveShopColorLabel` falls back
+ * to the raw id when no key is given, and a raw id is not copy (§50).
+ */
+const colorLabelKey = (colorId) => `filterPage.filters.colorNames.${colorId}`;
 
 const buildColorOptions = () => {
   const byId = new Map();
@@ -79,7 +97,7 @@ const buildColorOptions = () => {
     byId.set(color.id, {
       id: color.id,
       hex: color.hex,
-      labelKey: COLOR_LABEL_KEYS[color.id] || "",
+      labelKey: colorLabelKey(color.id),
     });
   });
 

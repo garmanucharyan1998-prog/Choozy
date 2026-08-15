@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSubmit } from "react-router";
 import { useLanguage } from "contexts";
-import { readRoleForEmail, rememberRoleForEmail, ROLES } from "entities/session";
+import {
+  hasAccountForEmail,
+  readPasswordHashForEmail,
+  readRoleForEmail,
+  rememberPasswordForEmail,
+  rememberRoleForEmail,
+  ROLES,
+} from "entities/session";
+import { hashPassword } from "entities/user";
 import { localizedPath } from "shared/lib/locale";
 import { useLockBodyScroll } from "shared/lib/useLockBodyScroll";
 
@@ -20,17 +28,26 @@ const MIN_PASSWORD_LENGTH = 6;
 const isLikelyEmail = (value) => /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)+$/.test(String(value).trim());
 
 /**
- * There is still no real backend (see the two submit handlers below — presence checks
- * only, nothing verified against a server). What changed: a role now gets posted to
- * `/session/login`, a resource-route `action` that sets the session cookie and issues a
- * real server redirect — see entities/session and app/routes/sessionLoginAction.js for
- * why that's a server action and not a client-side cookie write.
+ * There is still no real backend. A role gets posted to `/session/login`, a resource-route
+ * `action` that sets the session cookie and issues a real server redirect — see
+ * entities/session and app/routes/sessionLoginAction.js for why that's a server action and
+ * not a client-side cookie write.
  *
  * The role picker (`role`/`selectRole` below) only ever applies to registration — a real
  * account's role is decided once, when it's created, not re-chosen on every login. Login
- * instead looks the email up in entities/session's local role registry (populated by a
- * prior registration, or pre-seeded for the two demo accounts) and falls back to buyer for
- * an email that's never been seen — see readRoleForEmail's own doc comment.
+ * instead looks the email up in entities/session's local account registry (populated by a
+ * prior registration, or pre-seeded for the two demo accounts).
+ *
+ * **Login can now fail.** It used to be impossible: both handlers checked only that the fields
+ * were non-empty, and an unknown address fell through `?? ROLES.BUYER` into a successful sign-in
+ * as a buyer with an empty account — indistinguishable, from the visitor's side, from having
+ * lost everything in their own. Login now requires the account to exist, and requires the
+ * password to match when one is on file.
+ *
+ * This is not authentication and must not be read as it. The registry is localStorage the
+ * visitor can edit, the hash is unsalted SHA-256 computed in the browser, and the session cookie
+ * is one the browser sets on itself. What it buys is a login form that can be *wrong* — which is
+ * a UX property, not a security one.
  */
 export const useAuthModalPresenter = ({ isOpen, onClose }) => {
   const { t, language } = useLanguage();
@@ -69,7 +86,13 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
     }
 
     const opener = document.activeElement;
-    const dialog = document.querySelector('[role="dialog"][aria-modal="true"]');
+    /**
+     * The ref above, actually used. This line was still the document-wide query the comment on
+     * `dialogRef` says it replaced — the ref was created and wired up in `LoginModal`, and then
+     * never read here, so the trap kept resolving whichever `[role="dialog"][aria-modal="true"]`
+     * came first in the document.
+     */
+    const dialog = dialogRef.current;
     const focusablesIn = (root) =>
       Array.from(
         root?.querySelectorAll(
@@ -168,24 +191,69 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
     [submit, email, language, onClose],
   );
 
-  const handleLoginSubmit = useCallback(
-    (event) => {
-      event.preventDefault();
+  /**
+   * Hashes the typed password, or returns `""` when it cannot.
+   *
+   * `crypto.subtle` exists only in a secure context; over plain HTTP it throws. The account
+   * page learned this the hard way — there the rejection was swallowed and the user got no
+   * feedback. Here the consequence has to go the other way: an unusable hashing API must not
+   * lock anyone out of a demo, so it degrades to "cannot verify" and the account's other
+   * checks still apply. Nothing here is an authentication boundary; see the registry.
+   */
+  const hashOrEmpty = useCallback(async (plainText) => {
+    try {
+      return await hashPassword(plainText);
+    } catch {
+      return "";
+    }
+  }, []);
 
-      if (!email.trim() || !password.trim()) {
+  const handleLoginSubmit = useCallback(
+    async (event) => {
+      event.preventDefault();
+      const trimmedEmail = email.trim();
+
+      if (!trimmedEmail || !password.trim()) {
         setError(t("login.errors.required"));
         return;
       }
 
-      /** Unknown email (never registered here) — buyer is the least-surprising default. */
-      const resolvedRole = readRoleForEmail(email.trim()) ?? ROLES.BUYER;
+      /**
+       * An address nobody has registered in this browser is now a failed login rather than a
+       * silent success. It used to fall through to `?? ROLES.BUYER`, so a typo in an email —
+       * or any address at all — signed the visitor in as a buyer with an empty account, which
+       * looks exactly like losing your data.
+       */
+      if (!hasAccountForEmail(trimmedEmail)) {
+        setError(t("login.errors.invalidCredentials"));
+        return;
+      }
+
+      /**
+       * Only accounts that have a password on file can have a wrong one. The two seeded demo
+       * accounts have none, and neither does anything registered before passwords were stored,
+       * so those still accept any password — refusing them would lock people out of a password
+       * that was never set. Registration writes a hash from now on, so every account created
+       * from here is checked for real.
+       */
+      const storedHash = readPasswordHashForEmail(trimmedEmail);
+      if (storedHash) {
+        const typedHash = await hashOrEmpty(password);
+        if (typedHash && typedHash !== storedHash) {
+          setError(t("login.errors.invalidCredentials"));
+          return;
+        }
+      }
+
+      /** Guaranteed non-null by the existence check above; the fallback is belt and braces. */
+      const resolvedRole = readRoleForEmail(trimmedEmail) ?? ROLES.BUYER;
       submitSession(resolvedRole);
     },
-    [email, password, t, submitSession],
+    [email, password, t, submitSession, hashOrEmpty],
   );
 
   const handleRegisterSubmit = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
 
       if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
@@ -215,10 +283,18 @@ export const useAuthModalPresenter = ({ isOpen, onClose }) => {
         return;
       }
 
-      rememberRoleForEmail(email.trim(), role);
+      const trimmedEmail = email.trim();
+      rememberRoleForEmail(trimmedEmail, role);
+      /**
+       * The hash is what gives this account a password that can later be wrong. Written after
+       * the role, because `rememberPasswordForEmail` refuses to create an entry on its own — a
+       * password without a role is not an account.
+       */
+      const passwordHash = await hashOrEmpty(password);
+      if (passwordHash) rememberPasswordForEmail(trimmedEmail, passwordHash);
       submitSession(role);
     },
-    [confirmPassword, email, password, role, t, submitSession],
+    [confirmPassword, email, password, role, t, submitSession, hashOrEmpty],
   );
 
   const isRegisterMode = mode === AUTH_MODES.REGISTER;

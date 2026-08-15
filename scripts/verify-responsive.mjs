@@ -58,9 +58,23 @@ const MIN_TAP_TARGET = 24;
  */
 const MIN_BAR_TRACK = 90;
 
+/**
+ * 320 and 1024 are here because both once sat in a gap between the widths this checked, and a
+ * real defect lived in each of them:
+ *
+ *   - 1024 is the `lg` breakpoint itself, and every page of the site scrolled 60px sideways
+ *     there. The footer's nav asks for its widest spacing from `lg` up (three 200px columns,
+ *     80px gaps, 80px of its own padding = 920px of min-content) at exactly the width where the
+ *     row has 800px to give it. A flex item cannot shrink under min-content, so it simply hung
+ *     over the edge. Checking 768 and 1280 and nothing between them saw none of it.
+ *   - 320 is the narrowest viewport the shell claims to support (`min-w-[320px]`), and it is the
+ *     width WCAG 2.2 reflow is judged at.
+ */
 const VIEWPORTS = [
+  { name: "320 phone", width: 320, height: 720, mobile: true },
   { name: "360 phone", width: 360, height: 740, mobile: true },
   { name: "768 tablet", width: 768, height: 1024, mobile: false },
+  { name: "1024 laptop", width: 1024, height: 768, mobile: false },
   { name: "1280 desktop", width: 1280, height: 800, mobile: false },
 ];
 const LOCALES = [
@@ -266,10 +280,53 @@ const MEASURE = `(() => {
       }
     });
 
+  /*
+   * Controls nothing can be clicked through to.
+   *
+   * elementFromPoint at a control's own centre has to come back with that control. When it
+   * returns something else, whatever it returns is painting on top — and the visitor's tap
+   * lands there instead.
+   *
+   * A fixed overlay is excluded because that is its job: the bottom nav and the compare tray
+   * are meant to float over whatever has scrolled beneath them, and that content stays reachable
+   * by scrolling (which mainPadBottom above already guards). Occlusion by in-flow or *sticky*
+   * chrome is the real defect, and the reason this exists: the compare table's sticky left-0
+   * label column is opaque and 96px wide, the product columns carry snap-start, and the
+   * snapport began at the scroller's left edge — under the label column. So the browser snapped
+   * to scrollLeft=96 on load and parked the first product underneath it, on every phone width.
+   * Its photo, its title and its Remove button were all unreachable, and scrolling back sprang
+   * straight to 96 again. Nothing that measures overflow or tap-target size can see that: the
+   * column is present, full-size and correctly laid out — it is simply behind something.
+   */
+  const occludedControls = [];
+  document.querySelectorAll('a[href], button, input:not([type="hidden"]), select').forEach((el) => {
+    const style = getComputedStyle(el);
+    if (style.display === "none" || style.visibility === "hidden") return;
+    if (isScreenReaderOnly(el) || el.closest('[aria-hidden="true"]')) return;
+    const r = el.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4) return;
+    const cx = Math.round(r.left + r.width / 2);
+    const cy = Math.round(r.top + r.height / 2);
+    if (cx < 0 || cx > vw - 1 || cy < 0 || cy > doc.clientHeight - 1) return;
+    const hit = document.elementFromPoint(cx, cy);
+    if (!hit || hit === el || el.contains(hit) || hit.contains(el)) return;
+    const wrappingLabel = hit.closest("label");
+    if (wrappingLabel && wrappingLabel.contains(el)) return;
+    let node = hit;
+    let overlay = false;
+    while (node && node !== doc) {
+      if (getComputedStyle(node).position === "fixed") { overlay = true; break; }
+      node = node.parentElement;
+    }
+    if (overlay) return;
+    occludedControls.push(describe(el) + " behind " + describe(hit));
+  });
+
   const main = document.querySelector("main");
 
   return {
     lang: doc.lang,
+    occludedControls: [...new Set(occludedControls)].slice(0, 6),
     horizontalScroll: doc.scrollWidth - doc.clientWidth,
     viewportWidth: vw,
     overflowing: overflowing.slice(0, 10),
@@ -300,7 +357,15 @@ const MEASURE = `(() => {
 const PINNED_STRIP = `(() => {
   const table = document.querySelector("table");
   if (!table) return null;
-  const block = table.closest('[class*="overflow-x-auto"]');
+  /**
+   * The strip is anchored to the whole tables block, which holds two tables (specifications,
+   * then shop prices). Falling back to the first table's own scroller — which is what this used
+   * to do — reported the strip as stale from the moment the specifications scrolled past, while
+   * the shop-price columns it was still labelling were on screen.
+   */
+  const block =
+    document.querySelector("[data-compare-tables]") ||
+    table.closest('[class*="overflow-x-auto"]');
   /**
    * The painted header, not the spacer that reserves room for it. Once the header compacts on
    * scroll the two are ~47px apart, and measuring the reservation is exactly the mistake that
@@ -337,6 +402,49 @@ const PINNED_STRIP = `(() => {
   };
 })()`;
 
+/**
+ * Scrolls the compare table to its far right and reports any section heading that left with it.
+ *
+ * The row labels pin (`LABEL_CELL` is `sticky left-0`) but the section headings did not: every
+ * heading except the offers one is a single cell spanning the whole table, which cannot pin as a
+ * cell because it is already as wide as the table. So "Ընդհանուր" and "Բնութագրեր" slid off the
+ * left of the scroller, and a visitor two columns deep could read every row's name while no
+ * longer seeing which section those rows were in. The fix pins the heading's *text*, so this
+ * measures the text, not the cell — a spanning cell is always "in view" no matter where its
+ * words are.
+ */
+const SECTION_HEADINGS_PINNED = `(() => {
+  const table = document.querySelector("table");
+  if (!table) return null;
+  const scroller = table.closest('[class*="overflow-x-auto"]');
+  if (!scroller || scroller.scrollWidth <= scroller.clientWidth) return null;
+  scroller.scrollLeft = scroller.scrollWidth;
+  const box = scroller.getBoundingClientRect();
+  const escaped = [];
+  table.querySelectorAll('th[scope="colgroup"]').forEach((th) => {
+    const label = th.querySelector("span") || th;
+    const r = label.getBoundingClientRect();
+    if (r.width === 0) return;
+    if (r.left < box.left - 1 || r.right > box.right + 1) {
+      escaped.push((th.textContent || "").trim().slice(0, 24) + " at " + Math.round(r.left));
+    }
+  });
+  scroller.scrollLeft = 0;
+  return { scrolledTo: Math.round(scroller.scrollWidth - scroller.clientWidth), escaped };
+})()`;
+
+/**
+ * Toggles the header's language menu. Matched on `[data-language-switcher]`, the attribute the
+ * header already carries for its own outside-click handler, rather than on a class or an
+ * aria-label that differs per locale. Returns whether there was anything to click.
+ */
+const OPEN_LANGUAGE_MENU = `(() => {
+  const button = document.querySelector("[data-language-switcher] button");
+  if (!button) return false;
+  button.click();
+  return true;
+})()`;
+
 /** Puts the table across the pin line — its header gone, most of its rows still on screen. */
 const SCROLL_INTO_TABLE = `(() => {
   const table = document.querySelector("table");
@@ -347,10 +455,13 @@ const SCROLL_INTO_TABLE = `(() => {
 })()`;
 
 /** And well past its end, where the strip has no table left to label. */
+/** Past the *whole* tables block, for the reason spelled out on `PINNED_STRIP`'s own lookup. */
 const SCROLL_PAST_TABLE = `(() => {
   const table = document.querySelector("table");
   if (!table) return false;
-  const block = table.closest('[class*="overflow-x-auto"]');
+  const block =
+    document.querySelector("[data-compare-tables]") ||
+    table.closest('[class*="overflow-x-auto"]');
   scrollTo(0, block.getBoundingClientRect().bottom + scrollY + 200);
   return true;
 })()`;
@@ -475,11 +586,28 @@ const launchChrome = () => {
 
 const main = async () => {
   const { pairSlug, compareIds } = await discoverFixtures();
+  /**
+   * `cookie` is the demo session (see entities/session — a role and an email, no secret), set on
+   * the origin before navigating. The seller's product table is here because it is the one place
+   * in the app where a localized *word* changes the layout: the price is `whitespace-nowrap` in a
+   * cell that must stay `overflow-visible` for its tooltip, so "драм" and "AMD" spilled 31px of
+   * price over the row's action buttons where Armenian's "դր." fits.
+   */
+  const SELLER_COOKIE = `choozy_session=${encodeURIComponent(
+    JSON.stringify({ r: "seller", e: "shop@example.com" }),
+  )}; Path=/; SameSite=Lax`;
   const pages = [
     { id: "home", path: "/" },
     { id: "catalog", path: "/filter?category=smartphones" },
-    { id: "compare", path: `/compare?ids=${compareIds}` },
-    { id: "pair", path: `/compare/${pairSlug}` },
+    /**
+     * `pinnedStrip` marks the pages that carry `CompareStickyHeader`. The strip checks below
+     * find their table with `document.querySelector("table")`, and the seller's product table
+     * answers that just as well — without the flag it was reported as missing a strip it was
+     * never supposed to have, on all 15 of its renders.
+     */
+    { id: "compare", path: `/compare?ids=${compareIds}`, pinnedStrip: true },
+    { id: "pair", path: `/compare/${pairSlug}`, pinnedStrip: true },
+    { id: "seller", path: "/account/shop-account/products", cookie: SELLER_COOKIE },
   ];
   console.log(`Comparing ${compareIds.split(",").length} products; pair page ${pairSlug}\n`);
 
@@ -525,6 +653,12 @@ const main = async () => {
       );
 
       for (const page of pages) {
+        /** Set on the origin, which is already loaded, so the page's own loader sees it. */
+        await cdp.evaluate(
+          `document.cookie = ${JSON.stringify(
+            page.cookie ?? "choozy_session=; Path=/; SameSite=Lax; Max-Age=0",
+          )}, 1`,
+        );
         await cdp.send("Page.navigate", { url: `${baseUrl}${locale.prefix}${page.path}` });
         await cdp.once("Page.loadEventFired");
         /** Hydration, the mount gates, and the observer that publishes the tray's height. */
@@ -556,9 +690,38 @@ const main = async () => {
         m.smallTargets.forEach((target) =>
           findings.push(`${label}: tap target under ${MIN_TAP_TARGET}px — ${target}`),
         );
+        (m.occludedControls ?? []).forEach((control) =>
+          findings.push(`${label}: control cannot be tapped — ${control}`),
+        );
         (m.smallInputs ?? []).forEach((field) =>
           findings.push(`${label}: field text under 16px, iOS zooms on focus — ${field}`),
         );
+
+        /**
+         * The one control that has to be *opened* before it can be measured.
+         *
+         * The language menu is the last thing in the header, and it used to be centred on its
+         * own button (`right-1/2 translate-x-1/2`) below the md breakpoint — so half a 120px
+         * panel hung off the right edge of a phone. Opening it put 18px of horizontal scroll on
+         * the page (20px in Russian, whose language names are longer) and dragged the bottom nav
+         * and the compare tray out past the viewport with it. Every page at rest measured clean;
+         * the defect only existed once a visitor tapped.
+         */
+        const opened = await cdp.evaluate(OPEN_LANGUAGE_MENU);
+        if (opened) {
+          await sleep(250);
+          const om = await cdp.evaluate(MEASURE);
+          if (om.horizontalScroll > 1) {
+            findings.push(
+              `${label}: language menu open — page scrolls horizontally by ${om.horizontalScroll}px`,
+            );
+          }
+          om.overflowing.forEach((item) =>
+            findings.push(`${label}: language menu open — ${item.el} right=${item.right}`),
+          );
+          await cdp.evaluate(OPEN_LANGUAGE_MENU);
+          await sleep(150);
+        }
         (m.barPanels ?? []).forEach((panel) => {
           if (panel.trackSpread > 1) {
             findings.push(
@@ -582,8 +745,17 @@ const main = async () => {
           );
         }
 
+        if (page.pinnedStrip) {
+          const sections = await cdp.evaluate(SECTION_HEADINGS_PINNED);
+          (sections?.escaped ?? []).forEach((heading) =>
+            findings.push(
+              `${label}: section heading scrolls out of the table — ${heading} (scrolled ${sections.scrolledTo}px)`,
+            ),
+          );
+        }
+
         /** Scroll-dependent, so it runs after everything measured at rest. */
-        if (m.table) {
+        if (m.table && page.pinnedStrip) {
           await cdp.evaluate(SCROLL_INTO_TABLE);
           await sleep(250);
           const pinned = await cdp.evaluate(PINNED_STRIP);
